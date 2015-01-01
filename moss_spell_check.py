@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from time import sleep
 import re
 from moss_dump_analyzer import read_en_article_text
 
@@ -28,7 +29,6 @@ from moss_dump_analyzer import read_en_article_text
 
 all_words = set()
 
-"""
 for filename in [
         "/bulk-wikipedia/enwiktionary-20141129-all-titles-in-ns0",
         "/bulk-wikipedia/enwiki-20141208-all-titles-in-ns0"
@@ -38,7 +38,7 @@ for filename in [
             line = line.strip().lower().decode('utf8')
             for word in line.split(" "):
                 all_words.add(word)
-"""
+
 
 global count
 global misspelled_words
@@ -61,9 +61,8 @@ number_formats_allowed_re = re.compile(r"(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
 
 substitutions = [
-    # Order in the below is very important!
-    (re.compile(r"\{\{\S+\}\}"), ""),  # Templates, inner (hopefully)
-    (re.compile(r"\{\{.+?\}\}"), ""),  # Templates, inner (hopefully, no \n)
+    # Order in the below is very important!  Templates must be removed
+    # before these are applied.
     (re.compile(r"\s+"), " "),
     (re.compile(r"(&nbsp;|<br.*?>)"), " "),
     (re.compile(r"&ndash;"), "-"),  # To regular hypen
@@ -105,45 +104,62 @@ substitutions = [
 # "aaa bbb ccc ddd eee"
 
 
-def remove_templates(string, string_clean="", nesting_depth=0):
+def remove_templates(string):
     # string_clean and nesting_depth are for use during recursion only
 
-    # print "remove_templates string >>>%s<<<" % string
-    # print "remove_templates string_clean >>>%s<<<" % string_clean
-    print "remove_templates nesting_depth >>>%s<<<" % nesting_depth
+    string_clean = ""
+    nesting_depth = 0
 
-    open_index = string.find("{{")
-    close_index = string.find("}}")
+    # Use iteration instead of recursion to avoid exceeding maximum
+    # recursion depth in articles with more than 500 template
+    # instances
+    while "{{" in string:
+        open_index = string.find("{{")  # Always > -1 inside this loop
+        close_index = string.find("}}")
 
-    if open_index == -1 and nesting_depth == 0:
-        # Base case
-        # if close_index > 1, "}}" gets included in the output string.
-        return string_clean + string
+        #print "string_clean: %s" % string_clean
+        #print "nesting_depth: %s" % nesting_depth
+        #print "open_index: %s" % open_index
+        #print "close_index: %s" % close_index
+        #print "string: %s" % string
 
-    if open_index > -1 and nesting_depth == 0:
-        # Save text to the beginning of the template and open a new one
-        string_clean += string[:open_index]
-        return remove_templates(string[open_index+2:], string_clean, nesting_depth+1)
+        if nesting_depth == 0:
+            # Save text to the beginning of the template and open a new one
+            string_clean += string[:open_index]
+            string = string[open_index+2:]
+            nesting_depth += 1
+            continue
 
-    # nesting_depth > 0 from here on...
+        # nesting_depth > 0 from here on...
 
-    if close_index == -1:
-        # Unbalanced {{}}s
-        return string_clean
+        if close_index == -1 and nesting_depth > 0:
+            # Unbalanced {{}}s (too many {{)
+            # Drop string
+            return string_clean
 
-    # nesting_depth > 0 and close_index > -1 from here on...
+        if close_index > -1 and nesting_depth > 0:
+            if close_index < open_index:
+                # Discard text to the end of the template, close it,
+                # and check for further templates
+                string = string[close_index+2:]
+                nesting_depth -= 1
+                continue
+            else:
+                # Discard text to the beginning of the template and
+                # open a new one
+                string = string[open_index+2:]
+                nesting_depth += 1
+                continue
 
-    if open_index == -1:
-        # Remove this template and close, but check for further templates
-        return remove_templates(string[close_index+2:], string_clean, nesting_depth-1)
+    while nesting_depth > 0 and "}}" in string:
+        # Remove this template and close
+        close_index = string.find("}}")
+        string = string[close_index+2:]
+        nesting_depth -= 1
 
-    if open_index > -1:
-        if close_index < open_index:
-            # Remove this template and close, but check for further templates
-            return remove_templates(string[close_index+2:], string_clean, nesting_depth-1)
-        else:
-            # Discard text to the beginning of the template and open a new one
-            return remove_templates(string[open_index+2:], string_clean, nesting_depth+1)
+    # Note: if "}}" is in string and nesting_depth == 0, "}}" gets included
+    # in the output string due to unbalanced {{}} (too many }})
+    return string_clean + string
 
 
 def wikitext_to_plaintext(string):
@@ -164,18 +180,19 @@ def spellcheck_all_langs(article_title, article_text):
 
     global count
 
-    print "PROCESSING ARTICLE: " + article_title
+    # print "PROCESSING ARTICLE: " + article_title
 
     # if article_title != "Anarchism":
     #     return
 
     article_text = wikitext_to_plaintext(article_text)
-    # print "*** %s ***" % article_title.encode('utf8')
+    ## Debug article_text processing:
     # print article_text.encode('utf8')
-    # sleep(2)
+    # sleep(1)
     # return
 
-    if "}" in article_text:
+    # TODO: Handle }} inside <nowiki>
+    if "}}" in article_text:
         print "ABORTING PROCESSING OF %s" % article_title
         print article_text
         return
@@ -225,6 +242,10 @@ def spellcheck_all_langs(article_title, article_text):
 
 test_result = remove_templates("aaa {{bbb {{ccc}} ddd}} eee")
 if test_result != "aaa  eee":
+    raise Exception("Broken remove_templates returned: '%s'" % test_result)
+
+test_result = remove_templates("{{xxx yyy}} zzz")
+if test_result != " zzz":
     raise Exception("Broken remove_templates returned: '%s'" % test_result)
 
 read_en_article_text(spellcheck_all_langs)
