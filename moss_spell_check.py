@@ -39,12 +39,20 @@ for filename in [
             for word in line.split(" "):
                 all_words.add(word)
 
+# Words that aren't article titles, for technical reasons
+all_words.add("#")
+all_words.add("km<sup>2</sup>")
+all_words.add("co<sub>2</sub>")
+all_words.add("h<sub>2</sub>o")
+all_words.add("h<sub>2</sub>")
+all_words.add("o<sub>2</sub>")
+# NOTE: These cases and many others are now handled by excluding anything that isn't ^[a-z]+$
 
-global count
+global article_count
 global misspelled_words
 
 misspelled_words = {}
-count = 0
+article_count = 0
 
 
 def dump_results():
@@ -57,37 +65,38 @@ def dump_results():
 
 possessive_re = re.compile(r"'s$")
 abbr_re = re.compile(r"\.\w\.$")
-number_formats_allowed_re = re.compile(r"(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?%?")
+
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
+base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
+# (possibly incomplete list)
+
+# https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currency_symbols
+number_formats_allowed_re = re.compile(
+    r"(%s|%s%%|\$%s|us\$%s)" % (base_number_format, base_number_format, base_number_format, base_number_format))
+
+whitespace_re = re.compile(r"\s+")
+math_re = re.compile(r"<math.*?</math>")
+all_lower_re = re.compile(r"^[a-z]+$")
+upper_alpha_re = re.compile(r"[A-Z]")
 
 substitutions = [
     # Order in the below is very important!  Templates must be removed
     # before these are applied.
-    (re.compile(r"\s+"), " "),
     (re.compile(r"(&nbsp;|<br.*?>)"), " "),
     (re.compile(r"&ndash;"), "-"),  # To regular hypen
+    (re.compile(r"<!--.*?-->"), ""),
     (re.compile(r"<ref.*?</ref>"), ""),
     (re.compile(r"<ref.*?/\s*>"), ""),
     (re.compile(r"<source.*?</source>"), ""),
     (re.compile(r"<blockquote.*?</blockquote>"), ""),
     (re.compile(r"<syntaxhighlight.*?</syntaxhighlight>"), ""),
-    # (re.compile(r"<X.*?</X>"), ""),
-    # (re.compile(r"<X.*?</X>"), ""),
-    # (re.compile(r"<X.*?</X>"), ""),
-    (re.compile(r"<math.*?</math>"), ""),
     (re.compile(r"<gallery.*?</gallery>"), ""),
+    (re.compile(r"<code.*?</code>"), ""),
+    # (re.compile(r"<X.*?</X>"), ""),
     (re.compile(r"<small>"), ""),
     (re.compile(r"</small>"), ""),
-    (re.compile(r"<!--.*?-->"), ""),
     (re.compile(r"<references.*?>"), ""),
     (re.compile(r"__notoc__"), ""),
-
-    # Causes major malfunction, overmatching 8(
-    # {{.*?{{.*?}}.*?}}
-    # (re.compile(r"\{\{.*?\{\{.*?\}\}.*?\}\}"), ""),  # Templates, nested
-
-    (re.compile(r"\{\{.*?\}\}"), ""),  # Templates, possibly outer
-    (re.compile(r"\{\|.*?\|\}"), ""),  # Tables
     (re.compile(r"\[\s*(http|https|ftp):.*?\]"), ""),  # External links
     (re.compile(r"(http|https|ftp):.*?[ $]"), ""),  # Bare URLs
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
@@ -104,7 +113,7 @@ substitutions = [
 # "aaa bbb ccc ddd eee"
 
 
-def remove_templates(string):
+def remove_structure_nested(string, open_string, close_string):
     # string_clean and nesting_depth are for use during recursion only
 
     string_clean = ""
@@ -113,9 +122,9 @@ def remove_templates(string):
     # Use iteration instead of recursion to avoid exceeding maximum
     # recursion depth in articles with more than 500 template
     # instances
-    while "{{" in string:
-        open_index = string.find("{{")  # Always > -1 inside this loop
-        close_index = string.find("}}")
+    while open_string in string:
+        open_index = string.find(open_string)  # Always > -1 inside this loop
+        close_index = string.find(close_string)
 
         #print "string_clean: %s" % string_clean
         #print "nesting_depth: %s" % nesting_depth
@@ -133,7 +142,7 @@ def remove_templates(string):
         # nesting_depth > 0 from here on...
 
         if close_index == -1 and nesting_depth > 0:
-            # Unbalanced {{}}s (too many {{)
+            # Unbalanced (too many open_string)
             # Drop string
             return string_clean
 
@@ -151,14 +160,15 @@ def remove_templates(string):
                 nesting_depth += 1
                 continue
 
-    while nesting_depth > 0 and "}}" in string:
+    while nesting_depth > 0 and close_string in string:
         # Remove this template and close
-        close_index = string.find("}}")
+        close_index = string.find(close_string)
         string = string[close_index+2:]
         nesting_depth -= 1
 
-    # Note: if "}}" is in string and nesting_depth == 0, "}}" gets included
-    # in the output string due to unbalanced {{}} (too many }})
+    # Note: if close_string is in string and nesting_depth == 0,
+    # close_string gets included in the output string due to
+    # imbalance (too many close_string)
     return string_clean + string
 
 
@@ -166,7 +176,10 @@ def wikitext_to_plaintext(string):
 
     # TODO: Spell check visible contents of these special constructs
 
-    string = remove_templates(string)
+    string = whitespace_re.sub(" ", string)  # Sometimes contain "{{" etc.
+    string = math_re.sub("", string)  # Sometimes contain "{{" etc.
+    string = remove_structure_nested(string, "{{", "}}")
+    string = remove_structure_nested(string, "{|", "|}")
 
     for (regex, replacement) in substitutions:
         string = regex.sub(replacement, string)
@@ -178,9 +191,9 @@ def wikitext_to_plaintext(string):
 def spellcheck_all_langs(article_title, article_text):
     # article_text is Unicode (UTF-32) thanks to lxml
 
-    global count
+    global article_count
 
-    # print "PROCESSING ARTICLE: " + article_title
+    print "PROCESSING ARTICLE: " + article_title.encode('utf8')
 
     # if article_title != "Anarchism":
     #     return
@@ -193,11 +206,12 @@ def spellcheck_all_langs(article_title, article_text):
 
     # TODO: Handle }} inside <nowiki>
     if "}}" in article_text:
-        print "ABORTING PROCESSING OF %s" % article_title
-        print article_text
+        print "ABORTING PROCESSING OF %s" % article_title.encode('utf8')
+        print article_text.encode('utf8')
         return
 
-    count += 1
+    article_count += 1
+    oops_count = 0
     for word in article_text.split(" "):
         word_orig = word.strip(r",?!-()[]'\":;=*|")
 
@@ -216,10 +230,23 @@ def spellcheck_all_langs(article_title, article_text):
         if not abbr_re.search(word_tmp):
             word_tmp = word_tmp.strip(".")
 
+        # Do it again in case . or 's was outside one of these
+        word_tmp = word_tmp.strip(r",?!-()[]'\":;=*|")
+
         if word_tmp in all_words:
             continue
 
         if number_formats_allowed_re.match(word_tmp):
+            continue
+
+        # Ignore all capitalized words (might be proper noun which we
+        # legitimately don't have an entry for)
+        if upper_alpha_re.match(word_orig):
+            continue
+
+        # TODO: This is a massive loophole; need better wikitext
+        # processing.
+        if not all_lower_re.match(word_tmp):
             continue
 
         word_parts = re.split(u"[––/-]", word_tmp)
@@ -235,18 +262,22 @@ def spellcheck_all_langs(article_title, article_text):
                 continue
 
         misspelled_words[word_tmp] = misspelled_words.get(word_tmp, 0) + 1
-        # print "MISSPELLED: %s" % word_tmp.encode('utf8')
+        # print "ARTICLE %s MISSPELLED: %s" % (article_title.encode('utf8'), word_tmp.encode('utf8'))
+        print "ARTICLE %s MISSPELLED: %s                    %s" % (article_title.encode('utf8'), word_tmp.encode('utf8'), word_orig.encode('utf8'))
+        oops_count += 1
 
-    if count % 1000 == 0:
+    print "MISSPELLED WORD COUNT %s FOR %s" % (oops_count, article_title.encode('utf8'))
+    if article_count % 10000 == 0:
         dump_results()
 
-test_result = remove_templates("aaa {{bbb {{ccc}} ddd}} eee")
-if test_result != "aaa  eee":
-    raise Exception("Broken remove_templates returned: '%s'" % test_result)
 
-test_result = remove_templates("{{xxx yyy}} zzz")
+test_result = remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}")
+if test_result != "aaa  eee":
+    raise Exception("Broken remove_structure_nested returned: '%s'" % test_result)
+
+test_result = remove_structure_nested("{{xxx yyy}} zzz", "{{", "}}")
 if test_result != " zzz":
-    raise Exception("Broken remove_templates returned: '%s'" % test_result)
+    raise Exception("Broken remove_structure_nested returned: '%s'" % test_result)
 
 read_en_article_text(spellcheck_all_langs)
 dump_results
