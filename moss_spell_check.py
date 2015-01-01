@@ -36,7 +36,7 @@ for filename in [
     with open(filename, "r") as title_list:
         for line in title_list:
             line = line.strip().lower().decode('utf8')
-            for word in line.split(" "):
+            for word in line.split("_"):
                 all_words.add(word)
 
 # Words that aren't article titles, for technical reasons
@@ -92,6 +92,7 @@ substitutions = [
     (re.compile(r"<syntaxhighlight.*?</syntaxhighlight>"), ""),
     (re.compile(r"<gallery.*?</gallery>"), ""),
     (re.compile(r"<code.*?</code>"), ""),
+    (re.compile(r"<timeline.*?</timeline>"), ""),
     # (re.compile(r"<X.*?</X>"), ""),
     (re.compile(r"<small>"), ""),
     (re.compile(r"</small>"), ""),
@@ -225,6 +226,15 @@ def spellcheck_all_langs(article_title, article_text):
 
         # Bob's
         word_tmp = possessive_re.sub("", word_tmp)
+        # http://en.wiktionary.org/wiki/Wiktionary:About_English#Criteria_for_inclusion
+        # says that possessives should not be in the dictionary, so we
+        # exclude them systematically.
+
+        # https://en.wiktionary.org/wiki/Wiktionary:Criteria_for_inclusion#Inflections
+        # says that plural forms SHOULD be in the dictionary, so we do
+        # NOT exclude them systematically.  Any plurals that show up
+        # as misspelled words should be added to Wiktionary following
+        # the example at [[cameras]].
 
         # F.C. vs. lastwordinsentence.
         if not abbr_re.search(word_tmp):
@@ -263,7 +273,7 @@ def spellcheck_all_langs(article_title, article_text):
 
         misspelled_words[word_tmp] = misspelled_words.get(word_tmp, 0) + 1
         # print "ARTICLE %s MISSPELLED: %s" % (article_title.encode('utf8'), word_tmp.encode('utf8'))
-        print "ARTICLE %s MISSPELLED: %s                    %s" % (article_title.encode('utf8'), word_tmp.encode('utf8'), word_orig.encode('utf8'))
+        print "ARTICLE %s MISSPELLED: %s\t\t\t\t%s" % (article_title.encode('utf8'), word_tmp.encode('utf8'), word_orig.encode('utf8'))
         oops_count += 1
 
     print "MISSPELLED WORD COUNT %s FOR %s" % (oops_count, article_title.encode('utf8'))
