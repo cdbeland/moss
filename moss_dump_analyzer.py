@@ -15,6 +15,16 @@ import re
 #   LTR quote finding [('")] ... \1
 #   ' " -> <lqs id=3> <lqd id=4>
 #   unbalanced is possible
+#
+#  Note that regular expressions will not suffice; wikitext does not
+#  follow a regular grammar (in the technical sense).
+#  For explanation: https://www.mediawiki.org/wiki/Markup_spec
+#  Nested regions are problematic, like:
+#  {{template outer {{inner template}} danger zone}}
+#
+#  Need to tag token-by-token and maintain context (ref, template,
+#  table, quote, etc.)
+
 # * Get article blacklist (manual check needed) working
 #   -> Category filter
 # * Get web server fired up with API-based editing
@@ -50,7 +60,7 @@ def read_en_article_text(callback_function):
 
                    article_title = root_element.findtext('title')
                    article_text = root_element.findtext('.//text')                   
-                   callback_function(article_text, article_title)
+                   callback_function(article_title, article_text)
 
 
 def changer_callback(article_text, article_title):
