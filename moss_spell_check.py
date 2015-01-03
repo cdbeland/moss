@@ -4,6 +4,8 @@ from time import sleep
 import re
 from moss_dump_analyzer import read_en_article_text
 
+# Run time for commit e317dabb: 3 hours
+
 # SLOGAN: Dearth to typos!
 
 # TODO: Use enwiktionary-20141129-pages-articles.xml and look for
@@ -61,7 +63,6 @@ def dump_results():
     misspelled_by_freq = sorted(misspelled_by_freq)
     for (freq, word) in misspelled_by_freq:
         print "%s\t%s" % (freq, word.encode('utf8'))
-    print "***"
 
 possessive_re = re.compile(r"'s$")
 abbr_re = re.compile(r"\.\w\.$")
@@ -72,11 +73,11 @@ base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currency_symbols
 number_formats_allowed_re = re.compile(
-    r"(%s|%s%%|\$%s|us\$%s)" % (base_number_format, base_number_format, base_number_format, base_number_format))
+    r"(%s|%s%%|\$%s|US\$%s)" % (base_number_format, base_number_format, base_number_format, base_number_format))
 
 whitespace_re = re.compile(r"\s+")
 math_re = re.compile(r"<math.*?</math>")
-all_lower_re = re.compile(r"^[a-z]+$")
+all_letters_re = re.compile(r"^[a-zA-Z]+$")
 upper_alpha_re = re.compile(r"[A-Z]")
 
 substitutions = [
@@ -194,8 +195,6 @@ def spellcheck_all_langs(article_title, article_text):
 
     global article_count
 
-    print "PROCESSING ARTICLE: " + article_title.encode('utf8')
-
     # if article_title != "Anarchism":
     #     return
 
@@ -207,25 +206,23 @@ def spellcheck_all_langs(article_title, article_text):
 
     # TODO: Handle }} inside <nowiki>
     if "}}" in article_text:
-        print "ABORTING PROCESSING OF %s" % article_title.encode('utf8')
-        print article_text.encode('utf8')
+        print "!\tABORTING PROCESSING\t%s" % article_title.encode('utf8')
+        print "!\t%s" % article_text.encode('utf8')
         return
 
     article_count += 1
-    oops_count = 0
+    article_oops_list = []
     for word in article_text.split(" "):
-        word_orig = word.strip(r",?!-()[]'\":;=*|")
+        word_mixedcase = word.strip(r",?!-()[]'\":;=*|")
 
-        if not word_orig:
+        if not word_mixedcase:
             continue
 
-        word_tmp = word_orig.lower()
-
-        if (word_tmp in all_words):
+        if (word_mixedcase.lower() in all_words):
             continue
 
         # Bob's
-        word_tmp = possessive_re.sub("", word_tmp)
+        word_mixedcase = possessive_re.sub("", word_mixedcase)
         # http://en.wiktionary.org/wiki/Wiktionary:About_English#Criteria_for_inclusion
         # says that possessives should not be in the dictionary, so we
         # exclude them systematically.
@@ -237,47 +234,53 @@ def spellcheck_all_langs(article_title, article_text):
         # the example at [[cameras]].
 
         # F.C. vs. lastwordinsentence.
-        if not abbr_re.search(word_tmp):
-            word_tmp = word_tmp.strip(".")
+        if not abbr_re.search(word_mixedcase):
+            word_mixedcase = word_mixedcase.strip(".")
 
         # Do it again in case . or 's was outside one of these
-        word_tmp = word_tmp.strip(r",?!-()[]'\":;=*|")
+        word_mixedcase = word_mixedcase.strip(r",?!-()[]'\":;=*|")
 
-        if word_tmp in all_words:
+        word_lower = word_mixedcase.lower()
+
+        if word_lower in all_words:
             continue
 
-        if number_formats_allowed_re.match(word_tmp):
+        if number_formats_allowed_re.match(word_mixedcase):
             continue
 
         # Ignore all capitalized words (might be proper noun which we
         # legitimately don't have an entry for)
-        if upper_alpha_re.match(word_orig):
+        # TODO: Detect beginning-of-sentence and optionally report
+        # possibly misspelled words (or wait for sentence grammar
+        # parsing)
+        if upper_alpha_re.match(word_mixedcase):
             continue
 
         # TODO: This is a massive loophole; need better wikitext
         # processing.
-        if not all_lower_re.match(word_tmp):
+        if not all_letters_re.match(word_mixedcase):
             continue
 
-        word_parts = re.split(u"[––/-]", word_tmp)
+        word_parts_mixedcase = re.split(u"[––/-]", word_mixedcase)
         # emdash, endash, slash, hyphen
-        if len(word_parts) > 1:
+        if len(word_parts_mixedcase) > 1:
             any_bad = False
-            for part in word_parts:
-                if (part in all_words):
+            for part in word_parts_mixedcase:
+                if (part.lower() in all_words):
                     pass
                 else:
                     any_bad = True
             if not any_bad:
                 continue
 
-        misspelled_words[word_tmp] = misspelled_words.get(word_tmp, 0) + 1
-        # print "ARTICLE %s MISSPELLED: %s" % (article_title.encode('utf8'), word_tmp.encode('utf8'))
-        print "ARTICLE %s MISSPELLED: %s\t\t\t\t%s" % (article_title.encode('utf8'), word_tmp.encode('utf8'), word_orig.encode('utf8'))
-        oops_count += 1
+        misspelled_words[word_lower] = misspelled_words.get(word_lower, 0) + 1
+        article_oops_list.append(word_mixedcase)
 
-    print "MISSPELLED WORD COUNT %s FOR %s" % (oops_count, article_title.encode('utf8'))
-    if article_count % 10000 == 0:
+        # print "ARTICLE %s MISSPELLED: %s\t\t\t\t%s" % (article_title.encode('utf8'), word_tmp.encode('utf8'), word_mixedcase.encode('utf8'))
+
+    article_oops_string = u" ".join(article_oops_list)
+    print "@\t%s\t%s\t%s" % (len(article_oops_list), article_title.encode('utf8'), article_oops_string.encode('utf8'))
+    if article_count % 100000 == 0:
         dump_results()
 
 
@@ -290,4 +293,26 @@ if test_result != " zzz":
     raise Exception("Broken remove_structure_nested returned: '%s'" % test_result)
 
 read_en_article_text(spellcheck_all_langs)
-dump_results
+dump_results()
+
+
+# Analysis
+# cat test-run-compact-sorted-articles-only.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' >! misspelled-lists.txt
+# cat misspelled-lists.txt | perl -ne 'foreach $word (split($i))' >! misspelled-words.txt
+# cat misspelled-words.txt | perl -pe 'print length($_); print "\t"' >! misspelled-words-charlen.txt
+
+# TODO: Experiment with using NLTK and other grammar engines to parse wikitext
+
+# TODO: Post lists of the shortest and longest misspelled words,
+# articles with most and least number of misspelled words, random
+# assortment of typos in dump order.
+# * 2 - [[wikt:X]] - [[article1]], [[article2]]
+# Re-run with lists of article titles instead of just numeric
+# counting, so the inverse lists can be printed.  Uniq the article
+# lists after counting number of instances, for fair play.
+# Skip already done: Delete from list.  Ignore blue words.
+# For legitimate words: Click on the word if red, to add to wiktionary.
+# For incorrect words: Click on the links to articles to correct them.
+# Then delete the entry for the word so work won't be duplicated.
+# Don't worry if you miss something; it will reappear in a future
+# report if there are still mistakes.
