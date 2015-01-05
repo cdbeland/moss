@@ -33,7 +33,8 @@ all_words = set()
 
 for filename in [
         "/bulk-wikipedia/enwiktionary-20141129-all-titles-in-ns0",
-        "/bulk-wikipedia/enwiki-20141208-all-titles-in-ns0"
+        "/bulk-wikipedia/enwiki-20141208-all-titles-in-ns0",
+        "/bulk-wikipedia/specieswiki-20141218-all-titles-in-ns0",
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
@@ -54,15 +55,23 @@ global article_count
 global misspelled_words
 
 misspelled_words = {}
+# {'misspellling': (2, ['article1', 'article2'])}
+
 article_count = 0
 
 
 def dump_results():
     global misspelled_words
-    misspelled_by_freq = [(value, key) for (key, value) in misspelled_words.items()]
+    misspelled_by_freq = [(value[0], key, value[1]) for (key, value) in misspelled_words.items()]
     misspelled_by_freq = sorted(misspelled_by_freq)
-    for (freq, word) in misspelled_by_freq:
-        print "%s\t%s" % (freq, word.encode('utf8'))
+    for (freq, word, article_list) in misspelled_by_freq:
+        uniq_list = list(set(article_list))
+        uniq_list.sort()
+        uniq_string = ""
+        if uniq_list:
+            uniq_string = u"[[" + u"]], [[".join(uniq_list) + u"]]"
+        output_string = u"* %s - [[wikt:%s]] - %s" % (unicode(freq), word, uniq_string)
+        print output_string.encode('utf8')
 
 possessive_re = re.compile(r"'s$")
 abbr_re = re.compile(r"\.\w\.$")
@@ -273,7 +282,12 @@ def spellcheck_all_langs(article_title, article_text):
             if not any_bad:
                 continue
 
-        misspelled_words[word_lower] = misspelled_words.get(word_lower, 0) + 1
+        # Index by misspelled word of article titles
+        (freq, existing_list) = misspelled_words.get(word_lower, (0, []))
+        existing_list.append(article_title)
+        misspelled_words[word_lower] = (len(existing_list), existing_list)
+
+        # Index by article of mispelled words
         article_oops_list.append(word_mixedcase)
 
         # print "ARTICLE %s MISSPELLED: %s\t\t\t\t%s" % (article_title.encode('utf8'), word_tmp.encode('utf8'), word_mixedcase.encode('utf8'))
@@ -296,23 +310,30 @@ read_en_article_text(spellcheck_all_langs)
 dump_results()
 
 
-# Analysis
-# cat test-run-compact-sorted-articles-only.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' >! misspelled-lists.txt
+# Analysis:
+# python moss_spell_check.py > spell-check-output.txt
+# grep ^@ spell-check-output.txt | sort > sc-sorted-articles-only.txt
+# cat sc-sorted-articles-only.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' >! misspelled-lists.txt
 # cat misspelled-lists.txt | perl -ne 'foreach $word (split($i))' >! misspelled-words.txt
 # cat misspelled-words.txt | perl -pe 'print length($_); print "\t"' >! misspelled-words-charlen.txt
 
-# TODO: Experiment with using NLTK and other grammar engines to parse wikitext
+# TODO: Experiment with using NLTK and other grammar engines to parse
+# wikitext
 
 # TODO: Post lists of the shortest and longest misspelled words,
 # articles with most and least number of misspelled words, random
 # assortment of typos in dump order.
 # * 2 - [[wikt:X]] - [[article1]], [[article2]]
-# Re-run with lists of article titles instead of just numeric
-# counting, so the inverse lists can be printed.  Uniq the article
-# lists after counting number of instances, for fair play.
-# Skip already done: Delete from list.  Ignore blue words.
-# For legitimate words: Click on the word if red, to add to wiktionary.
-# For incorrect words: Click on the links to articles to correct them.
-# Then delete the entry for the word so work won't be duplicated.
+
+# Instructions for editors:
+#
+# * For legitimate words: Click on the word if red, to add to the
+#   English Wiktionary.  You can add species names to Wikispecies
+#   instead.
+# * For incorrect words: Click on the links to articles to correct them.
+# * Delete the entry for the word so work won't be duplicated.
+# * Delete any blue possibly-misspelled words you may notice; these
+#   have already been taken care of by other editors.
+#
 # Don't worry if you miss something; it will reappear in a future
 # report if there are still mistakes.
