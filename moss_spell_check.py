@@ -32,7 +32,7 @@ from moss_dump_analyzer import read_en_article_text
 all_words = set()
 
 for filename in [
-        "/bulk-wikipedia/enwiktionary-20141129-all-titles-in-ns0",
+        "/bulk-wikipedia/enwiktionary-20150102-all-titles-in-ns0",
         "/bulk-wikipedia/enwiki-20141208-all-titles-in-ns0",
         "/bulk-wikipedia/specieswiki-20141218-all-titles-in-ns0",
 ]:
@@ -294,8 +294,8 @@ def spellcheck_all_langs(article_title, article_text):
 
     article_oops_string = u" ".join(article_oops_list)
     print "@\t%s\t%s\t%s" % (len(article_oops_list), article_title.encode('utf8'), article_oops_string.encode('utf8'))
-    if article_count % 100000 == 0:
-        dump_results()
+    # if article_count % 100000 == 0:
+    #     dump_results()
 
 
 test_result = remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}")
@@ -311,11 +311,16 @@ dump_results()
 
 
 # Analysis:
-# python moss_spell_check.py > spell-check-output.txt
-# grep ^@ spell-check-output.txt | sort > sc-sorted-articles-only.txt
-# cat sc-sorted-articles-only.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' >! misspelled-lists.txt
-# cat misspelled-lists.txt | perl -ne 'foreach $word (split($i))' >! misspelled-words.txt
-# cat misspelled-words.txt | perl -pe 'print length($_); print "\t"' >! misspelled-words-charlen.txt
+# python moss_spell_check.py > run-1234567.txt
+# grep ^@ run-1234567.txt | sort -nr -k2 > articles-with-words.txt
+# cat articles-with-words.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' >! misspelled-lists.txt
+# cat misspelled-lists.txt | perl -ne 'foreach $word (split(" ")) {print $word . "\n"}' >! misspelled-words.txt
+# cat misspelled-words.txt | perl -pe 'print length($_) - 1; print "\t"' | sort -n >! misspelled-words-charlen.txt
+# grep '^*' run-1234567.txt | tac > words-with-articles.txt
+
+# cat articles-with-words.txt | perl -pe 's/^@\t(\d+)\t(.*?)\t/* \1 - [[\2]] - /' > articles-with-words-linked.txt
+# tac articles-with-words-linked.txt | grep -P "\* 1 -" | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' >! articles-with-words-linked-2.txt
+
 
 # TODO: Experiment with using NLTK and other grammar engines to parse
 # wikitext
@@ -325,15 +330,3 @@ dump_results()
 # assortment of typos in dump order.
 # * 2 - [[wikt:X]] - [[article1]], [[article2]]
 
-# Instructions for editors:
-#
-# * For legitimate words: Click on the word if red, to add to the
-#   English Wiktionary.  You can add species names to Wikispecies
-#   instead.
-# * For incorrect words: Click on the links to articles to correct them.
-# * Delete the entry for the word so work won't be duplicated.
-# * Delete any blue possibly-misspelled words you may notice; these
-#   have already been taken care of by other editors.
-#
-# Don't worry if you miss something; it will reappear in a future
-# report if there are still mistakes.
