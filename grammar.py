@@ -25,14 +25,13 @@
 
 
 import nltk
-import time
 import wikipedia
 # https://wikipedia.readthedocs.io/en/latest/code.html
 from spell import is_word_spelled_correctly
 
 
 def check_english(plain_text):
-    print ("SPP\tWPP\tmax WPS")
+    print("SPP\tWPP\tmax WPS")
     paragraphs = plain_text.split("\n")
     for paragraph in paragraphs:
         words_in_paragraph = nltk.word_tokenize(paragraph)
@@ -67,18 +66,18 @@ def check_english(plain_text):
             if not is_sentence_grammatical(sentence):
                 print("Ungrammatical sentence?\t%s" % sentence)
 
-        print ("%s\t%s\t%s" % (len(sentences), len(words_in_paragraph), max_words_per_sentence))
-
+        print("%s\t%s\t%s" % (len(sentences), len(words_in_paragraph), max_words_per_sentence))
 
 
 def is_sentence_grammatical(sentence):
-    ### TODO!
+    # TODO!
     return True
 
 
 def fetch_article_plaintext(title):
     page = wikipedia.page(title=title)
     return page.content
+
 
 def check_article(title):
     plaintext = fetch_article_plaintext(title)
@@ -126,6 +125,7 @@ sample_featured_articles = [
     "History of American football"
 ]
 
+
 def check_samples_from_disk():
     for title in sample_featured_articles:
         title_safe = title.replace(" ", "_")
@@ -134,7 +134,9 @@ def check_samples_from_disk():
             print("\n=%s=" % title)
             check_english(plaintext)
 
+
 check_samples_from_disk()
+
 
 def save_sample_articles():
     for title in sample_featured_articles:

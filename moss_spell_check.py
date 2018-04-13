@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from time import sleep
-import re
+import nltk
 from moss_dump_analyzer import read_en_article_text
-from wikitext_util import remove_structure_nested, wikitext_to_plaintext
+from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly
 
 # Run time for commit e317dabb: 3 hours
@@ -59,8 +58,8 @@ def dump_results():
         uniq_string = ""
         if uniq_list:
             uniq_string = u"[[" + u"]], [[".join(uniq_list) + u"]]"
-        output_string = u"* %s - [[wikt:%s]] - %s" % (unicode(freq), word, uniq_string)
-        print output_string.encode('utf8')
+        output_string = u"* %s - [[wikt:%s]] - %s" % (freq, word, uniq_string)
+        print(output_string)
 
 
 def spellcheck_all_langs(article_title, article_text):
@@ -72,24 +71,21 @@ def spellcheck_all_langs(article_title, article_text):
     #     return
 
     article_text = wikitext_to_plaintext(article_text)
-    ## Debug article_text processing:
-    # print article_text.encode('utf8')
-    # sleep(1)
-    # return
 
     # TODO: Handle }} inside <nowiki>
     if "}}" in article_text:
-        print "!\tABORTING PROCESSING\t%s" % article_title.encode('utf8')
-        print "!\t%s" % article_text.encode('utf8')
+        print("!\tABORTING PROCESSING\t%s" % article_title)
+        print("!\t%s" % article_text)
         return
 
     article_count += 1
     article_oops_list = []
-    for word in word_tokenize(article_text):
-        if is_word_spelled_correctly(word):
+    for word_mixedcase in nltk.word_tokenize(article_text):
+        if is_word_spelled_correctly(word_mixedcase):
             continue
 
         # Word is misspelled, so...
+        word_lower = word_mixedcase.lower()
 
         # Index by misspelled word of article titles
         (freq, existing_list) = misspelled_words.get(word_lower, (0, []))
@@ -100,15 +96,10 @@ def spellcheck_all_langs(article_title, article_text):
         article_oops_list.append(word_mixedcase)
 
     article_oops_string = u" ".join(article_oops_list)
-    print "@\t%s\t%s\t%s" % (len(article_oops_list), article_title.encode('utf8'), article_oops_string.encode('utf8'))
+    print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title.encode('utf8'), article_oops_string))
     # if article_count % 100000 == 0:
     #     dump_results()
 
 
 read_en_article_text(spellcheck_all_langs)
 dump_results()
-
-
-# TODO: Experiment with using NLTK and other grammar engines to parse
-# wikitext
-

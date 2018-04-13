@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # http://dumps.wikimedia.org/backup-index.html
 # http://meta.wikimedia.org/wiki/Data_dumps
@@ -33,7 +33,7 @@ import re
 #   to that generallized processor, with conditionals around them for
 #   dialect, segment type, etc.
 
-# grep '#8223;' /bulk-wikipedia/enwiki-20141208-pages-articles-multistream.xml
+# grep '#8223;' /bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml
 # Ukrainian alphabet | &amp;amp;#8222; &amp;amp;#8223;
 # Quotation marks | U+201F || {{smallcaps|{{lc:Double high-reversed-9 quotation mark}}}} || &amp;amp;#8223;
 
@@ -41,7 +41,7 @@ import re
 def read_en_article_text(callback_function):
     working_string = ""
 
-    with open("/bulk-wikipedia/enwiki-20141208-pages-articles-multistream.xml", "r") as article_xml_file:
+    with open("/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml", "r") as article_xml_file:
         for line in article_xml_file:
             working_string += line
             if line == "  </page>\n":
@@ -67,12 +67,12 @@ def read_en_article_text(callback_function):
 def changer_callback(article_text, article_title):
     (edit_summary, change_count, new_article_text) = make_changes(article_text)
     if article_text != new_article_text:
-        # print "%s\t%s\t%s\t%s" % (article_title, change_count, edit_summary, new_article_text)
+        # print ("%s\t%s\t%s\t%s" % (article_title, change_count, edit_summary, new_article_text))
         old = article_text.splitlines(1)
         new = new_article_text.splitlines(1)
         diff = difflib.unified_diff(old, new)
-        print "TITLE: " + article_title.encode('utf8')
-        print ''.join(diff).encode('utf8')
+        print("TITLE: " + article_title.encode('utf8'))
+        print(''.join(diff).encode('utf8'))
 
 
 def make_changes(input_wikitext):

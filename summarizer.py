@@ -17,4 +17,4 @@ for line in fileinput.input():
     article_list_str = "]], [[".join(article_list).strip("[]")
     better_line = "* %s - [[wikt:%s]] - [[%s]] ... [https://en.wikipedia.org/w/index.php?search=%s find all]" \
                   % (article_count, word, article_list_str, word)
-    print better_line
+    print(better_line)

@@ -47,6 +47,7 @@ number_formats_allowed_re = re.compile(
 
 print("Done.")
 
+
 def is_word_spelled_correctly(word):
     word_mixedcase = word.strip(r",?!-()[]'\":;=*|")
 
@@ -58,7 +59,7 @@ def is_word_spelled_correctly(word):
 
     # Possessive: NLTK parses e.g. "'s" as a separate word, which
     # Wikitionary has listed.
-    
+
     # https://en.wiktionary.org/wiki/Wiktionary:Criteria_for_inclusion#Inflections
     # says that plural forms SHOULD be in the dictionary, so we do
     # NOT exclude them systematically.  Any plurals that show up

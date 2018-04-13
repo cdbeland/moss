@@ -2,7 +2,7 @@
 # https://en.wikipedia.org/wiki/Head-driven_phrase_structure_grammar
 
 # https://en.wikipedia.org/wiki/Natural_Language_Toolkit
-### Consider changing labels to academic-standard?
+# TODO: Consider changing labels to academic-standard?
 # Not quite right:
 #  https://en.wikipedia.org/wiki/List_of_glossing_abbreviations
 
@@ -21,14 +21,14 @@ parts_of_speech = {
     "PST": "postposition",
     "PRE": "preposition",
     "PAR": "particle",
-    ### May need to special-case or further classify
+    # TODO: May need to special-case or further classify
     # See also: https://en.wiktionary.org/wiki/Category:English_clitics
     "PRO": "pronoun",
     "V": "verb",
 
     # Yes, we handle punctuation!
     "TERM": "sentence-terminal punctuation",
-    
+
     # Weird cases:
     "ABBR": "abbreviation",
     "CNT": "contraction",
@@ -80,11 +80,12 @@ closed_lexicon = {
 }
 
 attribute_expansion = {
-    "DR": ["N-PROP-PL-UNC"],  # cup
-    "NDR": ["N+PL", "N+UNC", "N+PROP"], # puppies, money, Germany
+    "DR": ["N-PROP-PL-UNC"],             # cup
+    "NDR": ["N+PL", "N+UNC", "N+PROP"],  # puppies, money, Germany
 }
 
-### Agreement rules
+# Agreement rules (TODO)
+#
 # * Impersonal verbs must have "it" as subject (?)
 # * Subject and main verb must agree as to person and number
 # * Determiner, and noun must agree as to definiteness
@@ -98,29 +99,29 @@ attribute_expansion = {
 # American English
 phrase_structures = {
     "NP": [
-        ["N+NDR"],         # puppies, money, Germany
-        ["AJP", "N+NDR"],  # brown puppies, dirty money, rich Germany
-        ["DET", "N+DR"],   # the cup
-        ["DET", "AJP", "N+DR"], # the empty cup
+        ["N+NDR"],               # puppies, money, Germany
+        ["AJP", "N+NDR"],        # brown puppies, dirty money, rich Germany
+        ["DET", "N+DR"],         # the cup
+        ["DET", "AJP", "N+DR"],  # the empty cup
         # NOT: cup, blue the ice
     ],
-    
+
     "AJP": [
         ["ADJ"],  # green
         ["ADJ", ",", "ADJ"],   # wet, tired
         ["ADJ", "CON+CO", "ADJ"],  # wet and tired
-        ### More adjectives than this are possible, but some
-        ### configurations are disfavored.  Need to think about this
-        ### more.
+        # TODO: More adjectives than this are possible, but some
+        # configurations are disfavored.  Need to think about this
+        # more.
     ],
 
     "PP": [
         ["PRE", "NP"],
         ["PP", "PP"]
-        ### More than two might be too many for an encyclopedia; need
-        ### to think about this more and maybe put in a limiter        
+        # TODO: More than two might be too many for an encyclopedia; need
+        # to think about this more and maybe put in a limiter
     ],
-    
+
     "VP": [
         ["V+0"],  # it rains
         ["V+1"],  # he runs
@@ -128,22 +129,22 @@ phrase_structures = {
         ["V+3", "NP", "NP"],  # you gave me the ball
 
         # ["VP", "AVP"] ?
-        ### NEED TO FIGURE OUT ADV vs. PP
+        # TODO: NEED TO FIGURE OUT ADV vs. PP
         ["V+0", "PP"],  # it rains on the lawn
         ["V+1", "PP"],  # he runs on the grass
     ],
-    
+
     "S": [
         ["NP", "VP", "TERM"],  # Joe runs.
         ["VP", "TERM"],  # (implied you) Run!
     ],
 
-    ###? 
+    # TODO: ?
     "AVP": [
         "ADV",
     ],
-    
-    ###? https://en.wikipedia.org/wiki/Complementizer
+
+    # TODO - ? https://en.wikipedia.org/wiki/Complementizer
     # "CP": [
     #    ["C", "S"],
     # ]

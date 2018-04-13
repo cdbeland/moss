@@ -2,15 +2,17 @@
 
 import re
 
-# "aaa {{bbb {{ccc}} ddd}} eee", "", 0
-# "bbb {{ccc}} ddd}} eee", "aaa ", 1
-# "ccc}} ddd}} eee", "aaa bbb", 2
-# " ddd}} eee", "aaa bbb ccc", 1
-# " eee", "aaa bbb ccc ddd", 0
-# "aaa bbb ccc ddd eee"
 
 def remove_structure_nested(string, open_string, close_string):
     # string_clean and nesting_depth are for use during recursion only
+
+    # Sample inputs and outputs:
+    # "aaa {{bbb {{ccc}} ddd}} eee", "", 0
+    # "bbb {{ccc}} ddd}} eee", "aaa ", 1
+    # "ccc}} ddd}} eee", "aaa bbb", 2
+    # " ddd}} eee", "aaa bbb ccc", 1
+    # " eee", "aaa bbb ccc ddd", 0
+    # "aaa bbb ccc ddd eee"
 
     string_clean = ""
     nesting_depth = 0
@@ -22,11 +24,11 @@ def remove_structure_nested(string, open_string, close_string):
         open_index = string.find(open_string)  # Always > -1 inside this loop
         close_index = string.find(close_string)
 
-        #print "string_clean: %s" % string_clean
-        #print "nesting_depth: %s" % nesting_depth
-        #print "open_index: %s" % open_index
-        #print "close_index: %s" % close_index
-        #print "string: %s" % string
+        # print("string_clean: %s" % string_clean)
+        # print("nesting_depth: %s" % nesting_depth)
+        # print("open_index: %s" % open_index)
+        # print("close_index: %s" % close_index)
+        # print("string: %s" % string)
 
         if nesting_depth == 0:
             # Save text to the beginning of the template and open a new one
@@ -67,6 +69,7 @@ def remove_structure_nested(string, open_string, close_string):
     # imbalance (too many close_string)
     return string_clean + string
 
+
 whitespace_re = re.compile(r"\s+")
 math_re = re.compile(r"<math.*?</math>")
 
@@ -96,6 +99,7 @@ substitutions = [
     (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
 ]
 
+
 def wikitext_to_plaintext(string):
 
     # TODO: Spell check visible contents of these special constructs
@@ -110,15 +114,3 @@ def wikitext_to_plaintext(string):
         # print string
         # print "---"
     return string
-
-
-# TODO: Move to separate test suite
-
-test_result = remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}")
-if test_result != "aaa  eee":
-    raise Exception("Broken remove_structure_nested returned: '%s'" % test_result)
-
-test_result = remove_structure_nested("{{xxx yyy}} zzz", "{{", "}}")
-if test_result != " zzz":
-    raise Exception("Broken remove_structure_nested returned: '%s'" % test_result)
-
