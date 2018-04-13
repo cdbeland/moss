@@ -4,6 +4,10 @@ import re
 
 print("Loading spellcheck dictionary...")
 
+# TODO: Possibly move this to postgres or MySQL.  Load DB as part of
+# update_downloads.sh; startup time is very slow due to loading this
+# all into Python, even though accessing in-memory data is very fast.
+
 all_words = set()
 
 for filename in [
