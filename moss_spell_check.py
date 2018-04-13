@@ -8,6 +8,11 @@ from moss_dump_analyzer import read_en_article_text
 
 # SLOGAN: Dearth to typos!
 
+# * Do a separate run for redirects matching
+#   "{{[\w]+(misspelling|incorrect)[\w* ]+}}" pages on enwiki and
+#   prepare batch edits for these
+# * Is there an equivalent for misspellings on wiktionary?
+
 # TODO: Use enwiktionary-20141129-pages-articles.xml and look for
 # r"=\s*English" and part-of-speech headers or whatever.  This sorts
 # out the non-English words for spellcheck purposes, and also produces
@@ -18,7 +23,6 @@ from moss_dump_analyzer import read_en_article_text
 # lists?
 
 # TODOs:
-# * Exclude {{R from misspelling}} pages on enwiki and equivalent on wiktionary
 # * Handle multi-word phrases properly, or slice up article titles?
 # * Be case-sensitive (need to recover from article text due to first
 #   word in article titles always being capitalized, and on the other
@@ -28,6 +32,11 @@ from moss_dump_analyzer import read_en_article_text
 # * Support {{sic}}, reading and writing
 # * Only allow 's on nouns
 # * Handle final . properly for real, by detecting end-of-sentence
+
+# * Monitor recent changes (see [[Wikipedia:Recent changes
+#   patrol#Monitoring]]) and drop notes on editor talk pages notifying
+#   them they may have made a spelling error.  The algorithm needs to
+#   be pretty solid.
 
 all_words = set()
 
@@ -321,6 +330,8 @@ dump_results()
 # cat articles-with-words.txt | perl -pe 's/^@\t(\d+)\t(.*?)\t/* \1 - [[\2]] - /' > articles-with-words-linked.txt
 # tac articles-with-words-linked.txt | grep -P "\* 1 -" | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' >! articles-with-words-linked-2.txt
 
+# tac run-e026b41/words-by-article.txt | head -1000 | python summarizer.py
+# tac misspelled-words-charlen.txt | uniq | perl -pe 's%(\d+)\t(.*)$%* \1 [https://en.wikipedia.org/w/index.php?search=\2 \2]%' > ! misspelled-words-charlen-linked.txt
 
 # TODO: Experiment with using NLTK and other grammar engines to parse
 # wikitext
