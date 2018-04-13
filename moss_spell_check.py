@@ -41,9 +41,9 @@ from moss_dump_analyzer import read_en_article_text
 all_words = set()
 
 for filename in [
-        "/bulk-wikipedia/enwiktionary-20150102-all-titles-in-ns0",
-        "/bulk-wikipedia/enwiki-20141208-all-titles-in-ns0",
-        "/bulk-wikipedia/specieswiki-20141218-all-titles-in-ns0",
+        "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
+        "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
+        "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
@@ -319,25 +319,6 @@ read_en_article_text(spellcheck_all_langs)
 dump_results()
 
 
-# Analysis:
-# python moss_spell_check.py > run-1234567.txt
-# grep ^@ run-1234567.txt | sort -nr -k2 > articles-with-words.txt
-# cat articles-with-words.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' >! misspelled-lists.txt
-# cat misspelled-lists.txt | perl -ne 'foreach $word (split(" ")) {print $word . "\n"}' >! misspelled-words.txt
-# cat misspelled-words.txt | perl -pe 'print length($_) - 1; print "\t"' | sort -n >! misspelled-words-charlen.txt
-# grep '^*' run-1234567.txt | tac > words-with-articles.txt
-
-# cat articles-with-words.txt | perl -pe 's/^@\t(\d+)\t(.*?)\t/* \1 - [[\2]] - /' > articles-with-words-linked.txt
-# tac articles-with-words-linked.txt | grep -P "\* 1 -" | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' >! articles-with-words-linked-2.txt
-
-# tac run-e026b41/words-by-article.txt | head -1000 | python summarizer.py
-# tac misspelled-words-charlen.txt | uniq | perl -pe 's%(\d+)\t(.*)$%* \1 [https://en.wikipedia.org/w/index.php?search=\2 \2]%' > ! misspelled-words-charlen-linked.txt
-
 # TODO: Experiment with using NLTK and other grammar engines to parse
 # wikitext
-
-# TODO: Post lists of the shortest and longest misspelled words,
-# articles with most and least number of misspelled words, random
-# assortment of typos in dump order.
-# * 2 - [[wikt:X]] - [[article1]], [[article2]]
 
