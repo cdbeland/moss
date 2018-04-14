@@ -109,6 +109,10 @@ def wikitext_to_plaintext(string):
     string = remove_structure_nested(string, "{{", "}}")
     string = remove_structure_nested(string, "{|", "|}")
 
+    # We see some cases where the {| is in a template and the |} is in
+    # the article.
+    string = remove_structure_nested(string, "|-", "|}")
+
     for (regex, replacement) in substitutions:
         string = regex.sub(replacement, string)
         # print string
