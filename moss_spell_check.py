@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import nltk
+import re
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly
@@ -62,13 +63,14 @@ def dump_results():
         print(output_string)
 
 
-def spellcheck_all_langs(article_title, article_text):
-    # article_text is Unicode (UTF-32) thanks to lxml
+move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags="i")
 
+
+def spellcheck_all_langs(article_title, article_text):
     global article_count
 
-    # if article_title != "Anarchism":
-    #     return
+    if move_re.search(article_text):
+        print("!\tSKIPPING (copy/move to other project)\t%s" % article_title)
 
     article_text = wikitext_to_plaintext(article_text)
 
