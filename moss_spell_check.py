@@ -64,7 +64,7 @@ def dump_results():
 
 
 move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags="i")
-
+ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==).*?$", flags="mi")
 
 def spellcheck_all_langs(article_title, article_text):
     global article_count
@@ -73,6 +73,10 @@ def spellcheck_all_langs(article_title, article_text):
         print("!\tSKIPPING (copy/move to other project)\t%s" % article_title)
 
     article_text = wikitext_to_plaintext(article_text)
+
+    # TODO: Get smarter about these sections.  But for now, ignore
+    # them, since they are full of proper nouns and URL words.
+    article_text = ignore_sections_re.sub("", article_text)
 
     # TODO: Handle }} inside <nowiki>
     if "}}" in article_text:
