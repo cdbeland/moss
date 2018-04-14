@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from string import punctuation
 
 print("Loading spellcheck dictionary...")
 
@@ -9,6 +10,7 @@ print("Loading spellcheck dictionary...")
 # all into Python, even though accessing in-memory data is very fast.
 
 all_words = set()
+punctuation_re = re.compile(r"[" + punctuation + r"]")
 
 for filename in [
         "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
@@ -18,9 +20,13 @@ for filename in [
     with open(filename, "r") as title_list:
         for line in title_list:
             line = line.strip().lower()
-            # line = line.strip().lower().decode('utf8')
-            for title_word in line.split("_"):
-                all_words.add(title_word)
+
+            # Mostly splitting on "_", but also ":", etc.
+            [all_words.add(title_word)
+             for title_word
+             in punctuation_re.split(line)
+             if title_word]
+
 
 # Words that aren't article titles, for technical reasons
 all_words.add("#")
