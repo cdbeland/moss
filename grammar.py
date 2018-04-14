@@ -25,31 +25,68 @@
 
 
 import nltk
+import re
 import wikipedia
 # https://wikipedia.readthedocs.io/en/latest/code.html
 from spell import is_word_spelled_correctly
 
 
-def check_english(plain_text):
-    print("SPP\tWPP\tmax WPS")
-    paragraphs = plain_text.split("\n")
+# TODO: Use this for visualization.  Would be interesting to see
+# curves for articles rated Featured, A, B, Good, C, Start, Stub, etc.
+def generate_stats(plaintext):
+    print("sentences per paragraph\twords per paragraph\tmax words per paragraph")
+    paragraphs = plaintext.split("\n")
     for paragraph in paragraphs:
         words_in_paragraph = nltk.word_tokenize(paragraph)
         if len(words_in_paragraph) == 0:
             continue
-        if len(words_in_paragraph) > 500:
-            print("Overly long paragraph?\t%s" % paragraph)
 
         sentences = nltk.sent_tokenize(paragraph)
-
         max_words_per_sentence = 0
         for sentence in sentences:
             words = nltk.word_tokenize(sentence)
             if len(words) > max_words_per_sentence:
                 max_words_per_sentence = len(words)
 
+        print("%s\t%s\t%s" % (len(sentences), len(words_in_paragraph), max_words_per_sentence))
+
+
+# Seems to happen with <math>
+# TODO: Report as bug to either Mediawiki (check for existing bug) or
+# Python Wikipedia module.
+# POSSIBLE WORKAROUND: Use wikitext instead of plain text
+broken_re = re.compile(r"displaystyle|{|}")
+
+
+def check_english(plaintext, title):
+    # Output is to stdout with tab-separated fields:
+    # * Type of message
+    #   S = spelling problem
+    #   G = grammar problem
+    #   L = length issues
+    #   ! = parse failure
+    # * Article title
+    # * Message
+    # * Details
+
+    if broken_re.search(plaintext):
+        print("!\tArticle parse broken?\t%s" % title)
+        return
+
+    paragraphs = plaintext.split("\n")
+    for paragraph in paragraphs:
+
+        words_in_paragraph = nltk.word_tokenize(paragraph)
+        if len(words_in_paragraph) == 0:
+            continue
+        if len(words_in_paragraph) > 500:
+            print("L\t%s\tOverly long paragraph?\t%s words\t%s" % (title, len(words_in_paragraph), paragraph))
+
+        sentences = nltk.sent_tokenize(paragraph)
+        for sentence in sentences:
+            words = nltk.word_tokenize(sentence)
             if len(words) > 200:
-                print("Overly long sentence?\t%s" % sentence)
+                print("S\t%s\tOverly long sentence?\t%s words\t%s" % (title, len(words), sentence))
 
             unknown_word = False
             for word in words:
@@ -59,14 +96,12 @@ def check_english(plain_text):
                     # only with wikitext.  So just use this as a quick
                     # filter to skip sentences with words we can't
                     # identify or junk that isn't words.
-                    print("Skipping sentence due to unknown word\t%s\t%s" % (word, sentence))
+                    print("S\t%s\tSkipping sentence due to unknown word\t%s\t%s" % (title, word, sentence))
                     unknown_word = True
             if unknown_word:
                 continue
             if not is_sentence_grammatical(sentence):
-                print("Ungrammatical sentence?\t%s" % sentence)
-
-        print("%s\t%s\t%s" % (len(sentences), len(words_in_paragraph), max_words_per_sentence))
+                print("G\t%s\tUngrammatical sentence?\t%s" % (title, sentence))
 
 
 def is_sentence_grammatical(sentence):
@@ -79,15 +114,15 @@ def fetch_article_plaintext(title):
     return page.content
 
 
+# TODO: For later command-line use
 def check_article(title):
     plaintext = fetch_article_plaintext(title)
-    check_english(plaintext)
+    check_english(plaintext, title)
 
 
 # BOOTSTRAPPING
 
 sample_featured_articles = [
-    "Europa (moon)",
     "BAE Systems",
     "Evolution",
     "Chicago Board of Trade Building",
@@ -131,8 +166,8 @@ def check_samples_from_disk():
         title_safe = title.replace(" ", "_")
         with open("samples/%s" % title_safe, "r") as text_file:
             plaintext = text_file.read()
-            print("\n=%s=" % title)
-            check_english(plaintext)
+            check_english(plaintext, title)
+            # generate_stats(plaintext)
 
 
 check_samples_from_disk()
@@ -144,5 +179,6 @@ def save_sample_articles():
         title_safe = title.replace(" ", "_")
         with open("samples/%s" % title_safe, "w") as text_file:
             text_file.write(plaintext)
+
 
 # save_sample_articles()
