@@ -113,6 +113,8 @@ phrase_structures = {
         # TODO: More adjectives than this are possible, but some
         # configurations are disfavored.  Need to think about this
         # more.
+        # Note that order matters in a complicated way:
+        # https://en.wikipedia.org/wiki/Adjective#Order
     ],
 
     "PP": [
