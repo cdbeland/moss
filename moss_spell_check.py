@@ -99,6 +99,9 @@ def spellcheck_all_langs(article_title, article_text):
     if "}}" in article_text:
         print("!\tABORTING PROCESSING\t%s" % article_title)
         print("!\t%s" % article_text)
+        # Often due to typo in wiki markup, but might be due to moss
+        # misinterpreting the markup.  (Either way, should be fixed
+        # because this blocks spell-checking the entire article.)
         return
 
     article_count += 1
