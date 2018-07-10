@@ -2,8 +2,9 @@
 
 import re
 from string import punctuation
+import sys
 
-print("Loading spellcheck dictionary...")
+print("Loading spellcheck dictionary...", file=sys.stderr)
 
 # TODO: Possibly move this to postgres or MySQL.  Load DB as part of
 # update_downloads.sh; startup time is very slow due to loading this
