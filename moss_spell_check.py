@@ -10,10 +10,7 @@ from spell import is_word_spelled_correctly
 # * transpress, literaturii dropped from common misspellings
 # TODO:
 # * \xXX in article titles in tmp-output.txt
-# ', -, * in words in post-longest-shortest-misspelled-words.txt
 # * Contractions in tmp-output.txt being truncated
-# * ''xxx in words in post-articles-with-single-typo2.txt
-# * ''whatido''—hosted by Robert Melnichuck, based on a ''100 Huntley Street'' segment. This program is no longer in production.
 # * Suppress broken table parses and HTML words
 # * &fnof; showing up as "fnof" commonly misspelled word, and CSS colors
 # * "... find all" not necessary in post-least-common-misspellings.txt
@@ -107,6 +104,12 @@ def spellcheck_all_langs(article_title, article_text):
     article_count += 1
     article_oops_list = []
     for word_mixedcase in nltk.word_tokenize(article_text):
+        # Gently removes only from beginning or end of words.  "." is
+        # specifically excluded from the below list, due to
+        # abbreviations which are handled correctly by spell.py with
+        # periods in place.
+        word_mixedcase = word_mixedcase.strip(r",?!-()[]'\":;=*|")
+
         if is_word_spelled_correctly(word_mixedcase):
             continue
 

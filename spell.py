@@ -52,12 +52,10 @@ base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
 number_formats_allowed_re = re.compile(
     r"(%s|%s%%|\$%s|US\$%s)" % (base_number_format, base_number_format, base_number_format, base_number_format))
 
-print("Done.")
+print("Done.", file=sys.stderr)
 
 
-def is_word_spelled_correctly(word):
-    word_mixedcase = word.strip(r",?!-()[]'\":;=*|")
-
+def is_word_spelled_correctly(word_mixedcase):
     if not word_mixedcase:
         return True
 

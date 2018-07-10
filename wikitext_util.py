@@ -86,10 +86,16 @@ substitutions = [
     (re.compile(r"<syntaxhighlight.*?</syntaxhighlight>"), ""),
     (re.compile(r"<gallery.*?</gallery>"), ""),
     (re.compile(r"<code.*?</code>"), ""),
+    (re.compile(r"<chem.*?</chem>"), ""),
+    (re.compile(r"<span.*?>"), ""),
+    (re.compile(r"</span>"), ""),
     (re.compile(r"<timeline.*?</timeline>"), ""),
-    # (re.compile(r"<X.*?</X>"), ""),
     (re.compile(r"<small>"), ""),
     (re.compile(r"</small>"), ""),
+    (re.compile(r"<sub>"), " "),
+    (re.compile(r"</sub>"), " "),
+    (re.compile(r"<sup>"), " "),
+    (re.compile(r"</sup>"), " "),
     (re.compile(r"<references.*?>"), ""),
     (re.compile(r"__notoc__"), ""),
     (re.compile(r"\[\s*(http|https|ftp):.*?\]"), ""),  # External links
@@ -97,9 +103,20 @@ substitutions = [
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]"), r"\2"),
     (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
+    (re.compile(r"'''''"), ""),
+    (re.compile(r"''''"), ""), # For when ''xxx'' has xxx removed
+    (re.compile(r"'''"), ""),
+    (re.compile(r"''"), ""),
+    (re.compile(r"{.*?{.*?}}"), ""),  # Happens in mathematical expressions
 ]
 
 
+# This function does not preserve all elements in the wikitext where
+# non-linear rendering or template substitution would be required, so
+# some information on the page is lost.  It is intended for use with
+# verification algorithms that are mostly expecting prose, and will
+# leave complicated markup (including math-in-prose) unverified.  Some
+# wikitext features, like section headers, are left intact.
 def wikitext_to_plaintext(string):
 
     # TODO: Spell check visible contents of these special constructs
