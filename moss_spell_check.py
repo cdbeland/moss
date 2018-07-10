@@ -6,10 +6,30 @@ from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly
 
-# Run time for commit e317dabb: 3 hours
+# TO CHECK:
+# * transpress, literaturii dropped from common misspellings
+# TODO:
+# * \xXX in article titles in tmp-output.txt
+# ', -, * in words in post-longest-shortest-misspelled-words.txt
+# * Contractions in tmp-output.txt being truncated
+# * ''xxx in words in post-articles-with-single-typo2.txt
+# * ''whatido''—hosted by Robert Melnichuck, based on a ''100 Huntley Street'' segment. This program is no longer in production.
+# * Suppress broken table parses and HTML words
+# * &fnof; showing up as "fnof" commonly misspelled word, and CSS colors
+# * "... find all" not necessary in post-least-common-misspellings.txt
+# * Auto-suppress words in links from https://species.wikimedia.org/wiki/Wikispecies:Requested_articles#From_Wikipedia
+# * Put Suppress direct quotations on a different channel?
+#   (verifying them takes more effort)
+# * {{spaced endash}} and friends (subst: all instances?)
+#   https://en.wikipedia.org/wiki/Category:Wikipedia_character-substitution_templates
+# * tmp-output.txt:* 24 - [[wikt:ation]] - [[1772 in poetry]] ([[attest]]ation)
 
-# SLOGAN: Dearth to typos!
-
+# TODO LONG TERM:
+# * Suppress items on
+#   https://en.wiktionary.org/wiki/Category:English_misspellings from
+#   the whitelist (maybe conditionally, if that is also a correct
+#   spelling of some other word)
+#   (suggested by User:-sche)
 # * Do a separate run for redirects matching
 #   "{{[\w]+(misspelling|incorrect)[\w* ]+}}" pages on enwiki and
 #   prepare batch edits for these
@@ -63,8 +83,8 @@ def dump_results():
         print(output_string)
 
 
-move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags="i")
-ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==).*?$", flags="mi")
+move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags=re.I)
+ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==).*?$", flags=re.M & re.I)
 
 def spellcheck_all_langs(article_title, article_text):
     global article_count
@@ -102,7 +122,7 @@ def spellcheck_all_langs(article_title, article_text):
         article_oops_list.append(word_mixedcase)
 
     article_oops_string = u" ".join(article_oops_list)
-    print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title.encode('utf8'), article_oops_string))
+    print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string))
     # if article_count % 100000 == 0:
     #     dump_results()
 
