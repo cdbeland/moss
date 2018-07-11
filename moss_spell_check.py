@@ -77,10 +77,10 @@ def dump_results():
 
 
 move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags=re.I)
-ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==).*?$", flags=re.M & re.I)
-blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I & re.M)
-prose_quote_re = re.compile(r'".{1,1000}?"', flags=re.M)
-unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z]")
+ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==).*?$", flags=re.I)
+blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
+prose_quote_re = re.compile(r'"\S.{0,1000}?\S"|"\S"')
+unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
 
 
 def spellcheck_all_langs(article_title, article_text):
@@ -98,7 +98,7 @@ def spellcheck_all_langs(article_title, article_text):
     quotation_list = blockquote_re.findall(article_text)
     quotation_list.extend(prose_quote_re.findall(article_text))
     if quotation_list:
-        article_text = blockquote_re.sub("", article_text)
+        article_text = blockquote_re.sub(" ", article_text)
         article_text = prose_quote_re.sub("", article_text)
         print("Q\t%s\t%s" % (article_title, u"\t".join(quotation_list)))
         # TODO: Spell-check quotations, but publish typos in them in a
@@ -113,27 +113,20 @@ def spellcheck_all_langs(article_title, article_text):
         #  [[340B Drug Pricing Program]] - [s]tretch
         #  [[Zachery Kouwe]] - appropriat[ing]
 
-    if "</ref>" in article_text:
-        print("!\tABORTING PROCESSING: Unmatched </ref>\t%s" % article_title)
-        print("!\t%s" % article_text)
-        return
+    for unmatched_item in ["<ref", "</ref>", "<blockquote", "</blockquote>", "}}", "{{", '"']:
+        if unmatched_item in article_text:
+            print("!\tABORTING PROCESSING: Unmatched %s\t%s" % (unmatched_item, article_title))
+            print("!\t%s" % article_text)
+            # Often due to typo in wiki markup, but might be due to
+            # moss misinterpreting the markup.  (Either way, should be
+            # fixed because this blocks spell-checking the entire
+            # article.)
+            return
 
-    if "</blockquote>" in article_text:
-        print("!\tABORTING PROCESSING: Unmatched </blockquote>\t%s" % article_title)
-        print("!\t%s" % article_text)
-        return
-
-    if unknown_html_tag_re.search(article_text):
-        print("W\tWARNING: Unknown HTML tag present \t%s" % article_title)
+    html_tag_matches = unknown_html_tag_re.findall(article_text)
+    if html_tag_matches:
+        print("W\tWARNING: Unknown HTML tag(s) present: %s \t%s" % ("  ".join(html_tag_matches), article_title))
         print("W\t%s" % article_text)
-
-    if "}}" in article_text:
-        print("!\tABORTING PROCESSING: }} present\t%s" % article_title)
-        print("!\t%s" % article_text)
-        # Often due to typo in wiki markup, but might be due to moss
-        # misinterpreting the markup.  (Either way, should be fixed
-        # because this blocks spell-checking the entire article.)
-        return
 
     article_count += 1
     article_oops_list = []
@@ -143,9 +136,10 @@ def spellcheck_all_langs(article_title, article_text):
         # abbreviations which are handled correctly by spell.py with
         # periods in place.
 
+        word_mixedcase = word_mixedcase.strip(",?!-()[]'\":=*|")
         if not word_mixedcase.startswith("&"):
             # Let &xxx; pass through un-stripped so it's easy to identify later
-            word_mixedcase = word_mixedcase.strip(r",?!-()[]'\":;=*|")
+            word_mixedcase = word_mixedcase.strip(";")
 
         if is_word_spelled_correctly(word_mixedcase):
             continue
@@ -163,6 +157,7 @@ def spellcheck_all_langs(article_title, article_text):
 
     article_oops_string = u" ".join(article_oops_list)
     print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string))
+
     # if article_count % 100000 == 0:
     #     dump_results()
 

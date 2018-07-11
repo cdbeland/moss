@@ -89,7 +89,7 @@ substitutions = [
     (re.compile(r"&minus;", flags=re.I), "−"),
 
     (re.compile(r"<!--.*?-->"), ""),
-    (re.compile(r"<ref.*?/\s*>", flags=re.I), ""),  # Must come before <ref>...</ref>
+    (re.compile(r"<ref[^>]*?/\s*>", flags=re.I), ""),  # Must come before <ref>...</ref>
     (re.compile(r"<ref.*?</ref>", flags=re.I), ""),
     (re.compile(r"<source.*?</source>", flags=re.I), ""),
     (re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I), ""),
@@ -97,6 +97,7 @@ substitutions = [
     (re.compile(r"<timeline.*?</timeline>", flags=re.I), ""),
     (re.compile(r"<code.*?</code>", flags=re.I), ""),
     (re.compile(r"<chem.*?</chem>", flags=re.I), ""),
+    (re.compile(r"<score.*?</score>", flags=re.I), ""),
     (re.compile(r"<span.*?>", flags=re.I), ""),
     (re.compile(r"</span>", flags=re.I), ""),
     (re.compile(r"<div.*?>", flags=re.I), ""),
@@ -113,6 +114,8 @@ substitutions = [
     (re.compile(r"</sup>", flags=re.I), " "),
     (re.compile(r"<s>", flags=re.I), ""),
     (re.compile(r"</s>", flags=re.I), ""),
+    (re.compile(r"<u>", flags=re.I), ""),
+    (re.compile(r"</u>", flags=re.I), ""),
     (re.compile(r"<references.*?>", flags=re.I), ""),
     (re.compile(r"__notoc__", flags=re.I), ""),
     (re.compile(r"\[\s*(http|https|ftp):.*?\]", flags=re.I), ""),  # External links
@@ -131,6 +134,8 @@ substitutions = [
     (re.compile(r"<nowiki>", flags=re.I), ""),
     (re.compile(r"</nowiki>", flags=re.I), ""),
 
+    (re.compile(r"<nowiki/>", flags=re.I), ""),
+    # Used to prevent auto-linking inflections, for example [[truck]]<nowiki/>s
 ]
 
 

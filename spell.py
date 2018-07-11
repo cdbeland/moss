@@ -42,7 +42,7 @@ all_words.add("o<sub>2</sub>")
 abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[a-zA-Z]+$")
 upper_alpha_re = re.compile(r"[A-Z]")
-html_entity_re = re.compile(r"^&[a-z]+;$")
+html_entity_re = re.compile(r"&[a-zA-Z]+;")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
 base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
@@ -56,6 +56,7 @@ print("Done.", file=sys.stderr)
 
 
 def is_word_spelled_correctly(word_mixedcase):
+
     if not word_mixedcase:
         return True
 
@@ -75,6 +76,16 @@ def is_word_spelled_correctly(word_mixedcase):
     if not abbr_re.search(word_mixedcase):
         word_mixedcase = word_mixedcase.strip(".")
 
+    if html_entity_re.match(word_mixedcase):
+        # HTML-escaped characters should have been converted to a real
+        # UTF-8 character in a previous phase of processing.  If they
+        # have not, this is a sign that the rule for this particular
+        # character either isn't coded into moss or that it was
+        # violated by the wikitext.  Either way, it's an error that
+        # needs to be fixed.
+        print("HTML entity", file=sys.stderr)
+        return False
+
     # Do it again in case . or 's was outside one of these
     word_mixedcase = word_mixedcase.strip(r",?!-()[]'\":;=*|")
 
@@ -85,15 +96,6 @@ def is_word_spelled_correctly(word_mixedcase):
 
     if number_formats_allowed_re.match(word_mixedcase):
         return True
-
-    if html_entity_re.match(word_lower):
-        # HTML-escaped characters should have been converted to a real
-        # UTF-8 character in a previous phase of processing.  If they
-        # have not, this is a sign that the rule for this particular
-        # character either isn't coded into moss or that it was
-        # violated by the wikitext.  Either way, it's an error that
-        # needs to be fixed.
-        return False
 
     # Ignore all capitalized words (might be proper noun which we
     # legitimately don't have an entry for)
