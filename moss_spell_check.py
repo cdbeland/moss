@@ -9,10 +9,6 @@ from spell import is_word_spelled_correctly
 # TO CHECK:
 # * transpress, literaturii dropped from common misspellings
 # TODO:
-# * \xXX in article titles in tmp-output.txt
-# * Contractions in tmp-output.txt being truncated
-# * Suppress broken table parses and HTML words
-# * &fnof; showing up as "fnof" commonly misspelled word, and CSS colors
 # * "... find all" not necessary in post-least-common-misspellings.txt
 # * Auto-suppress words in links from https://species.wikimedia.org/wiki/Wikispecies:Requested_articles#From_Wikipedia
 # * Put Suppress direct quotations on a different channel?
@@ -82,6 +78,10 @@ def dump_results():
 
 move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags=re.I)
 ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==).*?$", flags=re.M & re.I)
+blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I & re.M)
+prose_quote_re = re.compile(r'".{1,1000}?"', flags=re.M)
+unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z]")
+
 
 def spellcheck_all_langs(article_title, article_text):
     global article_count
@@ -95,9 +95,40 @@ def spellcheck_all_langs(article_title, article_text):
     # them, since they are full of proper nouns and URL words.
     article_text = ignore_sections_re.sub("", article_text)
 
-    # TODO: Handle }} inside <nowiki>
+    quotation_list = blockquote_re.findall(article_text)
+    quotation_list.extend(prose_quote_re.findall(article_text))
+    if quotation_list:
+        article_text = blockquote_re.sub("", article_text)
+        article_text = prose_quote_re.sub("", article_text)
+        print("Q\t%s\t%s" % (article_title, u"\t".join(quotation_list)))
+        # TODO: Spell-check quotations, but publish typos in them in a
+        #  separate list, since they need to be verified against the
+        #  original source, or at least corrected more carefully.
+        #  Archaic spelling should be retained and added to Wiktionary.
+        #  Spelling errors should be corrected, or if important to
+        #  keep, tagged with {{typo|}} and {{sic}}.  For now, we have
+        #  plenty of typos to fix without bothering with quotations.
+        #  See: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Quotations
+        # TODO: Handle notation for fixes to quotes like:
+        #  [[340B Drug Pricing Program]] - [s]tretch
+        #  [[Zachery Kouwe]] - appropriat[ing]
+
+    if "</ref>" in article_text:
+        print("!\tABORTING PROCESSING: Unmatched </ref>\t%s" % article_title)
+        print("!\t%s" % article_text)
+        return
+
+    if "</blockquote>" in article_text:
+        print("!\tABORTING PROCESSING: Unmatched </blockquote>\t%s" % article_title)
+        print("!\t%s" % article_text)
+        return
+
+    if unknown_html_tag_re.search(article_text):
+        print("W\tWARNING: Unknown HTML tag present \t%s" % article_title)
+        print("W\t%s" % article_text)
+
     if "}}" in article_text:
-        print("!\tABORTING PROCESSING\t%s" % article_title)
+        print("!\tABORTING PROCESSING: }} present\t%s" % article_title)
         print("!\t%s" % article_text)
         # Often due to typo in wiki markup, but might be due to moss
         # misinterpreting the markup.  (Either way, should be fixed
@@ -111,7 +142,10 @@ def spellcheck_all_langs(article_title, article_text):
         # specifically excluded from the below list, due to
         # abbreviations which are handled correctly by spell.py with
         # periods in place.
-        word_mixedcase = word_mixedcase.strip(r",?!-()[]'\":;=*|")
+
+        if not word_mixedcase.startswith("&"):
+            # Let &xxx; pass through un-stripped so it's easy to identify later
+            word_mixedcase = word_mixedcase.strip(r",?!-()[]'\":;=*|")
 
         if is_word_spelled_correctly(word_mixedcase):
             continue

@@ -70,44 +70,67 @@ def remove_structure_nested(string, open_string, close_string):
     return string_clean + string
 
 
-whitespace_re = re.compile(r"\s+")
-math_re = re.compile(r"<math.*?</math>")
+# These have to happen before templates are stripped out.
+early_substitutions = [
+    (re.compile(r"\s+"), " "),
+    (re.compile(r"{{[·|bold middot|dot|middot]}}"), " · "),
+    (re.compile(r"{{[•|bull]}}"), " • "),
+    (re.compile(r"<math.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
+    (re.compile(r"{{[spaced en dash|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash]}}", flags=re.I), " - "),
+]
 
 substitutions = [
     # Order in the below is very important!  Templates must be removed
     # before these are applied.
-    (re.compile(r"(&nbsp;|<br.*?>)"), " "),
-    (re.compile(r"&ndash;"), "-"),  # To regular hypen
+    (re.compile(r"(&nbsp;|<br.*?>)", flags=re.I), " "),
+    (re.compile(r"&ndash;", flags=re.I), "-"),  # To regular hypen
+
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Other_dashes says &minus is allowed
+    (re.compile(r"&minus;", flags=re.I), "−"),
+
     (re.compile(r"<!--.*?-->"), ""),
-    (re.compile(r"<ref.*?</ref>"), ""),
-    (re.compile(r"<ref.*?/\s*>"), ""),
-    (re.compile(r"<source.*?</source>"), ""),
-    (re.compile(r"<blockquote.*?</blockquote>"), ""),
-    (re.compile(r"<syntaxhighlight.*?</syntaxhighlight>"), ""),
-    (re.compile(r"<gallery.*?</gallery>"), ""),
-    (re.compile(r"<code.*?</code>"), ""),
-    (re.compile(r"<chem.*?</chem>"), ""),
-    (re.compile(r"<span.*?>"), ""),
-    (re.compile(r"</span>"), ""),
-    (re.compile(r"<timeline.*?</timeline>"), ""),
-    (re.compile(r"<small>"), ""),
-    (re.compile(r"</small>"), ""),
-    (re.compile(r"<sub>"), " "),
-    (re.compile(r"</sub>"), " "),
-    (re.compile(r"<sup>"), " "),
-    (re.compile(r"</sup>"), " "),
-    (re.compile(r"<references.*?>"), ""),
-    (re.compile(r"__notoc__"), ""),
-    (re.compile(r"\[\s*(http|https|ftp):.*?\]"), ""),  # External links
-    (re.compile(r"(http|https|ftp):.*?[ $]"), ""),  # Bare URLs
+    (re.compile(r"<ref.*?/\s*>", flags=re.I), ""),  # Must come before <ref>...</ref>
+    (re.compile(r"<ref.*?</ref>", flags=re.I), ""),
+    (re.compile(r"<source.*?</source>", flags=re.I), ""),
+    (re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I), ""),
+    (re.compile(r"<gallery.*?</gallery>", flags=re.I), ""),
+    (re.compile(r"<timeline.*?</timeline>", flags=re.I), ""),
+    (re.compile(r"<code.*?</code>", flags=re.I), ""),
+    (re.compile(r"<chem.*?</chem>", flags=re.I), ""),
+    (re.compile(r"<span.*?>", flags=re.I), ""),
+    (re.compile(r"</span>", flags=re.I), ""),
+    (re.compile(r"<div.*?>", flags=re.I), ""),
+    (re.compile(r"</div>", flags=re.I), ""),
+    (re.compile(r"<small>", flags=re.I), ""),
+    (re.compile(r"</small>", flags=re.I), ""),
+    (re.compile(r"<big>", flags=re.I), ""),
+    (re.compile(r"</big>", flags=re.I), ""),
+    (re.compile(r"<center>", flags=re.I), ""),
+    (re.compile(r"</center>", flags=re.I), ""),
+    (re.compile(r"<sub>", flags=re.I), " "),
+    (re.compile(r"</sub>", flags=re.I), " "),
+    (re.compile(r"<sup>", flags=re.I), " "),
+    (re.compile(r"</sup>", flags=re.I), " "),
+    (re.compile(r"<s>", flags=re.I), ""),
+    (re.compile(r"</s>", flags=re.I), ""),
+    (re.compile(r"<references.*?>", flags=re.I), ""),
+    (re.compile(r"__notoc__", flags=re.I), ""),
+    (re.compile(r"\[\s*(http|https|ftp):.*?\]", flags=re.I), ""),  # External links
+    (re.compile(r"(http|https|ftp):.*?[ $]", flags=re.I), ""),  # Bare URLs
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]"), r"\2"),
     (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
     (re.compile(r"'''''"), ""),
-    (re.compile(r"''''"), ""), # For when ''xxx'' has xxx removed
+    (re.compile(r"''''"), ""),  # For when ''xxx'' has xxx removed
     (re.compile(r"'''"), ""),
     (re.compile(r"''"), ""),
-    (re.compile(r"{.*?{.*?}}"), ""),  # Happens in mathematical expressions
+    (re.compile(r"\{.{1,200}?\{.{1,200}?\}\}"), ""),  # Happens in mathematical expressions
+
+    # TODO: Might need to actually respect this and protect segments
+    # inside these tags from substitutions.
+    (re.compile(r"<nowiki>", flags=re.I), ""),
+    (re.compile(r"</nowiki>", flags=re.I), ""),
+
 ]
 
 
@@ -118,11 +141,10 @@ substitutions = [
 # leave complicated markup (including math-in-prose) unverified.  Some
 # wikitext features, like section headers, are left intact.
 def wikitext_to_plaintext(string):
+    for (regex, replacement) in early_substitutions:
+        string = regex.sub(replacement, string)
 
     # TODO: Spell check visible contents of these special constructs
-
-    string = whitespace_re.sub(" ", string)  # Sometimes contain "{{" etc.
-    string = math_re.sub("", string)  # Sometimes contain "{{" etc.
     string = remove_structure_nested(string, "{{", "}}")
     string = remove_structure_nested(string, "{|", "|}")
 
@@ -132,6 +154,5 @@ def wikitext_to_plaintext(string):
 
     for (regex, replacement) in substitutions:
         string = regex.sub(replacement, string)
-        # print string
-        # print "---"
+
     return string
