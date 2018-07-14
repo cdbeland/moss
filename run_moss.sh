@@ -22,7 +22,7 @@ cat tmp-articles-with-words.txt | perl -pe 's/^@\t(\d+)\t(.*?)\t/* \1 - [[\2]] -
 head -1000 tmp-articles-linked-words.txt > post-articles-with-most-misspelled-words.txt
 tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' > post-articles-with-single-typo.txt
 
-cat tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py > post-most-common-misspellings.txt
+cat tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings.txt
 tac tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt
 
 # TODO: Link directly to articles where these words were detected

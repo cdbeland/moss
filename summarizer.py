@@ -1,8 +1,9 @@
 import fileinput
 import re
+import sys
 
 
-for line in fileinput.input():
+for line in fileinput.input("-"):
     line = line.strip()
 
     match_result = re.match(r"^\* (\d+) - \[\[wikt:(\w+)\]\] - (.+)$",
@@ -18,6 +19,7 @@ for line in fileinput.input():
     article_list = article_list_str.split("]], [[")
     article_list = article_list[:5]
     article_list_str = "]], [[".join(article_list).strip("[]")
-    better_line = "* %s - [[wikt:%s]] - [[%s]] ... [https://en.wikipedia.org/w/index.php?search=%s find all]" \
-                  % (article_count, word, article_list_str, word)
+    better_line = "* %s - [[wikt:%s]] - [[%s]]" % (article_count, word, article_list_str)
+    if len(sys.argv) > 1 and sys.argv[1] == "--find-all":
+        better_line += " ... [https://en.wikipedia.org/w/index.php?search=%s find all]" % word
     print(better_line)
