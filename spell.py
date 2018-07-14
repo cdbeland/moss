@@ -11,7 +11,8 @@ print("Loading spellcheck dictionary...", file=sys.stderr)
 # all into Python, even though accessing in-memory data is very fast.
 
 all_words = set()
-punctuation_re = re.compile(r"[" + punctuation + r"]")
+punctuation_tmp = punctuation
+punctuation_re = re.compile(r"[ " + punctuation + r"]")
 
 for filename in [
         "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
@@ -22,45 +23,111 @@ for filename in [
         for line in title_list:
             line = line.strip().lower()
 
-            # Mostly splitting on "_", but also ":", etc.
+            # Mostly splitting on " ", but also ":", etc.
             [all_words.add(title_word)
              for title_word
              in punctuation_re.split(line)
              if title_word]
 
-
-# Words that aren't article titles, for technical reasons
-all_words.add("#")
-all_words.add("km<sup>2</sup>")
-all_words.add("co<sub>2</sub>")
-all_words.add("h<sub>2</sub>o")
-all_words.add("h<sub>2</sub>")
-all_words.add("o<sub>2</sub>")
-# NOTE: These cases and many others are now handled by excluding anything that isn't ^[a-z]+$
-
+            # Re-parse splitting only on " " to make sure forms like
+            # "'s" get added (for compatibility with the NLTK
+            # tokenizer)
+            [all_words.add(title_word)
+             for title_word
+             in line.split(" ")
+             if title_word]
 
 abbr_re = re.compile(r"\.\w\.$")
-all_letters_re = re.compile(r"^[a-zA-Z]+$")
+all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)
 upper_alpha_re = re.compile(r"[A-Z]")
-html_entity_re = re.compile(r"&[a-zA-Z]+;")
+html_entity_re = re.compile(r"&#?[a-zA-Z]+;")
+html_tag_re = re.compile(r"<\w+></\w+><\w+/>")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
 base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
 # (possibly incomplete list)
+# https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Decimals
+# says that "0.02" is generally favored over ".02" except for
+# e.g. calibers and batting averages (which can be marked with {{not a typo}})
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currency_symbols
+number_prefix_symbols = [
+    "±",
+    r"\$",
+    r"US\$",
+    "€",
+    "£",
+    "¥",
+    "₹",
+    "₴",
+]
+
+prefixed_number_formats = [
+    "%s%s" % (prefix, base_number_format) for prefix in number_prefix_symbols
+]
+
 number_formats_allowed_re = re.compile(
-    r"(%s|%s%%|\$%s|US\$%s)" % (base_number_format, base_number_format, base_number_format, base_number_format))
+    r"(%s|%s%%|%s)" % (base_number_format,
+                       base_number_format,
+                       "|".join(prefixed_number_formats)))
+
+# Treated as separate words by NLTK tokenizer
+allowed_whitelist = [
+
+    # Legitimate English prose punctuation
+    ",",
+    "?",
+    "!",
+    "-",
+    "(",
+    ")",
+    "[",
+    "]",
+    "'",
+    '"',
+    ":",
+    ".",
+
+    # Wiki markup
+    "*",
+    "#",
+
+    # TODO: Handle general mathematical notation in HTML here or in
+    # regexes.  (<math>...</math> text will be removed.)  See:
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Mathematics#Using_HTML
+]
+
 
 print("Done.", file=sys.stderr)
 
 
+# Returns True, False, or "uncertain"
 def is_word_spelled_correctly(word_mixedcase):
 
     if not word_mixedcase:
         return True
 
     if word_mixedcase.lower() in all_words:
+        return True
+
+    if word_mixedcase in allowed_whitelist:
+        return True
+
+    if html_entity_re.match(word_mixedcase):
+        # Allowed HTML-escaped characters should have been converted
+        # to a real UTF-8 character in a previous phase of processing.
+        # If they have not, this is a sign that the rule for this
+        # particular character either isn't coded into moss or that it
+        # was violated by the wikitext.  Either way, it's an error
+        # that needs to be fixed.
+        return False
+
+    if html_tag_re.match(word_mixedcase):
+        # HTML tags should be whitelisted if allowed in wikitext, or
+        # removed by a previous phase of processing.
+        return False
+
+    if number_formats_allowed_re.match(word_mixedcase):
         return True
 
     # Possessive: NLTK parses e.g. "'s" as a separate word, which
@@ -72,30 +139,21 @@ def is_word_spelled_correctly(word_mixedcase):
     # as misspelled words should be added to Wiktionary following
     # the example at: https://en.wiktionary.org/wiki/cameras
 
+    search_again = False
+
     # F.C. vs. lastwordinsentence.
     if not abbr_re.search(word_mixedcase):
-        word_mixedcase = word_mixedcase.strip(".")
+        word_mixedcase = word_mixedcase.rstrip(".")
+        search_again = True
 
-    if html_entity_re.match(word_mixedcase):
-        # HTML-escaped characters should have been converted to a real
-        # UTF-8 character in a previous phase of processing.  If they
-        # have not, this is a sign that the rule for this particular
-        # character either isn't coded into moss or that it was
-        # violated by the wikitext.  Either way, it's an error that
-        # needs to be fixed.
-        print("HTML entity", file=sys.stderr)
-        return False
+    if word_mixedcase.startswith("†"):
+        # Used to indicate extinct species
+        word_mixedcase = word_mixedcase.lstrip("†")
+        search_again = True
 
-    # Do it again in case . or 's was outside one of these
-    word_mixedcase = word_mixedcase.strip(r",?!-()[]'\":;=*|")
-
-    word_lower = word_mixedcase.lower()
-
-    if word_lower in all_words:
-        return True
-
-    if number_formats_allowed_re.match(word_mixedcase):
-        return True
+    if search_again:
+        if word_mixedcase.lower() in all_words:
+            return True
 
     # Ignore all capitalized words (might be proper noun which we
     # legitimately don't have an entry for)
@@ -103,12 +161,7 @@ def is_word_spelled_correctly(word_mixedcase):
     # possibly misspelled words (or wait for sentence grammar
     # parsing)
     if upper_alpha_re.match(word_mixedcase):
-        return True
-
-    # TODO: This is a massive loophole; need better wikitext
-    # processing.
-    if not all_letters_re.match(word_mixedcase):
-        return True
+        return "uncertain"
 
     word_parts_mixedcase = re.split(u"[––/-]", word_mixedcase)
     # emdash, endash, slash, hyphen
@@ -119,5 +172,11 @@ def is_word_spelled_correctly(word_mixedcase):
                 any_bad = True
         if not any_bad:
             return True
+
+    # Lots of things here are probably legitimate, but we need better
+    # pattern-matching filters before it's worthwhile posting these
+    # for editors to fix.
+    if not all_letters_re.match(word_mixedcase):
+        return "uncertain"
 
     return False

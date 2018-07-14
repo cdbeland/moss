@@ -81,6 +81,8 @@ ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
 prose_quote_re = re.compile(r'"\S.{0,1000}?\S"|"\S"')
 unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
+start_template_re = re.compile(r"{{")
+end_template_re = re.compile(r"}}")
 
 
 def spellcheck_all_langs(article_title, article_text):
@@ -88,6 +90,14 @@ def spellcheck_all_langs(article_title, article_text):
 
     if move_re.search(article_text):
         print("!\tSKIPPING (copy/move to other project)\t%s" % article_title)
+
+    # This can break wikitext_to_plaintext() in ways that cause wiki
+    # syntax to be mistaken for prose.
+    starters = start_template_re.findall(article_text)
+    enders = end_template_re.findall(article_text)
+    if len(starters) != len(enders):
+        print("!\tMISMATCHED {{ }}; try https://tools.wmflabs.org/bracketbot/cgi-bin/find.py\t%s" % article_title)
+        return
 
     article_text = wikitext_to_plaintext(article_text)
 
@@ -130,21 +140,104 @@ def spellcheck_all_langs(article_title, article_text):
 
     article_count += 1
     article_oops_list = []
-    for word_mixedcase in nltk.word_tokenize(article_text):
-        # Gently removes only from beginning or end of words.  "." is
-        # specifically excluded from the below list, due to
+
+    word_list = nltk.word_tokenize(article_text)
+
+    # Old-fashioned loop to allow lookahead and cope with the fact
+    # that the length of word_list may change as it is edited in
+    # place.
+    i = 0
+    while i < len(word_list):
+        # TODO: Make test cases, especially for beginning and
+        # end-of-document HTML entities.
+
+        # Reassemble HTML markup the tokenizer has split into multiple
+        # words.  Must double-check because the tokenizer ignores
+        # whitespace, and we don't want to accidentally match
+        # e.g. where an ampersand in prose is followed shortly by a
+        # semicolon.
+
+        # TODO: Parameterize to avoid code duplication
+
+        # Three-token sequences
+        if i < len(word_list) - 2:
+            if word_list[i] == "&" and word_list[i + 2] == ";":
+                consolidated = "&%s;" % word_list[i + 1]
+                if consolidated in article_text:
+                    word_list[i] = consolidated
+                    del word_list[i + 2]
+                    del word_list[i + 1]
+
+            if word_list[i] == "<" and word_list[i + 2] == ">":
+                consolidated = "<%s>" % word_list[i + 1]
+                if consolidated in article_text:
+                    word_list[i] = consolidated
+                    del word_list[i + 2]
+                    del word_list[i + 1]
+
+        # Four-token sequences
+        if i < len(word_list) - 3:
+            if word_list[i] == "&" and word_list[i + 1] == "#" and word_list[i + 3] == ";":
+                consolidated = "&#%s;" % word_list[i + 2]
+                if consolidated in article_text:
+                    word_list[i] = consolidated
+                    del word_list[i + 3]
+                    del word_list[i + 2]
+                    del word_list[i + 1]
+
+            if word_list[i] == "<" and word_list[i + 1] == "/" and word_list[i + 3] == ">":
+                consolidated = "</%s>" % word_list[i + 2]
+                if consolidated in article_text:
+                    word_list[i] = consolidated
+                    del word_list[i + 3]
+                    del word_list[i + 2]
+                    del word_list[i + 1]
+
+            if word_list[i] == "<" and word_list[i + 2] == "/" and word_list[i + 3] == ">":
+                consolidated = "<%s/>" % word_list[i + 1]
+                if consolidated in article_text:
+                    word_list[i] = consolidated
+                    del word_list[i + 3]
+                    del word_list[i + 2]
+                    del word_list[i + 1]
+
+        i += 1
+
+    for word_mixedcase in word_list:
+
+        # "." is specifically excluded from the below list, due to
         # abbreviations which are handled correctly by spell.py with
         # periods in place.
+        word_mixedcase = word_mixedcase.strip(
+            # Deal with symmetrical wiki markup
+            "=" +
+            # Deal with, NLTK treatment of hyphenated and slashed words
+            "––/-" +
 
-        word_mixedcase = word_mixedcase.strip(",?!-()[]'\":=*|")
+            # TODO: NLTK tokenizer breaks on British quoting style
+            # (which is allowed in places): 'xxx'
+            "'"
+        )
+
+        # Deal with asymmetrical wiki markup
+        word_mixedcase = word_mixedcase.lstrip(":")
+        word_mixedcase = word_mixedcase.lstrip("*")
+
         if not word_mixedcase.startswith("&"):
             # Let &xxx; pass through un-stripped so it's easy to identify later
             word_mixedcase = word_mixedcase.strip(";")
 
-        if is_word_spelled_correctly(word_mixedcase):
+        is_spelling_correct = is_word_spelled_correctly(word_mixedcase)
+        if is_spelling_correct is True:
+            continue
+        if is_spelling_correct == "uncertain":
+            print("I\t%s\t%s" % (word_mixedcase, article_title))
+            # "I" for "ignored but maybe shouldn't be"
             continue
 
         # Word is misspelled, so...
+
+        # Normalize for report rollup purposes, even if this is incorrect capitalization
         word_lower = word_mixedcase.lower()
 
         # Index by misspelled word of article titles

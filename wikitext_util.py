@@ -4,15 +4,10 @@ import re
 
 
 def remove_structure_nested(string, open_string, close_string):
-    # string_clean and nesting_depth are for use during recursion only
-
+    # TODO: Write tests
     # Sample inputs and outputs:
-    # "aaa {{bbb {{ccc}} ddd}} eee", "", 0
-    # "bbb {{ccc}} ddd}} eee", "aaa ", 1
-    # "ccc}} ddd}} eee", "aaa bbb", 2
-    # " ddd}} eee", "aaa bbb ccc", 1
-    # " eee", "aaa bbb ccc ddd", 0
-    # "aaa bbb ccc ddd eee"
+    # ("aaa {{bbb {{ccc}} ddd}} eee", "{{, "}}") -> "aaa  eee"
+    # ("bbb {{ccc}} ddd}} eee", "{{, "}}") -> "bbb  ddd}} eee"
 
     string_clean = ""
     nesting_depth = 0
@@ -23,12 +18,6 @@ def remove_structure_nested(string, open_string, close_string):
     while open_string in string:
         open_index = string.find(open_string)  # Always > -1 inside this loop
         close_index = string.find(close_string)
-
-        # print("string_clean: %s" % string_clean)
-        # print("nesting_depth: %s" % nesting_depth)
-        # print("open_index: %s" % open_index)
-        # print("close_index: %s" % close_index)
-        # print("string: %s" % string)
 
         if nesting_depth == 0:
             # Save text to the beginning of the template and open a new one
@@ -75,7 +64,7 @@ early_substitutions = [
     (re.compile(r"\s+"), " "),
     (re.compile(r"{{[·|bold middot|dot|middot]}}"), " · "),
     (re.compile(r"{{[•|bull]}}"), " • "),
-    (re.compile(r"<math.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
+    (re.compile(r"<math>.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
     (re.compile(r"{{[spaced en dash|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash]}}", flags=re.I), " - "),
 ]
 
@@ -89,18 +78,20 @@ substitutions = [
     (re.compile(r"&minus;", flags=re.I), "−"),
 
     (re.compile(r"<!--.*?-->"), ""),
-    (re.compile(r"<ref[^>]*?/\s*>", flags=re.I), ""),  # Must come before <ref>...</ref>
-    (re.compile(r"<ref.*?</ref>", flags=re.I), ""),
-    (re.compile(r"<source.*?</source>", flags=re.I), ""),
-    (re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I), ""),
-    (re.compile(r"<gallery.*?</gallery>", flags=re.I), ""),
-    (re.compile(r"<timeline.*?</timeline>", flags=re.I), ""),
-    (re.compile(r"<code.*?</code>", flags=re.I), ""),
-    (re.compile(r"<chem.*?</chem>", flags=re.I), ""),
-    (re.compile(r"<score.*?</score>", flags=re.I), ""),
-    (re.compile(r"<span.*?>", flags=re.I), ""),
+    (re.compile(r"<(\??[a-zA-Z]+)[^>]{0,1000}?(/?)\s*>"), r"<\1\2>"),  # Drop HTML attributes for easier parsing
+
+    (re.compile(r"<ref/>", flags=re.I), ""),  # Must come before <ref>...</ref>
+    (re.compile(r"<ref>.*?</ref>", flags=re.I), ""),
+    (re.compile(r"<source>.*?</source>", flags=re.I), ""),
+    (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I), ""),
+    (re.compile(r"<gallery>.*?</gallery>", flags=re.I), ""),
+    (re.compile(r"<timeline>.*?</timeline>", flags=re.I), ""),
+    (re.compile(r"<code>.*?</code>", flags=re.I), ""),
+    (re.compile(r"<chem>.*?</chem>", flags=re.I), ""),
+    (re.compile(r"<score>.*?</score>", flags=re.I), ""),
+    (re.compile(r"<span>", flags=re.I), ""),
     (re.compile(r"</span>", flags=re.I), ""),
-    (re.compile(r"<div.*?>", flags=re.I), ""),
+    (re.compile(r"<div>", flags=re.I), ""),
     (re.compile(r"</div>", flags=re.I), ""),
     (re.compile(r"<small>", flags=re.I), ""),
     (re.compile(r"</small>", flags=re.I), ""),
@@ -116,12 +107,15 @@ substitutions = [
     (re.compile(r"</s>", flags=re.I), ""),
     (re.compile(r"<u>", flags=re.I), ""),
     (re.compile(r"</u>", flags=re.I), ""),
-    (re.compile(r"<references.*?>", flags=re.I), ""),
+    (re.compile(r"<references[^>]*?>", flags=re.I), ""),
     (re.compile(r"__notoc__", flags=re.I), ""),
     (re.compile(r"\[\s*(http|https|ftp):.*?\]", flags=re.I), ""),  # External links
     (re.compile(r"(http|https|ftp):.*?[ $]", flags=re.I), ""),  # Bare URLs
+
+    # TODO: These could really use test cases
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]"), r"\2"),
+
     (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
     (re.compile(r"'''''"), ""),
     (re.compile(r"''''"), ""),  # For when ''xxx'' has xxx removed
