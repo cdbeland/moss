@@ -1,7 +1,6 @@
 import fileinput
 import math
 import re
-import sys
 
 number_re = re.compile("\* (\d+)")
 count_by_number_of_things = {}
@@ -17,7 +16,6 @@ def dump_output(hash_to_dump):
     # and 19 misspelled words)
     bucketed_hash = {}
     for key in hash_to_dump.keys():
-        print("%s:%s" % (key, hash_to_dump[key]), file=sys.stderr)
         bucket = None
         if key == 0:
             bucket = "0"
@@ -32,7 +30,6 @@ def dump_output(hash_to_dump):
             else:
                 bucket = "%s-%s" % (bucket_lower, bucket_upper)
 
-        print("BUCKET: %s" % bucket, file=sys.stderr)
         bucketed_hash[bucket] = bucketed_hash.get(bucket, 0) + hash_to_dump[key]
 
     # Print out bucketed results
