@@ -71,11 +71,22 @@ early_substitutions = [
 substitutions = [
     # Order in the below is very important!  Templates must be removed
     # before these are applied.
-    (re.compile(r"(&nbsp;|<br.*?>)", flags=re.I), " "),
-    (re.compile(r"&ndash;", flags=re.I), "-"),  # To regular hypen
 
-    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Other_dashes says &minus is allowed
-    (re.compile(r"&minus;", flags=re.I), "−"),
+    # TODO: Implement results of discussion at
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style#HTML_entities
+
+    # Whitespace
+    (re.compile(r"&nbsp;|<br.*?>|&thinsp;", flags=re.I), " "),
+
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Dashes
+    # says these are allowed
+    (re.compile(r"&ndash;", flags=re.I), "-"),  # To regular hypen
+    (re.compile(r"&mdash;", flags=re.I), "—"),  # U+2013
+    (re.compile(r"&minus;", flags=re.I), "−"),  # U+2212
+
+    # Confusingly similar to quotation marks
+    (re.compile(r"&prime;", flags=re.I), "′"),  # U+2032
+    (re.compile(r"&Prime;", flags=re.I), "″"),  # U+2033
 
     (re.compile(r"<!--.*?-->"), ""),
     (re.compile(r"<(\??[a-zA-Z]+)[^>]{0,1000}?(/?)\s*>"), r"<\1\2>"),  # Drop HTML attributes for easier parsing
@@ -130,6 +141,10 @@ substitutions = [
 
     (re.compile(r"<nowiki/>", flags=re.I), ""),
     # Used to prevent auto-linking inflections, for example [[truck]]<nowiki/>s
+
+    # Used inside links per https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Brackets_and_linking
+    (re.compile(r"&#91;", flags=re.I), "["),
+    (re.compile(r"&#93;", flags=re.I), "]"),
 ]
 
 

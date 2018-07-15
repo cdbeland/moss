@@ -19,11 +19,21 @@ cat tmp-misspelled-words.txt | perl -pe 'print length($_) - 1; print "\t"' | sor
 grep '^*' tmp-output.txt | tac > tmp-words-with-articles.txt
 
 cat tmp-articles-with-words.txt | perl -pe 's/^@\t(\d+)\t(.*?)\t/* \1 - [[\2]] - /' > tmp-articles-linked-words.txt
-head -1000 tmp-articles-linked-words.txt > post-articles-with-most-misspelled-words.txt
+grep -P ' - [a-z ]+$' tmp-articles-linked-words.txt | head -1000 > post-articles-with-most-misspelled-words.txt
+grep -vP ' - [a-z ]+$' tmp-articles-linked-words.txt | head -1000 > debug-articles-with-most-misspelled-words-intl.txt
+# TODO: Download titles only for Wikipedias for all languages, and
+# include these in all_words lookup (might need to move to database
+# instead of in-memory since this list will get extremely large)
+
+
 tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' > post-articles-with-single-typo.txt
 
-cat tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings.txt
-tac tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt
+grep -P "\[\[wikt:[a-z]+\]\]" tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings.txt
+tac tmp-words-with-articles.txt | grep -P "\[\[wikt:[a-z]+\]\]" | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt
+grep -P "\[\[wikt:&" tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-html-entities.txt
+grep -P "\[\[wikt:<" tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-html-tags.txt
+
+cat tmp-words-with-articles.txt | grep -vP "\[\[wikt:[a-z]+\]\]" | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings-intl.txt
 
 # TODO: Link directly to articles where these words were detected
 tac tmp-misspelled-words-charlen.txt | uniq | perl -pe 's%(\d+)\t(.*)$%* \1 [https://en.wikipedia.org/w/index.php?search=\2 \2]%' > post-longest-shortest-misspelled-words.txt

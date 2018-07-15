@@ -1,5 +1,8 @@
 cd /bulk-wikipedia/
 
+rm -f Wikispecies:Requested_articles
+wget https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
+
 rm -f enwiktionary-latest-all-titles-in-ns0
 wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-all-titles-in-ns0.gz
 gunzip enwiktionary-latest-all-titles-in-ns0.gz

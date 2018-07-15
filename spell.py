@@ -41,7 +41,7 @@ abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)
 upper_alpha_re = re.compile(r"[A-Z]")
 html_entity_re = re.compile(r"&#?[a-zA-Z]+;")
-html_tag_re = re.compile(r"<\w+></\w+><\w+/>")
+html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
 base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
@@ -129,6 +129,11 @@ def is_word_spelled_correctly(word_mixedcase):
 
     if number_formats_allowed_re.match(word_mixedcase):
         return True
+
+    if "…" in word_mixedcase:
+        # "..." is preferred by
+        # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Ellipses
+        return False
 
     # Possessive: NLTK parses e.g. "'s" as a separate word, which
     # Wikitionary has listed.

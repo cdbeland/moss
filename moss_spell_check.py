@@ -10,9 +10,6 @@ from spell import is_word_spelled_correctly
 # * transpress, literaturii dropped from common misspellings
 # TODO:
 # * "... find all" not necessary in post-least-common-misspellings.txt
-# * Auto-suppress words in links from https://species.wikimedia.org/wiki/Wikispecies:Requested_articles#From_Wikipedia
-# * Put Suppress direct quotations on a different channel?
-#   (verifying them takes more effort)
 # * {{spaced endash}} and friends (subst: all instances?)
 #   https://en.wikipedia.org/wiki/Category:Wikipedia_character-substitution_templates
 # * tmp-output.txt:* 24 - [[wikt:ation]] - [[1772 in poetry]] ([[attest]]ation)
@@ -84,12 +81,22 @@ unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 
+requested_species_html = ""
+with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
+    requested_species_html = requested_species_file.read()
+
 
 def spellcheck_all_langs(article_title, article_text):
     global article_count
 
     if move_re.search(article_text):
-        print("!\tSKIPPING (copy/move to other project)\t%s" % article_title)
+        print("!\tSKIPPING (copy/move article to other project)\t%s" % article_title)
+        return
+
+    request_search_string = 'title="en:%s"' % article_title
+    if request_search_string in requested_species_html:
+        print("!\tSKIPPING (list with requested species)\t%s" % article_title)
+        return
 
     # This can break wikitext_to_plaintext() in ways that cause wiki
     # syntax to be mistaken for prose.
