@@ -6,7 +6,7 @@ import sys
 for line in fileinput.input("-"):
     line = line.strip()
 
-    match_result = re.match(r"^\* (\d+) - \[\[wikt:(\w+)\]\] - (.+)$",
+    match_result = re.match(r"^\* (\d+) - \[\[wikt:(.*?)\]\] - (.+)$",
                             line)
     if not match_result:
         # Word probably contains non-\w characters; skip!
