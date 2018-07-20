@@ -76,17 +76,56 @@ substitutions = [
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style#HTML_entities
 
     # Whitespace
-    (re.compile(r"&nbsp;|<br.*?>|&thinsp;", flags=re.I), " "),
+    (re.compile(r"&nbsp;|&thinsp;|&hairsp;"), " "),
+    (re.compile(r"<br.*?>", flags=re.I), " "),
 
-    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Dashes
-    # says these are allowed
-    (re.compile(r"&ndash;", flags=re.I), "-"),  # To regular hypen
-    (re.compile(r"&mdash;", flags=re.I), "—"),  # U+2013
-    (re.compile(r"&minus;", flags=re.I), "−"),  # U+2212
-
-    # Confusingly similar to quotation marks
-    (re.compile(r"&prime;", flags=re.I), "′"),  # U+2032
-    (re.compile(r"&Prime;", flags=re.I), "″"),  # U+2033
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Text_formatting#HTML_character_entity_references
+    # says these are allowed to avoid confusion.  Should be treated
+    # the same as the Unicode characters by downstream code, so
+    # normalize them to that.
+    (re.compile(r"&ndash;"), "-"),  # To regular hypen
+    (re.compile(r"&mdash;"), "—"),  # U+2013
+    (re.compile(r"&minus;"), "−"),  # U+2212
+    (re.compile(r"&prime;"), "′"),  # U+2032
+    (re.compile(r"&Prime;"), "″"),  # U+2033
+    (re.compile(r"&Prime;"), "″"),  # U+2033
+    (re.compile(r"&Alpha;"), "Α"),
+    (re.compile(r"&Beta;"), "Β"),
+    (re.compile(r"&Epsilon;"), "Ε"),
+    (re.compile(r"&Zeta;"), "Ζ"),
+    (re.compile(r"&Eta;"), "Η"),
+    (re.compile(r"&Iota;"), "Ι"),
+    (re.compile(r"&Kappa;"), "Κ"),
+    (re.compile(r"&Mu;"), "Μ"),
+    (re.compile(r"&Nu;"), "Ν"),
+    (re.compile(r"&Omicron;"), "Ο"),
+    (re.compile(r"&Rho;"), "Ρ"),
+    (re.compile(r"&Tau;"), "Τ"),
+    (re.compile(r"&Upsilon;"), "Υ"),
+    (re.compile(r"&Chi;"), "Χ"),
+    (re.compile(r"&kappa;"), "κ"),
+    (re.compile(r"&omicron;"), "ο"),
+    (re.compile(r"&rho;"), "ρ"),
+    (re.compile(r"&lsquo;"), "‘"),
+    (re.compile(r"&rsquo;"), "’"),
+    (re.compile(r"&sbquo;"), "‚"),
+    (re.compile(r"&ldquo;"), "“"),
+    (re.compile(r"&rdquo;"), "”"),
+    (re.compile(r"&bdquo;"), "„"),
+    (re.compile(r"&acute;"), "´"),
+    (re.compile(r"&#96;"), "`"),
+    (re.compile(r"&;lrm"), ""),
+    (re.compile(r"&;rlm"), ""),
+    (re.compile(r"&times;"), "×"),
+    (re.compile(r"&and;"), "∧"),
+    (re.compile(r"&or;"), "∨"),
+    (re.compile(r"&lang;"), "〈"),
+    (re.compile(r"&rang;"), "〉"),
+    (re.compile(r"&lsaquo;"), "‹"),
+    (re.compile(r"&rsaquo;"), "›"),
+    (re.compile(r"&sdot;"), "⋅"),
+    (re.compile(r"&middot;"), "·"),
+    (re.compile(r"&bull;"), "•"),
 
     (re.compile(r"<!--.*?-->"), ""),
     (re.compile(r"<(\??[a-zA-Z]+)[^>]{0,1000}?(/?)\s*>"), r"<\1\2>"),  # Drop HTML attributes for easier parsing
