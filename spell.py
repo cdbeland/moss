@@ -418,6 +418,17 @@ allowed_list = [
     "*",
     "#",
 
+    # Allowed HTML entities per
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Text_formatting#HTML_character_entity_references
+    # (May want to comment these out occasionaly and make sure the
+    # uses are legitimate, or convert some or all to <nowiki>?)
+    "&amp;",
+    "&lt;",
+    "&gt;",
+    "&#91;",
+    "&#93;",
+    "&apos;",
+
     # TODO: Handle general mathematical notation in HTML here or in
     # regexes.  (<math>...</math> text will be removed.)  See:
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Mathematics#Using_HTML
