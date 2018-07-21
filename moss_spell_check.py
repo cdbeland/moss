@@ -169,11 +169,16 @@ def spellcheck_all_langs(article_title, article_text):
         # Three-token sequences
         if i < len(word_list) - 2:
             if word_list[i] == "&" and word_list[i + 2] == ";":
-                consolidated = "&%s;" % word_list[i + 1]
-                if consolidated in article_text:
-                    word_list[i] = consolidated
-                    del word_list[i + 2]
-                    del word_list[i + 1]
+
+                # Protect against & in acronyms, common for railroads
+                # and companies like AT&T, PG&E.
+                if i == 0 or (re.match("^[A-Z]+$", word_list[i + 1])
+                              and re.match("^[A-Z]+$", word_list[i - 1])):
+                    consolidated = "&%s;" % word_list[i + 1]
+                    if consolidated in article_text:
+                        word_list[i] = consolidated
+                        del word_list[i + 2]
+                        del word_list[i + 1]
 
             if word_list[i] == "<" and word_list[i + 2] == ">":
                 consolidated = "<%s>" % word_list[i + 1]
