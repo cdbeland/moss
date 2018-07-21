@@ -1,6 +1,7 @@
 import fileinput
 import re
 import sys
+import urllib.parse
 
 
 for line in fileinput.input("-"):
@@ -19,7 +20,26 @@ for line in fileinput.input("-"):
     article_list = article_list_str.split("]], [[")
     article_list = article_list[:5]
     article_list_str = "]], [[".join(article_list).strip("[]")
-    better_line = "* %s - [[wikt:%s]] - [[%s]]" % (article_count, word, article_list_str)
+
+    special_word = False
+    if word.startswith("<") or word.startswith("&"):
+        special_word = True
+
+    if special_word:
+        better_line = "* %s - <nowiki>%s</nowiki> - [[%s]]" % (article_count, word, article_list_str)
+    else:
+        better_line = "* %s - [[wikt:%s]] - [[%s]]" % (article_count, word, article_list_str)
+
     if len(sys.argv) > 1 and sys.argv[1] == "--find-all":
-        better_line += " ... [https://en.wikipedia.org/w/index.php?search=%s find all]" % word
+        if special_word:
+            # Strip ">" instead of encoding it so we find instances
+            # with HTML attributes
+            # word_safe = re.sub(">", "%3E", word_safe)
+            word_safe = re.sub(">", "", word)
+
+            word_safe = urllib.parse.quote_plus(word_safe)
+            better_line += " ... [https://en.wikipedia.org/w/index.php?search=insource%%3A%%2F\%s%%2F&ns0=1 find all]" % word_safe
+
+        else:
+            better_line += " ... [https://en.wikipedia.org/w/index.php?search=%s find all]" % word
     print(better_line)
