@@ -30,8 +30,8 @@ grep -vP ' - [a-z ]+$' tmp-articles-linked-words.txt | head -1000 > debug-articl
 # -intl channels become useful.  (May also need to remove HTML
 # entities and tags.)
 
-tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -P ' - [a-z ]+$' | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' > post-articles-with-single-typo.txt
-tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -vP ' - [a-z ]+$' | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' > debug-articles-with-single-typo-intl.txt
+tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -P ' - [a-z ]+$' | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' | ../venv/bin/python3 ../sectionalizer.py > post-articles-with-single-typo.txt
+tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -vP ' - [a-z ]+$' | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' | ../venv/bin/python3 ../sectionalizer.py > debug-articles-with-single-typo-intl.txt
 
 grep -P "\[\[wikt:[a-z]+\]\]" tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings.txt
 tac tmp-words-with-articles.txt | grep -P "\[\[wikt:[a-z]+\]\]" | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt

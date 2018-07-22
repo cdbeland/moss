@@ -10,7 +10,7 @@ for line in fileinput.input("-"):
     match_result = re.match(r"^\* (\d+) - \[\[wikt:(.*?)\]\] - (.+)$",
                             line)
     if not match_result:
-        # Word probably contains non-\w characters; skip!
+        # Some sort of garbled output?
         continue
 
     article_count = match_result.group(1)
