@@ -417,6 +417,10 @@ allowed_list = [
     # Wiki markup
     "*",
     "#",
+    "<poem>",
+    "</poem>",
+    "<abbr>",
+    "</abbr>",
 
     # Allowed HTML entities per
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Text_formatting#HTML_character_entity_references

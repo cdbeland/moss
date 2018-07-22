@@ -128,10 +128,21 @@ substitutions = [
     (re.compile(r"&bull;"), "•"),
 
     (re.compile(r"<!--.*?-->"), ""),
-    (re.compile(r"<(\??[a-zA-Z]+)[^>]{0,1000}?(/?)\s*>"), r"<\1\2>"),  # Drop HTML attributes for easier parsing
 
+    # Drop HTML attributes for easier parsing
+    (re.compile(r"<(\??[a-zA-Z]+)[^>]{0,1000}?(/?)\s*>"), r"<\1\2>"),
+
+    # ----
+
+    # https://en.wikipedia.org/wiki/Help:HTML_in_wikitext has a big
+    # list of allowed elements, some of which are custom tags
+    # interpreted by the Mediawiki engine.
+
+    # Unlikely to have parseable prose
     (re.compile(r"<ref/>", flags=re.I), ""),  # Must come before <ref>...</ref>
     (re.compile(r"<ref>.*?</ref>", flags=re.I), ""),
+    (re.compile(r"<references[^>]*/>", flags=re.I), ""),  # Must come before <references>...</references>
+    (re.compile(r"<references[^>]*>.*?</\s*references>", flags=re.I), ""),
     (re.compile(r"<source>.*?</source>", flags=re.I), ""),
     (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I), ""),
     (re.compile(r"<gallery>.*?</gallery>", flags=re.I), ""),
@@ -139,6 +150,14 @@ substitutions = [
     (re.compile(r"<code>.*?</code>", flags=re.I), ""),
     (re.compile(r"<chem>.*?</chem>", flags=re.I), ""),
     (re.compile(r"<score>.*?</score>", flags=re.I), ""),
+    (re.compile(r"<pre>.*?</pre>", flags=re.I), ""),
+    (re.compile(r"<var>.*?</var>", flags=re.I), ""),
+    (re.compile(r"<hiero>.*?</hiero>", flags=re.I), ""),
+    (re.compile(r"<imagemap>.*?</imagemap>", flags=re.I), ""),
+    (re.compile(r"<mapframe>.*?</mapframe>", flags=re.I), ""),
+
+    # Make the contained text bubble up to become part of the
+    # surrounding text
     (re.compile(r"<span>", flags=re.I), ""),
     (re.compile(r"</span>", flags=re.I), ""),
     (re.compile(r"<div>", flags=re.I), ""),
@@ -157,7 +176,18 @@ substitutions = [
     (re.compile(r"</s>", flags=re.I), ""),
     (re.compile(r"<u>", flags=re.I), ""),
     (re.compile(r"</u>", flags=re.I), ""),
-    (re.compile(r"<references[^>]*?>", flags=re.I), ""),
+    (re.compile(r"<del>", flags=re.I), ""),
+    (re.compile(r"</del>", flags=re.I), ""),
+    (re.compile(r"<time>", flags=re.I), ""),
+    (re.compile(r"</time>", flags=re.I), ""),
+    (re.compile(r"<onlyinclude>", flags=re.I), ""),
+    (re.compile(r"</onlyinclude>", flags=re.I), ""),
+    (re.compile(r"<includeonly>", flags=re.I), ""),
+    (re.compile(r"</includeonly>", flags=re.I), ""),
+    (re.compile(r"<section[^>]*/>", flags=re.I), ""),
+    (re.compile(r"<noinclude>", flags=re.I), ""),
+    (re.compile(r"</noinclude>", flags=re.I), ""),
+
     (re.compile(r"__notoc__", flags=re.I), ""),
     (re.compile(r"\[\s*(http|https|ftp):.*?\]", flags=re.I), ""),  # External links
     (re.compile(r"(http|https|ftp):.*?[ $]", flags=re.I), ""),  # Bare URLs

@@ -106,6 +106,7 @@ def spellcheck_all_langs(article_title, article_text):
         print("!\tMISMATCHED {{ }}; try https://tools.wmflabs.org/bracketbot/cgi-bin/find.py\t%s" % article_title)
         return
 
+    article_text_orig = article_text
     article_text = wikitext_to_plaintext(article_text)
 
     # TODO: Get smarter about these sections.  But for now, ignore
@@ -172,8 +173,8 @@ def spellcheck_all_langs(article_title, article_text):
 
                 # Protect against & in acronyms, common for railroads
                 # and companies like AT&T, PG&E.
-                if i == 0 or (re.match("^[A-Z]+$", word_list[i + 1])
-                              and re.match("^[A-Z]+$", word_list[i - 1])):
+                if i == 0 or not (re.match("^[A-Z]+$", word_list[i + 1])
+                                  and re.match("^[A-Z]+$", word_list[i - 1])):
                     consolidated = "&%s;" % word_list[i + 1]
                     if consolidated in article_text:
                         word_list[i] = consolidated
@@ -245,6 +246,16 @@ def spellcheck_all_langs(article_title, article_text):
         if is_spelling_correct == "uncertain":
             print("I\t%s\t%s" % (word_mixedcase, article_title))
             # "I" for "ignored but maybe shouldn't be"
+            continue
+
+        # Hack to avoid having to do even more complicated token
+        # re-assembly, though this may cause some unnecessary HTML
+        # markup on the same page to be ignored.
+        if word_mixedcase == "<li>" and "<li value=" in article_text_orig:
+            continue
+        if word_mixedcase == "<ol>" and "<ol start=" in article_text_orig:
+            continue
+        if word_mixedcase == "<ol>" and "<ol type=" in article_text_orig:
             continue
 
         # Word is misspelled, so...
