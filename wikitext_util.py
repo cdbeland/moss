@@ -84,6 +84,7 @@ substitutions = [
     # the same as the Unicode characters by downstream code, so
     # normalize them to that.
     (re.compile(r"&ndash;"), "-"),  # To regular hypen
+    (re.compile(r"&shy;"), ""),  # Optional hyphen
     (re.compile(r"&mdash;"), "—"),  # U+2013
     (re.compile(r"&minus;"), "−"),  # U+2212
     (re.compile(r"&prime;"), "′"),  # U+2032
@@ -114,8 +115,8 @@ substitutions = [
     (re.compile(r"&bdquo;"), "„"),
     (re.compile(r"&acute;"), "´"),
     (re.compile(r"&#96;"), "`"),
-    (re.compile(r"&;lrm"), ""),
-    (re.compile(r"&;rlm"), ""),
+    (re.compile(r"&lrm;"), ""),
+    (re.compile(r"&rlm;"), ""),
     (re.compile(r"&times;"), "×"),
     (re.compile(r"&and;"), "∧"),
     (re.compile(r"&or;"), "∨"),

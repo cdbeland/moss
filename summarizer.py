@@ -22,11 +22,14 @@ for line in fileinput.input("-"):
     article_list_str = "]], [[".join(article_list).strip("[]")
 
     special_word = False
-    if word.startswith("<") or word.startswith("&"):
-        special_word = True
 
-    if special_word:
+    if word.startswith("<"):
+        special_word = True
         better_line = "* %s - <nowiki>%s</nowiki> - [[%s]]" % (article_count, word, article_list_str)
+    elif word.startswith("&"):
+        special_word = True
+        word_no_amp = word.lstrip("&")
+        better_line = "* %s - &amp;%s (%s) - [[%s]]" % (article_count, word_no_amp, word, article_list_str)
     else:
         better_line = "* %s - [[wikt:%s]] - [[%s]]" % (article_count, word, article_list_str)
 
@@ -37,8 +40,9 @@ for line in fileinput.input("-"):
             # word_safe = re.sub(">", "%3E", word_safe)
             word_safe = re.sub(">", "", word)
 
+            word_safe = word_safe.replace("<", "\<")
             word_safe = urllib.parse.quote_plus(word_safe)
-            better_line += " ... [https://en.wikipedia.org/w/index.php?search=insource%%3A%%2F\%s%%2F&ns0=1 find all]" % word_safe
+            better_line += " ... [https://en.wikipedia.org/w/index.php?search=insource%%3A%%2F%s%%2Fi&ns0=1 find all]" % word_safe
 
         else:
             better_line += " ... [https://en.wikipedia.org/w/index.php?search=%s find all]" % word

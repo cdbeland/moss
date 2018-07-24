@@ -393,7 +393,6 @@ prohibited_list = [
     # Unnecessary whitespace
     "&ensp;",
     "&emsp;",
-    "&zwnj;",
     "&zwj;",
 ]
 
@@ -432,6 +431,7 @@ allowed_list = [
     "&#91;",
     "&#93;",
     "&apos;",
+    "&zwnj;",
 
     # TODO: Handle general mathematical notation in HTML here or in
     # regexes.  (<math>...</math> text will be removed.)  See:

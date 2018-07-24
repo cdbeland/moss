@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+# Run time for commit 10512ac: 23h 19m (whata)
 # Run time for commit 4933ad4: 22h 00m (whata) +/- 10 min
 # Run time for commit e20e070: 19h 47m (whata)
 # Run time: 12h 38m (whata)

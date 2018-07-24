@@ -173,7 +173,7 @@ def spellcheck_all_langs(article_title, article_text):
 
                 # Protect against & in acronyms, common for railroads
                 # and companies like AT&T, PG&E.
-                if i == 0 or not (re.match("^[A-Z]+$", word_list[i + 1])
+                if i == 0 or not (re.match("^[A-Z]+s?$", word_list[i + 1])
                                   and re.match("^[A-Z]+$", word_list[i - 1])):
                     consolidated = "&%s;" % word_list[i + 1]
                     if consolidated in article_text:
