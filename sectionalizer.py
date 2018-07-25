@@ -23,7 +23,6 @@ while changes_made:
     new_hash = {}
     for (group_key, line_list) in grouped_lines.items():
         if len(line_list) > 50 and len(group_key) < 5:
-            print("%s has too many lines" % group_key)
             changes_made = True
             for line in line_list:
                 word = get_word(line)
