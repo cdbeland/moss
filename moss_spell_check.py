@@ -74,7 +74,9 @@ def dump_results():
 
 
 move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags=re.I)
-ignore_sections_re = re.compile(r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==).*?$", flags=re.I)
+ignore_sections_re = re.compile(
+    r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==|==\s*Publications\s*==|==\s*Works\s*==).*?$",
+    flags=re.I)
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"')
 unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
