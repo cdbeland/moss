@@ -18,6 +18,7 @@ for filename in [
         "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
         "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
         "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
+        "/bulk-wikipedia/Wikispecies:Requested_articles",
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
