@@ -215,6 +215,11 @@ substitutions = [
     # Used inside links per https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Brackets_and_linking
     (re.compile(r"&#91;", flags=re.I), "["),
     (re.compile(r"&#93;", flags=re.I), "]"),
+
+    # Some parts of tables can end up outside of {| |} due to templates
+    (re.compile(r"! colspan=.*?\n"), ""),
+    (re.compile(r"\| colspan=.*?\n"), ""),
+    (re.compile(r"\|\|? rowspan=.*?\n"), ""),
 ]
 
 
