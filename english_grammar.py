@@ -81,6 +81,14 @@ closed_lexicon = {
     "POSS": ["'s"]
 }
 
+# Wiktionary includes a lot of archaic and obscure definitions.  For
+# high-frequency words, this can cause a lot of spurious parses.  This
+# lmits the part-of-speech possibilities for a given word to only
+# those possibilities listed here.
+vocab_overrides = {
+    "a": ["DET"],
+}
+
 attribute_expansion = {
     "DR": ["N-PROP-PL-UNC"],             # cup
     "NDR": ["N+PL", "N+UNC", "N+PROP"],  # puppies, money, Germany

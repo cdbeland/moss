@@ -18,10 +18,11 @@
 import mysql.connector
 import nltk
 import re
-import wikipedia
-# https://wikipedia.readthedocs.io/en/latest/code.html
-from english_grammar import enwiktionary_cat_to_pos, phrase_structures, closed_lexicon
-
+import wikipedia  # https://wikipedia.readthedocs.io/en/latest/code.html
+from english_grammar import (enwiktionary_cat_to_pos,
+                             phrase_structures,
+                             closed_lexicon,
+                             vocab_overrides)
 
 mysql_connection = mysql.connector.connect(user='beland',
                                            host='127.0.0.1',
@@ -147,7 +148,16 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         return False
 
     if possible_parses:
-        print([parse for parse in possible_parses])
+        seen = []
+        possible_parses_dedup = []
+        for parse in possible_parses:
+            serialized = parse.pformat()
+            if serialized in seen:
+                continue
+            else:
+                possible_parses_dedup.append(parse)
+                seen.append(serialized)
+        [parse.pretty_print() for parse in possible_parses_dedup]
         return True
     else:
         return False
@@ -253,15 +263,9 @@ def fetch_categories(word):
 def load_grammar_for_page(page_text):
     grammar_string = ""
 
-    word_set = set(nltk.word_tokenize(page_text))
+    # ---
 
-    more_words = set()
-    for word in word_set:
-        if word == word.title():
-            more_words.add(word.lower())
-    word_set = word_set.union(more_words)
-
-    word_to_pos = {}
+    # Load relationships between parts of speech
 
     for (parent_pos, child_structures) in sorted(phrase_structures.items()):
         alternatives = []
@@ -271,19 +275,51 @@ def load_grammar_for_page(page_text):
             alternatives.append(" ".join(child_list))
         grammar_string += "%s -> %s\n" % (parent_pos, " | ".join(alternatives))
 
+    # ---
+
+    # Load limited vocabulary (only for words on this page, to
+    # minimize the size of the grammar).
+
+    word_set = set(nltk.word_tokenize(page_text))
+
+    # Deal with the possibility that some words are only capitalized
+    # because they begin a sentence.  No harm here in loading a few
+    # lowercase variants we won't actually use later.
+    more_words = set()
     for word in word_set:
-        word_categories = fetch_categories(word)
+        if word == word.title():
+            more_words.add(word.lower())
+    word_set = word_set.union(more_words)
+
+    word_to_pos = {}
+    for word in word_set:
         word_pos_set = set()
-        for category_name in word_categories:
-            new_pos = enwiktionary_cat_to_pos.get(category_name)
-            if new_pos:
-                word_pos_set.add(new_pos)
+
+        if word in vocab_overrides:
+            word_pos_set = vocab_overrides[word]
+        else:
+            word_categories = fetch_categories(word)
+            for category_name in word_categories:
+                new_pos = enwiktionary_cat_to_pos.get(category_name)
+                if new_pos:
+                    word_pos_set.add(new_pos)
 
         if word_pos_set:
             word_to_pos[word] = list(word_pos_set)
 
         for pos in word_pos_set:
             grammar_string += '%s -> "%s"\n' % (pos, word)
+
+    # ---
+
+    # Load closed-class vocabulary explicity set by
+    # english_grammar.py.
+
+    # TODO: This is probably unnecessary; Wiktionary almost certainly
+    # has these listed. These are currently adding to the grammar, not
+    # overriding Wiktionary, so it's unclear if the attributes are
+    # going to come through at the other end.  (They're currently
+    # unused anyway, but that could change.)
 
     for (pos, word_list) in closed_lexicon.items():
         pos = pos.split("+")[0]
