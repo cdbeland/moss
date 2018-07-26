@@ -108,7 +108,7 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         if first_word and not pos_list and word == word.title():
             pos_list = word_to_pos.get(word.lower())
             if pos_list:
-                print("Lowercase version found for %s" % word)
+                print("Lowercase version found for %s: %s" % (word, pos_list))
                 # For CFG library
                 word_list[0] = word.lower()
         if not pos_list and word.isalpha() and (word == word.title() or word == word.upper()):
@@ -134,15 +134,15 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         word_train.append((word, pos_list))
         first_word = False
 
-    # print("DEBUG\t%s" % word_train)
-
     grammar = nltk.CFG.fromstring(grammar_string)
     parser = nltk.parse.RecursiveDescentParser(grammar)
+    # parser.trace(5)
+
+    # print(grammar)
 
     try:
         possible_parses = parser.parse(word_list)
     except Exception as e:
-        # print(grammar_string)
         print(e)
         return False
 
@@ -179,41 +179,42 @@ def check_article(title):
 # https://en.wikipedia.org/wiki/Wikipedia:Featured_articles
 
 sample_featured_articles = [
-    "BAE Systems",
-    "Evolution",
-    "Chicago Board of Trade Building",
-    "ROT13",
-    "Periodic table",
-    "Everything Tastes Better with Bacon",
-    "Renewable energy in Scotland",
-    "Pigeon photography",
-    "University of California, Riverside",
-    "Same-sex marriage in Spain",
-    "Irish phonology",
-    "Sentence spacing",
+    "0test",
+    # "BAE Systems",
+    # "Evolution",
+    # "Chicago Board of Trade Building",
+    # "ROT13",
+    # "Periodic table",
+    # "Everything Tastes Better with Bacon",
+    # "Renewable energy in Scotland",
+    # "Pigeon photography",
+    # "University of California, Riverside",
+    # "Same-sex marriage in Spain",
+    # "Irish phonology",
+    # "Sentence spacing",
     # https://en.wikipedia.org/wiki/X%C3%A1_L%E1%BB%A3i_Pagoda_raids
-    "Xá Lợi Pagoda raids",
-    "Flag of Japan",
-    "Cerebellum",
+    # "Xá Lợi Pagoda raids",
+    # "Flag of Japan",
+    # "Cerebellum",
     # https://en.wikipedia.org/wiki/L%C5%8D%CA%BBihi_Seamount
-    "Lōʻihi Seamount",
-    "India",
-    "To Kill a Mockingbird",
-    "Edward VIII abdication crisis",
+    # "Lōʻihi Seamount",
+    # "India",
+    # "To Kill a Mockingbird",
+    # "Edward VIII abdication crisis",
     # https://en.wikipedia.org/wiki/W%C5%82adys%C5%82aw_II_Jagie%C5%82%C5%82o
-    "Władysław II Jagiełło",
-    "Atheism",
-    "Liberal Movement (Australia)",
-    "Europa (moon)",
-    "Philosophy of mind",
-    "R.E.M.",
-    "Tornado",
-    "The Hitchhiker's Guide to the Galaxy (radio series)",
-    "Pi",
-    "Byzantine navy",
-    "Wii",
-    "Mass Rapid Transit (Singapore)",
-    "History of American football"
+    # "Władysław II Jagiełło",
+    # "Atheism",
+    # "Liberal Movement (Australia)",
+    # "Europa (moon)",
+    # "Philosophy of mind",
+    # "R.E.M.",
+    # "Tornado",
+    # "The Hitchhiker's Guide to the Galaxy (radio series)",
+    # "Pi",
+    # "Byzantine navy",
+    # "Wii",
+    # "Mass Rapid Transit (Singapore)",
+    # "History of American football"
 ]
 
 
@@ -262,6 +263,14 @@ def load_grammar_for_page(page_text):
 
     word_to_pos = {}
 
+    for (parent_pos, child_structures) in sorted(phrase_structures.items()):
+        alternatives = []
+        for child_list in child_structures:
+            # Strip attributes for now
+            child_list = [child.split("+")[0] for child in child_list]
+            alternatives.append(" ".join(child_list))
+        grammar_string += "%s -> %s\n" % (parent_pos, " | ".join(alternatives))
+
     for word in word_set:
         word_categories = fetch_categories(word)
         word_pos_set = set()
@@ -275,12 +284,6 @@ def load_grammar_for_page(page_text):
 
         for pos in word_pos_set:
             grammar_string += '%s -> "%s"\n' % (pos, word)
-
-    for (parent_pos, child_structures) in phrase_structures.items():
-        for child_list in child_structures:
-            # Strip attributes for now
-            child_list = [child.split("+")[0] for child in child_list]
-            grammar_string += "%s -> %s\n" % (parent_pos, " ".join(child_list))
 
     for (pos, word_list) in closed_lexicon.items():
         pos = pos.split("+")[0]

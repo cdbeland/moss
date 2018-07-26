@@ -77,7 +77,8 @@ closed_lexicon = {
     "DET+ART": ["a", "an", "the"],
     # https://en.wiktionary.org/wiki/Category:English_articles (ignoring archaic)
     "TERM": [".", "!", "?"],
-    "COMMA": [","]
+    "COMMA": [","],
+    "POSS": ["'s"]
 }
 
 attribute_expansion = {
@@ -105,11 +106,20 @@ phrase_structures = {
         ["DET", "N+DR"],         # the cup
         ["DET", "AJP", "N+DR"],  # the empty cup
         # NOT: cup, blue the ice
+
+        # Putting ["N", "POSS"] in AJP makes more sense, but that
+        # creates an infinite loop that resultes in a stack overflow.
+        ["N", "POSS", "N"],  # David's car
+        ["DET", "N", "POSS", "N"],  # the owner's money
+        ["DET", "AJP", "N", "POSS", "N"],  # the blue puppy's eyes
     ],
 
     "AJP": [
         ["ADJ"],  # green
         ["ADJ", "COMMA", "ADJ"],   # wet, tired
+        ["ADJ", "ADJ"],            # big brown
+        ["ADJ", "ADJ", "ADJ"],     # ugly big brown
+        ["ADJ", "ADJ"],            # big brown
         ["ADJ", "CON+CO", "ADJ"],  # wet and tired
         # TODO: More adjectives than this are possible, but some
         # configurations are disfavored.  Need to think about this
@@ -117,14 +127,18 @@ phrase_structures = {
         # Note that order matters in a complicated way:
         # https://en.wikipedia.org/wiki/Adjective#Order
         ["NUM"],  # five
-        ["NUM", "ADJ"]  # two red
+        ["NUM", "ADJ"],  # two red
     ],
 
     "PP": [
-        ["PRE", "NP"],
-        ["PP", "PP"]
         # TODO: More than two might be too many for an encyclopedia; need
         # to think about this more and maybe put in a limiter
+        ["PP2"],
+        ["PP2", "PP2"]
+    ],
+    # Using "2" to avoid an infinite loop
+    "PP2": [
+        ["PRE", "NP"],
     ],
 
     "VP": [
@@ -133,20 +147,34 @@ phrase_structures = {
         ["V+2", "NP"],  # she runs Congress
         ["V+3", "NP", "NP"],  # you gave me the ball
 
-        # ["VP", "AVP"] ?
-        # TODO: NEED TO FIGURE OUT ADV vs. PP
-        ["V+0", "PP"],  # it rains on the lawn
-        ["V+1", "PP"],  # he runs on the grass
+        ["V+0", "PP"],   # it rains on the lawn
+        ["V+0", "ADV"],  # it rains often
+        ["V+1", "PP"],   # Sunlight shines on the grass
+        ["V+1", "ADV"],  # Alice runs often
+        ["ADV", "V+1", "ADV"],  # he often runs quickly
+        ["ADV", "V+1", "PP"],  # he often runs in circles
+        ["V+2", "NP", "PP"],  # Don drove the car on the sidewalk
+        ["V+2", "NP", "AVP"],  # he ran the race well
+        ["AVP", "V+2", "NP", "PP"],  # she quickly tossed the ball over the fence
+        ["V+3", "NP", "NP", "PP"],   # you gave me the ball on Tuesday
+        ["V+3", "NP", "NP", "ADV"],  # you gave me the ball too fast
+        ["V+3", "NP", "NP", "PP", "ADV"],  # Kelly sold him the house on the corner expeditiously
     ],
 
-    "S": [
-        ["NP", "VP", "TERM"],  # Joe runs.
+    # "0" added to force this to sort to the top, since the grammar
+    # definition requires the start state to be the first thing
+    # defined.
+    "0S": [
+        ["NP", "VP", "TERM"],
+        # Alice gave me the ball.
+
         ["VP", "TERM"],  # (implied you) Run!
     ],
 
     # TODO: ?
     "AVP": [
-        "ADV",
+        ["ADV"],         # well
+        ["ADV", "ADV"],  # very well, too fast
     ],
 
     # TODO - ? https://en.wikipedia.org/wiki/Complementizer
