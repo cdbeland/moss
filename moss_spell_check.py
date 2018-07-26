@@ -232,6 +232,12 @@ def spellcheck_all_langs(article_title, article_text):
             # TODO: NLTK tokenizer breaks on British quoting style
             # (which is allowed in places): 'xxx'
             "'"
+
+            # https://en.wikipedia.org/wiki/%CA%BBOkina#Names
+            # TODO: NLTK tokenizer breaks on Polynesian words using
+            # apostrophes and quote marks to represent 'eta and other
+            # glottal stops.  Hawaiian words should use ʻokina which
+            # are tokenized correctly, as a letter.
         )
 
         # Deal with asymmetrical wiki markup
