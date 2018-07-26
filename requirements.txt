@@ -2,3 +2,4 @@ lxml
 nltk
 flake8
 wikipedia
+mysql-connector-python
