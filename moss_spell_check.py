@@ -5,6 +5,7 @@ import re
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly
+from grammar import prose_quote_re
 
 # TO CHECK:
 # * transpress, literaturii dropped from common misspellings
@@ -78,7 +79,6 @@ ignore_sections_re = re.compile(
     r"(==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==|==\s*Publications\s*==|==\s*Works\s*==).*?$",
     flags=re.I)
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
-prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"')
 unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
@@ -133,7 +133,7 @@ def spellcheck_all_langs(article_title, article_text):
         #  [[340B Drug Pricing Program]] - [s]tretch
         #  [[Zachery Kouwe]] - appropriat[ing]
 
-    for unmatched_item in ["<ref", "</ref>", "<blockquote", "</blockquote>", "}}", "{{", '"']:
+    for unmatched_item in ["<ref", "</ref>", "<blockquote", "</blockquote>", "}}", "{{", '"', "colspan", "rowspan", "cellspacing"]:
         if unmatched_item in article_text:
             print("!\tABORTING PROCESSING: Unmatched %s\t%s" % (unmatched_item, article_title))
             print("!\t%s" % article_text)
