@@ -6,6 +6,7 @@
 # Not quite right:
 #  https://en.wikipedia.org/wiki/List_of_glossing_abbreviations
 
+
 # As recognized by Wiktionary
 # https://en.wiktionary.org/wiki/Category:English_lemmas
 parts_of_speech = {
@@ -78,7 +79,15 @@ closed_lexicon = {
     # https://en.wiktionary.org/wiki/Category:English_articles (ignoring archaic)
     "TERM": [".", "!", "?"],
     "COMMA": [","],
-    "POSS": ["'s"]
+    "SEMCOL": [";"],
+    "PERC": ["%"],
+    "POSS": ["'s"],
+    "CUR": ["$", "€", "£", "¥", "₹", "US$", "A\$", "Can$"],
+
+    "QUOTE": ["✂"],
+    # Quotations are not inspected for grammar, but must be retained
+    # to keep the surrounding syntax structure intact.
+
 }
 
 # Wiktionary includes a lot of archaic and obscure definitions.  For
@@ -87,6 +96,8 @@ closed_lexicon = {
 # those possibilities listed here.
 vocab_overrides = {
     "a": ["DET"],
+    "plc": ["N"],  # Not found in Wiktionary; part of multi-word proper nouns (company names)
+    # "plc": ["N+PROP"],
 }
 
 attribute_expansion = {
@@ -120,22 +131,51 @@ phrase_structures = {
         ["N", "POSS", "N"],  # David's car
         ["DET", "N", "POSS", "N"],  # the owner's money
         ["DET", "AJP", "N", "POSS", "N"],  # the blue puppy's eyes
+
+        # Multi-word proper nouns (not checked for agreement)
+        ["N", "N"],
+        ["N", "N", "N"],
+        ["N", "N", "N", "N"],
+
+        # Lists, Oxford comma required
+        ["N", "CON+CO" "N"],
+        ["N", "COMMA", "N", "COMMA", "CON+CO", "N"],
+        ["N", "COMMA", "N", "COMMA", "N", "COMMA", "CON+CO", "N"],
+
+        ["NUM", "PERC"],
+        ["CUR", "NUM"],
+        ["CURNUM"],
+
+        ["NUM"],  # works for dates, numbers as numbers
     ],
 
     "AJP": [
-        ["ADJ"],  # green
-        ["ADJ", "COMMA", "ADJ"],   # wet, tired
-        ["ADJ", "ADJ"],            # big brown
-        ["ADJ", "ADJ", "ADJ"],     # ugly big brown
-        ["ADJ", "ADJ"],            # big brown
-        ["ADJ", "CON+CO", "ADJ"],  # wet and tired
+        ["ADJ2"],  # green
+        ["ADJ2", "COMMA", "ADJ2"],   # wet, tired
+        ["ADJ2", "ADJ2"],            # big brown
+        ["ADJ2", "ADJ2", "ADJ2"],     # ugly big brown
+        ["ADJ2", "ADJ2"],            # big brown
+        ["ADJ2", "CON+CO", "ADJ2"],  # wet and tired
+
+        ["ADJ2", "COMMA", "ADJ2", "COMMA", "CON+CO", "ADJ2"],
+        ["ADJ2", "COMMA", "ADJ2", "COMMA", "ADJ2", "COMMA", "CON+CO", "ADJ2"],
+
+        ["ADJ2", "ADJ2", "COMMA", "ADJ2", "COMMA", "CON+CO", "ADJ2"],
+        ["ADJ2", "ADJ2", "ADJ2", "COMMA", "ADJ2", "COMMA", "CON+CO", "ADJ2"],  # British multinational defence, security, and aerospace [company]
+
         # TODO: More adjectives than this are possible, but some
         # configurations are disfavored.  Need to think about this
         # more.
         # Note that order matters in a complicated way:
         # https://en.wikipedia.org/wiki/Adjective#Order
-        ["NUM"],  # five
-        ["NUM", "ADJ"],  # two red
+        ["NUM"],          # five
+        ["NUM", "ADJ2"],  # two red
+        ["ORD"],          # 3rd
+    ],
+
+    "ADJ2": [
+        ["ADJ"],
+        ["N"],  # Any noun can work as an adjective, like "security company"
     ],
 
     "PP": [
@@ -167,16 +207,27 @@ phrase_structures = {
         ["V+3", "NP", "NP", "PP"],   # you gave me the ball on Tuesday
         ["V+3", "NP", "NP", "ADV"],  # you gave me the ball too fast
         ["V+3", "NP", "NP", "PP", "ADV"],  # Kelly sold him the house on the corner expeditiously
+
+        ["V+SAID", "PP", "QUOTE"],  # Donna said in 2016 "xxx"
+        ["V+SAID", "QUOTE"],  # Donna said "xxx"
+
     ],
 
     # "0" added to force this to sort to the top, since the grammar
     # definition requires the start state to be the first thing
     # defined.
     "0S": [
-        ["NP", "VP", "TERM"],
-        # Alice gave me the ball.
 
-        ["VP", "TERM"],  # (implied you) Run!
+        # Simple sentences
+        ["NP", "VP", "TERM"],
+
+        # Compound sentences and subordinate clauses
+        ["NP", "VP", "CON", "NP", "VP", "TERM"],
+        ["NP", "VP", "COMMA", "CON", "NP", "VP", "TERM"],
+        ["NP", "VP", "SEMCOL", "NP", "VP", "TERM"],
+
+        # Implied "you"
+        ["VP", "TERM"],
     ],
 
     # TODO: ?

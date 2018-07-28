@@ -24,6 +24,9 @@ from english_grammar import (enwiktionary_cat_to_pos,
                              closed_lexicon,
                              vocab_overrides)
 
+prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"')
+parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)')
+
 mysql_connection = mysql.connector.connect(user='beland',
                                            host='127.0.0.1',
                                            database='enwiktionary')
@@ -54,7 +57,17 @@ def generate_stats(plaintext):
 # Python Wikipedia module.
 # POSSIBLE WORKAROUND: Use wikitext instead of plain text
 # ACTUALLY TODO - run through wiki_utils.py
-broken_re = re.compile(r"displaystyle|{|}")
+broken_re = re.compile(r"displaystyle|colspan|rowspan|cellspacing|{|}")
+
+# https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Numbers
+number_pattern = "(\d+|\d+.\d+|\d+:\d)"
+conforming_number_re = re.compile(r"^%s$" % number_pattern)
+ordinal_re = re.compile(r"^\d*(1st|2nd|3rd|4th|5th|6th|7th|8th|9th|0th)$")
+
+# https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
+currency_pattern = "|".join(closed_lexicon["CUR"])
+currency_pattern = currency_pattern.replace("$", "\$")
+conforming_currency_re = re.compile("^(%s)%s$" % (currency_pattern, number_pattern))
 
 
 def check_english(plaintext, title):
@@ -72,26 +85,32 @@ def check_english(plaintext, title):
         print("!\tArticle parse broken?\t%s" % title)
         return
 
-    (grammar_string, word_to_pos) = load_grammar_for_page(plaintext)
-
     paragraphs = plaintext.split("\n")
     for paragraph in paragraphs:
-
         words_in_paragraph = nltk.word_tokenize(paragraph)
-        if len(words_in_paragraph) == 0:
-            continue
         if len(words_in_paragraph) > 500:
             print("L\t%s\tOverly long paragraph?\t%s words\t%s" % (title, len(words_in_paragraph), paragraph))
 
-        sentences = nltk.sent_tokenize(paragraph)
-        for sentence in sentences:
-            words = nltk.word_tokenize(sentence)
-            if len(words) > 200:
-                print("L\t%s\tOverly long sentence?\t%s words\t%s" % (title, len(words), sentence))
+    # Quotations and parentheticals are not inspected for grammar
+    plaintext = prose_quote_re.sub("✂", plaintext)
+    plaintext = parenthetical_re.sub("", plaintext)
 
-            # TODO: Skip this inside <poem>...</poem>
-            if not is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string):
-                print("G\t%s\tUngrammatical sentence?\t%s" % (title, sentence))
+    sentences = nltk.sent_tokenize(plaintext)
+
+    # Parse the short sentences first since they should be
+    # easiest.
+    sentences.sort(key=lambda s: len(s))
+
+    for sentence in sentences:
+        (grammar_string, word_to_pos) = load_grammar_for_text(sentence)
+
+        words = nltk.word_tokenize(sentence)
+        if len(words) > 200:
+            print("L\t%s\tOverly long sentence?\t%s words\t%s" % (title, len(words), sentence))
+
+        # TODO: Skip this inside <poem>...</poem>
+        if not is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string):
+            print("G\t%s\tUngrammatical sentence?\t%s" % (title, sentence))
 
 
 def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, grammar_string):
@@ -117,10 +136,18 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
             pos_list = ["N"]
             expand_grammar = True
             print("Assuming proper noun for %s" % word)
-        if not pos_list and word.isnumeric():
+        if not pos_list and conforming_number_re.match(word):
             pos_list = ["NUM"]
             expand_grammar = True
-            print("Assuming number for %s" % word)
+            print("Assuming cardinal number for %s" % word)
+        if not pos_list and ordinal_re.match(word):
+            pos_list = ["ORD"]
+            expand_grammar = True
+            print("Assuming ordinal number for %s" % word)
+        if not pos_list and conforming_currency_re.match(word):
+            pos_list = ["CURNUM"]
+            expand_grammar = True
+            print("Assuming ordinal number for %s" % word)
         if not pos_list:
             # print("S\t%s\tSkipping sentence due to unknown word\t%s\t%s" % (title, word, word_list))
             print("S\t%s\tNo POS for word\t%s" % (word, word_list))
@@ -136,8 +163,11 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         first_word = False
 
     grammar = nltk.CFG.fromstring(grammar_string)
-    parser = nltk.parse.RecursiveDescentParser(grammar)
+
+    # parser = nltk.parse.RecursiveDescentParser(grammar)  # Cannot handle X -> X Y (infinite loop)
     # parser.trace(5)
+    # parser = nltk.parse.LeftCornerChartParser(grammar)
+    parser = nltk.parse.BottomUpLeftCornerChartParser(grammar)
 
     # print(grammar)
 
@@ -147,20 +177,20 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         print(e)
         return False
 
-    if possible_parses:
-        seen = []
-        possible_parses_dedup = []
-        for parse in possible_parses:
-            serialized = parse.pformat()
-            if serialized in seen:
-                continue
-            else:
-                possible_parses_dedup.append(parse)
-                seen.append(serialized)
-        [parse.pretty_print() for parse in possible_parses_dedup]
-        return True
-    else:
+    seen = []
+    possible_parses_dedup = []
+    for parse in possible_parses:
+        serialized = parse.pformat()
+        if serialized in seen:
+            print("DROPPED DUP!")
+            continue
+        else:
+            possible_parses_dedup.append(parse)
+            seen.append(serialized)
+    parse_dummies = [parse.pretty_print() for parse in possible_parses_dedup]
+    if len(parse_dummies) == 0:
         return False
+    return True
 
 
 def is_sentence_grammatical_nltk(word_list):
@@ -189,8 +219,8 @@ def check_article(title):
 # https://en.wikipedia.org/wiki/Wikipedia:Featured_articles
 
 sample_featured_articles = [
-    "0test",
-    # "BAE Systems",
+    # "0test",
+    "BAE Systems",
     # "Evolution",
     # "Chicago Board of Trade Building",
     # "ROT13",
@@ -260,7 +290,7 @@ def fetch_categories(word):
     return result
 
 
-def load_grammar_for_page(page_text):
+def load_grammar_for_text(text):
     grammar_string = ""
 
     # ---
@@ -277,10 +307,10 @@ def load_grammar_for_page(page_text):
 
     # ---
 
-    # Load limited vocabulary (only for words on this page, to
+    # Load limited vocabulary (only for words in this text, to
     # minimize the size of the grammar).
 
-    word_set = set(nltk.word_tokenize(page_text))
+    word_set = set(nltk.word_tokenize(text))
 
     # Deal with the possibility that some words are only capitalized
     # because they begin a sentence.  No harm here in loading a few
