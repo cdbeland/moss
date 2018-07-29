@@ -74,7 +74,7 @@ attributes = {
 }
 
 closed_lexicon = {
-    "CON+CO": ["and", "or", "not"],
+    "CON+CO": ["and", "or", "not", "&"],
     "DET+ART": ["a", "an", "the"],
     # https://en.wiktionary.org/wiki/Category:English_articles (ignoring archaic)
     "TERM": [".", "!", "?"],
@@ -88,6 +88,14 @@ closed_lexicon = {
     # Quotations are not inspected for grammar, but must be retained
     # to keep the surrounding syntax structure intact.
 
+
+    "SAID": ["said", "says", "wrote", "writes", "stated", "states",
+             "opined", "opines"],
+    "MONTH": ["January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December"],
+    "DOM": ["1", "2", "3", "4", "5,6 7", "8", "9", "10", "11", "12",
+            "13", "14", "15", "16", "17", "18", "19", "20", "21", "22",
+            "23", "24", "25", "26", "27", "28", "29", "30", "31"]
 }
 
 # Wiktionary includes a lot of archaic and obscure definitions.  For
@@ -96,6 +104,7 @@ closed_lexicon = {
 # those possibilities listed here.
 vocab_overrides = {
     "a": ["DET"],
+    "to": ["INF", "PRE"],
     "plc": ["N"],  # Not found in Wiktionary; part of multi-word proper nouns (company names)
     # "plc": ["N+PROP"],
 }
@@ -136,6 +145,8 @@ phrase_structures = {
         ["N", "N"],
         ["N", "N", "N"],
         ["N", "N", "N", "N"],
+        ["N", "N", "N", "CON+CO", "N"],  # BAE Systems Land & Armaments
+        ["N", "N", "N", "N", "N"],
 
         # Lists, Oxford comma required
         ["N", "CON+CO" "N"],
@@ -143,19 +154,47 @@ phrase_structures = {
         ["N", "COMMA", "N", "COMMA", "N", "COMMA", "CON+CO", "N"],
 
         ["NUM", "PERC"],
-        ["CUR", "NUM"],
-        ["CURNUM"],
+        ["DET", "NUM", "PERC", "N"],  # A 5% solution
+        ["CUR", "NUM"],     # $5 when nltk parses the parts separately
+        ["CURNUM"],         # £7
+        ["CURNUM", "NUM"],  # £2.3 billion
 
         ["NUM"],  # works for dates, numbers as numbers
+
+        ["QUOTE+NP"],
+
+        ["DATE"],
+    ],
+
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Dates,_months_and_years
+    "DATE": [
+        ["MDY_DATE"],
+        ["DMY_DATE"],
+        ["MONTH", "YEAR"],
+    ],
+    "MDY_DATE": [
+        ["MONTH", "DOM"],
+        ["MONTH", "DOM", "YEAR"],
+        ["MONTH", "DOM", "COMMA", "YEAR"],
+        ["MONTH", "DOM", "COMMA", "YEAR", "COMMA"],
+    ],
+    "DMY_DATE": [
+        ["DOM", "MONTH"],
+        ["DOM", "MONTH", "YEAR"],
+        ["DOM", "MONTH", "YEAR", "COMMA"],
+    ],
+    "YEAR": [
+        ["NUM"],
     ],
 
     "AJP": [
         ["ADJ2"],  # green
-        ["ADJ2", "COMMA", "ADJ2"],   # wet, tired
-        ["ADJ2", "ADJ2"],            # big brown
-        ["ADJ2", "ADJ2", "ADJ2"],     # ugly big brown
-        ["ADJ2", "ADJ2"],            # big brown
-        ["ADJ2", "CON+CO", "ADJ2"],  # wet and tired
+        ["ADJ2", "COMMA", "ADJ2"],         # wet, tired
+        ["ADJ2", "ADJ2"],                  # big brown
+        ["ADJ2", "ADJ2", "ADJ2"],          # ugly big brown
+        ["ADJ2", "ADJ2", "ADJ2", "ADJ2"],  # Hawk advanced jet trainer [aircraft]
+        ["ADJ2", "ADJ2"],                  # big brown
+        ["ADJ2", "CON+CO", "ADJ2"],        # wet and tired
 
         ["ADJ2", "COMMA", "ADJ2", "COMMA", "CON+CO", "ADJ2"],
         ["ADJ2", "COMMA", "ADJ2", "COMMA", "ADJ2", "COMMA", "CON+CO", "ADJ2"],
@@ -190,28 +229,77 @@ phrase_structures = {
     ],
 
     "VP": [
-        ["V+0"],  # it rains
-        ["V+1"],  # he runs
-        ["V+2", "NP"],  # she runs Congress
-        ["V+3", "NP", "NP"],  # you gave me the ball
+        ["CORE_V"],            # it rains, he runs
+        ["CORE_V", "POST_V"],  # she runs Congress
 
-        ["V+0", "PP"],   # it rains on the lawn
-        ["V+0", "ADV"],  # it rains often
-        ["V+1", "PP"],   # Sunlight shines on the grass
-        ["V+1", "ADV"],  # Alice runs often
-        ["ADV", "V+1", "ADV"],  # he often runs quickly
-        ["ADV", "V+1", "PP"],  # he often runs in circles
-        ["V+2", "NP", "PP"],  # Don drove the car on the sidewalk
-        ["V+2", "NP", "AVP"],  # he ran the race well
-        ["AVP", "V+2", "NP", "PP"],  # she quickly tossed the ball over the fence
-        ["V+3", "NP", "NP", "PP"],   # you gave me the ball on Tuesday
-        ["V+3", "NP", "NP", "ADV"],  # you gave me the ball too fast
-        ["V+3", "NP", "NP", "PP", "ADV"],  # Kelly sold him the house on the corner expeditiously
+        ["AVP", "CORE_V"],     # Silently, he hid.  In 2006, they ruled.
+        ["AVP", "CORE_V", "POST_V"],     # Quickly, he hid the papers.
 
-        ["V+SAID", "PP", "QUOTE"],  # Donna said in 2016 "xxx"
-        ["V+SAID", "QUOTE"],  # Donna said "xxx"
-
+        ["SAID", "PP", "QUOTE"],  # Donna said in 2016 "xxx"
+        ["SAID", "QUOTE"],  # Donna said "xxx"
+        ["SAID", "CON+SUB", "0S"],  # Alice said that Bob is broke
+        ["SAID", "0S"],  # Alice said Bob is broke
     ],
+
+    "CORE_V": [
+        ["CORE_V2"],
+
+        # Passive voice, which might be disfavored
+        ["AUXV", "CORE_V2"],          # was illuminated
+        ["AUXV", "AUXV", "CORE_V2"],  # has been deleted
+        ["AUXV", "AUXV", "AVP", "CORE_V2"],  # has been widely praised
+
+        ["INF", "CORE_V2"],           # to wonder
+        ["INF", "ADV", "CORE_V2"],    # to boldly go  (yes, split infinitives are allowed)
+    ],
+
+    "POST_V": [
+        ["AVP"],
+
+        # TODO: These should only be used with to-be verbs, I think
+        ["ADJ"],
+
+        ["NP"],  # Direct object
+        ["NP", "AVP"],
+
+        ["NP", "NP"],  # Direct and indirect objects
+        ["NP", "NP", "AVP"],
+    ],
+
+    "CORE_V2": [
+        ["V"],          # glow
+        ["V", "PRE"],    # burn up
+    ],
+
+    # TODO: Including valence tracking multiplies out the
+    # possibilities too much.  Analyze this as another phase after
+    # syntactic parse, possibly to help disambiguate.
+    #
+    # "VP": [
+    #     ["V+0"],  # it rains
+    #     ["V+1"],  # he runs
+    #     ["V+2", "NP"],  # she runs Congress
+    #     ["V+3", "NP", "NP"],  # you gave me the ball
+    #
+    #     ["V+0", "PP"],   # it rains on the lawn
+    #     ["V+0", "ADV"],  # it rains often
+    #     ["V+1", "PP"],   # Sunlight shines on the grass
+    #     ["V+1", "ADV"],  # Alice runs often
+    #     ["ADV", "V+1", "ADV"],  # he often runs quickly
+    #     ["ADV", "V+1", "PP"],  # he often runs in circles
+    #     ["V+2", "NP", "PP"],  # Don drove the car on the sidewalk
+    #     ["V+2", "NP", "AVP"],  # he ran the race well
+    #     ["AVP", "V+2", "NP", "PP"],  # she quickly tossed the ball over the fence
+    #     ["V+3", "NP", "NP", "PP"],   # you gave me the ball on Tuesday
+    #     ["V+3", "NP", "NP", "ADV"],  # you gave me the ball too fast
+    #     ["V+3", "NP", "NP", "PP", "ADV"],  # Kelly sold him the house on the corner expeditiously
+    #
+    #     ["SAID", "PP", "QUOTE"],  # Donna said in 2016 "xxx"
+    #     ["SAID", "QUOTE"],  # Donna said "xxx"
+    #     ["SAID", "CON+SUB", "0S"],  # Alice said that Bob is broke
+    #     ["SAID", "0S"],  # Alice said Bob is broke
+    #        "English_auxiliary_verb_forms": "AUXV",
+    # ],
 
     # "0" added to force this to sort to the top, since the grammar
     # definition requires the start state to be the first thing
@@ -220,6 +308,9 @@ phrase_structures = {
 
         # Simple sentences
         ["NP", "VP", "TERM"],
+
+        # However, he is dead.   Slowly, the ship was raised.
+        ["AVP", "COMMA" "NP", "VP", "TERM"],
 
         # Compound sentences and subordinate clauses
         ["NP", "VP", "CON", "NP", "VP", "TERM"],
@@ -230,16 +321,14 @@ phrase_structures = {
         ["VP", "TERM"],
     ],
 
-    # TODO: ?
     "AVP": [
         ["ADV"],         # well
         ["ADV", "ADV"],  # very well, too fast
-    ],
 
-    # TODO - ? https://en.wikipedia.org/wiki/Complementizer
-    # "CP": [
-    #    ["C", "S"],
-    # ]
+        ["PP"],
+        ["ADV", "PP"],   # recklessly on the sidewalk
+        ["PP", "ADV"],   # on the sidewalk recklessly
+    ],
 }
 
 
@@ -253,11 +342,14 @@ enwiktionary_cat_to_pos = {
     "English_nouns": "N",
     "English_proper_nouns": "N",
     "English_numerals": "NUM",
-    "English_particles": "PAR",
+    # "English_particles": "PAR",  # Not a useful category, syntactically speaking
     "English_postpositions": "PST",
     "English_prepositions": "PRE",
     "English_pronouns": "PRO",
     "English_verbs": "V",
+    "English_irregular_verbs": "V",
+    "English_intransitive_verbs": "V",
+    "English_auxiliary_verbs": "AUXV",
 
     # Inflected
     "English_adjective_forms": "ADJ",
@@ -285,6 +377,24 @@ enwiktionary_cat_to_pos = {
     "English_proper_noun_forms": "N",
     "English_proper_noun_plural_forms": "N",
     "English_verb_forms": "V",
+    "English_verb_irregular_forms": "V",
+    "English_verb_simple_past_forms": "V",
+    "English_past_participles": "V",
+    "English_present_participles": "V",
+    "English_auxiliary_verb_forms": "AUXV",
+    "English_irregular_first-person_singular_forms": "V",
+    "English_irregular_past_participles": "V",
+    "English_irregular_plurals": "V",
+    "English_irregular_second-person_singular_forms": "V",
+    "English_irregular_simple_past_forms": "V",
+    "English_irregular_third-person_singular_forms": "V",
+    "English_gerunds": "V",
+    "English_verb_simple_past_forms": "V",
+    "English_verb_singular_forms": "V",
+    "English_first-person_singular_forms": "V",
+    "English_second-person_singular_forms": "V",
+    "English_second-person_singular_past_tense_forms": "V",
+    "English_third-person_singular_forms": "V",
 }
 
 # PARTIALLY DIGESTED DUMP OF CATEGORIES
@@ -325,8 +435,6 @@ enwiktionary_cat_to_pos = {
 # English_articles
 # English_aspect_adverbs
 # English_autological_terms
-# English_auxiliary_verb_forms
-# English_auxiliary_verbs
 # English_back-formations
 # English_bahuvrihi_compounds
 # English_basic_words
@@ -449,19 +557,8 @@ enwiktionary_cat_to_pos = {
 # English_interrogative_adverbs
 # English_interrogative_pro-forms
 # English_interrogative_pronouns
-# English_intransitive_verbs
-# English_invariant_nouns
-# English_irregular_first-person_singular_forms
-# English_irregular_past_participles
-# English_irregular_plurals
-# English_irregular_second-person_singular_forms
-# English_irregular_simple_past_forms
-# English_irregular_third-person_singular_forms
-# English_irregular_verbs
 # English_jocular_terms
 # English_karmadharaya_compounds
-# English_learnedly_borrowed_terms
-# English_lemmas
 # English_letters
 # English_light_verb_constructions
 # English_literary_terms
@@ -481,7 +578,6 @@ enwiktionary_cat_to_pos = {
 # English_modal_adverbs
 # English_modal_verbs
 # English_negative_polarity_items
-# English_neologisms
 # English_non-constituents
 # English_non-idiomatic_translation_targets
 # English_non-lemma_forms
@@ -490,31 +586,21 @@ enwiktionary_cat_to_pos = {
 # English_nonstandard_terms
 # English_noun-forming_suffixes
 # English_noun-noun_compound_nouns
-# English_noun_forms
-# English_noun_plural_forms
-# English_nouns
 # English_nouns_with_common_ending_formations
 # English_nouns_with_irregular_plurals
 # English_nouns_with_unattested_plurals
 # English_nouns_with_unknown_or_uncertain_plurals
 # English_numbers
 # English_numeral_symbols
-# English_numerals
 # English_numerical_contractions
 # English_oaths
 # English_obsolete_forms
 # English_obsolete_terms
-# English_offensive_terms
-# English_officialese_terms
 # English_one-letter_words
 # English_onomatopoeias
 # English_ordinal_numbers
 # English_orthographically_borrowed_terms
-# English_oxymorons
-# English_palindromes
 # English_parasynthetic_adjectives
-# English_particles
-# English_past_participles
 # English_pejoratives
 # English_personal_pronouns
 # English_phrasal_prepositions
@@ -602,13 +688,10 @@ enwiktionary_cat_to_pos = {
 # English_predicates
 # English_prefixes
 # English_prepositional_phrases
-# English_prepositions
-# English_present_participles
 # English_pro-forms
 # English_pro-sentences
 # English_productive_suffixes
 # English_pronominal_adverbs
-# English_pronouns
 # English_pronunciation_spellings
 # English_proper_adjectives
 # English_proper_names
@@ -616,7 +699,6 @@ enwiktionary_cat_to_pos = {
 # English_proper_nouns
 # English_proper_nouns_with_unattested_plurals
 # English_proper_nouns_with_unknown_or_uncertain_plurals
-# English_proverbs
 # English_pseudo-acronyms
 # English_punctuation_marks
 # English_quantizers
@@ -699,13 +781,7 @@ enwiktionary_cat_to_pos = {
 # English_unproductive_prefixes
 # English_unproductive_suffixes
 # English_verb-forming_suffixes
-# English_verb_forms
-# English_verb_forms_using_redundant_wikisyntax
-# English_verb_froms
-# English_verb_irregular_forms
-# English_verb_simple_past_forms
 # English_verbal_nouns
-# English_verbs
 # English_verbs_suffixed_with_-en
 # English_verbs_with_base_form_identical_to_past_participle
 # English_verbs_with_placeholder_it

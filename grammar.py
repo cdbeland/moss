@@ -18,6 +18,7 @@
 import mysql.connector
 import nltk
 import re
+import sys
 import wikipedia  # https://wikipedia.readthedocs.io/en/latest/code.html
 from english_grammar import (enwiktionary_cat_to_pos,
                              phrase_structures,
@@ -25,7 +26,7 @@ from english_grammar import (enwiktionary_cat_to_pos,
                              vocab_overrides)
 
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"')
-parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)')
+parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?\S\]|\[\S\]')
 
 mysql_connection = mysql.connector.connect(user='beland',
                                            host='127.0.0.1',
@@ -85,11 +86,15 @@ def check_english(plaintext, title):
         print("!\tArticle parse broken?\t%s" % title)
         return
 
-    paragraphs = plaintext.split("\n")
-    for paragraph in paragraphs:
-        words_in_paragraph = nltk.word_tokenize(paragraph)
-        if len(words_in_paragraph) > 500:
-            print("L\t%s\tOverly long paragraph?\t%s words\t%s" % (title, len(words_in_paragraph), paragraph))
+    # This is a good check, but the Wikipedia module is misparsing the
+    # wikitext and not putting line breaks at the end of some
+    # paragraphs.  Maybe due to <ref>s?
+    #
+    # paragraphs = plaintext.split("\n")
+    # for paragraph in paragraphs:
+    #     words_in_paragraph = nltk.word_tokenize(paragraph)
+    #     if len(words_in_paragraph) > 500:
+    #         print("L\t%s\tOverly long paragraph?\t%s words\t%s" % (title, len(words_in_paragraph), paragraph))
 
     # Quotations and parentheticals are not inspected for grammar
     plaintext = prose_quote_re.sub("✂", plaintext)
@@ -109,12 +114,27 @@ def check_english(plaintext, title):
             print("L\t%s\tOverly long sentence?\t%s words\t%s" % (title, len(words), sentence))
 
         # TODO: Skip this inside <poem>...</poem>
-        if not is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string):
+        if is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string):
+            print("Y\t%s\tYay, parsed sentence successfully!" % title)
+            # print("Y\t%s\tYay, parsed sentence successfully!\t%s" % (title, sentence))
+        else:
             print("G\t%s\tUngrammatical sentence?\t%s" % (title, sentence))
 
 
 def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, grammar_string):
-    if "==" in word_list or "===" in word_list:
+    if "==" in word_list or "===" in word_list or "====" in word_list:
+        return True
+
+    if "✂" in word_list:
+        # TODO: Handle quote marks
+        # * They can replace any part of speech, if they parse as that
+        #   part of speech themselves.
+        # * They can contain novel words and errors.
+        # * They can be a literal quotation with a "said"
+        #   construction, in which case they don't need to be any
+        #   particular part of speech.  (Though maybe they are usually
+        #   full sentences, unless it's someone blurting out a partial
+        #   utterance?)
         return True
 
     word_train = []
@@ -123,38 +143,29 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
     for word in word_list:
         expand_grammar = False
         pos_list = word_to_pos.get(word)
-        if pos_list:
-            print("Found %s: %s" % (word, pos_list))
         if first_word and not pos_list and word == word.title():
             pos_list = word_to_pos.get(word.lower())
             if pos_list:
-                print("Lowercase version found for %s: %s" % (word, pos_list))
-                # For CFG library
+                # So that CFG parser can do the POS lookup
                 word_list[0] = word.lower()
         if not pos_list and word.isalpha() and (word == word.title() or word == word.upper()):
             # Assume all capitalized words and acronyms are proper nouns
             pos_list = ["N"]
             expand_grammar = True
-            print("Assuming proper noun for %s" % word)
         if not pos_list and conforming_number_re.match(word):
             pos_list = ["NUM"]
             expand_grammar = True
-            print("Assuming cardinal number for %s" % word)
         if not pos_list and ordinal_re.match(word):
             pos_list = ["ORD"]
             expand_grammar = True
-            print("Assuming ordinal number for %s" % word)
         if not pos_list and conforming_currency_re.match(word):
             pos_list = ["CURNUM"]
             expand_grammar = True
-            print("Assuming ordinal number for %s" % word)
         if not pos_list:
-            # print("S\t%s\tSkipping sentence due to unknown word\t%s\t%s" % (title, word, word_list))
             print("S\t%s\tNo POS for word\t%s" % (word, word_list))
             return True
 
         if expand_grammar:
-            print("expanding %s %s" % (word, pos_list))
             word_to_pos[word] = pos_list
             for pos in pos_list:
                 grammar_string += '%s -> "%s"\n' % (pos, word)
@@ -187,8 +198,10 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         else:
             possible_parses_dedup.append(parse)
             seen.append(serialized)
-    parse_dummies = [parse.pretty_print() for parse in possible_parses_dedup]
+    # parse_dummies = [parse.pretty_print() for parse in possible_parses_dedup]
+    parse_dummies = [parse for parse in possible_parses_dedup]
     if len(parse_dummies) == 0:
+        print(word_train)
         return False
     return True
 
@@ -219,7 +232,7 @@ def check_article(title):
 # https://en.wikipedia.org/wiki/Wikipedia:Featured_articles
 
 sample_featured_articles = [
-    # "0test",
+    "0test",
     "BAE Systems",
     # "Evolution",
     # "Chicago Board of Trade Building",
@@ -365,7 +378,9 @@ def load_grammar_for_text(text):
 
 # --- RUNTIME ---
 
-# save_sample_articles()
+if len(sys.argv) > 1 and sys.argv[1] == "--download":
+    save_sample_articles()
+    exit(0)
 
 check_samples_from_disk()
 mysql_connection.close()
