@@ -384,7 +384,6 @@ enwiktionary_cat_to_pos = {
     "English_auxiliary_verb_forms": "AUXV",
     "English_irregular_first-person_singular_forms": "V",
     "English_irregular_past_participles": "V",
-    "English_irregular_plurals": "V",
     "English_irregular_second-person_singular_forms": "V",
     "English_irregular_simple_past_forms": "V",
     "English_irregular_third-person_singular_forms": "V",

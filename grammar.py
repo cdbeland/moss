@@ -161,6 +161,20 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         if not pos_list and conforming_currency_re.match(word):
             pos_list = ["CURNUM"]
             expand_grammar = True
+        if "-" in word:
+            # Looking for hyphenated adjective phrase like "blue-grey" or "two-hull"
+            word_parts = word.split("-")
+            all_adj_or_noun = True
+            for part in word_parts:
+                tmp_pos_list = word_to_pos.get(part)
+                if tmp_pos_list and ("ADJ" in tmp_pos_list or "N" in tmp_pos_list):
+                    continue
+                else:
+                    all_adj_or_noun = False
+                    break
+            if all_adj_or_noun:
+                pos_list = ["ADJ"]
+                expand_grammar = True
         if not pos_list:
             print("S\t%s\tNo POS for word\t%s" % (word, word_list))
             return True
@@ -332,6 +346,8 @@ def load_grammar_for_text(text):
     for word in word_set:
         if word == word.title():
             more_words.add(word.lower())
+        if "-" in word:
+            [more_words.add(part) for part in word.split("-")]
     word_set = word_set.union(more_words)
 
     word_to_pos = {}
