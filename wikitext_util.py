@@ -65,7 +65,7 @@ early_substitutions = [
     (re.compile(r"{{[·|bold middot|dot|middot]}}"), " · "),
     (re.compile(r"{{[•|bull]}}"), " • "),
     (re.compile(r"<math>.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
-    (re.compile(r"{{[spaced en dash|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash]}}", flags=re.I), " - "),
+    (re.compile(r"{{(spaced en dash|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash)}}", flags=re.I), " - "),
 ]
 
 substitutions = [
