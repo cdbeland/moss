@@ -27,6 +27,9 @@ from english_grammar import (enwiktionary_cat_to_pos,
 
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"')
 parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?\S\]|\[\S\]')
+ignore_sections_re = re.compile(
+    r"(==\s*See also\s*==|==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==|==\s*Publications\s*==|==\s*Works\s*==).*$",
+    flags=re.I + re.S)
 
 mysql_connection = mysql.connector.connect(user='beland',
                                            host='127.0.0.1',
@@ -99,7 +102,9 @@ def check_english(plaintext, title):
     #     if len(words_in_paragraph) > 500:
     #         print("L\t%s\tOverly long paragraph?\t%s words\t%s" % (title, len(words_in_paragraph), paragraph))
 
-    # Quotations and parentheticals are not inspected for grammar
+    # Quotations, parentheticals, and list-based sections are not
+    # inspected for grammar
+    plaintext = ignore_sections_re.sub("", plaintext)
     plaintext = prose_quote_re.sub("✂", plaintext)
     plaintext = parenthetical_re.sub("", plaintext)
 
@@ -297,8 +302,8 @@ def check_article(title):
 
 sample_featured_articles = [
     # "0test",
-    "BAE Systems",
-    # "Evolution",
+    # "BAE Systems",
+    "Evolution",
     # "Chicago Board of Trade Building",
     # "ROT13",
     # "Periodic table",
