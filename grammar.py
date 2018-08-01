@@ -61,6 +61,7 @@ def generate_stats(plaintext):
 broken_re = re.compile(r"displaystyle|colspan|rowspan|cellspacing|{|}")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Numbers
+# Includes integers, decimal fractions, ratios
 number_pattern = "(\d+|\d+.\d+|\d+:\d)"
 conforming_number_re = re.compile(r"^%s$" % number_pattern)
 ordinal_re = re.compile(r"^\d*(1st|2nd|3rd|4th|5th|6th|7th|8th|9th|0th)$")
@@ -68,7 +69,9 @@ ordinal_re = re.compile(r"^\d*(1st|2nd|3rd|4th|5th|6th|7th|8th|9th|0th)$")
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
 currency_pattern = "|".join(closed_lexicon["CUR"])
 currency_pattern = currency_pattern.replace("$", "\$")
-conforming_currency_re = re.compile("^(%s)%s$" % (currency_pattern, number_pattern))
+conforming_currency_re = re.compile("^(%s)%s(M|bn)?$" % (currency_pattern, number_pattern))
+# M for million, bn for billion per
+# https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
 
 
 def check_english(plaintext, title):
@@ -139,19 +142,15 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
 
     word_train = []
 
-    first_word = True
+    previous_word = None
     for word in word_list:
         expand_grammar = False
         pos_list = word_to_pos.get(word)
-        if first_word and not pos_list and word == word.title():
+        if previous_word is None and not pos_list and word == word.title():
             pos_list = word_to_pos.get(word.lower())
             if pos_list:
                 # So that CFG parser can do the POS lookup
                 word_list[0] = word.lower()
-        if not pos_list and word.isalpha() and (word == word.title() or word == word.upper()):
-            # Assume all capitalized words and acronyms are proper nouns
-            pos_list = ["N"]
-            expand_grammar = True
         if not pos_list and conforming_number_re.match(word):
             pos_list = ["NUM"]
             expand_grammar = True
@@ -161,20 +160,69 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         if not pos_list and conforming_currency_re.match(word):
             pos_list = ["CURNUM"]
             expand_grammar = True
+        if not pos_list and word.isalnum() and word[0].isalpha() and (word[0] == word[0].upper()):
+            # Assume all capitalized words and acronyms (allowing some numbers sprinkled in) are proper nouns
+            # Including Chris, NASA, GmbH, A380
+            pos_list = ["N"]
+            expand_grammar = True
+        if not pos_list and word == "'" and previous_word[-1].lower() == "s":
+            pos_list = ["POSS"]
+            expand_grammar = True
         if "-" in word:
-            # Looking for hyphenated adjective phrase like "blue-grey" or "two-hull"
             word_parts = word.split("-")
-            all_adj_or_noun = True
+            pos_patterns = []
             for part in word_parts:
                 tmp_pos_list = word_to_pos.get(part)
-                if tmp_pos_list and ("ADJ" in tmp_pos_list or "N" in tmp_pos_list):
-                    continue
+                if not tmp_pos_list:
+                    tmp_pos_list = word_to_pos.get(part.lower())
+                if tmp_pos_list:
+                    pos_patterns.append(tmp_pos_list)
                 else:
-                    all_adj_or_noun = False
                     break
-            if all_adj_or_noun:
-                pos_list = ["ADJ"]
-                expand_grammar = True
+            if len(pos_patterns) == len(word_parts) and len(word_parts) == 2:
+                if "ADJ" in pos_patterns[0] and "N" in pos_patterns[1]:
+                    # e.g. "blue-hull"
+                    pos_list = ["ADJ"]
+                    expand_grammar = True
+                elif "NUM" in pos_patterns[0] and "N" in pos_patterns[1]:
+                    # e.g. "two-hull"
+                    pos_list = ["ADJ"]
+                    expand_grammar = True
+                elif "ADJ" in pos_patterns[0] and "ADJ" in pos_patterns[1]:
+                    # e.g. "blue-grey"
+                    pos_list = ["ADJ"]
+                    expand_grammar = True
+                elif word_parts[0].isnumeric() and "N" in pos_patterns[1]:
+                    # e.g. 15-year
+                    pos_list = ["ADJ"]
+                    expand_grammar = True
+                elif "ADJ" in pos_patterns[0] and "V" in pos_patterns[1] and word_parts[1][-1] == "d":
+                    # e.g. Saudi-led
+                    # -d is a cheesy way to look for past tense verbs only
+                    pos_list = ["ADJ"]
+                    expand_grammar = True
+                elif "N" in pos_patterns[0] and "V" in pos_patterns[1] and word_parts[1][-1] == "d":
+                    # e.g. hickory-smoked
+                    # -d is a cheesy way to look for past tense verbs only
+                    pos_list = ["ADJ"]
+                    expand_grammar = True
+                elif word_parts[0].lower() == "sub":
+                    # e.g. sub-contract
+                    pos_list = pos_patterns[1]
+                    expand_grammar = True
+                elif word_parts[0].lower() == "co":
+                    # e.g. co-founders, co-founded
+                    pos_list = pos_patterns[1]
+                    expand_grammar = True
+                elif word_parts[0].lower() == "non":
+                    # e.g. non-aggression, non-blue
+                    pos_list = pos_patterns[1]
+                    expand_grammar = True
+                elif word_parts[1].lower() == "class":
+                    # e.g. Washington-class
+                    pos_list = "ADJ"
+                    expand_grammar = True
+
         if not pos_list:
             print("S\t%s\tNo POS for word\t%s" % (word, word_list))
             return True
@@ -185,7 +233,7 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
                 grammar_string += '%s -> "%s"\n' % (pos, word)
 
         word_train.append((word, pos_list))
-        first_word = False
+        previous_word = word
 
     grammar = nltk.CFG.fromstring(grammar_string)
 
@@ -193,6 +241,8 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
     # parser.trace(5)
     # parser = nltk.parse.LeftCornerChartParser(grammar)
     parser = nltk.parse.BottomUpLeftCornerChartParser(grammar)
+    # Parsers background: http://www.nltk.org/book/ch08.html
+    # Other parsers are available in nltk.parse
 
     # print(grammar)
 
@@ -246,7 +296,7 @@ def check_article(title):
 # https://en.wikipedia.org/wiki/Wikipedia:Featured_articles
 
 sample_featured_articles = [
-    "0test",
+    # "0test",
     "BAE Systems",
     # "Evolution",
     # "Chicago Board of Trade Building",
@@ -312,7 +362,8 @@ def fetch_categories(word):
     cursor.execute("SELECT title, category_name FROM page_categories WHERE title=%s", (word, ))
 
     # Account for SQL being case-insensitive
-    result = [cat.decode('utf-8') for (title, cat) in cursor if title.decode('utf-8') == word]
+    # result = [cat.decode('utf-8') for (title, cat) in cursor if title.decode('utf-8') == word]
+    result = [cat for (title, cat) in cursor if title == word]
     cursor.close()
     return result
 
@@ -348,6 +399,7 @@ def load_grammar_for_text(text):
             more_words.add(word.lower())
         if "-" in word:
             [more_words.add(part) for part in word.split("-")]
+            [more_words.add(part.lower()) for part in word.split("-")]
     word_set = word_set.union(more_words)
 
     word_to_pos = {}

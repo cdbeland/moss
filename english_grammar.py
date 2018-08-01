@@ -93,7 +93,7 @@ closed_lexicon = {
              "opined", "opines"],
     "MONTH": ["January", "February", "March", "April", "May", "June",
               "July", "August", "September", "October", "November", "December"],
-    "DOM": ["1", "2", "3", "4", "5,6 7", "8", "9", "10", "11", "12",
+    "DOM": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
             "13", "14", "15", "16", "17", "18", "19", "20", "21", "22",
             "23", "24", "25", "26", "27", "28", "29", "30", "31"]
 }
@@ -105,8 +105,11 @@ closed_lexicon = {
 vocab_overrides = {
     "a": ["DET"],
     "to": ["INF", "PRE"],
-    "plc": ["N"],  # Not found in Wiktionary; part of multi-word proper nouns (company names)
-    # "plc": ["N+PROP"],
+
+    # TODO: Mark these as "+PROP" (can't handle attributes at this
+    #  late stage yet)
+    # Final nouns for company names:
+    "plc": ["N"],  # Wiktionary just marks this as an English intialism
 }
 
 attribute_expansion = {
@@ -129,6 +132,13 @@ attribute_expansion = {
 # American English
 phrase_structures = {
     "NP": [
+        ["NP2"],  # the doctor, a consummate professional,
+
+        # https://en.wikipedia.org/wiki/Apposition
+        ["NP2", "COMMA", "NP2", "COMMA"],  # the doctor, a consummate professional,
+        ["NP2", "COMMA", "NP2"],           # the ball, a toy.  (TERM omitted)
+    ],
+    "NP2": [
         ["N+NDR"],               # puppies, money, Germany
         ["AJP", "N+NDR"],        # brown puppies, dirty money, rich Germany
         ["DET", "N+DR"],         # the cup
@@ -140,6 +150,10 @@ phrase_structures = {
         ["N", "POSS", "N"],  # David's car
         ["DET", "N", "POSS", "N"],  # the owner's money
         ["DET", "AJP", "N", "POSS", "N"],  # the blue puppy's eyes
+
+        # Infinitives as post-positional adjectives
+        ["DET", "N", "INF", "V", "V"],   # the task to be completed
+        ["DET", "AJP", "N", "INF", "V", "V"],   # the ugly task to be completed
 
         # Multi-word proper nouns (not checked for agreement)
         ["N", "N"],
@@ -156,8 +170,13 @@ phrase_structures = {
         ["NUM", "PERC"],
         ["DET", "NUM", "PERC", "N"],  # A 5% solution
         ["CUR", "NUM"],     # $5 when nltk parses the parts separately
+
         ["CURNUM"],         # £7
         ["CURNUM", "NUM"],  # £2.3 billion
+        ["CURNUM", "N"],         # £7 items
+        ["CURNUM", "NUM", "N"],  # £2.3 billion mistakes
+        ["DET", "CURNUM", "N"],         # the £7 disc
+        ["DET", "CURNUM", "NUM", "N"],  # the £2.3 billion project
 
         ["NUM"],  # works for dates, numbers as numbers
 
@@ -174,14 +193,14 @@ phrase_structures = {
     ],
     "MDY_DATE": [
         ["MONTH", "DOM"],
-        ["MONTH", "DOM", "YEAR"],
         ["MONTH", "DOM", "COMMA", "YEAR"],
         ["MONTH", "DOM", "COMMA", "YEAR", "COMMA"],
     ],
     "DMY_DATE": [
         ["DOM", "MONTH"],
+        ["DOM", "CON", "DOM", "MONTH"],
         ["DOM", "MONTH", "YEAR"],
-        ["DOM", "MONTH", "YEAR", "COMMA"],
+        ["DOM", "CON", "DOM", "MONTH", "YEAR"],
     ],
     "YEAR": [
         ["NUM"],
@@ -310,7 +329,13 @@ phrase_structures = {
         ["NP", "VP", "TERM"],
 
         # However, he is dead.   Slowly, the ship was raised.
-        ["AVP", "COMMA" "NP", "VP", "TERM"],
+        ["AVP", "COMMA", "NP", "VP", "TERM"],
+
+        ["PP", "NP", "VP", "TERM"],
+        # Allows "On 7 March 2005 something happened" without commas,
+        # which Beland does not like but which
+        # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Commas
+        # doesn't say is wrong.
 
         # Compound sentences and subordinate clauses
         ["NP", "VP", "CON", "NP", "VP", "TERM"],
