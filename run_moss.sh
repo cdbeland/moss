@@ -43,9 +43,10 @@ grep -P "\[\[wikt:<" tmp-words-with-articles.txt | ../venv/bin/python3 ../summar
 
 cat tmp-words-with-articles.txt | grep -vP "\[\[wikt:[a-z]+\]\]" | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-misspellings-intl.txt
 
-# TODO: Link directly to articles where these words were detected
-tac tmp-misspelled-words-charlen.txt | grep -P '\t[a-z]+$' | uniq | perl -pe 's%(\d+)\t(.*)$%* \1 [https://en.wikipedia.org/w/index.php?search=\2 \2]%' > post-longest-shortest-misspelled-words.txt
-tac tmp-misspelled-words-charlen.txt | grep -vP '\t[a-z]+$' | uniq | perl -pe 's%(\d+)\t(.*)$%* \1 [https://en.wikipedia.org/w/index.php?search=\2 \2]%' > debug-longest-shortest-misspelled-words-intl.txt
+tac tmp-misspelled-words-charlen.txt | uniq | ../venv/bin/python3 ../word_categorizer.py > tmp-misspelled-words-charlen-cat.txt
+grep ^R tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^R\t//' > post-longest-shortest-misspelled-words.txt
+grep '^[IN]' tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^[IN]\t//' > post-longest-shortest-misspelled-words-intl.txt
+grep ^C tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^C\t//' > post-longest-shortest-misspelled-words-chem.txt
 
 # Generate stats
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt
