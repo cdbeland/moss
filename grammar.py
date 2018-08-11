@@ -150,12 +150,16 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
     previous_word = None
     for word in word_list:
         expand_grammar = False
-        pos_list = word_to_pos.get(word)
-        if previous_word is None and not pos_list and word == word.title():
-            pos_list = word_to_pos.get(word.lower())
-            if pos_list:
+        pos_list = word_to_pos.get(word, [])
+
+        # Not requiring pos_list be empty because "Such" is a proper
+        # noun but we need to look up "such"
+        if previous_word is None and word == word.title():
+            tmp_pos_list = word_to_pos.get(word.lower())
+            if tmp_pos_list:
                 # So that CFG parser can do the POS lookup
                 word_list[0] = word.lower()
+                pos_list.extend(tmp_pos_list)
         if not pos_list and conforming_number_re.match(word):
             pos_list = ["NUM"]
             expand_grammar = True
@@ -301,7 +305,13 @@ def check_article(title):
 # https://en.wikipedia.org/wiki/Wikipedia:Featured_articles
 
 sample_featured_articles = [
+
+    # DEBUGGING FILES
+
     # "0test",
+
+    # FEATURED ARTICLES
+
     # "BAE Systems",
     "Evolution",
     # "Chicago Board of Trade Building",
@@ -336,7 +346,11 @@ sample_featured_articles = [
     # "Byzantine navy",
     # "Wii",
     # "Mass Rapid Transit (Singapore)",
-    # "History of American football"
+    # "History of American football",
+
+    # ARTICLES NEEDING COPYEDIT
+
+    # "Gender inequality in China"
 ]
 
 
