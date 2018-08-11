@@ -18,7 +18,11 @@ chem_re = re.compile(
     "propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
     "cyclo|poly|iso)")
 
-
+# Note: This may malfunction slightly if there are commas inside the
+# chemical name.
+# https://en.wikipedia.org/wiki/IUPAC_nomenclature_of_inorganic_chemistry
+# https://en.wikipedia.org/wiki/IUPAC_nomenclature_of_organic_chemistry
+# https://en.wikipedia.org/wiki/Chemical_nomenclature
 def is_chemistry_word(word):
     small_word = chem_re.sub("", word)
     # print("CHEM_SMALL\t%s" % small_word)
