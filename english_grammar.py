@@ -81,8 +81,8 @@ closed_lexicon = {
     "COMMA": [","],
     "SEMCOL": [";"],
     "PERC": ["%"],
-    "POSS": ["'s"],
     "CUR": ["$", "€", "£", "¥", "₹", "US$", "A\$", "Can$"],
+    "POSS": ["'s"],
 
     "QUOTE": ["✂"],
     # Quotations are not inspected for grammar, but must be retained
@@ -110,6 +110,13 @@ vocab_overrides = {
     #  late stage yet)
     # Final nouns for company names:
     "plc": ["N"],  # Wiktionary just marks this as an English intialism
+
+    # Contractions are not allowed outside of direct quotes and proper nouns: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Abbreviations#Contractions
+    # If parsing informal speech, these will need to be added...
+    # "'s": ["POSS", "V", "AUXV"],  # Dave's, it's, it's been completed
+    # "'t": ["ADV"]     # not, as in "isn't"
+    # "'ve": ["AUXV"],  # have, as in "you've"  (not seen as V, like "you've the ball")
+    # ...and more: https://en.wikipedia.org/wiki/English_auxiliaries_and_contractions#Contractions
 }
 
 attribute_expansion = {
@@ -132,7 +139,7 @@ attribute_expansion = {
 # American English
 phrase_structures = {
     "NP": [
-        ["NP2"],  # the doctor, a consummate professional,
+        ["NP2"],  # the doctor
 
         # https://en.wikipedia.org/wiki/Apposition
         ["NP2", "COMMA", "NP2", "COMMA"],  # the doctor, a consummate professional,
@@ -144,6 +151,16 @@ phrase_structures = {
         ["DET", "N+DR"],         # the cup
         ["DET", "AJP", "N+DR"],  # the empty cup
         # NOT: cup, blue the ice
+        # Same as above but with modifiers
+        ["N+NDR", "PP"],
+        ["AJP", "N+NDR", "PP"],
+        ["DET", "N+DR", "PP"],
+        ["DET", "AJP", "N+DR", "PP"],
+
+        ["N", "V+PAST", "PP"],                # boards composed of wood
+        ["DET", "N", "V+PAST", "PP"],         # the board composed of wood
+        ["AJP", "N", "V+PAST", "PP"],         # long boards composed of wood
+        ["DET", "AJP", "N", "V+PAST", "PP"],  # the long board composed of wood
 
         # Putting ["N", "POSS"] in AJP makes more sense, but that
         # creates an infinite loop that resultes in a stack overflow.
@@ -206,6 +223,11 @@ phrase_structures = {
         ["NUM"],
     ],
 
+    # Hacky workaround for the numbers 1-30 only have one category due to override
+    "NUM": [
+        ["DOM"],
+    ],
+
     "AJP": [
         ["ADJ2"],  # green
         ["ADJ2", "COMMA", "ADJ2"],         # wet, tired
@@ -229,6 +251,8 @@ phrase_structures = {
         ["NUM"],          # five
         ["NUM", "ADJ2"],  # two red
         ["ORD"],          # 3rd
+
+        ["ADV", "ADJ"],   # generally red
     ],
 
     "ADJ2": [
@@ -276,7 +300,7 @@ phrase_structures = {
         ["AVP"],
 
         # TODO: These should only be used with to-be verbs, I think
-        ["ADJ"],
+        ["AJP"],  # are generally fast
 
         ["NP"],  # Direct object
         ["NP", "AVP"],
