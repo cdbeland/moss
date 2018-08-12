@@ -47,6 +47,7 @@ tac tmp-misspelled-words-charlen.txt | uniq | ../venv/bin/python3 ../word_catego
 grep ^R tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^R\t//' > post-longest-shortest-misspelled-words.txt
 grep '^[IN]' tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^[IN]\t//' > post-longest-shortest-misspelled-words-intl.txt
 grep ^C tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^C\t//' > post-longest-shortest-misspelled-words-chem.txt
+grep ^Y tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^Y\t//' > post-longest-shortest-misspelled-words-rhyme.txt
 
 # Generate stats
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt
