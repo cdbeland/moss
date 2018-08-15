@@ -83,7 +83,6 @@ def dump_results():
 
 ignore_tags_re = re.compile(r"{{\s*((copy|move) to \w+|not english|cleanup HTML)\s*}}", flags=re.I)
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
-unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 
@@ -95,13 +94,13 @@ with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_sp
 def spellcheck_all_langs(article_title, article_text):
     global article_count
 
-    if ignore_tags_re.re.search(article_text):
-        print("!\tSKIPPING due to known cleanup tag\t%s" % article_title)
+    if ignore_tags_re.search(article_text):
+        print("S\tSKIPPING due to known cleanup tag\t%s" % article_title)
         return
 
     request_search_string = 'title="en:%s"' % article_title
     if request_search_string in requested_species_html:
-        print("!\tSKIPPING (list with requested species)\t%s" % article_title)
+        print("S\tSKIPPING - list with requested species\t%s" % article_title)
         return
 
     # This can break wikitext_to_plaintext() in ways that cause wiki
@@ -109,7 +108,7 @@ def spellcheck_all_langs(article_title, article_text):
     starters = start_template_re.findall(article_text)
     enders = end_template_re.findall(article_text)
     if len(starters) != len(enders):
-        print("!\tMISMATCHED {{ }}; try https://tools.wmflabs.org/bracketbot/cgi-bin/find.py\t%s" % article_title)
+        print("!\t* [[%s]] - Mismatched {{ }}; try [https://tools.wmflabs.org/bracketbot/cgi-bin/find.py bracketbot]" % article_title)
         return
 
     article_text_orig = article_text
@@ -124,7 +123,9 @@ def spellcheck_all_langs(article_title, article_text):
     if quotation_list:
         article_text = blockquote_re.sub(" ", article_text)
         article_text = prose_quote_re.sub("", article_text)
-        print("Q\t%s\t%s" % (article_title, u"\t".join(quotation_list)))
+
+        # (Works, but disabled to save space because output is not being used.)
+        # print("Q\t%s\t%s" % (article_title, u"\t".join(quotation_list)))
         # TODO: Spell-check quotations, but publish typos in them in a
         #  separate list, since they need to be verified against the
         #  original source, or at least corrected more carefully.
@@ -139,18 +140,21 @@ def spellcheck_all_langs(article_title, article_text):
 
     for unmatched_item in ["<ref", "</ref>", "<blockquote", "</blockquote>", "}}", "{{", '"', "colspan", "rowspan", "cellspacing"]:
         if unmatched_item in article_text:
-            print("!\tABORTING PROCESSING: Unmatched %s\t%s" % (unmatched_item, article_title))
-            print("!\t%s" % article_text)
-            # Often due to typo in wiki markup, but might be due to
-            # moss misinterpreting the markup.  (Either way, should be
-            # fixed because this blocks spell-checking the entire
-            # article.)
+            matches = re.findall(r".{0,20}%s.{0,20}" % unmatched_item, article_text)
+            excerpt = " ... ".join(matches)
+            print("!\t* [[%s]] - Unmatched %s near: %s" % (article_title, unmatched_item, excerpt))
+            # Often due to typo in wiki markup or mismatched English
+            # punctuation, but might be due to moss misinterpreting
+            # the markup.  (Either way, should be fixed because this
+            # blocks spell-checking the entire article.)
             return
 
-    html_tag_matches = unknown_html_tag_re.findall(article_text)
-    if html_tag_matches:
-        print("W\tWARNING: Unknown HTML tag(s) present: %s \t%s" % ("  ".join(html_tag_matches), article_title))
-        print("W\t%s" % article_text)
+    # These are now in a report; this is only needed for debugging.
+    # unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
+    # html_tag_matches = unknown_html_tag_re.findall(article_text)
+    # if html_tag_matches:
+    #     print("W\tWARNING: Unknown HTML tag(s) present: %s \t%s" % ("  ".join(html_tag_matches), article_title))
+    #     print("W\t%s" % article_text)
 
     article_count += 1
     article_oops_list = []
