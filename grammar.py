@@ -25,7 +25,8 @@ from english_grammar import (enwiktionary_cat_to_pos,
                              closed_lexicon,
                              vocab_overrides)
 
-prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"')
+prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
+# "" because the contents may have been removed on a previous replacement
 parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?\S\]|\[\S\]')
 ignore_sections_re = re.compile(
     r"(==\s*See also\s*==|==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==|==\s*Publications\s*==|==\s*Works\s*==).*$",
@@ -465,9 +466,10 @@ def load_grammar_for_text(text):
 
 # --- RUNTIME ---
 
-if len(sys.argv) > 1 and sys.argv[1] == "--download":
-    save_sample_articles()
-    exit(0)
+def run_grammar_check():
+    if len(sys.argv) > 1 and sys.argv[1] == "--download":
+        save_sample_articles()
+        exit(0)
 
-check_samples_from_disk()
-mysql_connection.close()
+    check_samples_from_disk()
+    mysql_connection.close()

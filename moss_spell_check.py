@@ -7,13 +7,20 @@ from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly
 from grammar import prose_quote_re, ignore_sections_re
 
-# TO CHECK:
-# * transpress, literaturii dropped from common misspellings
 # TODO:
-# * "... find all" not necessary in post-least-common-misspellings.txt
-# * {{spaced endash}} and friends (subst: all instances?)
+# * {{spaced endash}} and friends
 #   https://en.wikipedia.org/wiki/Category:Wikipedia_character-substitution_templates
+# * Make sure tests pass
+# * Excerpts around " for mismatched quotes, post a "fix me" list
+# * "... find all" not necessary in post-least-common-misspellings.txt
 # * tmp-output.txt:* 24 - [[wikt:ation]] - [[1772 in poetry]] ([[attest]]ation)
+# * Report these:
+#    :"..."
+#    :''"..."''
+#    <blockquote>"..."</blockquote>
+#    {{quote|"..."}}
+#   as possible violations of [[MOS:BLOCKQUOTE]]; exclude these from
+#   "parse failed" output
 
 # TODO LONG TERM:
 # * Suppress items on
@@ -74,7 +81,7 @@ def dump_results():
         print(output_string)
 
 
-move_re = re.compile(r"{{\s*(copy|move) to \w+\s*}}", flags=re.I)
+ignore_tags_re = re.compile(r"{{\s*((copy|move) to \w+|not english|cleanup HTML)\s*}}", flags=re.I)
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
 unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
 start_template_re = re.compile(r"{{")
@@ -88,8 +95,8 @@ with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_sp
 def spellcheck_all_langs(article_title, article_text):
     global article_count
 
-    if move_re.search(article_text):
-        print("!\tSKIPPING (copy/move article to other project)\t%s" % article_title)
+    if ignore_tags_re.re.search(article_text):
+        print("!\tSKIPPING due to known cleanup tag\t%s" % article_title)
         return
 
     request_search_string = 'title="en:%s"' % article_title
