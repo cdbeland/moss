@@ -66,6 +66,13 @@ early_substitutions = [
     (re.compile(r"{{(•|bull)}}"), " • "),
     (re.compile(r"<math>.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
     (re.compile(r"{{(spaced en dash|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash)}}", flags=re.I), " - "),
+
+    # Must happen before table removal to prevent [[aa|{{bb}}-cc]] being changed to "aacc"
+    # TODO: These could really use test cases
+    (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
+    (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]"), r"\2"),
+    (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
+
 ]
 
 substitutions = [
@@ -193,11 +200,6 @@ substitutions = [
     (re.compile(r"\[\s*(http|https|ftp):.*?\]", flags=re.I), ""),  # External links
     (re.compile(r"(http|https|ftp):.*?[ $]", flags=re.I), ""),  # Bare URLs
 
-    # TODO: These could really use test cases
-    (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
-    (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]"), r"\2"),
-
-    (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
     (re.compile(r"'''''"), ""),
     (re.compile(r"''''"), ""),  # For when ''xxx'' has xxx removed
     (re.compile(r"'''"), ""),
