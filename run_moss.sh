@@ -36,7 +36,7 @@ tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -P ' - [a-z ]+$' | p
 tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -vP ' - [a-z ]+$' | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' | ../venv/bin/python3 ../sectionalizer.py > debug-articles-with-single-typo-intl.txt
 
 grep -P "\[\[wikt:[a-z]+\]\]" tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings.txt
-tac tmp-words-with-articles.txt | grep -P "\[\[wikt:[a-z]+\]\]" | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt
+# tac tmp-words-with-articles.txt | grep -P "\[\[wikt:[a-z]+\]\]" | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt
 
 grep -P "\[\[wikt:&" tmp-words-with-articles.txt | ../venv/bin/python3 ../summarizer.py --find-all | grep -v "<nowiki></" > post-html-entities-by-freq.txt
 # Skip </xxx> tags because they duplicate <xxx> tags.
