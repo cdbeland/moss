@@ -38,16 +38,18 @@ tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -vP ' - [a-z ]+$' | 
 grep -P "\[\[wikt:[a-z]+\]\]" tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings.txt
 tac tmp-words-with-articles.txt | grep -P "\[\[wikt:[a-z]+\]\]" | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt
 
-grep -P "\[\[wikt:&" tmp-words-with-articles.txt | ../venv/bin/python3 ../summarizer.py --find-all > post-html-entities-by-freq.txt
+grep -P "\[\[wikt:&" tmp-words-with-articles.txt | ../venv/bin/python3 ../summarizer.py --find-all | grep -v "<nowiki></" > post-html-entities-by-freq.txt
+# Skip </xxx> tags because they duplicate <xxx> tags.
 grep -P "\[\[wikt:<" tmp-words-with-articles.txt | ../venv/bin/python3 ../summarizer.py --find-all > post-html-tags-by-freq.txt
 
-cat tmp-words-with-articles.txt | grep -vP "\[\[wikt:[a-z]+\]\]" | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-misspellings-intl.txt
+cat tmp-words-with-articles.txt | grep -vP "\[\[wikt:[a-z]+\]\]" | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings-intl.txt
 
 tac tmp-misspelled-words-charlen.txt | uniq | ../venv/bin/python3 ../word_categorizer.py > tmp-misspelled-words-charlen-cat.txt
 grep ^R tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^R\t//' > post-longest-shortest-misspelled-words.txt
 grep '^[IN]' tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^[IN]\t//' > post-longest-shortest-misspelled-words-intl.txt
 grep ^C tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^C\t//' > post-longest-shortest-misspelled-words-chem.txt
-grep ^Y tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^Y\t//' > post-longest-shortest-misspelled-words-rhyme.txt
+grep ^P tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^P\t//' > post-longest-shortest-misspelled-words-pattern.txt
+grep ^D tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^D\t//' > post-longest-shortest-misspelled-words-dna.txt
 
 # Generate stats
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt

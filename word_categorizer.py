@@ -1,6 +1,7 @@
 # R = Regular
 # C = Chemistry
-# Y = Rhyme scheme
+# P = Pattern of some kind (rhyme scheme, reduplication)
+# D = DNA sequence
 # N = Numbers or punctuation
 # I = International (non-ASCII characters)
 
@@ -8,10 +9,11 @@ from collections import defaultdict
 import fileinput
 import re
 
-az_re = re.compile("^[a-z]+$")
+az_re = re.compile("^[a-z]+$", flags=re.I)
 az_plus_re = re.compile("^[a-z|\d|\-]+$", flags=re.I)
 ag_re = re.compile("^[a-g]+$")
 mz_re = re.compile("[m-z]")
+dna_re = re.compile("^[acgt]+$")
 
 chem_re = re.compile(
     "(\d+\-|"
@@ -76,10 +78,12 @@ for line in fileinput.input("-"):
 
     category = None
     if az_plus_re.match(word):
-        if is_chemistry_word(word):
+        if dna_re.match(word):
+            category = "D"
+        elif is_chemistry_word(word):
             category = "C"
-        if is_rhyme_scheme(word):
-            category = "Y"
+        elif is_rhyme_scheme(word):
+            category = "P"
         elif az_re.match(word):
             category = "R"
         else:

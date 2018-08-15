@@ -41,6 +41,7 @@ for line in fileinput.input("-"):
             word_safe = re.sub(">", "", word)
 
             word_safe = word_safe.replace("<", "\<")
+            word_safe = word_safe.replace("/", "\/")
             word_safe = urllib.parse.quote_plus(word_safe)
             better_line += " ... [https://en.wikipedia.org/w/index.php?search=insource%%3A%%2F%s%%2Fi&ns0=1 find all]" % word_safe
 
