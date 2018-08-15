@@ -6,9 +6,13 @@ from xml.sax.saxutils import unescape
 
 for line in fileinput.input("-"):
     new_line = unescape(line, {
+        "&rArr": "⇒",
+        "&rho;": "ρ",
+        "&hellip;": "...",
+        "&Lambda;": "Λ",
         "&Delta;": "Δ",
-        "&Omega": "Ω",
-        "&Sigma": "Σ",
+        "&Omega;": "Ω",
+        "&Sigma;": "Σ",
         "&Phi;": "Φ",
         "&Gamma;": "Ɣ",
         "&Eacute;": "É",
