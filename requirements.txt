@@ -1,5 +1,6 @@
-lxml
-nltk
 flake8
-wikipedia
+lxml
 mysql-connector-python
+nltk
+nose
+wikipedia

@@ -1,23 +1,45 @@
-from wikitext_util import remove_structure_nested, wikitext_to_plaintext
-from spell import is_word_spelled_correctly
+import unittest
 
-# TODO: Use a test framework
+from .wikitext_util import remove_structure_nested, wikitext_to_plaintext
 
-test_result = remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}")
-if test_result != "aaa  eee":
-    raise Exception("Broken remove_structure_nested returned: '%s'" % test_result)
 
-test_result = remove_structure_nested("{{xxx yyy}} zzz", "{{", "}}")
-if test_result != " zzz":
-    raise Exception("Broken remove_structure_nested returned: '%s'" % test_result)
+class WikitextUtilTest(unittest.TestCase):
 
-test_result = is_word_spelled_correctly("<nowiki/>")
-if not test_result:
-    raise Exception("Unknown HTML tags not considered incorrect")
+    def test_remove_structure_nested(self):
+        self.assertEqual(
+            remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}"),
+            "aaa  eee")
 
-# From https://en.wikipedia.org/wiki/Łoś–Vaught test
+        self.assertEqual(
+            remove_structure_nested("{{xxx yyy}} zzz", "{{", "}}"),
+            " zzz")
 
-text_in = "a satisfiable theory is [[Morley's categoricity theorem|{{mvar|&kappa;}}-categorical]] (there exists an infinite cardinal {{mvar|&kappa;}} such that)"
-text_out = wikitext_to_plaintext(text_in)
-if not text_out == "a satisfiable theory is -categorical (there exists an infinite cardinal {{mvar|&kappa;}} such that)":
-    raise Exception("Failed Łoś–Vaught")
+    def test_links(self):
+        self.assertEqual(
+            wikitext_to_plaintext("[[Regular page]]s"),
+            "Regular pages")
+        self.assertEqual(
+            wikitext_to_plaintext("[[Target page|Display text]]"),
+            "Display text")
+        self.assertEqual(
+            wikitext_to_plaintext("[[Namespace:Target page]]"),
+            "")
+
+        # From https://en.wikipedia.org/wiki/Scott_Shiflett
+        self.assertEqual(
+            wikitext_to_plaintext("*''[[Face to Face (1996 Face to Face album)|Face to Face]]'' (1996)"),
+            "*Face to Face (1996)")
+
+    def test_ŁośVaught(self):
+        # From https://en.wikipedia.org/wiki/Łoś–Vaught test
+        text_in = "a satisfiable theory is [[Morley's categoricity theorem|{{mvar|&kappa;}}-categorical]] (there exists an infinite cardinal {{mvar|&kappa;}} such that)"
+        self.assertEqual(
+            wikitext_to_plaintext(text_in),
+            "a satisfiable theory is -categorical (there exists an infinite cardinal  such that)")
+
+
+class SpellTest(unittest.TestCase):
+
+    def test_unknown_html_tag(self):
+        from .spell import is_word_spelled_correctly  # This takes a long time
+        self.assertFalse(is_word_spelled_correctly("<nowiki/>"))

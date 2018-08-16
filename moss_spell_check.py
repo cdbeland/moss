@@ -12,7 +12,6 @@ from grammar import prose_quote_re, ignore_sections_re
 #   https://en.wikipedia.org/wiki/Category:Wikipedia_character-substitution_templates
 # * Make sure tests pass
 # * Excerpts around " for mismatched quotes, post a "fix me" list
-# * "... find all" not necessary in post-least-common-misspellings.txt
 # * tmp-output.txt:* 24 - [[wikt:ation]] - [[1772 in poetry]] ([[attest]]ation)
 # * Report these:
 #    :"..."

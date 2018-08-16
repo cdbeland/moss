@@ -68,9 +68,14 @@ early_substitutions = [
     (re.compile(r"{{(spaced en dash|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash)}}", flags=re.I), " - "),
 
     # Must happen before table removal to prevent [[aa|{{bb}}-cc]] being changed to "aacc"
-    # TODO: These could really use test cases
+
+    # [[Regular page]]
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
+
+    # [[Target page|Display text]]
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]"), r"\2"),
+
+    # [[Namespace:Target page]]
     (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
 
 ]
