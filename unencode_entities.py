@@ -6,6 +6,10 @@ from xml.sax.saxutils import unescape
 
 for line in fileinput.input("-"):
     new_line = unescape(line, {
+        "&times": "×",
+        "&#043;": "+",
+        "&#061;": "=",
+        "&#037;": "%",
         "&rArr": "⇒",
         "&rho;": "ρ",
         "&hellip;": "...",
