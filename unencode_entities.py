@@ -4,12 +4,13 @@ import sys
 from xml.sax.saxutils import unescape
 
 
-for line in fileinput.input("-"):
-    new_line = unescape(line, {
+def fix_text(text):
+    new_text = unescape(text, {
         "&times": "×",
         "&#043;": "+",
         "&#061;": "=",
         "&#037;": "%",
+        "&quot;": '"',
         "&rArr": "⇒",
         "&rho;": "ρ",
         "&hellip;": "...",
@@ -105,12 +106,18 @@ for line in fileinput.input("-"):
         "&uuml;": "ü",
         "&auml;": "ä",
         "&egrave;": "è",
-        "&quot;": '"',
+        "&ugrave;": "ù",
+        "&ograve;": "ò",
+        "&igrave;": "ì",
     })
 
-    new_line = new_line.replace("…", "...")
+    new_text = new_text.replace("…", "...")
+    return new_text
 
-    sys.stdout.write(new_line)
 
-    if re.search("&(?!nbsp|ndash|mdash|prime|minus)[a-zA-Z#0-9]+;", new_line):
-        sys.stderr.write(new_line)
+if __name__ == '__main__':
+    for line in fileinput.input("-"):
+        new_line = fix_text(line)
+        sys.stdout.write(new_line)
+        if re.search("&(?!nbsp|ndash|mdash|prime|minus)[a-zA-Z#0-9]+;", new_line):
+            sys.stderr.write(new_line)

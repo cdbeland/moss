@@ -3,4 +3,5 @@ lxml
 mysql-connector-python
 nltk
 nose
+pywikibot
 wikipedia
