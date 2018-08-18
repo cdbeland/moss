@@ -6,7 +6,14 @@ from xml.sax.saxutils import unescape
 
 def fix_text(text):
     new_text = unescape(text, {
+        # Potentially confusing; pay attention in diffs
+        "&omicron;": "ο",
+        "&kappa;": "κ",
+        "&Kappa;": "Κ",
+        "&Upsilon;": "Υ",
         "&times": "×",
+
+        # Safe to always change over
         "&#043;": "+",
         "&#061;": "=",
         "&#037;": "%",
@@ -122,3 +129,4 @@ if __name__ == '__main__':
         sys.stdout.write(new_line)
         if re.search("&(?!nbsp|ndash|mdash|prime|minus)[a-zA-Z#0-9]+;", new_line):
             sys.stderr.write(new_line)
+            raise Exception("Unknown HTML entity")
