@@ -23,7 +23,7 @@ cat tmp-misspelled-lists.txt | perl -ne 'foreach $word (split(" ")) {print $word
 cat tmp-misspelled-words.txt | perl -pe 'print length($_) - 1; print "\t"' | sort -n > tmp-misspelled-words-charlen.txt
 grep '^*' tmp-output.txt | tac > tmp-words-with-articles.txt
 
-cat tmp-articles-with-words.txt | perl -pe 's/^@\t(\d+)\t(.*?)\t/* \1 - [[\2]] - /' > tmp-articles-linked-words.txt
+cat tmp-articles-with-words.txt | perl -pe 's/^@\t(\d+)\t(.*?)\t/* \1 - [[\2]] - /' | perl -pe 's/&/&amp;/g; s/</&lt;/g; s/>/&gt;/g' > tmp-articles-linked-words.txt
 grep -P ' - [a-z ]+$' tmp-articles-linked-words.txt | head -1000 > post-articles-with-most-misspelled-words.txt
 grep -vP ' - [a-z ]+$' tmp-articles-linked-words.txt | head -1000 > debug-articles-with-most-misspelled-words-intl.txt
 # TODO: Download titles only for Wikipedias for all languages, and
