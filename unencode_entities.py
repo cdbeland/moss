@@ -1,125 +1,285 @@
 import fileinput
 import re
 import sys
-from xml.sax.saxutils import unescape
+
+# Manual transformation probably required
+alert = [
+    "™", "©", "®",
+    "Ⅰ", "Ⅱ", "ⅰ", "ⅱ",
+    "¼", "½", "¾", "&frasl;"
+    "¹", "⁺", "ⁿ", "₁", "₊", "ₙ",
+
+    # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
+    "µ", "&micro;",
+
+    # Only allowed in proper names and text in languages in which they are standard. See [[MOS:LIGATURES]].
+    "&aelig;",  # æ
+    "&oelig;",  # œ
+    "Æ", "æ", "Œ", "œ",
+
+    # Probably would be controversial to change these
+    "∑", "&sum;",
+    "∏",
+
+    # Try &mdash instead
+    "―", "&horbar;",
+
+    # Convert to straight quotes, or keep &-encoded version
+    "‘", "&lsquo;",
+    "’", "&rsquo;",
+    "‚", "&sbquo;",
+    "“", "&ldquo;",
+    "”", "&rdquo;",
+    "„", "&bdquo;",
+    "´", "&acute;",
+    "`", "&#96;",
+
+    # Convert to straight quotes per [[MOS:CONFORM]]
+    "‹", "&lsaquo;", "›", "&rsaquo;",
+    "«", "&lsaquo;", "»", "&rsaquo;",
+
+    # Probably convert to regular space or no space
+    "&ensp;", "&emsp;", "&thinsp;", "&hairsp;",
+
+    # &zwj; usually wants to be &zwnj; and probably that usually isn't
+    # needed?
+    "&zwj;", "&zwnj;"
+
+    # Probably wants to be wiki-list syntax
+    "•", "&bull;", "·", "&middot;", "⋅", "&sdot;",
+]
+
+# Ignore these if seen in articles
+keep = [
+    # Allowed for math notation only
+    "&prime;", "′", "&Prime;", "″",
+
+    # Definitely confusing, keep forever
+    "&ndash;", "&mdash;", "&minus;", "&shy;",
+    "&nbsp;", "&lrm;", "&rlm;",
+
+    # Definitely confusing, probably keep forever
+    "&times;",  # ×
+    "&and;",    # ∧
+    "&or;",     # ∨
+    "&lang;",   # 〈
+    "&rang;",   # 〉
+]
+
+controversial = {
+    # Possibly controversial (math and science people have been somewhat upset)
+    "&asymp;": "≈",
+    "&empty;": "∅",
+    "&part;": "∂",
+    "&notin;": "∉",
+    "&otimes;": "⊗",
+    "&exist;": "∃",
+    "&nabla;": "∇",
+    "&sub;": "⊂",
+    "&equiv;": "≡",
+    "&cap;": "∩",
+    "&cup;": "∪",
+    "&oplus;": "⊕",
+    "&plusmn;": "±",
+    "&ne;": "≠",
+    "&sube;": "⊆",
+    "&not;": "¬",
+    "&radic;": "√",
+    "&forall;": "∀",
+    "&sup;": "⊃",
+    "&sim;": "∼",
+    "&perp;": "⊥",
+    "&alefsym;": "ℵ",
+    "&isin;": "∈",
+    "&le;": "≤",
+    "&fnof;": "ƒ",
+    "&infin;": "∞",
+    "&ge;": "≥",
+    "&lowast;": "∗",
+    "&cong;": "≅",
+    "&weierp;": "℘",
+    "&hArr": "⇔",
+    "&rArr": "⇒",
+    "&rarr;": "→",
+    "&larr;": "←",
+    "&harr;": "↔",
+    "&darr;": "↓",
+    "&uarr;": "↑",
+}
+
+keep.extend(controversial.keys())
+
+# Automatically change, with the expectation there will be a
+# manual inspection of the diff
+transform = {
+    "&#043;": "+",
+    "&#061;": "=",
+    "&#037;": "%",
+    "&quot;": '"',
+    "&hellip;": "...",
+    "…": "...",
+    "&trade;": "™",
+    "&copy;": "©",
+    "&reg;": "®",
+
+    "&amp;": "&",
+    "&lt;": "<",
+    "&gt;": ">",
+    "&#91;": "[",
+    "&#93;": "]",
+    "&apos;": "'",
+    "&#124;": "|",
+
+    # Very common symbols, to change outside of math/science articles
+    "&pound;": "£",
+    "&sect;": "§",
+    "&deg;": "°",
+
+    # Latin and Germanic letters
+    "&aacute;": "á",
+    "&agrave;": "à",
+    "&aring;": "å",
+    "&atilde;": "ã",
+    "&auml;": "ä",
+    "&szlig;": "ß",
+    "&ccedil;": "ç",
+    "&Eacute;": "É",
+    "&eacute;": "é",
+    "&ecirc;": "ê",
+    "&egrave;": "è",
+    "&iacute;": "í",
+    "&igrave;": "ì",
+    "&iuml;": "ï",
+    "&ntilde;": "ñ",
+    "&oacute;": "ó",
+    "&ocirc;": "ô",
+    "&ograve;": "ò",
+    "&oslash;": "ø",
+    "&ouml;": "ö",
+    "&uacute;": "ú",
+    "&ugrave;": "ù",
+    "&uuml;": "ü",
+
+    # Greek letters only found in actual Greek words
+    "&sigmaf;": "ς",  # Written this way when word-final
+    "&#x1F7B;": "ύ",
+    "&#x1F76;": "ὶ",
+    "&#x1FC6;": "ῆ",
+    "&#x1F10;": "ἐ",
+    "&#x1FF7;": "ῷ",
+    "&#x1FC6;": "ῆ",
+    "&#304;": "İ",
+    "&#287;": "ğ",
+
+    "’": "'",
+    "« ": '"',
+    " »": '"',
+    "«": '"',
+    "»": '"',
+}
+
+greek_letters = {
+    "&alpha;": "α",
+    "&beta;": "β",
+    "&gamma;": "γ",
+    "&delta;": "δ",
+    "&epsilon;": "ε",
+    "&zeta;": "ζ",
+    "&eta;": "η",
+    "&theta;": "θ",
+    "&iota;": "ι",
+    "&lambda;": "λ",
+    "&mu;": "μ",
+    "&nu;": "ν",
+    "&xi;": "ξ",
+    "&pi;": "π",
+    "&sigma;": "σ",
+    "&tau;": "τ",
+    "&upsilon;": "υ",
+    "&phi;": "φ",
+    "&chi;": "χ",
+    "&psi;": "ψ",
+    "&omega;": "ω",
+    "&Gamma;": "Γ",
+    "&Delta;": "Δ",
+    "&Theta;": "Θ",
+    "&Lambda;": "Λ",
+    "&Xi;": "Ξ",
+    "&Pi;": "Π",
+    "&Sigma;": "Σ",
+    "&Phi;": "Φ",
+    "&Psi;": "Ψ",
+    "&Omega;": "Ω",
+
+    # There are strong objections to changing these outside of
+    # Greek words, because they look too much like Latin letters.
+    "&kappa;": "κ",
+    "&omicron;": "ο",
+    "&rho;": "ρ",
+    "&Alpha;": "Α",
+    "&Beta;": "Β",
+    "&Epsilon;": "Ε",
+    "&Zeta;": "Ζ",
+    "&Eta;": "Η",
+    "&Iota;": "Ι",
+    "&Kappa;": "Κ",
+    "&Mu;": "Μ",
+    "&Nu;": "Ν",
+    "&Omicron;": "Ο",
+    "&Rho;": "Ρ",
+    "&Tau;": "Τ",
+    "&Upsilon;": "Υ",
+    "&Chi;": "Χ",
+}
 
 
-def fix_text(text):
-    new_text = unescape(text, {
-        # Potentially confusing; pay attention in diffs
-        "&omicron;": "ο",
-        "&kappa;": "κ",
-        "&Kappa;": "Κ",
-        "&Upsilon;": "Υ",
-        "&times": "×",
+def make_useful(entity):
+    result = re.match("&#(x?[0-9a-fA-F]+);", entity)
+    if result:
+        number = result.group(1)
+        if number.startswith("x"):
+            number = number.strip("x")
+            number = int(number, 16)
+        else:
+            number = int(number)
+        converted_entity = chr(number)
+        return "%s (%s)" % (entity, converted_entity)
+    else:
+        return entity
 
-        # Safe to always change over
-        "&#043;": "+",
-        "&#061;": "=",
-        "&#037;": "%",
-        "&quot;": '"',
-        "&hArr": "⇔",
-        "&rArr": "⇒",
-        "&rho;": "ρ",
-        "&hellip;": "...",
-        "&Lambda;": "Λ",
-        "&Delta;": "Δ",
-        "&Omega;": "Ω",
-        "&Sigma;": "Σ",
-        "&Phi;": "Φ",
-        "&Gamma;": "Ɣ",
-        "&Eacute;": "É",
-        "&eacute;": "é",
-        "&rarr;": "→",
-        "&omega;": "ω",
-        "&alpha;": "α",
-        "&isin;": "∈",
-        "&lambda;": "λ",
-        "&phi;": "φ",
-        "&pi;": "π",
-        "&le;": "≤",
-        "&sigma;": "σ",
-        "&mu;": "μ",
-        "&gamma;": "γ",
-        "&fnof;": "ƒ",
-        "&epsilon;": "ε",
-        "&infin;": "∞",
-        "&beta;": "β",
-        "&delta;": "δ",
-        "&ge;": "≥",
-        "&tau;": "τ",
-        "&theta;": "θ",
-        "&lowast;": "∗",
-        "&larr;": "←",
-        "&equiv;": "≡",
-        "&cap;": "∩",
-        "&nu;": "ν",
-        "&cup;": "∪",
-        "&oplus;": "⊕",
-        "&plusmn;": "±",
-        "&ne;": "≠",
-        "&sube;": "⊆",
-        "&not;": "¬",
-        "&radic;": "√",
-        "&forall;": "∀",
-        "&sub;": "⊂",
-        "&psi;": "ψ",
-        "&chi;": "χ",
-        "&otimes;": "⊗",
-        "&harr;": "↔",
-        "&exist;": "∃",
-        "&nabla;": "∇",
-        "&eta;": "η",
-        "&cong;": "≅",
-        "&zeta;": "ζ",
-        "&darr;": "↓",
-        "&xi;": "ξ",
-        "&perp;": "⊥",
-        "&alefsym;": "ℵ",
-        "&sum;": "∑",
-        "&sect;": "§",
-        "&uarr;": "↑",
-        "&asymp;": "≈",
-        "&reg;": "®",
-        "&empty;": "∅",
-        "&part;": "∂",
-        "&ccedil;": "ç",
-        "&atilde;": "ã",
-        "&ntilde;": "ñ",
-        "&notin;": "∉",
-        "&agrave;": "à",
-        "&sim;": "∼",
-        "&oacute;": "ó",
-        "&aelig;": "æ",
-        "&iacute;": "í",
-        "&weierp;": "℘",
-        "&trade;": "™",
-        "&oelig;": "œ",
-        "&iota;": "ι",
-        "&szlig;": "ß",
-        "&sup;": "⊃",
-        "&ecirc;": "ê",
-        "&copy;": "©",
-        "&aring;": "å",
-        "&uacute;": "ú",
-        "&sigmaf;": "ς",
-        "&iuml;": "ï",
-        "&upsilon;": "υ",
-        "&ocirc;": "ô",
-        "&pound;": "£",
-        "&deg;": "°",
-        "&aacute;": "á",
-        "&oslash;": "ø",
-        "&ouml;": "ö",
-        "&uuml;": "ü",
-        "&auml;": "ä",
-        "&egrave;": "è",
-        "&ugrave;": "ù",
-        "&ograve;": "ò",
-        "&igrave;": "ì",
-    })
 
-    new_text = new_text.replace("…", "...")
+def fix_text(text, transform_greek=False):
+
+    for string in alert:
+        if string in text:
+            with_context_re = re.compile(r".{0,10}%s.{0,10}" % string)
+            with_context_results = with_context_re.findall(text)
+            print("FOUND BAD CHARACTER IN TEXT: %s" % " ".join(with_context_results),
+                  file=sys.stderr)
+
+    if transform_greek:
+        conversion_dict = transform.copy()
+        conversion_dict.update(greek_letters)
+    else:
+        conversion_dict = transform
+
+    new_text = text
+    for (from_string, to_string) in conversion_dict.items():
+        new_text = new_text.replace(from_string, to_string)
+
+    test_string = new_text
+    for string in keep:
+        test_string = test_string.replace(string, "")
+    if not transform_greek:
+        for string in greek_letters:
+            test_string = test_string.replace(string, "")
+    unknown_entities = re.findall("&#?[a-zA-Z0-9]+;", test_string)
+    if unknown_entities:
+        sys.stderr.write(new_text)
+        raise Exception("Unknown HTML entity: %s" % " ".join([
+            make_useful(string) for string in unknown_entities
+        ]))
+
     return new_text
 
 
@@ -127,6 +287,3 @@ if __name__ == '__main__':
     for line in fileinput.input("-"):
         new_line = fix_text(line)
         sys.stdout.write(new_line)
-        if re.search("&(?!nbsp|ndash|mdash|prime|minus)[a-zA-Z#0-9]+;", new_line):
-            sys.stderr.write(new_line)
-            raise Exception("Unknown HTML entity")

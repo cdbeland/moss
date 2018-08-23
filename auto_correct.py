@@ -25,11 +25,14 @@ if sys.argv[1].startswith("titles:"):
 else:
     # pywikibot documentation:
     # https://doc.wikimedia.org/pywikibot/master/api_ref/pywikibot.html
-    results = pagegenerators.SearchPageGenerator(query, namespaces=[0], total=10)
+    results = pagegenerators.SearchPageGenerator(query, namespaces=[0], total=5)
 
 for page in results:
-    print(page.title())
-    new_text = fix_text(page.text)
+    print(page.title(), file=sys.stderr)
+    transform_greek = False
+    if sys.argv[-1] == "--greek":
+        transform_greek = True
+    new_text = fix_text(page.text, transform_greek=transform_greek)
     title_safe = page.title().replace(" ", "_")
     with open("swap/%s" % title_safe, 'w') as output_file:
         output_file.write(new_text)
