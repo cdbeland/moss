@@ -128,7 +128,10 @@ transform = {
     "&#91;": "[",
     "&#93;": "]",
     "&apos;": "'",
-    "&#124;": "|",
+
+    "&#124;": "-",
+    # This is a pipe, but usually happens in URL titles, in which case
+    # making a dash is easier.
 
     # Very common symbols, to change outside of math/science articles
     "&pound;": "£",
@@ -148,6 +151,7 @@ transform = {
     "&ecirc;": "ê",
     "&egrave;": "è",
     "&iacute;": "í",
+    "&Iacute;": "Í",
     "&igrave;": "ì",
     "&iuml;": "ï",
     "&ntilde;": "ñ",
@@ -156,9 +160,15 @@ transform = {
     "&ograve;": "ò",
     "&oslash;": "ø",
     "&ouml;": "ö",
+    "&Uacute;": "Ú",
     "&uacute;": "ú",
     "&ugrave;": "ù",
     "&uuml;": "ü",
+
+    "&#250;": "ú",
+    "&#225;": "á",
+    "&#237;": "í",
+    "&#233;": "é",
 
     # Greek letters only found in actual Greek words
     "&sigmaf;": "ς",  # Written this way when word-final
@@ -171,11 +181,30 @@ transform = {
     "&#304;": "İ",
     "&#287;": "ğ",
 
+    "‘": "'",
+    "&lsquo;": "'",
     "’": "'",
+    "&rsquo;": "'",
+    "“": '"',
+    "&ldquo;": '"',
+    "”": '"',
+    "&rdquo;": '"',
+    "´": "'",
+    "&acute;": "'",
+    "`": "'",
+    "&#96;": "'",
+
+    "&#8216;": "'",  # ‘ -> '
+    "&#8217;": "'",  # ’ -> '
+    "&#8212;": "—",  # emdash
+
+    # Per [[MOS:CONFORM]]
     "« ": '"',
     " »": '"',
     "«": '"',
     "»": '"',
+    "&raquo;": '"',
+    "&laquo;": '"',
 }
 
 greek_letters = {
@@ -250,13 +279,6 @@ def make_useful(entity):
 
 def fix_text(text, transform_greek=False):
 
-    for string in alert:
-        if string in text:
-            with_context_re = re.compile(r".{0,10}%s.{0,10}" % string)
-            with_context_results = with_context_re.findall(text)
-            print("FOUND BAD CHARACTER IN TEXT: %s" % " ".join(with_context_results),
-                  file=sys.stderr)
-
     if transform_greek:
         conversion_dict = transform.copy()
         conversion_dict.update(greek_letters)
@@ -266,6 +288,13 @@ def fix_text(text, transform_greek=False):
     new_text = text
     for (from_string, to_string) in conversion_dict.items():
         new_text = new_text.replace(from_string, to_string)
+
+    for string in alert:
+        if string in new_text:
+            with_context_re = re.compile(r".{0,10}%s.{0,10}" % string)
+            with_context_results = with_context_re.findall(text)
+            print("FOUND BAD CHARACTER IN TEXT: %s" % " ".join(with_context_results),
+                  file=sys.stderr)
 
     test_string = new_text
     for string in keep:
