@@ -9,6 +9,7 @@ import re
 from subprocess import call
 import sys
 from unencode_entities import fix_text
+from urllib import parse
 
 
 input_safe = sys.argv[1].replace("<", "\<")
@@ -34,6 +35,7 @@ for page in results:
         transform_greek = True
     new_text = fix_text(page.text, transform_greek=transform_greek)
     title_safe = page.title().replace(" ", "_")
+    title_safe = parse.quote(title_safe, safe='')
     with open("swap/%s" % title_safe, 'w') as output_file:
         output_file.write(new_text)
     call(["firefox",
