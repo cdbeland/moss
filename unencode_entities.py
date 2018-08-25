@@ -12,11 +12,6 @@ alert = [
     # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
     "µ", "&micro;",
 
-    # Only allowed in proper names and text in languages in which they are standard. See [[MOS:LIGATURES]].
-    "&aelig;",  # æ
-    "&oelig;",  # œ
-    "Æ", "æ", "Œ", "œ",
-
     # Probably would be controversial to change these
     "∑", "&sum;",
     "∏",
@@ -141,6 +136,7 @@ transform = {
     # Latin and Germanic letters
     "&aacute;": "á",
     "&agrave;": "à",
+    "&Aring;": "Å",
     "&aring;": "å",
     "&atilde;": "ã",
     "&auml;": "ä",
@@ -165,14 +161,29 @@ transform = {
     "&ugrave;": "ù",
     "&uuml;": "ü",
 
+    "&#163;": "£",
+    "&#214;": "Ö",
     "&#225;": "á",
     "&#227;": "ã",
+    "&#228;": "ä",
+    "&#229;": "å",
+    "&#230;": "æ",
     "&#233;": "é",
     "&#234;": "ê",
     "&#237;": "í",
+    "&#246;": "ö",
+    "&#248;": "ø",
     "&#250;": "ú",
     "&#287;": "ğ",
     "&#304;": "İ",
+
+    # Removed from "alert": "Æ", "æ", "Œ", "œ",
+    # Per [[MOS:LIGATURES]], allowed in proper names and text in
+    # languages in which they are standard. Usually not worth
+    # reviewing. Non-proper names will show up on spell check anyway
+    # if it's not a standard rendering.
+    "&aelig;": "æ",
+    "&oelig;": "œ",
 
     # Greek letters only found in actual Greek words
     "&sigmaf;": "ς",  # Written this way when word-final
@@ -194,6 +205,9 @@ transform = {
     "´": "'",
     "&acute;": "'",
     "`": "'",
+    "&#x27;": "'",
+    "&#39;": "'",
+    "&#039;": "'",
     "&#96;": "'",
 
     "&#8220;": '"',  # “ -> "
