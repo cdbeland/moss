@@ -17,7 +17,7 @@ venv/bin/python3 moss_spell_check.py > $RUN_NAME/tmp-output.txt
 cd $RUN_NAME
 grep ^@ tmp-output.txt | sort -nr -k2 > tmp-articles-with-words.txt
 grep '^!' tmp-output.txt | perl -pe 's/.*\t//' | sort > post-parse-failures.txt
-grep '^I' tmp-output.txt | sort > debug-spellcheck-ignored.txt
+# grep '^I' tmp-output.txt | sort > debug-spellcheck-ignored.txt  # Not currently used, may reactivate in future
 cat tmp-articles-with-words.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' > tmp-misspelled-lists.txt
 cat tmp-misspelled-lists.txt | perl -ne 'foreach $word (split(" ")) {print $word . "\n"}' > tmp-misspelled-words.txt
 cat tmp-misspelled-words.txt | perl -pe 'print length($_) - 1; print "\t"' | sort -n > tmp-misspelled-words-charlen.txt
@@ -34,6 +34,8 @@ grep -vP ' - [a-z ]+$' tmp-articles-linked-words.txt | head -1000 > debug-articl
 
 tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -P ' - [a-z ]+$' | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' | ../venv/bin/python3 ../sectionalizer.py > post-articles-with-single-typo.txt
 tac tmp-articles-linked-words.txt | grep -P "\* 1 -" | grep -vP ' - [a-z ]+$' | perl -pe 's/ - (\w+)$/ - [[wikt:\1]]/' | ../venv/bin/python3 ../sectionalizer.py > debug-articles-with-single-typo-intl.txt
+grep '^* 5 - ' tmp-articles-linked-words.txt | tac | grep -P ' - [a-z ]+$' | perl -pe 's/ - (\w+) (\w+) (\w+) (\w+) (\w+)$/ - [[wikt:\1]] [[wikt:\2]] [[wikt:\3]] [[wikt:\4]] [[wikt:\5]]/' | ../venv/bin/python3 ../sectionalizer.py > post-articles-with-five-typos.txt
+grep '^* 5 - ' tmp-articles-linked-words.txt | tac | grep -vP ' - [a-z ]+$' | perl -pe 's/ - (\w+) (\w+) (\w+) (\w+) (\w+)$/ - [[wikt:\1]] [[wikt:\2]] [[wikt:\3]] [[wikt:\4]] [[wikt:\5]]/' | ../venv/bin/python3 ../sectionalizer.py > post-articles-with-five-typos-intl.txt
 
 grep -P "\[\[wikt:[a-z]+\]\]" tmp-words-with-articles.txt | head -1000 | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-misspellings.txt
 # tac tmp-words-with-articles.txt | grep -P "\[\[wikt:[a-z]+\]\]" | head -1000 | ../venv/bin/python3 ../summarizer.py > post-least-common-misspellings.txt
