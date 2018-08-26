@@ -16,7 +16,7 @@ venv/bin/python3 moss_spell_check.py > $RUN_NAME/tmp-output.txt
 
 cd $RUN_NAME
 grep ^@ tmp-output.txt | sort -nr -k2 > tmp-articles-with-words.txt
-grep '^!' tmp-output.txt | sort > post-parse-failures.txt
+grep '^!' tmp-output.txt | perl -pe 's/.*\t//' | sort > post-parse-failures.txt
 grep '^I' tmp-output.txt | sort > debug-spellcheck-ignored.txt
 cat tmp-articles-with-words.txt | grep -vP '^@\t0' | perl -pe 's/.*\t//' > tmp-misspelled-lists.txt
 cat tmp-misspelled-lists.txt | perl -ne 'foreach $word (split(" ")) {print $word . "\n"}' > tmp-misspelled-words.txt
@@ -54,4 +54,4 @@ grep ^D tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^D\t//' > post-longes
 # Generate stats
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt
 echo "Parse errors: " >> post-misspellings-per-article.txt
-grep -P "!\tABORT" debug-brackets.txt | wc -l >> post-misspellings-per-article.txt
+wc -l post-parse-failures.txt >> post-misspellings-per-article.txt
