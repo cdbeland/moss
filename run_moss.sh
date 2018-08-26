@@ -57,3 +57,6 @@ grep ^D tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^D\t//' > post-longes
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt
 echo "Parse errors: " >> post-misspellings-per-article.txt
 wc -l post-parse-failures.txt >> post-misspellings-per-article.txt
+
+../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
+cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt

@@ -10,7 +10,10 @@ for line in fileinput.input("-"):
     match_result = re.match(r"^\* (\d+) - \[\[wikt:(.*?)\]\] - (.+)$",
                             line)
     if not match_result:
-        # Some sort of garbled output?
+        match_result = re.match(r"^\* (\d+/\d+) - (.*?) - (\[\[.+\]\])$", line)
+
+    if not match_result:
+        print(line)
         continue
 
     article_count = match_result.group(1)
