@@ -44,10 +44,10 @@ def entity_check(article_title, article_text):
         else:
             add_safely(article_title, entity, unknown_found)
 
-
 def dump_dict(section_title, dictionary):
     print("=== %s ===" % section_title)
-    for (key, article_list) in dictionary.items():
+    sorted_items = sorted(dictionary.items(), key=lambda t: len(t[1]), reverse=True)
+    for (key, article_list) in sorted_items:
         article_set = set(article_list)
         print("* %s/%s - %s - %s" % (
             len(article_list),
@@ -58,10 +58,10 @@ def dump_dict(section_title, dictionary):
 
 
 def dump_results():
-    dump_dict("To avoid", alerts_found)
     dump_dict("Controversial entities", controversial_found)
-    dump_dict("Uncontroversial entities", uncontroversial_found)
     dump_dict("Greek letters", greek_letters_found)
+    dump_dict("To avoid", alerts_found)
+    dump_dict("Uncontroversial entities", uncontroversial_found)
     dump_dict("Unknown", unknown_found)
 
 
