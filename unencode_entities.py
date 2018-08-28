@@ -46,6 +46,9 @@ alert = [
 
 # Ignore these if seen in articles
 keep = [
+    "&amp;",  # dangerous for e.g. &amp;126;
+
+
     # Allowed for math notation only
     "&prime;", "′", "&Prime;", "″",
 
@@ -93,13 +96,21 @@ controversial = {
     "&lowast;": "∗",
     "&cong;": "≅",
     "&weierp;": "℘",
-    "&hArr": "⇔",
-    "&rArr": "⇒",
+    "&hArr;": "⇔",
+    "&rArr;": "⇒",
     "&rarr;": "→",
     "&larr;": "←",
+    "&lArr;": "⇐",
     "&harr;": "↔",
     "&darr;": "↓",
     "&uarr;": "↑",
+    "&uArr;": "⇑",
+    "&crarr;": "↵",
+    "&prop;": "∝",
+    "&int;": "∫",
+    "&rceil;": "⌉",
+    "&lceil;": "⌈",
+    "&real;": "ℜ",
 }
 
 keep.extend(controversial.keys())
@@ -107,6 +118,43 @@ keep.extend(controversial.keys())
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+
+    # Per [[MOS:FRAC]]
+    "¼": "{{frac|1|4}}",
+    "½": "{{frac|1|2}}",
+    "¾": "{{frac|3|4}}",
+    "&frac12": "{{frac|1|2}}",
+    "&frac14": "{{frac|1|4}}",
+    "&frac34": "{{frac|3|4}}",
+    "&frac16": "{{frac|1|6}}",
+
+    "&sup1;": "<sup>1</sup>",
+    "&sup2;": "<sup>2</sup>",
+    "&sup3;": "<sup>3</sup>",
+
+    "&#61;": "=",
+    "&#x3D;": "=",
+    "&#x38;": "8",
+    "&#x038;": "8",
+    "&#x22;": '"',
+    "&#32;": " ",
+    "&#x20;": " ",
+    "&#123;": "{",
+    "&#125;": "}",
+    "&#x5B;": "{",
+    "&#x5D;": "}",
+    "&#42;": "*",
+    "&#58;": "X",
+    "&#0033;": "!",
+    "&#0047;": "/",
+    "&#005B": "[",
+    "&#005C;": "\\",
+    "&#0060": "<",
+    "&#0061;": "=",
+    "&#0062;": "<",
+    "&#0093": "]",
+    "&#0124;": "|",
+
     "&#043;": "+",
     "&#061;": "=",
     "&#037;": "%",
@@ -117,7 +165,6 @@ transform = {
     "&copy;": "©",
     "&reg;": "®",
 
-    "&amp;": "&",
     "&lt;": "<",
     "&gt;": ">",
     "&#91;": "[",
@@ -128,40 +175,70 @@ transform = {
     # This is a pipe, but usually happens in URL titles, in which case
     # making a dash is easier.
 
-    # Very common symbols, to change outside of math/science articles
+    # Common symbols, to change outside of math/science articles
+    "&iquest;": "¿",
     "&pound;": "£",
+    "&#163;": "£",
     "&sect;": "§",
+    "&para;": "¶",
+    "&brvbar;": "¦",
+    "&euro;": "€",
+    "&curren;": "¤",
+    "&dagger;": "†",
+    "&Dagger;": "‡",
+    "&clubs;": "♣",
     "&deg;": "°",
+    "&oline;": "‾",
 
     # Latin and Germanic letters
+    "&Aacute;": "Á",
     "&aacute;": "á",
+    "&Agrave;": "À",
     "&agrave;": "à",
     "&Aring;": "Å",
     "&aring;": "å",
+    "&Atilde;": "Ã",
     "&atilde;": "ã",
+    "&Auml;": "Ä",
     "&auml;": "ä",
-    "&szlig;": "ß",
+    "&#X101;": "ā",
+    "&Ccedil;": "Ç",
     "&ccedil;": "ç",
+    "&eth;": "ð",
     "&Eacute;": "É",
     "&eacute;": "é",
     "&ecirc;": "ê",
+    "&Egrave;": "È",
     "&egrave;": "è",
+    "&euml;": "ë",
+    "&#X1E24;": "Ḥ",
     "&iacute;": "í",
     "&Iacute;": "Í",
     "&igrave;": "ì",
     "&iuml;": "ï",
+    "&Ntilde;": "Ñ",
     "&ntilde;": "ñ",
     "&oacute;": "ó",
     "&ocirc;": "ô",
+    "&Oacute;": "Ó",
     "&ograve;": "ò",
+    "&Oslash;": "Ø",
     "&oslash;": "ø",
+    "&Ouml;": "Ö",
     "&ouml;": "ö",
+    "&#X14D;": "ō",
+    "&Scaron;": "Š",
+    "&scaron;": "š",
+    "&#X161;": "š",
+    "&szlig;": "ß",
     "&Uacute;": "Ú",
     "&uacute;": "ú",
+    "&Ucirc;": "Û",
+    "&ucirc;": "û",
     "&ugrave;": "ù",
+    "&Uuml;": "Ü",
     "&uuml;": "ü",
 
-    "&#163;": "£",
     "&#214;": "Ö",
     "&#225;": "á",
     "&#227;": "ã",
@@ -184,6 +261,7 @@ transform = {
     # if it's not a standard rendering.
     "&aelig;": "æ",
     "&oelig;": "œ",
+    "&AElig;": "Æ",
 
     # Greek letters only found in actual Greek words
     "&sigmaf;": "ς",  # Written this way when word-final
@@ -193,6 +271,9 @@ transform = {
     "&#x1F10;": "ἐ",
     "&#x1FF7;": "ῷ",
     "&#x1FC6;": "ῆ",
+
+    "&#x00B4;": "&acute;",
+    "&ordf;": "ª",
 
     "‘": "'",
     "&lsquo;": "'",
@@ -214,9 +295,10 @@ transform = {
     "&#8221;": '"',  # ” -> "
     "&#8211;": "–",  # endash
 
-    "&#8216;": "'",  # ‘ -> '
-    "&#8217;": "'",  # ’ -> '
-    "&#8212;": "—",  # emdash
+    "&#8216;": "'",   # ‘ -> '
+    "&#8217;": "'",   # ’ -> '
+    "&#8212;": "—",   # emdash
+    "&#X2014;": "—",  # emdash
 
     # Per [[MOS:CONFORM]]
     "« ": '"',
@@ -225,6 +307,13 @@ transform = {
     "»": '"',
     "&raquo;": '"',
     "&laquo;": '"',
+
+    # U+FE0E Variation selector 15
+    "&#65038;": "",
+
+    # Broken
+    "&ccedi;": "ç",  # Typo on page
+    "&Amp;": "&amp;",
 }
 
 greek_letters = {
@@ -282,7 +371,7 @@ greek_letters = {
 }
 
 
-def make_useful(entity):
+def find_char_num(entity):
     result = re.match("&#(x?[0-9a-fA-F]+);", entity)
     if result:
         number = result.group(1)
@@ -290,11 +379,21 @@ def make_useful(entity):
             number = number.strip("x")
             number = int(number, 16)
         else:
-            number = int(number)
-        converted_entity = chr(number)
-        return "%s (%s)" % (entity, converted_entity)
+            try:
+                number = int(number)
+            except ValueError:
+                return None
+        return number
     else:
-        return entity
+        return None
+
+
+def find_char(entity):
+    number = find_char_num(entity)
+    if number:
+        return chr(number)
+    else:
+        return None
 
 
 def fix_text(text, transform_greek=False):
@@ -322,12 +421,11 @@ def fix_text(text, transform_greek=False):
     if not transform_greek:
         for string in greek_letters:
             test_string = test_string.replace(string, "")
-    unknown_entities = re.findall("&#?[a-zA-Z0-9]+;", test_string)
-    if unknown_entities:
-        sys.stderr.write(new_text)
-        raise Exception("Unknown HTML entity: %s" % " ".join([
-            make_useful(string) for string in unknown_entities
-        ]))
+    for unknown_entity in re.findall("&#?[a-zA-Z0-9]+;", test_string):
+        character = find_char(unknown_entity)
+        if character:
+            new_text = new_text.replace(unknown_entity, character)
+        print("unknown entity: %s  character: %s" % (unknown_entity, character))
 
     return new_text
 

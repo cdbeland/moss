@@ -1,8 +1,9 @@
-# Run time: About 97 minutes
+# Run time: About 2 hours
 
 from moss_dump_analyzer import read_en_article_text
 import re
-from unencode_entities import alert, keep, controversial, transform, greek_letters
+from unencode_entities import alert, keep, controversial, transform, greek_letters, find_char_num
+
 
 entities_re = re.compile("&#?[a-zA-Z0-9]+;")
 alerts_found = {}
@@ -10,6 +11,9 @@ controversial_found = {}
 uncontroversial_found = {}
 greek_letters_found = {}
 unknown_found = {}
+unknown_numerical_latin = {}
+unknown_numerical_low = {}
+unknown_numerical_high = {}
 non_entity_transform = [string for string in transform.keys() if not string.startswith("&")]
 
 
@@ -23,12 +27,17 @@ def add_safely(value, key, dictionary):
 def entity_check(article_title, article_text):
 
     for string in alert:
-        if string in article_text:
+        for instance in re.findall(string, article_text):
             add_safely(article_title, string, alerts_found)
+            # This intentionally adds the article title as many times
+            # as the string appears
 
     for string in non_entity_transform:
         if string in article_text:
-            add_safely(article_title, string, uncontroversial_found)
+            for instance in re.findall(string, article_text):
+                add_safely(article_title, string, uncontroversial_found)
+                # This intentionally adds the article title as many
+                # times as the string appears
 
     for entity in entities_re.findall(article_text):
         if entity in alert:
@@ -42,7 +51,20 @@ def entity_check(article_title, article_text):
         elif entity in transform:
             add_safely(article_title, entity, uncontroversial_found)
         else:
-            add_safely(article_title, entity, unknown_found)
+            value = find_char_num(entity)
+            if value:
+                if int(value) < 592:      # x0250
+                    add_safely(article_title, entity, unknown_numerical_latin)
+                elif int(value) < 12288:  # x3000
+                    add_safely(article_title, entity, unknown_numerical_low)
+                else:
+                    add_safely(article_title, entity, unknown_numerical_high)
+            else:
+                if entity == entity.upper() and re.search("[A-Z]+%s" % entity, article_text):
+                    # Ignore things like "R&B;" and "PB&J;" which is common in railroad names.
+                    continue
+                add_safely(article_title, entity, unknown_found)
+
 
 def dump_dict(section_title, dictionary):
     print("=== %s ===" % section_title)
@@ -63,6 +85,9 @@ def dump_results():
     dump_dict("To avoid", alerts_found)
     dump_dict("Uncontroversial entities", uncontroversial_found)
     dump_dict("Unknown", unknown_found)
+    dump_dict("Unknown numerical, Latin range", unknown_numerical_latin)
+    dump_dict("Unknown low numerical", unknown_numerical_low)
+    dump_dict("Unknown high numerical", unknown_numerical_high)
 
 
 read_en_article_text(entity_check)

@@ -13,16 +13,6 @@ def get_word(line):
     return match_result.group(1)
 
 
-grouped_lines = {}
-for line in fileinput.input("-"):
-    line = line.strip()
-    word = get_word(line)
-    # Group by initial character
-    lines = grouped_lines.get(word[0], [])
-    lines.append(line)
-    grouped_lines[word[0]] = lines
-
-
 def split_big_sections(grouped_lines):
     changes_made = True
     while changes_made:
@@ -65,9 +55,18 @@ def merge_small_sections(grouped_lines):
     return new_hash
 
 
-grouped_lines = split_big_sections(grouped_lines)
-grouped_lines = merge_small_sections(grouped_lines)
-for (group_key, line_list) in sorted(grouped_lines.items()):
-    print("==== %s ====" % group_key)
-    for line in sorted(line_list):
-        print(line)
+if __name__ == '__main__':
+    grouped_lines = {}
+    for line in fileinput.input("-"):
+        line = line.strip()
+        word = get_word(line)
+        # Group by initial character
+        lines = grouped_lines.get(word[0], [])
+        lines.append(line)
+        grouped_lines[word[0]] = lines
+    grouped_lines = split_big_sections(grouped_lines)
+    grouped_lines = merge_small_sections(grouped_lines)
+    for (group_key, line_list) in sorted(grouped_lines.items()):
+        print("==== %s ====" % group_key)
+        for line in sorted(line_list):
+            print(line)
