@@ -47,7 +47,7 @@ alert = [
 # Ignore these if seen in articles
 keep = [
     "&amp;",  # dangerous for e.g. &amp;126;
-
+    "&c;",    # Almost all are in archaic quotations and titles
 
     # Allowed for math notation only
     "&prime;", "′", "&Prime;", "″",
@@ -187,6 +187,8 @@ transform = {
     "&dagger;": "†",
     "&Dagger;": "‡",
     "&clubs;": "♣",
+    "&diams;": "♦",
+    "&spades;": "♠",
     "&deg;": "°",
     "&oline;": "‾",
 
@@ -262,6 +264,7 @@ transform = {
     "&aelig;": "æ",
     "&oelig;": "œ",
     "&AElig;": "Æ",
+    "&OElig;": "Œ",
 
     # Greek letters only found in actual Greek words
     "&sigmaf;": "ς",  # Written this way when word-final
