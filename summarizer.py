@@ -49,5 +49,5 @@ for line in fileinput.input("-"):
             better_line += " ... [https://en.wikipedia.org/w/index.php?search=insource%%3A%%2F%s%%2Fi&ns0=1 find all]" % word_safe
 
         else:
-            better_line += " ... [https://en.wikipedia.org/w/index.php?search=%s find all]" % word
+            better_line += " ... [https://en.wikipedia.org/w/index.php?search=%%22%s%%22 find all]" % word
     print(better_line)
