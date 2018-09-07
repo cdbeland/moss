@@ -10,7 +10,10 @@ MAX_KEY_LENGTH = 5
 def get_word(line):
     match_result = re.search(r"\[\[(.*?)\]\]",
                              line)
-    return match_result.group(1)
+    word = match_result.group(1)
+    if word.startswith("wikt:"):
+        word = word.replace("wikt:", "")
+    return word
 
 
 def split_big_sections(grouped_lines):
