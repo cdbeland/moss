@@ -14,7 +14,7 @@ from urllib import parse
 
 input_safe = sys.argv[1].replace("<", "\<")
 input_safe = input_safe.replace("/", "\/")
-query = "insource:/%s/i" % input_safe
+query = "insource:/%s/" % input_safe
 
 results = []
 if sys.argv[1].startswith("titles:"):
