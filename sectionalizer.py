@@ -71,5 +71,5 @@ if __name__ == '__main__':
     grouped_lines = merge_small_sections(grouped_lines)
     for (group_key, line_list) in sorted(grouped_lines.items()):
         print("==== %s ====" % group_key)
-        for line in sorted(line_list):
+        for line in sorted(line_list, key=lambda line: get_word(line)):
             print(line)
