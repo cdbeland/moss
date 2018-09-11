@@ -262,8 +262,8 @@ def spellcheck_all_langs(article_title, article_text):
         if is_spelling_correct is True:
             continue
         if is_spelling_correct == "uncertain":
-            print("I\t%s\t%s" % (word_mixedcase, article_title))
-            # "I" for "ignored but maybe shouldn't be"
+            print("G\t%s\t%s" % (word_mixedcase, article_title))
+            # "G" for "iGnored but maybe shouldn't be"
             continue
 
         # Hack to avoid having to do even more complicated token

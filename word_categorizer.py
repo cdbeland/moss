@@ -102,6 +102,28 @@ def near_common_word(word):
 # https://github.com/wolfgarbe/SymSpell
 
 
+def get_word_category(word):
+    category = None
+    if az_plus_re.match(word):
+        if dna_re.match(word):
+            category = "D"
+        elif is_chemistry_word(word):
+            category = "C"
+        elif is_rhyme_scheme(word):
+            category = "P"
+        elif az_re.match(word):
+            edit_distance = near_common_word(word)
+            if edit_distance:
+                category = "T" + str(edit_distance)
+            else:
+                category = "R"
+        else:
+            category = "N"
+    else:
+        category = "I"
+    return category
+
+
 if __name__ == '__main__':
     for line in fileinput.input("-"):
         line = line.strip()
@@ -114,24 +136,7 @@ if __name__ == '__main__':
         else:
             word = get_word(line)
 
-        category = None
-        if az_plus_re.match(word):
-            if dna_re.match(word):
-                category = "D"
-            elif is_chemistry_word(word):
-                category = "C"
-            elif is_rhyme_scheme(word):
-                category = "P"
-            elif az_re.match(word):
-                edit_distance = near_common_word(word)
-                if edit_distance:
-                    category = "T" + str(edit_distance)
-                else:
-                    category = "R"
-            else:
-                category = "N"
-        else:
-            category = "I"
+        category = get_word_category(word)
 
         if length:
             print("%s\t* %s [https://en.wikipedia.org/w/index.php?search=%s %s]"
