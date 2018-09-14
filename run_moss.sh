@@ -27,7 +27,7 @@ rm -rf /tmp/sorted_by_article.txt
 # TODO: Can this run as one line, or is that the source of the .py command not found error?
 # grep ^@ tmp-output.txt | sort -nr -k2 | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 
-grep '^!' tmp-output.txt | perl -pe 's/.*\t//' | sort > manual-post-parse-failures.txt
+grep '^!' tmp-output.txt | perl -pe 's/.*\t//' | sort > post-parse-failures.txt
 # grep '^G' tmp-output.txt | sort > debug-spellcheck-ignored.txt  # Not currently used, may reactivate in future
 
 # Run time for this line: ~2h 45m
@@ -36,7 +36,7 @@ tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tm
 # --- BY ARTICLE ---
 
 # TODO: Post other useful patterns once these are done (e.g. mix in T2s)
-grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1.txt
+grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > tmp-by-article-edit1.txt
 
 # grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-compound.txt
 # Posting by-frequency instead, to avoid mixing in whitespace errors
@@ -46,9 +46,9 @@ head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles
 
 # --- BY FREQUENCY ---
 
-grep ^TS tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-compound.txt
-grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-edit1.txt
-grep -P '^(?\!T1|TS|I|P|D|C)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > post-most-common-new-words.txt
+grep ^TS tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
+grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
+grep -P '^(?\!T1|TS|I|P|D|C)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
 
 grep -P "\[\[wikt:<" tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all | grep -v "<nowiki></" > post-html-tags-by-freq.txt
 # Skip </xxx> tags because they duplicate <xxx> tags.
@@ -119,13 +119,13 @@ grep ^D tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^D\t//' > beland-long
 
 # --- STATS ---
 
-cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py > manual-post-misspellings-per-article.txt
-echo "Parse errors: " >> manual-post-misspellings-per-article.txt
-wc -l manual-post-parse-failures.txt >> manual-post-misspellings-per-article.txt
+cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt
+echo "Parse errors: " >> post-misspellings-per-article.txt
+wc -l post-parse-failures.txt >> post-misspellings-per-article.txt
 
 # --- HTML ENTITIES ---
 
 # Run time for this segment: ~2h
 
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
-cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all > manual-post-entities.txt
+cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt

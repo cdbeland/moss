@@ -80,7 +80,7 @@ post all at once.""")
 print("")
 
 
-print(get_sections_from_file("post-by-article-edit1.txt", 50, by_article_suppress))
+print(get_sections_from_file("tmp-by-article-edit1.txt", 50, by_article_suppress))
 
 
 print("=== Likely misspellings by frequency (%s) ===" % active_range_str)
@@ -92,7 +92,7 @@ words that need to be added to Wiktionary. For each run, only words
 from half of the alphabet are shown, to avoid duplicate work from when
 new dumps are being processed.""")
 print("")
-print(get_active_lines_from_file("post-most-common-edit1.txt", alpha_half_active, alpha_half_inactive))
+print(get_active_lines_from_file("tmp-most-common-edit1.txt", alpha_half_active, alpha_half_inactive))
 print("")
 
 
@@ -105,7 +105,7 @@ corrected. For each run, only words from half of the alphabet are
 shown, to avoid duplicate work from when new dumps are being
 processed.""")
 print("")
-print(get_active_lines_from_file("post-most-common-compound.txt", alpha_half_active, alpha_half_inactive))
+print(get_active_lines_from_file("tmp-most-common-compound.txt", alpha_half_active, alpha_half_inactive))
 print("")
 
 print("=== Likely new words by frequency (%s) ===" % active_range_str)
@@ -122,5 +122,5 @@ this list, you can either add an entry to the English Wiktionary
 all instances of the word on the English Wikipedia with
 {{tl|lang}}.""")
 print("")
-print(get_active_lines_from_file("post-most-common-new-words.txt", alpha_half_active, alpha_half_inactive))
+print(get_active_lines_from_file("tmp-most-common-new-words.txt", alpha_half_active, alpha_half_inactive))
 print("")
