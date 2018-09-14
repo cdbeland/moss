@@ -65,7 +65,41 @@ early_substitutions = [
     (re.compile(r"{{(·|bold middot|dot|middot)}}"), " · "),
     (re.compile(r"{{(•|bull)}}"), " • "),
     (re.compile(r"<math[^>]*>.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
-    (re.compile(r"{{(spaced en dash|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash)}}", flags=re.I), " - "),
+
+    # Mostly from:
+    # https://en.wikipedia.org/wiki/Category:Character_templates
+    (re.compile(r"{{(spaced en dash|spaced en dash space|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash)}}", flags=re.I), " - "),
+    (re.compile(r"{{(mdash|—|em dash|emdash|em-dash|--|em dash)}}", flags=re.I), "-"),
+    (re.compile(r"{{(endash|en dash|–|ndash|nsndns|subdash)}}", flags=re.I), "-"),
+    (re.compile(r"{{(\\)}}", flags=re.I), " / "),
+    (re.compile(r"{{tm}}", flags=re.I), "™"),
+    (re.compile(r"{{theta}}", flags=re.I), "&theta;"),
+    (re.compile(r"{{SH}}"), "ś"),
+    (re.compile(r"{{seggol}}", flags=re.I), "ֶ"),
+    (re.compile(r"{{schwahook}}", flags=re.I), "ɚ"),
+    (re.compile(r"{{schwa}}", flags=re.I), "ə"),
+    (re.compile(r"{{rturn}}", flags=re.I), "ɹ"),
+    (re.compile(r"{{rfishhook}}", flags=re.I), "ɾ"),
+    (re.compile(r"{{pipedbl}}", flags=re.I), "ǁ"),
+    (re.compile(r"{{okina}}", flags=re.I), "ʻ"),
+    (re.compile(r"{{mu}}", flags=re.I), "μ"),
+    (re.compile(r"{{mappiq}}", flags=re.I), "ּ"),
+    (re.compile(r"{{linevertsub}}", flags=re.I), "ˌ"),
+    (re.compile(r"{{linevert}}", flags=re.I), "ˈ"),
+    (re.compile(r"{{lengthmark}}", flags=re.I), "ː"),
+    (re.compile(r"{{lambda}}", flags=re.I), "λ"),
+    (re.compile(r"{{hicaron}}", flags=re.I), "̌"),
+    (re.compile(r"{{hbrrafe}}", flags=re.I), "ֿ"),
+    (re.compile(r"{{thinsp}}", flags=re.I), "&thinsp;"),
+    (re.compile(r"{{gamma}}", flags=re.I), "γ"),
+    (re.compile(r"{{epsilon1revhook}}", flags=re.I), "ɝ"),
+    (re.compile(r"{{epsilon1rev}}", flags=re.I), "ɜ"),
+    (re.compile(r"{{epsilon1}}", flags=re.I), "Ɛ"),
+    (re.compile(r"{{dirprod}}", flags=re.I), "⊗"),
+    (re.compile(r"{{DELTA}}"), "Δ"),
+    (re.compile(r"{{circle}}", flags=re.I), "￼"),
+    (re.compile(r"{{angle bracket|(.*?)}}", flags=re.I), "⟨\1⟩"),
+    (re.compile(r"{{beta letter}}", flags=re.I), "β"),
 
     # Must happen before table removal to prevent [[aa|{{bb}}-cc]] being changed to "aacc"
 

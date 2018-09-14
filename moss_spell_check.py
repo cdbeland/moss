@@ -9,12 +9,8 @@ from grammar import prose_quote_re, ignore_sections_re
 
 
 # TODO:
-# * {{spaced endash}} and friends
-#   https://en.wikipedia.org/wiki/Category:Wikipedia_character-substitution_templates
 # * Detect strings of three or more Greek letters ONLY for
 #   spell-checking purposes.
-# * Make sure tests pass
-# * Excerpts around " for mismatched quotes, post a "fix me" list
 # * tmp-output.txt:* 24 - [[wikt:ation]] - [[1772 in poetry]] ([[attest]]ation)
 # * Report these:
 #    :"..."
