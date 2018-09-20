@@ -119,8 +119,9 @@ dumps are being processed.
 Some of the words might not be from English.  To get these words off
 this list, you can either add an entry to the English Wiktionary
 (which provides English definitions for words in all languages) or tag
-all instances of the word on the English Wikipedia with
-{{tl|lang}}.""")
+all instances of the word on the English Wikipedia with {{tl|lang}}.
+Wiktionary does not accept Romanizations for some languages, so those
+cases must be tagged as {{tl|transl}} or {{tl|lang}}.""")
 print("")
 print(get_active_lines_from_file("tmp-most-common-new-words.txt", alpha_half_active, alpha_half_inactive))
 print("")
