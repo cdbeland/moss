@@ -62,6 +62,12 @@ keep = [
     "&or;",     # ∨
     "&lang;",   # 〈
     "&rang;",   # 〉
+
+    # Often unsafe to change
+    "&#x7C;",
+    "&#x007C;",
+    "&#x005B;",
+    "&#x005D;",
 ]
 
 controversial = {
@@ -115,14 +121,61 @@ controversial = {
 
 keep.extend(controversial.keys())
 
-# Automatically change, with the expectation there will be a
-# manual inspection of the diff
-transform = {
+transform_unsafe = {
+    # These transformations can't be made in places where the
+    # character itself is being discussed.
 
     # Per [[MOS:FRAC]]
     "¼": "{{frac|1|4}}",
     "½": "{{frac|1|2}}",
     "¾": "{{frac|3|4}}",
+    "…": "...",
+    "&hellip;": "...",
+
+    # Often breaks markup
+    "&#91;": "[",
+    "&#93;": "]",
+    "&#x7C;": "|",
+
+    # This is a pipe, but usually happens in URL titles, in which case
+    # making a dash is easier.
+    "&#124;": "-",
+
+    # Normalizing quote marks
+    "‘": "'",
+    "&lsquo;": "'",
+    "’": "'",
+    "&rsquo;": "'",
+    "“": '"',
+    "&ldquo;": '"',
+    "”": '"',
+    "&rdquo;": '"',
+    "´": "'",
+    "&acute;": "'",
+    "`": "'",
+    "&#x27;": "'",
+    "&#39;": "'",
+    "&#039;": "'",
+    "&#96;": "'",
+    "&#8220;": '"',  # “ -> "
+    "&#8221;": '"',  # ” -> "
+    "&#8216;": "'",   # ‘ -> '
+    "&#8217;": "'",   # ’ -> '
+
+    # Per [[MOS:CONFORM]]
+    "« ": '"',
+    " »": '"',
+    "«": '"',
+    "»": '"',
+    "&raquo;": '"',
+    "&laquo;": '"',
+}
+
+# Automatically change, with the expectation there will be a
+# manual inspection of the diff
+transform = {
+
+    # Per [[MOS:FRAC]]
     "&frac12": "{{frac|1|2}}",
     "&frac14": "{{frac|1|4}}",
     "&frac34": "{{frac|3|4}}",
@@ -132,19 +185,6 @@ transform = {
     "&sup2;": "<sup>2</sup>",
     "&sup3;": "<sup>3</sup>",
 
-    "&#61;": "=",
-    "&#x3D;": "=",
-    "&#x38;": "8",
-    "&#x038;": "8",
-    "&#x22;": '"',
-    "&#32;": " ",
-    "&#x20;": " ",
-    "&#123;": "{",
-    "&#125;": "}",
-    "&#x5B;": "{",
-    "&#x5D;": "}",
-    "&#42;": "*",
-    "&#58;": "X",
     "&#0033;": "!",
     "&#0047;": "/",
     "&#005B": "[",
@@ -159,21 +199,13 @@ transform = {
     "&#061;": "=",
     "&#037;": "%",
     "&quot;": '"',
-    "&hellip;": "...",
-    "…": "...",
     "&trade;": "™",
     "&copy;": "©",
     "&reg;": "®",
 
     "&lt;": "<",
     "&gt;": ">",
-    "&#91;": "[",
-    "&#93;": "]",
     "&apos;": "'",
-
-    "&#124;": "-",
-    # This is a pipe, but usually happens in URL titles, in which case
-    # making a dash is easier.
 
     # Common symbols, to change outside of math/science articles
     "&iquest;": "¿",
@@ -195,6 +227,7 @@ transform = {
     # Latin and Germanic letters
     "&Aacute;": "Á",
     "&aacute;": "á",
+    "&acirc;": "â",
     "&Agrave;": "À",
     "&agrave;": "à",
     "&Aring;": "Å",
@@ -278,46 +311,15 @@ transform = {
     "&#x00B4;": "&acute;",
     "&ordf;": "ª",
 
-    "‘": "'",
-    "&lsquo;": "'",
-    "’": "'",
-    "&rsquo;": "'",
-    "“": '"',
-    "&ldquo;": '"',
-    "”": '"',
-    "&rdquo;": '"',
-    "´": "'",
-    "&acute;": "'",
-    "`": "'",
-    "&#x27;": "'",
-    "&#39;": "'",
-    "&#039;": "'",
-    "&#96;": "'",
-
-    "&#8220;": '"',  # “ -> "
-    "&#8221;": '"',  # ” -> "
-    "&#8211;": "–",  # endash
-
-    "&#8216;": "'",   # ‘ -> '
-    "&#8217;": "'",   # ’ -> '
     "&#8212;": "—",   # emdash
     "&#X2014;": "—",  # emdash
-
-    # Per [[MOS:CONFORM]]
-    "« ": '"',
-    " »": '"',
-    "«": '"',
-    "»": '"',
-    "&raquo;": '"',
-    "&laquo;": '"',
-
-    # U+FE0E Variation selector 15
-    "&#65038;": "",
 
     # Broken
     "&ccedi;": "ç",  # Typo on page
     "&Amp;": "&amp;",
 }
+
+# transform.extend(transform_unsafe)
 
 greek_letters = {
     "&alpha;": "α",
