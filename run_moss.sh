@@ -11,6 +11,9 @@ set -e
 
 # --- MAIN SPELL CHECK ---
 
+echo "Beginning main spell check"
+echo `date`
+
 RUN_NAME=run-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T"`
 
 mkdir $RUN_NAME
@@ -19,6 +22,9 @@ venv/bin/python3 moss_spell_check.py > $RUN_NAME/tmp-output.txt
 cd $RUN_NAME
 
 # --- SPELL CHECK WORD CATEGORIZATION AND PARSE FAILURE POST-PROCESSING ---
+
+echo "Beginning word categorization run 1"
+echo `date`
 
 # Run time for this segment: 4h+
 grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
@@ -30,10 +36,16 @@ rm -rf /tmp/sorted_by_article.txt
 grep '^!' tmp-output.txt | perl -pe 's/.*\t//' | sort > post-parse-failures.txt
 # grep '^G' tmp-output.txt | sort > debug-spellcheck-ignored.txt  # Not currently used, may reactivate in future
 
+echo "Beginning word categorization run 2"
+echo `date`
+
 # Run time for this line: ~2h 45m
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---
+
+echo "Beginning by-article post-processing"
+echo `date`
 
 # TODO: Post other useful patterns once these are done (e.g. mix in T2s)
 grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > tmp-by-article-edit1.txt
@@ -50,7 +62,7 @@ grep ^TS tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../ven
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
 grep -P '^(?\!T1|TS|I|P|D|C)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
 
-grep -P "\[\[wikt:<" tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all | grep -v "<nowiki></" > post-html-tags-by-freq.txt
+grep -P "\[\[wikt:<" tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all | grep -v "<nowiki></" | head -200 > post-html-tags-by-freq.txt
 # Skip </xxx> tags because they duplicate <xxx> tags.
 
 grep ^I tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-misspellings-intl.txt
@@ -125,7 +137,13 @@ wc -l post-parse-failures.txt >> post-misspellings-per-article.txt
 
 # --- HTML ENTITIES ---
 
+echo "Beginning HTML entity check"
+echo `date`
+
 # Run time for this segment: ~2h
 
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
-cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
+cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all | head -1000 > post-entities.txt
+
+echo "Done"
+echo `date`
