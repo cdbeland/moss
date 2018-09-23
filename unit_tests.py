@@ -43,3 +43,7 @@ class SpellTest(unittest.TestCase):
     def test_unknown_html_tag(self):
         from .spell import is_word_spelled_correctly  # This takes a long time
         self.assertFalse(is_word_spelled_correctly("<nowiki/>"))
+
+    def test_transliteration(self):
+        from .spell import is_word_spelled_correctly
+        self.assertTrue(is_word_spelled_correctly("Āb Anbār-e Pā’īn"))

@@ -83,6 +83,7 @@ ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
+unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -193,6 +194,26 @@ def spellcheck_all_langs(article_title, article_text):
                 consolidated = "<%s>" % word_list[i + 1]
                 if consolidated in article_text:
                     word_list[i] = consolidated
+                    del word_list[i + 2]
+                    del word_list[i + 1]
+
+            # In transliterations from Arabic script (which includes
+            # Persian), NLTK correctly parses U+0027 (apostrophe) and
+            # U+02BE/U+02BF (preferred by the Unicode Consortium and
+            # United Nations).
+            # https://en.wikipedia.org/wiki/Romanization_of_Persian
+            # https://en.wikipedia.org/wiki/Romanization_of_Arabic
+            #
+            # However, Wikipedia allows the use of U+2019 (right
+            # single quote mark) which NLTK will (arguably
+            # justifiably) misparse if used as something other than a
+            # quotation mark.
+            # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Persian
+            # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Arabic
+            if word_list[i + 1] == "’":
+                # For example "Āb Anbār-e Pā’īn" must be parsed as three words.
+                if unicode_letters_plus_dashes_re.search(word_list[i]) and unicode_letters_plus_dashes_re.search(word_list[i + 2]):
+                    word_list[i] = word_list[i] + word_list[i + 1] + word_list[i + 2]
                     del word_list[i + 2]
                     del word_list[i + 1]
 
