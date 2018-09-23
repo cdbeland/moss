@@ -5,14 +5,16 @@ import re
 
 # Focus letters that were posted on the last run, and should take a
 # rest this run to avoid duplicate work.
-by_article_suppress = ["2006", "3", "4", "5", "Aa", "Ab", "Ba", "J", "Q", "Z", "J"]
-# previously run: "0", "1", "2000", "2001", "2002", "2003", "2004",
-# "2005", "6", "7", "8", "9", "X", "Y", "Á", "Å", "Ç", "É", "Ö", "Ø",
-# "Ş"
+by_article_suppress = ["1", "2"]
+
+# previously run: "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+# "Aa", "Ab", "Ba", "J", "Q", "X", "Y", "Z", "Á", "Å", "Ç", "É", "Ö",
+# "Ø", "Ş"
+
 
 # By-frequency lists swap which half of the alphabet they suppress
-alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
-alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+alpha_half_inactive = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+alpha_half_active = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
 find_word_re = re.compile(" - \[\[wikt:(.*?)\]\] - ")
