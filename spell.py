@@ -13,6 +13,8 @@ print("Loading spellcheck dictionary...", file=sys.stderr)
 all_words = set()
 punctuation_tmp = punctuation
 punctuation_re = re.compile(r"[ " + punctuation + r"]")
+compound_separators_re = re.compile(r"[—–/\-]")
+#                                      emdash, endash, slash, hyphen
 
 for filename in [
         "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
@@ -502,6 +504,19 @@ def is_word_spelled_correctly(word_mixedcase):
         if word_mixedcase.lower() in all_words:
             return True
 
+    word_parts_mixedcase = compound_separators_re.split(word_mixedcase)
+    if len(word_parts_mixedcase) > 1:
+        result_list = [is_word_spelled_correctly(word_part) for word_part in word_parts_mixedcase]
+
+        # Results may be mixed (like "incorrrect-correct-Aaagjior"
+        # would produce [False, True, "uncertain"]) so return the
+        # "worst" value from the list.
+        if False in result_list:
+            return False
+        if "uncertain" in result_list:
+            return "uncertain"
+        return True
+
     # Ignore all capitalized words (might be proper noun which we
     # legitimately don't have an entry for)
     # TODO: Detect beginning-of-sentence and optionally report
@@ -510,16 +525,6 @@ def is_word_spelled_correctly(word_mixedcase):
     # parsing may also help.
     if word_mixedcase[0].upper() == word_mixedcase[0]:
         return "uncertain"
-
-    word_parts_mixedcase = re.split(u"[––/-]", word_mixedcase)
-    # emdash, endash, slash, hyphen
-    if len(word_parts_mixedcase) > 1:
-        any_bad = False
-        for part in word_parts_mixedcase:
-            if not (part.lower() in all_words):
-                any_bad = True
-        if not any_bad:
-            return True
 
     # Lots of things here are probably legitimate, but we need better
     # pattern-matching filters before it's worthwhile posting these

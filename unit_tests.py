@@ -40,8 +40,18 @@ class WikitextUtilTest(unittest.TestCase):
 
 class SpellTest(unittest.TestCase):
 
-    def test_unknown_html_tag(self):
+    def test_dashes(self):
         from .spell import is_word_spelled_correctly  # This takes a long time
+
+        # May also return "uncertain", which is the wrong answer (but
+        # evaluates to True)
+        self.assertTrue(is_word_spelled_correctly("entirely-wet") is True)
+        self.assertTrue(is_word_spelled_correctly("jelly—otherwise" is True))
+        self.assertTrue(is_word_spelled_correctly("entirely-wet" is True))
+        self.assertTrue(is_word_spelled_correctly("Arabic-based" is True))
+
+    def test_unknown_html_tag(self):
+        from .spell import is_word_spelled_correctly
         self.assertFalse(is_word_spelled_correctly("<nowiki/>"))
 
     def test_transliterations(self):
