@@ -92,9 +92,3 @@ def dump_results():
 
 read_en_article_text(entity_check)
 dump_results()
-
-
-def html_tag_check():
-    # TODO: search for HTML tags here
-    # article_text_tmp = re.sub("<nowiki>.*?</nowiki>", "", article_text_tmp)
-    pass
