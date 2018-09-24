@@ -66,6 +66,8 @@ early_substitutions = [
     (re.compile(r"{{(•|bull)}}"), " • "),
     (re.compile(r"<math[^>]*>.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
 
+    (re.compile(r"{{ISBN\|(.*?)}}"), r"\1"),
+
     # Mostly from:
     # https://en.wikipedia.org/wiki/Category:Character_templates
     (re.compile(r"{{(spaced en dash|spaced en dash space|dash|nbspndash|snd|sndash|spacedendash|spacedndash|spnd|spndash)}}", flags=re.I), " - "),
