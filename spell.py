@@ -497,6 +497,8 @@ def is_word_spelled_correctly(word_mixedcase):
         search_again = True
 
     if search_again:
+        if not word_mixedcase:
+            return True
         if word_mixedcase.lower() in all_words:
             return True
 
