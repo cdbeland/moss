@@ -84,6 +84,7 @@ blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
+spaced_emdash_re = re.compile(r".{0,10}—\s.{0,10}|.{0,10}\s—.{0,10}")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -112,6 +113,15 @@ def spellcheck_all_langs(article_title, article_text):
 
     article_text_orig = article_text
     article_text = wikitext_to_plaintext(article_text)
+
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Dashes
+    # requires that emdashes be unspaced.
+    bad_emdash_context_list = spaced_emdash_re.findall(article_text)
+    if bad_emdash_context_list:
+        print("D\t* %s - [[%s]]: %s" % (
+            len(bad_emdash_context_list),
+            article_title,
+            " ... ".join(bad_emdash_context_list)))
 
     # TODO: Get smarter about these sections.  But for now, ignore
     # them, since they are full of proper nouns and URL words.
@@ -190,7 +200,7 @@ def spellcheck_all_langs(article_title, article_text):
                         del word_list[i + 2]
                         del word_list[i + 1]
 
-            if word_list[i] == "<" and word_list[i + 2] == ">":
+            elif word_list[i] == "<" and word_list[i + 2] == ">":
                 consolidated = "<%s>" % word_list[i + 1]
                 if consolidated in article_text:
                     word_list[i] = consolidated
@@ -210,7 +220,7 @@ def spellcheck_all_langs(article_title, article_text):
             # quotation mark.
             # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Persian
             # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Arabic
-            if word_list[i + 1] == "’":
+            elif word_list[i + 1] == "’":
                 # For example "Āb Anbār-e Pā’īn" must be parsed as three words.
                 if unicode_letters_plus_dashes_re.search(word_list[i]) and unicode_letters_plus_dashes_re.search(word_list[i + 2]):
                     word_list[i] = word_list[i] + word_list[i + 1] + word_list[i + 2]
@@ -227,7 +237,7 @@ def spellcheck_all_langs(article_title, article_text):
                     del word_list[i + 2]
                     del word_list[i + 1]
 
-            if word_list[i] == "<" and word_list[i + 1] == "/" and word_list[i + 3] == ">":
+            elif word_list[i] == "<" and word_list[i + 1] == "/" and word_list[i + 3] == ">":
                 consolidated = "</%s>" % word_list[i + 2]
                 if consolidated in article_text:
                     word_list[i] = consolidated
@@ -235,7 +245,7 @@ def spellcheck_all_langs(article_title, article_text):
                     del word_list[i + 2]
                     del word_list[i + 1]
 
-            if word_list[i] == "<" and word_list[i + 2] == "/" and word_list[i + 3] == ">":
+            elif word_list[i] == "<" and word_list[i + 2] == "/" and word_list[i + 3] == ">":
                 consolidated = "<%s/>" % word_list[i + 1]
                 if consolidated in article_text:
                     word_list[i] = consolidated
