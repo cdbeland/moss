@@ -40,7 +40,6 @@ for filename in [
 
 abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)
-upper_alpha_re = re.compile(r"[A-Z]")
 html_entity_re = re.compile(r"&#?[a-zA-Z]+;")
 html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
 
@@ -504,9 +503,10 @@ def is_word_spelled_correctly(word_mixedcase):
     # Ignore all capitalized words (might be proper noun which we
     # legitimately don't have an entry for)
     # TODO: Detect beginning-of-sentence and optionally report
-    # possibly misspelled words (or wait for sentence grammar
-    # parsing)
-    if upper_alpha_re.match(word_mixedcase):
+    # possibly misspelled words.  This might work well constraining to
+    # edit-distance 1 from a known word, and grammatical constituent
+    # parsing may also help.
+    if word_mixedcase[0].upper() == word_mixedcase[0]:
         return "uncertain"
 
     word_parts_mixedcase = re.split(u"[––/-]", word_mixedcase)

@@ -44,6 +44,11 @@ class SpellTest(unittest.TestCase):
         from .spell import is_word_spelled_correctly  # This takes a long time
         self.assertFalse(is_word_spelled_correctly("<nowiki/>"))
 
-    def test_transliteration(self):
+    def test_transliterations(self):
         from .spell import is_word_spelled_correctly
-        self.assertTrue(is_word_spelled_correctly("Āb Anbār-e Pā’īn"))
+        # Dashes in a proper noun
+        self.assertTrue(is_word_spelled_correctly("Anbār-e"))
+        # Single quote marks in a proper noun
+        self.assertTrue(is_word_spelled_correctly("Pā’īn"))
+        # Non-ASCII capitals make it a proper noun
+        self.assertTrue(is_word_spelled_correctly("Ḩasan"))
