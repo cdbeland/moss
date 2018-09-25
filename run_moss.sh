@@ -65,6 +65,11 @@ grep -P '^(?\!T1|TS|I|P|D|C)' tmp-words-with-articles.txt | head -200 | perl -pe
 grep -P "\[\[wikt:<" tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all | grep -v "<nowiki></" | head -200 > post-html-tags-by-freq.txt
 # Skip </xxx> tags because they duplicate <xxx> tags.
 
+# Dealing with these types without posting, since they can all be
+# fixed in one sitting
+grep ^P tmp-words-with-articles.txt | perl -pe 's/^P\t//' > beland-pattern-by-freq.txt
+grep ^D tmp-words-with-articles.txt | perl -pe 's/^P\t//' > beland-dna-by-freq.txt
+
 grep ^I tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-misspellings-intl.txt
 # TODO for intl:
 # * Separate words into the scripts they use:
@@ -125,15 +130,18 @@ echo "" >> collected_by_length.txt
 # Skipping in favor of most-common-misspellings-intl (see below)
 # grep '^[IN]' tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^[IN]\t//' > post-longest-shortest-intl.txt
 
-# Dealing with these types offline, since they can all be fixed
-grep ^P tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^P\t//' > beland-longest-shortest-pattern.txt
-grep ^D tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^D\t//' > beland-longest-shortest-dna.txt
-
 # --- STATS ---
 
 cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt
 echo "Parse errors: " >> post-misspellings-per-article.txt
 wc -l post-parse-failures.txt >> post-misspellings-per-article.txt
+
+# --- DASHES ---
+
+grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ../sectionalizer.py > debug-dashes.txt
+# TODO: Are spaced emdashes more common than unspaced?  I like them
+# better but they go against the style guide. -- Beland
+
 
 # --- HTML ENTITIES ---
 
