@@ -52,16 +52,22 @@ base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
 # says that "0.02" is generally favored over ".02" except for
 # e.g. calibers and batting averages (which can be marked with {{not a typo}})
 
-# https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currency_symbols
 number_prefix_symbols = [
-    "±",
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currency_symbols
+    r"±",
+    r"−",  # U+2212 Minus sign; hyphen-minus is specifically not allowed
+    r"\+",
+    r"~",  # Not officially blessed:
+
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currency_symbols
     r"\$",
     r"US\$",
-    "€",
-    "£",
-    "¥",
-    "₹",
-    "₴",
+    r"€",
+    r"£",
+    r"¥",
+    r"₹",
+    r"₴",
+    r"₱",
 ]
 
 prefixed_number_formats = [
@@ -396,6 +402,9 @@ prohibited_list = [
     "&ensp;",
     "&emsp;",
     "&zwj;",
+
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
+    "₤",
 ]
 
 # Treated as separate words by NLTK tokenizer
