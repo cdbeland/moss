@@ -1,6 +1,7 @@
 import unittest
 
 from .wikitext_util import remove_structure_nested, wikitext_to_plaintext
+from .word_categorizer import letters_introduced_alphabetically
 
 
 class WikitextUtilTest(unittest.TestCase):
@@ -36,6 +37,14 @@ class WikitextUtilTest(unittest.TestCase):
         self.assertEqual(
             wikitext_to_plaintext(text_in),
             "a satisfiable theory is -categorical (there exists an infinite cardinal  such that)")
+
+
+class WordCategorizerTest(unittest.TestCase):
+    def test_letters_introduced(self):
+        self.assertTrue(letters_introduced_alphabetically("aAbB"))
+        self.assertTrue(letters_introduced_alphabetically("AbcabD"))
+        self.assertFalse(letters_introduced_alphabetically("baa"))
+        self.assertFalse(letters_introduced_alphabetically("abd"))
 
 
 class SpellTest(unittest.TestCase):

@@ -15,7 +15,10 @@ import enchant
 import fileinput
 from nltk.metrics import distance
 import re
-from sectionalizer import get_word
+try:
+    from sectionalizer import get_word
+except ImportError:
+    from .sectionalizer import get_word
 
 
 enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
@@ -49,11 +52,33 @@ def is_chemistry_word(word):
     return False
 
 
+def letters_introduced_alphabetically(word):
+    # One of the distinctive characteristics of a rhyme scheme, at
+    # least for the first stanza, is that letters are used in
+    # alphabetical order, left to right, with each letter appearing
+    # for the first time for a line that doesn't rhyme with any
+    # previous lines.
+
+    letters_seen = []
+    for letter in word.lower():
+        if len(letters_seen) == 0:
+            if letter != "a":
+                return False
+        elif letter in letters_seen:
+            continue
+        elif letter != chr(ord(letters_seen[-1]) + 1):
+            return False
+        letters_seen.append(letter)
+    return True
+
+
 def is_rhyme_scheme(word):
     word = word.lower()
     points = 0
 
-    if word == "abab" or word == "cdcd" or word == "efef":
+    if word == "cdcd" or word == "efef":
+        return True
+    if letters_introduced_alphabetically(word):
         return True
 
     if ag_re.match(word):
