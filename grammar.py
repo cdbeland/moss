@@ -473,3 +473,7 @@ def run_grammar_check():
 
     check_samples_from_disk()
     mysql_connection.close()
+
+
+if __name__ == '__main__':
+    run_grammar_check()
