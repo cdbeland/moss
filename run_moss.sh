@@ -26,7 +26,7 @@ cd $RUN_NAME
 echo "Beginning word categorization run 1"
 echo `date`
 
-# Run time for this segment: 4h+
+# Run time for this segment: 4h 20m
 grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
 cat /tmp/sorted_by_article.txt | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 rm -rf /tmp/sorted_by_article.txt
@@ -106,7 +106,7 @@ echo "" >> collected_by_length.txt
 
 # Redundant to by-article and by-frequency
 # echo "==== Likely misspellings (longest) ====" >> collected_by_length.txt
-# grep -P "^T1\t" tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^T1\t//' | head 20 >> collected_by_length.txt
+# grep -P "^T1\t" tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^T1\t//' | head -20 >> collected_by_length.txt
 
 echo "==== Likely missing whitespace ====" >> collected_by_length.txt
 grep ^TS tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^TS\t//' | head -20 >> collected_by_length.txt
@@ -141,6 +141,15 @@ wc -l post-parse-failures.txt >> post-misspellings-per-article.txt
 grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ../sectionalizer.py > debug-dashes.txt
 # TODO: Are spaced emdashes more common than unspaced?  I like them
 # better but they go against the style guide. -- Beland
+#
+# grep line counts from enwiki-latest-pages-articles-multistream.xml:
+# "—"      4148695
+# " — "    1340803
+# "\w—\w"   486271
+#
+# -> Write some code to run a report that accumulates info on what
+#    characters exactly are before and after (count before and after
+#    separately, or else there are too many combinations)
 
 
 # --- HTML ENTITIES ---
@@ -148,7 +157,7 @@ grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ..
 echo "Beginning HTML entity check"
 echo `date`
 
-# Run time for this segment: ~2h
+# Run time for this segment: 2h 20m
 
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
 cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all | head -1000 > post-entities.txt
