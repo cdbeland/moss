@@ -82,7 +82,7 @@ post all at once.""")
 print("")
 
 
-print(get_sections_from_file("tmp-by-article-edit1.txt", 50, by_article_suppress))
+print(get_sections_from_file("tmp-by-article-edit1.txt", 80, by_article_suppress))
 
 
 print("=== Likely misspellings by frequency (%s) ===" % active_range_str)
