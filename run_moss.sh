@@ -132,9 +132,13 @@ echo "" >> collected_by_length.txt
 
 # --- STATS ---
 
-cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py > post-misspellings-per-article.txt
-echo "Parse errors: " >> post-misspellings-per-article.txt
-wc -l post-parse-failures.txt >> post-misspellings-per-article.txt
+echo "Possible typos per article: " > post-stats.txt
+cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py >> post-stats.txt
+echo "Parse errors: " >> post-stats.txt
+wc -l post-parse-failures.txt >> post-stats.txt
+
+echo "Possible typos by type: " >> post-stats.txt
+cat tmp-words-with-articles.txt | perl -pe 's/\t.*//' | perl /home/beland/wikipedia/scripts/count-up.pl | sort -k2
 
 # --- DASHES ---
 
