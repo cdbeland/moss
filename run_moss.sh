@@ -138,7 +138,7 @@ echo "Parse errors: " >> post-stats.txt
 wc -l post-parse-failures.txt >> post-stats.txt
 
 echo "Possible typos by type: " >> post-stats.txt
-cat tmp-words-with-articles.txt | perl -pe 's/\t.*//' | perl /home/beland/wikipedia/scripts/count-up.pl | sort -k2
+cat tmp-words-with-articles.txt | venv/bin/python3 count_by_rating.py >> post-stats.py
 
 # --- DASHES ---
 

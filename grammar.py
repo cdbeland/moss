@@ -18,12 +18,15 @@
 import mysql.connector
 import nltk
 import re
+import stopit
 import sys
-import wikipedia  # https://wikipedia.readthedocs.io/en/latest/code.html
+import time
 from english_grammar import (enwiktionary_cat_to_pos,
                              phrase_structures,
                              closed_lexicon,
                              vocab_overrides)
+from pywikibot import Page, Site
+from wikitext_util import wikitext_to_plaintext
 
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
 # "" because the contents may have been removed on a previous replacement
@@ -31,6 +34,7 @@ parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?
 ignore_sections_re = re.compile(
     r"(==\s*See also\s*==|==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==|==\s*Publications\s*==|==\s*Works\s*==).*$",
     flags=re.I + re.S)
+ignore_headers_re = re.compile("=[^\n]+=\n")
 
 mysql_connection = mysql.connector.connect(user='beland',
                                            host='127.0.0.1',
@@ -57,13 +61,6 @@ def generate_stats(plaintext):
         print("%s\t%s\t%s" % (len(sentences), len(words_in_paragraph), max_words_per_sentence))
 
 
-# Seems to happen with <math>
-# TODO: Report as bug to either Mediawiki (check for existing bug) or
-# Python Wikipedia module.
-# POSSIBLE WORKAROUND: Use wikitext instead of plain text
-# ACTUALLY TODO - run through wiki_utils.py
-broken_re = re.compile(r"displaystyle|colspan|rowspan|cellspacing|{|}")
-
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Numbers
 # Includes integers, decimal fractions, ratios
 number_pattern = "(\d+|\d+.\d+|\d+:\d)"
@@ -89,33 +86,36 @@ def check_english(plaintext, title):
     # * Message
     # * Details
 
-    if broken_re.search(plaintext):
-        print("!\tArticle parse broken?\t%s" % title)
-        return
-
-    # This is a good check, but the Wikipedia module is misparsing the
-    # wikitext and not putting line breaks at the end of some
-    # paragraphs.  Maybe due to <ref>s?
-    #
-    # paragraphs = plaintext.split("\n")
-    # for paragraph in paragraphs:
-    #     words_in_paragraph = nltk.word_tokenize(paragraph)
-    #     if len(words_in_paragraph) > 500:
-    #         print("L\t%s\tOverly long paragraph?\t%s words\t%s" % (title, len(words_in_paragraph), paragraph))
+    # if (TODO: CONSOLIDATE WITH moss_spell_check.py):
+    #    print("!\tArticle parse broken?\t%s" % title)
+    #    return
 
     # Quotations, parentheticals, and list-based sections are not
     # inspected for grammar
     plaintext = ignore_sections_re.sub("", plaintext)
     plaintext = prose_quote_re.sub("✂", plaintext)
     plaintext = parenthetical_re.sub("", plaintext)
+    plaintext = ignore_headers_re.sub("", plaintext)
 
-    sentences = nltk.sent_tokenize(plaintext)
+    sentences = []
+
+    # Tokenizing paragraphs individually helps prevent NLTK from
+    # getting confused by some situations, like list items.
+    paragraphs = plaintext.split("\n")
+    for paragraph in paragraphs:
+        words_in_paragraph = nltk.word_tokenize(paragraph)
+        if len(words_in_paragraph) > 500:
+            print("L\t%s\tOverly long paragraph?\t%s words\t%s" % (title, len(words_in_paragraph), paragraph))
+
+        sentences.extend(nltk.sent_tokenize(paragraph))
 
     # Parse the short sentences first since they should be
     # easiest.
     sentences.sort(key=lambda s: len(s))
 
     for sentence in sentences:
+        start_time = time.time()
+
         (grammar_string, word_to_pos) = load_grammar_for_text(sentence)
 
         words = nltk.word_tokenize(sentence)
@@ -123,16 +123,24 @@ def check_english(plaintext, title):
             print("L\t%s\tOverly long sentence?\t%s words\t%s" % (title, len(words), sentence))
 
         # TODO: Skip this inside <poem>...</poem>
-        if is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string):
-            print("Y\t%s\tYay, parsed sentence successfully!" % title)
-            # print("Y\t%s\tYay, parsed sentence successfully!\t%s" % (title, sentence))
+        is_grammatical = None
+        with stopit.SignalTimeout(3, swallow_exc=True) as timeout_result:
+            is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string)
+
+        elapsed = time.time() - start_time
+
+        if timeout_result.state == timeout_result.TIMED_OUT:
+            print("T\t%s\t%s\tTIMEOUT\t%s" % (title, elapsed, sentence))
+            continue
+
+        elapsed = time.time() - start_time
+        if is_grammatical:
+            print("Y\t%s\t%s\tYay, parsed sentence successfully!\t%s" % (title, elapsed, sentence))
         else:
-            print("G\t%s\tUngrammatical sentence?\t%s" % (title, sentence))
+            print("G\t%s\t%s\tUngrammatical sentence?\t%s" % (title, elapsed, sentence))
 
 
 def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, grammar_string):
-    if "==" in word_list or "===" in word_list or "====" in word_list:
-        return True
 
     if "✂" in word_list:
         # TODO: Handle quote marks
@@ -245,6 +253,8 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
         word_train.append((word, pos_list))
         previous_word = word
 
+    print("DEBUG\t%s" % word_train)
+
     grammar = nltk.CFG.fromstring(grammar_string)
 
     # parser = nltk.parse.RecursiveDescentParser(grammar)  # Cannot handle X -> X Y (infinite loop)
@@ -267,7 +277,7 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
     for parse in possible_parses:
         serialized = parse.pformat()
         if serialized in seen:
-            print("DROPPED DUP!")
+            print("!\tDROPPED DUP!")
             continue
         else:
             possible_parses_dedup.append(parse)
@@ -275,7 +285,7 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
     # parse_dummies = [parse.pretty_print() for parse in possible_parses_dedup]
     parse_dummies = [parse for parse in possible_parses_dedup]
     if len(parse_dummies) == 0:
-        print(word_train)
+        print("DEBUG\t%s" % word_train)
         return False
     return True
 
@@ -289,8 +299,9 @@ def is_sentence_grammatical_nltk(word_list):
 
 
 def fetch_article_plaintext(title):
-    page = wikipedia.page(title=title)
-    return page.content
+    site = Site()
+    page = Page(site, title=title)
+    return wikitext_to_plaintext(page.text)
 
 
 # TODO: For later command-line use
@@ -313,45 +324,44 @@ sample_featured_articles = [
 
     # FEATURED ARTICLES
 
-    # "BAE Systems",
+    "BAE Systems",
     "Evolution",
-    # "Chicago Board of Trade Building",
-    # "ROT13",
-    # "Periodic table",
-    # "Everything Tastes Better with Bacon",
-    # "Renewable energy in Scotland",
-    # "Pigeon photography",
-    # "University of California, Riverside",
-    # "Same-sex marriage in Spain",
-    # "Irish phonology",
-    # "Sentence spacing",
+    "Chicago Board of Trade Building",
+    "ROT13",
+    "Periodic table",
+    "Everything Tastes Better with Bacon",
+    "Renewable energy in Scotland",
+    "Pigeon photography",
+    "University of California, Riverside",
+    "Same-sex marriage in Spain",
+    "Irish phonology",
+    "Sentence spacing",
     # https://en.wikipedia.org/wiki/X%C3%A1_L%E1%BB%A3i_Pagoda_raids
-    # "Xá Lợi Pagoda raids",
-    # "Flag of Japan",
-    # "Cerebellum",
+    "Xá Lợi Pagoda raids",
+    "Flag of Japan",
+    "Cerebellum",
     # https://en.wikipedia.org/wiki/L%C5%8D%CA%BBihi_Seamount
-    # "Lōʻihi Seamount",
-    # "India",
-    # "To Kill a Mockingbird",
-    # "Edward VIII abdication crisis",
+    "Lōʻihi Seamount",
+    "India",
+    "To Kill a Mockingbird",
+    "Edward VIII abdication crisis",
     # https://en.wikipedia.org/wiki/W%C5%82adys%C5%82aw_II_Jagie%C5%82%C5%82o
-    # "Władysław II Jagiełło",
-    # "Atheism",
-    # "Liberal Movement (Australia)",
-    # "Europa (moon)",
-    # "Philosophy of mind",
-    # "R.E.M.",
-    # "Tornado",
-    # "The Hitchhiker's Guide to the Galaxy (radio series)",
-    # "Pi",
-    # "Byzantine navy",
-    # "Wii",
-    # "Mass Rapid Transit (Singapore)",
-    # "History of American football",
+    "Władysław II Jagiełło",
+    "Atheism",
+    "Liberal Movement (Australia)",
+    "Europa (moon)",
+    "Philosophy of mind",
+    "R.E.M.",
+    "Tornado",
+    "The Hitchhiker's Guide to the Galaxy (radio series)",
+    "Pi",
+    "Byzantine navy",
+    "Wii",
+    "Mass Rapid Transit (Singapore)",
+    "History of American football",
 
     # ARTICLES NEEDING COPYEDIT
-
-    # "Gender inequality in China"
+    "Gender inequality in China"
 ]
 
 

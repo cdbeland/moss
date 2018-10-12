@@ -61,7 +61,13 @@ def remove_structure_nested(string, open_string, close_string):
 
 # These have to happen before templates are stripped out.
 early_substitutions = [
-    (re.compile(r"\s+"), " "),
+
+    # Make one line per paragraph, being careful to keep headers and
+    # list items on their own lines
+    (re.compile(r"  +"), " "),
+    (re.compile(r"\n\n\n+"), r"\n\n"),
+    (re.compile(r"(?<!=)\n(?![\n=\*:;])"), r""),
+
     (re.compile(r"{{(·|bold middot|dot|middot)}}"), " · "),
     (re.compile(r"{{(•|bull)}}"), " • "),
     (re.compile(r"<math[^>]*>.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
