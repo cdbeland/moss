@@ -5,7 +5,7 @@ import re
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly
-from grammar import prose_quote_re, ignore_sections_re
+from grammar import prose_quote_re, ignore_sections_re, line_starts_with_space_re
 
 
 # TODO:
@@ -126,6 +126,8 @@ def spellcheck_all_langs(article_title, article_text):
     # TODO: Get smarter about these sections.  But for now, ignore
     # them, since they are full of proper nouns and URL words.
     article_text = ignore_sections_re.sub("", article_text)
+    # Many of these are computer programming code snippets
+    article_text = line_starts_with_space_re.sub("\n", article_text)
 
     quotation_list = blockquote_re.findall(article_text)
     quotation_list.extend(prose_quote_re.findall(article_text))

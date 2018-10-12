@@ -35,6 +35,8 @@ ignore_sections_re = re.compile(
     r"(==\s*See also\s*==|==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==|==\s*Publications\s*==|==\s*Works\s*==).*$",
     flags=re.I + re.S)
 ignore_headers_re = re.compile("=[^\n]+=\n")
+line_starts_with_space_re = re.compile("\n [^\n]*\n")
+
 
 mysql_connection = mysql.connector.connect(user='beland',
                                            host='127.0.0.1',
@@ -96,6 +98,7 @@ def check_english(plaintext, title):
     plaintext = prose_quote_re.sub("✂", plaintext)
     plaintext = parenthetical_re.sub("", plaintext)
     plaintext = ignore_headers_re.sub("", plaintext)
+    plaintext = line_starts_with_space_re.sub("\n", plaintext)
 
     sentences = []
 
