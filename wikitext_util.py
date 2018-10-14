@@ -66,7 +66,7 @@ early_substitutions = [
     # list items on their own lines
     (re.compile(r"  +"), " "),
     (re.compile(r"\n\n\n+"), r"\n\n"),
-    (re.compile(r"(?<!=)\n(?![\n=\*:;])"), r""),
+    (re.compile(r"(?<!=)\n(?![\n=\*:;])"), r" "),
 
     (re.compile(r"{{(·|bold middot|dot|middot)}}"), " · "),
     (re.compile(r"{{(•|bull)}}"), " • "),

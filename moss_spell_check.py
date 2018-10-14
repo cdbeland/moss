@@ -327,5 +327,6 @@ def spellcheck_all_langs(article_title, article_text):
     #     dump_results()
 
 
-read_en_article_text(spellcheck_all_langs)
-dump_results()
+if __name__ == '__main__':
+    read_en_article_text(spellcheck_all_langs)
+    dump_results()

@@ -6,6 +6,11 @@ from .word_categorizer import letters_introduced_alphabetically
 
 class WikitextUtilTest(unittest.TestCase):
 
+    def test_whitespace(self):
+        self.assertEqual(
+            wikitext_to_plaintext("xxx\nyyy"),
+            "xxx yyy")
+
     def test_remove_structure_nested(self):
         self.assertEqual(
             remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}"),
