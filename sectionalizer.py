@@ -1,5 +1,6 @@
 import fileinput
 import re
+import sys
 
 
 MAX_SIZE = 50
@@ -10,6 +11,10 @@ MAX_KEY_LENGTH = 5
 def get_word(line):
     match_result = re.search(r"\[\[(.*?)\]\]",
                              line)
+    if not match_result or not match_result.group(1):
+        print("Word not found in line: '%s'" % line,
+              file=sys.stderr)
+        return None
     word = match_result.group(1)
     if word.startswith("wikt:"):
         word = word.replace("wikt:", "")
@@ -63,6 +68,8 @@ if __name__ == '__main__':
     for line in fileinput.input("-"):
         line = line.strip()
         word = get_word(line)
+        if not word:
+            continue
         # Group by initial character
         lines = grouped_lines.get(word[0], [])
         lines.append(line)

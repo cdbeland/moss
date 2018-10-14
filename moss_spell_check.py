@@ -85,6 +85,7 @@ start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
 spaced_emdash_re = re.compile(r".{0,10}—\s.{0,10}|.{0,10}\s—.{0,10}")
+newline_re = re.compile(r"\n")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -116,7 +117,8 @@ def spellcheck_all_langs(article_title, article_text):
 
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Dashes
     # requires that emdashes be unspaced.
-    bad_emdash_context_list = spaced_emdash_re.findall(article_text)
+    article_text_safe = newline_re.sub(" ", article_text)
+    bad_emdash_context_list = spaced_emdash_re.findall(article_text_safe)
     if bad_emdash_context_list:
         print("D\t* %s - [[%s]]: %s" % (
             len(bad_emdash_context_list),
