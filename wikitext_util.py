@@ -63,10 +63,10 @@ def remove_structure_nested(string, open_string, close_string):
 early_substitutions = [
 
     # Make one line per paragraph, being careful to keep headers and
-    # list items on their own lines
+    # list and table items on their own lines
     (re.compile(r"  +"), " "),
-    (re.compile(r"\n\n\n+"), r"\n\n"),
-    (re.compile(r"(?<!=)\n(?![\n=\*:;])"), r" "),
+    (re.compile(r"(?<![=\n])\n(?![\n=\*:; \|\}])"), r" "),
+    (re.compile(r"\n\n+"), r"\n"),
 
     (re.compile(r"{{(·|bold middot|dot|middot)}}"), " · "),
     (re.compile(r"{{(•|bull)}}"), " • "),
@@ -269,6 +269,9 @@ substitutions = [
     (re.compile(r"! colspan=.*?\n"), ""),
     (re.compile(r"\| colspan=.*?\n"), ""),
     (re.compile(r"\|\|? rowspan=.*?\n"), ""),
+
+    # Final whitespace cleanup
+    (re.compile(r"\n\s*\n+"), r"\n"),
 ]
 
 

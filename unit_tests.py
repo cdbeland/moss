@@ -10,6 +10,9 @@ class WikitextUtilTest(unittest.TestCase):
         self.assertEqual(
             wikitext_to_plaintext("xxx\nyyy"),
             "xxx yyy")
+        self.assertEqual(
+            wikitext_to_plaintext("one ONE\n\n==Section==\n\ntwo TWO"),
+            "one ONE\n==Section==\ntwo TWO")
 
     def test_remove_structure_nested(self):
         self.assertEqual(
