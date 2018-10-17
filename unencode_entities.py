@@ -176,10 +176,12 @@ transform_unsafe = {
 transform = {
 
     # Per [[MOS:FRAC]]
-    "&frac12": "{{frac|1|2}}",
-    "&frac14": "{{frac|1|4}}",
-    "&frac34": "{{frac|3|4}}",
-    "&frac16": "{{frac|1|6}}",
+    "&frac12;": "{{frac|1|2}}",
+    "&frac14;": "{{frac|1|4}}",
+    "&frac34;": "{{frac|3|4}}",
+    "&frac16;": "{{frac|1|6}}",
+
+    "&permil;": "‰",
 
     "&sup1;": "<sup>1</sup>",
     "&sup2;": "<sup>2</sup>",
@@ -319,8 +321,6 @@ transform = {
     "&Amp;": "&amp;",
 }
 
-# transform.extend(transform_unsafe)
-
 greek_letters = {
     "&alpha;": "α",
     "&beta;": "β",
@@ -436,6 +436,10 @@ def fix_text(text, transform_greek=False):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == "--safe":
+        pass
+    else:
+        transform.update(transform_unsafe)
     for line in fileinput.input("-"):
         new_line = fix_text(line)
         sys.stdout.write(new_line)
