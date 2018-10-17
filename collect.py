@@ -13,8 +13,8 @@ by_article_suppress = ["1", "2"]
 
 
 # By-frequency lists swap which half of the alphabet they suppress
-alpha_half_inactive = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
-alpha_half_active = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
 find_word_re = re.compile(" - \[\[wikt:(.*?)\]\] - ")
@@ -32,6 +32,9 @@ def get_sections_from_file(filename, number_of_sections, suppression_list):
             if line.startswith("="):
                 skip_this_section = False
                 result = re.match(r"==== ([^\-].*?)(\-.+)? ====", line)
+                if not result:
+                    # If the first character is itself a dash
+                    result = re.match(r"==== (\-)(\-.+)? ====", line)
                 start = result.group(1)
                 end = ""
                 if result.group(2):
