@@ -164,7 +164,10 @@ echo `date`
 # Run time for this segment: 2h 20m
 
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
-cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all | head -1000 > post-entities.txt
+
+# Separate operations to avoid "broken pipe" error.
+cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all > tmp-entities-summarized.txt
+head -1000 tmp-entities-summarized.txt > post-entities.txt
 
 echo "Done"
 echo `date`
