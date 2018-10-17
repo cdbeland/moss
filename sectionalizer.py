@@ -50,7 +50,11 @@ def merge_small_sections(grouped_lines):
             if len(tmp_list) < MAX_SIZE - MIN_SIZE:
                 tmp_list.extend(line_list)
                 del new_hash[previous_key]
-                key_parts = previous_key.split("-")
+                key_parts = []
+                if previous_key.startswith("-"):
+                    key_parts = ["-", previous_key.lstrip("-")]
+                else:
+                    key_parts = previous_key.split("-")
                 new_key = "%s-%s" % (key_parts[0], group_key)
                 new_hash[new_key] = tmp_list
                 previous_key = new_key
