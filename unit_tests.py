@@ -13,6 +13,9 @@ class WikitextUtilTest(unittest.TestCase):
         self.assertEqual(
             wikitext_to_plaintext("one ONE\n\n==Section==\n\ntwo TWO"),
             "one ONE\n==Section==\ntwo TWO")
+        self.assertEqual(
+            wikitext_to_plaintext("==Section==\n[[File:xxx]]\naaa"),
+            "==Section==\naaa")
 
     def test_remove_structure_nested(self):
         self.assertEqual(
@@ -44,7 +47,7 @@ class WikitextUtilTest(unittest.TestCase):
         text_in = "a satisfiable theory is [[Morley's categoricity theorem|{{mvar|&kappa;}}-categorical]] (there exists an infinite cardinal {{mvar|&kappa;}} such that)"
         self.assertEqual(
             wikitext_to_plaintext(text_in),
-            "a satisfiable theory is -categorical (there exists an infinite cardinal  such that)")
+            "a satisfiable theory is -categorical (there exists an infinite cardinal such that)")
 
 
 class WordCategorizerTest(unittest.TestCase):
