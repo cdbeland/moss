@@ -107,6 +107,8 @@ early_substitutions = [
     (re.compile(r"{{angle bracket\|(.*?)}}", flags=re.I), "⟨\1⟩"),
     (re.compile(r"{{beta letter}}", flags=re.I), "β"),
 
+    # ---
+
     # Must happen before table removal to prevent [[aa|{{bb}}-cc]] being changed to "aacc"
 
     # [[Regular page]]
@@ -118,6 +120,10 @@ early_substitutions = [
     # [[Namespace:Target page]]
     (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
 
+    # ---
+
+    # Must happen before table removal due to possibility of "|-"
+    (re.compile(r"<gallery>.*?</gallery>", flags=re.I+re.S), "\n\n"),
 ]
 
 substitutions = [
@@ -194,16 +200,15 @@ substitutions = [
     # Unlikely to have parseable prose
     (re.compile(r"<ref/>", flags=re.I+re.S), ""),
     (re.compile(r"<ref>.*?</ref>", flags=re.I+re.S), ""),
-    (re.compile(r"<references/>", flags=re.I+re.S), ""),
-    (re.compile(r"<references>.*?</\s*references>", flags=re.I+re.S), ""),
-    (re.compile(r"<source>.*?</source>", flags=re.I+re.S), ""),
-    (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I+re.S), ""),
-    (re.compile(r"<gallery>.*?</gallery>", flags=re.I+re.S), ""),
-    (re.compile(r"<timeline>.*?</timeline>", flags=re.I+re.S), ""),
-    (re.compile(r"<code>.*?</code>", flags=re.I+re.S), ""),
+    (re.compile(r"<references/>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<references>.*?</\s*references>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<source>.*?</source>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<timeline>.*?</timeline>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<code>.*?</code>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<chem>.*?</chem>", flags=re.I+re.S), ""),
     (re.compile(r"<score>.*?</score>", flags=re.I+re.S), ""),
-    (re.compile(r"<pre>.*?</pre>", flags=re.I+re.S), ""),
+    (re.compile(r"<pre>.*?</pre>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<var>.*?</var>", flags=re.I+re.S), ""),
     (re.compile(r"<hiero>.*?</hiero>", flags=re.I+re.S), ""),
     (re.compile(r"<imagemap>.*?</imagemap>", flags=re.I+re.S), ""),
@@ -271,7 +276,7 @@ substitutions = [
 
     # Make one line per paragraph, being careful to keep headers and
     # list and table items on their own lines
-    (re.compile(r"\n\s*\n+"), r"\n"),
+    (re.compile(r"\n\s*\n+"), r"\n\n"),
     (re.compile(r"(?<![=\n])\n(?![\n=\*:; \|\}\]])"), r" "),
     (re.compile(r"\n\n+"), r"\n"),
     (re.compile(r"  +"), " "),

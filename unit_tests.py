@@ -17,7 +17,24 @@ class WikitextUtilTest(unittest.TestCase):
             wikitext_to_plaintext("==Section==\n[[File:xxx]]\naaa"),
             "==Section==\naaa")
 
-    def test_remove_structure_nested(self):
+    def test_tags(self):
+        self.assertEqual(
+            wikitext_to_plaintext("bbb\n<timeline arg=1>\nccc\n</timeline>\nddd"),
+            "bbb\nddd")
+        self.assertEqual(
+            wikitext_to_plaintext("eee\n<code>\nfff\n</code>\nggg"),
+            "eee\nggg")
+
+        text = """hhh
+<gallery>
+qqq.jpg|- www
+rrr.jpg|- ttt
+</gallery>
+iii"""
+        self.assertEqual(
+            wikitext_to_plaintext(text),
+            "hhh\niii")
+
         self.assertEqual(
             remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}"),
             "aaa  eee")
