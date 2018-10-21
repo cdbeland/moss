@@ -3,9 +3,9 @@ import re
 
 # --- HELPER VARIABLES AND CONFIG ---
 
-# Focus letters that were posted on the last run, and should take a
-# rest this run to avoid duplicate work.
-by_article_suppress = ["1", "2"]
+# # Focus letters that were posted on the last run, and should take a
+# # rest this run to avoid duplicate work.
+# by_article_suppress = ["1", "2"]
 
 # previously run: "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 # "Aa", "Ab", "Ba", "J", "Q", "X", "Y", "Z", "Á", "Å", "Ç", "É", "Ö",
@@ -73,19 +73,21 @@ def get_active_lines_from_file(filename, active_list, inactive_list):
 
 # --- MAIN PRINTOUT ---
 
-print("=== Likely misspellings by article ===")
-print("")
-print("""The most efficient list to work on if all you want to do is fix
-misspellings.  All typos from a given article are shown, but only
-typos that are very close to known words are shown.  The algorithm is
-not perfect, so some of these may still be words that need to be added
-to Wiktionary. A different part of the alphabet is posted on each run
-to avoid duplicate work, and because the whole list is too long to
-post all at once.""")
-print("")
+# Now uploading these on separate pages, entire letter at a time.
 
-
-print(get_sections_from_file("tmp-by-article-edit1.txt", 80, by_article_suppress))
+# print("=== Likely misspellings by article ===")
+# print("")
+# print("""The most efficient list to work on if all you want to do is fix
+# misspellings.  All typos from a given article are shown, but only
+# typos that are very close to known words are shown.  The algorithm is
+# not perfect, so some of these may still be words that need to be added
+# to Wiktionary. A different part of the alphabet is posted on each run
+# to avoid duplicate work, and because the whole list is too long to
+# post all at once.""")
+# print("")
+#
+#
+# print(get_sections_from_file("tmp-by-article-edit1.txt", 80, by_article_suppress))
 
 
 print("=== Likely misspellings by frequency (%s) ===" % active_range_str)

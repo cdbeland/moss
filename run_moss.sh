@@ -48,7 +48,7 @@ echo "Beginning by-article post-processing"
 echo `date`
 
 # TODO: Post other useful patterns once these are done (e.g. mix in T2s)
-grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > tmp-by-article-edit1.txt
+grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1.txt
 
 # grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-compound.txt
 # Posting by-frequency instead, to avoid mixing in whitespace errors
