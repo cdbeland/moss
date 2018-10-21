@@ -192,22 +192,23 @@ substitutions = [
     # interpreted by the Mediawiki engine.
 
     # Unlikely to have parseable prose
-    (re.compile(r"<ref/>", flags=re.I), ""),  # Must come before <ref>...</ref>
-    (re.compile(r"<ref>.*?</ref>", flags=re.I), ""),
-    (re.compile(r"<references[^>]*/>", flags=re.I), ""),  # Must come before <references>...</references>
-    (re.compile(r"<references[^>]*>.*?</\s*references>", flags=re.I), ""),
-    (re.compile(r"<source[^>]*>.*?</source>", flags=re.I), ""),
-    (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I), ""),
-    (re.compile(r"<gallery>.*?</gallery>", flags=re.I), ""),
-    (re.compile(r"<timeline>.*?</timeline>", flags=re.I), ""),
-    (re.compile(r"<code>.*?</code>", flags=re.I), ""),
-    (re.compile(r"<chem>.*?</chem>", flags=re.I), ""),
-    (re.compile(r"<score>.*?</score>", flags=re.I), ""),
-    (re.compile(r"<pre>.*?</pre>", flags=re.I), ""),
-    (re.compile(r"<var>.*?</var>", flags=re.I), ""),
-    (re.compile(r"<hiero>.*?</hiero>", flags=re.I), ""),
-    (re.compile(r"<imagemap>.*?</imagemap>", flags=re.I), ""),
-    (re.compile(r"<mapframe>.*?</mapframe>", flags=re.I), ""),
+    (re.compile(r"<ref/>", flags=re.I+re.S), ""),
+    (re.compile(r"<ref>.*?</ref>", flags=re.I+re.S), ""),
+    (re.compile(r"<references/>", flags=re.I+re.S), ""),
+    (re.compile(r"<references>.*?</\s*references>", flags=re.I+re.S), ""),
+    (re.compile(r"<source>.*?</source>", flags=re.I+re.S), ""),
+    (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I+re.S), ""),
+    (re.compile(r"<gallery>.*?</gallery>", flags=re.I+re.S), ""),
+    (re.compile(r"<timeline>.*?</timeline>", flags=re.I+re.S), ""),
+    (re.compile(r"<code>.*?</code>", flags=re.I+re.S), ""),
+    (re.compile(r"<chem>.*?</chem>", flags=re.I+re.S), ""),
+    (re.compile(r"<score>.*?</score>", flags=re.I+re.S), ""),
+    (re.compile(r"<pre>.*?</pre>", flags=re.I+re.S), ""),
+    (re.compile(r"<var>.*?</var>", flags=re.I+re.S), ""),
+    (re.compile(r"<hiero>.*?</hiero>", flags=re.I+re.S), ""),
+    (re.compile(r"<imagemap>.*?</imagemap>", flags=re.I+re.S), ""),
+    (re.compile(r"<mapframe>.*?</mapframe>", flags=re.I+re.S), ""),
+    (re.compile(r"<kbd>.*?</kbd>", flags=re.I+re.S), ""),
 
     # Make the contained text bubble up to become part of the
     # surrounding text
