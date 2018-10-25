@@ -80,7 +80,7 @@ def dump_results():
 
 
 ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup).*?}}")
-blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I)
+blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I+re.S)
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")

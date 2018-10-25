@@ -68,7 +68,7 @@ early_substitutions = [
 
     (re.compile(r"{{(·|bold middot|dot|middot)}}"), " · "),
     (re.compile(r"{{(•|bull)}}"), " • "),
-    (re.compile(r"<math[^>]*>.*?</math>", flags=re.I), ""),  # Sometimes contain {{ / }}, which can look like template start/end
+    (re.compile(r"<math[^>]*>.*?</math>", flags=re.I+re.S), ""),  # Sometimes contain {{ / }}, which can look like template start/end
 
     (re.compile(r"{{ISBN\|(.*?)}}"), r"\1"),
 
@@ -115,15 +115,16 @@ early_substitutions = [
     (re.compile(r"\[\[(?![a-zA-Z\s]+:)([^\|]+?)\]\]"), r"\1"),
 
     # [[Target page|Display text]]
-    (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]"), r"\2"),
+    (re.compile(r"\[\[(?![a-zA-Z\s]+:)(.*?)\|\s*(.*?)\s*\]\]", flags=re.S), r"\2"),
 
     # [[Namespace:Target page]]
-    (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]"), ""),  # Category, interwiki
+    # Deletes links for category, interwiki, images, etc.
+    (re.compile(r"\[\[[a-zA-Z\s]+:.*?\]\]", flags=re.S), ""),
 
     # ---
 
     # Must happen before table removal due to possibility of "|-"
-    (re.compile(r"<gallery>.*?</gallery>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<gallery[^>]*>.*?</gallery>", flags=re.I+re.S), "\n\n"),
 ]
 
 substitutions = [
@@ -186,7 +187,7 @@ substitutions = [
     (re.compile(r"&middot;"), "·"),
     (re.compile(r"&bull;"), "•"),
 
-    (re.compile(r"<!--.*?-->"), ""),
+    (re.compile(r"<!--.*?-->", flags=re.S), ""),
 
     # Drop HTML attributes for easier parsing
     (re.compile(r"<(\??[a-zA-Z]+)[^>]{0,1000}?(/?)\s*>"), r"<\1\2>"),
@@ -198,9 +199,9 @@ substitutions = [
     # interpreted by the Mediawiki engine.
 
     # Unlikely to have parseable prose
-    (re.compile(r"<ref/>", flags=re.I+re.S), ""),
+    (re.compile(r"<ref/>", flags=re.I), ""),
     (re.compile(r"<ref>.*?</ref>", flags=re.I+re.S), ""),
-    (re.compile(r"<references/>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<references/>", flags=re.I), "\n\n"),
     (re.compile(r"<references>.*?</\s*references>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<source>.*?</source>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I+re.S), "\n\n"),
@@ -277,7 +278,8 @@ substitutions = [
     # Make one line per paragraph, being careful to keep headers and
     # list and table items on their own lines
     (re.compile(r"\n\s*\n+"), r"\n\n"),
-    (re.compile(r"(?<![=\n])\n(?![\n=\*:; \|\}\]])"), r" "),
+    (re.compile(r"^\s*\n+"), r"\n"),
+    (re.compile(r"(?<!^)(?<![=\n])\n(?![\n=\*:; \|\}\]])"), r" "),
     (re.compile(r"\n\n+"), r"\n"),
     (re.compile(r"  +"), " "),
 ]
