@@ -23,7 +23,8 @@ except ImportError:
 
 enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
 az_re = re.compile("^[a-z]+$", flags=re.I)
-az_plus_re = re.compile("^[a-z|\d|\-]+$", flags=re.I)
+az_plus_re = re.compile("^[a-z|\d|\-|\.]+$", flags=re.I)
+az_dot_re = re.compile("^[a-z]+\.[a-z]+$", flags=re.I)
 ag_re = re.compile("^[a-g]+$")
 mz_re = re.compile("[m-z]")
 dna_re = re.compile("^[acgt]+$")
@@ -139,9 +140,14 @@ def get_word_category(word):
         elif az_re.match(word):
             edit_distance = near_common_word(word)
             if edit_distance:
+                # Possibly TS
                 category = "T" + str(edit_distance)
             else:
                 category = "R"
+        elif az_dot_re.match(word):
+            # Usually missing whitespace after a period at the end of
+            # a sentence
+            category = "TS"
         else:
             category = "N"
     else:

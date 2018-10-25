@@ -99,3 +99,10 @@ class SpellTest(unittest.TestCase):
         self.assertTrue(is_word_spelled_correctly("Pā’īn"))
         # Non-ASCII capitals make it a proper noun
         self.assertTrue(is_word_spelled_correctly("Ḩasan"))
+
+    def period_splices(self):
+        from .spell import is_word_spelled_correctly
+        self.assertFalse(is_word_spelled_correctly("again.The"))
+        self.assertFalse(is_word_spelled_correctly("Everest.Another"))
+        self.assertTrue(is_word_spelled_correctly("Ph.B"))
+        self.assertEqual(is_word_spelled_correctly("Im.C23", "uncertain"))

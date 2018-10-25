@@ -44,6 +44,7 @@ abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)
 html_entity_re = re.compile(r"&#?[a-zA-Z]+;")
 html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
+period_splice_re = re.compile(r"^[a-zA-Z]*[a-z]\.[A-Z][a-zA-Z]*$")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
 base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
@@ -535,10 +536,19 @@ def is_word_spelled_correctly(word_mixedcase):
     if word_mixedcase[0].upper() == word_mixedcase[0]:
         return "uncertain"
 
-    # Lots of things here are probably legitimate, but we need better
-    # pattern-matching filters before it's worthwhile posting these
-    # for editors to fix.
     if not all_letters_re.match(word_mixedcase):
+        if period_splice_re.match(word_mixedcase):
+            plus_period = "%s." % word_mixedcase.lower()
+            if plus_period in all_words:
+                # Because the word segmenter often doesn't keep the
+                # trailing period with the word.  TODO: Catch situations
+                # where the trailing period is actually missing.
+                return True
+            return False
+
+        # Lots of things here are probably legitimate, but we need
+        # better pattern-matching filters before it's worthwhile
+        # posting these for editors to fix.
         return "uncertain"
 
     return False
