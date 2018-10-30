@@ -37,18 +37,21 @@ def remove_structure_nested(string, open_string, close_string):
             if close_index < open_index:
                 # Discard text to the end of the template, close it,
                 # and check for further templates
+                string_clean += "✂"
                 string = string[close_index+2:]
                 nesting_depth -= 1
                 continue
             else:
                 # Discard text to the beginning of the template and
                 # open a new one
+                string_clean += "✂"
                 string = string[open_index+2:]
                 nesting_depth += 1
                 continue
 
     while nesting_depth > 0 and close_string in string:
         # Remove this template and close
+        string_clean += "✂"
         close_index = string.find(close_string)
         string = string[close_index+2:]
         nesting_depth -= 1
@@ -279,7 +282,7 @@ substitutions = [
     # list and table items on their own lines
     (re.compile(r"\n\s*\n+"), r"\n\n"),
     (re.compile(r"^\s*\n+"), r"\n"),
-    (re.compile(r"(?<!^)(?<![=\n])\n(?![\n=\*:; \|\}\]])"), r" "),
+    (re.compile(r"(?<!^)(?<![=\n✂\}\]\|])\n(?![\n=\*:;✂ \|])"), r" "),
     (re.compile(r"\n\n+"), r"\n"),
     (re.compile(r"  +"), " "),
 ]

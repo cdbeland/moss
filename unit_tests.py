@@ -37,11 +37,11 @@ iii"""
 
         self.assertEqual(
             remove_structure_nested("aaa {{bbb {{ccc}} ddd}} eee", "{{", "}}"),
-            "aaa  eee")
+            "aaa ✂✂✂ eee")
 
         self.assertEqual(
             remove_structure_nested("{{xxx yyy}} zzz", "{{", "}}"),
-            " zzz")
+            "✂ zzz")
 
     def test_links(self):
         self.assertEqual(
@@ -64,7 +64,7 @@ iii"""
         text_in = "a satisfiable theory is [[Morley's categoricity theorem|{{mvar|&kappa;}}-categorical]] (there exists an infinite cardinal {{mvar|&kappa;}} such that)"
         self.assertEqual(
             wikitext_to_plaintext(text_in),
-            "a satisfiable theory is -categorical (there exists an infinite cardinal such that)")
+            "a satisfiable theory is ✂-categorical (there exists an infinite cardinal ✂ such that)")
 
 
 class WordCategorizerTest(unittest.TestCase):
