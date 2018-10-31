@@ -172,6 +172,7 @@ def spellcheck_all_langs(article_title, article_text):
     article_count += 1
     article_oops_list = []
 
+    article_text = article_text.replace("✂", " ")
     word_list = nltk.word_tokenize(article_text)
 
     # Old-fashioned loop to allow lookahead and cope with the fact
