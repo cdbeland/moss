@@ -435,11 +435,10 @@ def fix_text(text, transform_greek=False):
     return new_text
 
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] == "--safe":
-        pass
-    else:
-        transform.update(transform_unsafe)
+if len(sys.argv) > 1 and "--safe" in sys.argv:
+    pass
+else:
+    transform.update(transform_unsafe)
     for line in fileinput.input("-"):
         new_line = fix_text(line)
         sys.stdout.write(new_line)
