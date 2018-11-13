@@ -5,7 +5,21 @@
 # TODO: Consider changing labels to academic-standard?
 # Not quite right:
 #  https://en.wikipedia.org/wiki/List_of_glossing_abbreviations
-
+# NLTK set:
+# Tag	Meaning	English Examples
+# ADJ	adjective	new, good, high, special, big, local
+# ADP	adposition	on, of, at, with, by, into, under
+# ADV	adverb	really, already, still, early, now
+# CONJ	conjunction	and, or, but, if, while, although
+# DET	determiner, article	the, a, some, most, every, no, which
+# NOUN	noun	year, home, costs, time, Africa
+# NUM	numeral	twenty-four, fourth, 1991, 14:24
+# PRT	particle	at, on, out, over per, that, up, with
+# PRON	pronoun	he, their, her, its, my, I, us
+# VERB	verb	is, say, told, given, playing, would
+# .	punctuation marks	. , ; !
+# X	other	ersatz, esprit, dunno, gr8, univeristy
+# http://www.nltk.org/book/ch05.html
 
 # As recognized by Wiktionary
 # https://en.wiktionary.org/wiki/Category:English_lemmas
