@@ -439,6 +439,8 @@ if len(sys.argv) > 1 and "--safe" in sys.argv:
     pass
 else:
     transform.update(transform_unsafe)
+
+if __name__ == '__main__':
     for line in fileinput.input("-"):
         new_line = fix_text(line)
         sys.stdout.write(new_line)
