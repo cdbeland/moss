@@ -11,6 +11,8 @@ set -e
 
 # --- MAIN SPELL CHECK ---
 
+# Run time for this segment: ~26h 07m
+
 echo "Beginning main spell check"
 echo `date`
 
@@ -26,7 +28,7 @@ cd $RUN_NAME
 echo "Beginning word categorization run 1"
 echo `date`
 
-# Run time for this segment: 4h 20m
+# Run time for this segment: ~3h 25m
 grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
 cat /tmp/sorted_by_article.txt | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 rm -rf /tmp/sorted_by_article.txt
@@ -39,13 +41,15 @@ grep '^!' tmp-output.txt | perl -pe 's/.*\t//' | sort > post-parse-failures.txt
 echo "Beginning word categorization run 2"
 echo `date`
 
-# Run time for this line: ~2h 45m
+# Run time for this line: ~2h 23m
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---
 
 echo "Beginning by-article post-processing"
 echo `date`
+
+# Run time for here to next timestamp: ~2 min
 
 # TODO: Post other useful patterns once these are done (e.g. mix in T2s)
 grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1.txt
@@ -162,7 +166,7 @@ grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ..
 echo "Beginning HTML entity check"
 echo `date`
 
-# Run time for this segment: 2h 20m
+# Run time for this segment: ~2h
 
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
 
