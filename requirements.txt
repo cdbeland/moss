@@ -3,5 +3,6 @@ lxml
 mysql-connector-python
 nltk
 nose
+stopit
 wikipedia
 git+https://github.com/wikimedia/pywikibot.git
