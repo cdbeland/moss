@@ -32,7 +32,18 @@ prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
 # "" because the contents may have been removed on a previous replacement
 parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?\S\]|\[\S\]')
 ignore_sections_re = re.compile(
-    r"(==\s*See also\s*==|==\s*External links\s*==|==\s*References\s*==|==\s*Bibliography\s*==|==\s*Further reading\s*==|==\s*Sources\s*==|==\s*Publications\s*==|==\s*Works\s*==).*$",
+    r"(==\s*See also\s*==|"
+    r"==\s*External links\s*==|"
+    r"==\s*References\s*==|"
+    r"==\s*Bibliography\s*==|"
+    r"==\s*Further reading\s*==|"
+    r"==\s*Sources\s*==|"
+    r"==\s*Publications\s*==|"
+    r"==\s*Filmography\s*==|"
+    r"==\s*Works\s*=="
+    r"==\s*Compositions\s*=="
+    r"==\s*Recordings\s*=="
+    r").*$",
     flags=re.I + re.S)
 ignore_headers_re = re.compile("=[^\n]+=\n")
 line_starts_with_space_re = re.compile("\n [^\n]*\n")
