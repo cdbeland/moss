@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+# Run time for commit c6ce3ab: ~26h (whata)
 # Run time for commit 5e6b2ce: 21h 18m (whata)
 # Run time for commit 10512ac: 23h 19m (whata)
 # Run time for commit 4933ad4: 22h 00m (whata) +/- 10 min
@@ -35,7 +36,7 @@ rm -rf /tmp/sorted_by_article.txt
 # TODO: Can this run as one line, or is that the source of the .py command not found error?
 # grep ^@ tmp-output.txt | sort -nr -k2 | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 
-grep '^!' tmp-output.txt | perl -pe 's/.*\t//' | sort > post-parse-failures.txt
+grep '^!' tmp-output.txt | perl -pe 's/.*?\t//' | sort > post-parse-failures.txt
 # grep '^G' tmp-output.txt | sort > debug-spellcheck-ignored.txt  # Not currently used, may reactivate in future
 
 echo "Beginning word categorization run 2"
