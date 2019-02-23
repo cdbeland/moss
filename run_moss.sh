@@ -49,10 +49,39 @@ tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tm
 echo "Beginning by-article post-processing"
 echo `date`
 
-# Run time for here to next timestamp: ~2 min
+# Run time for here to beginning of HTML tag report: ~2 minutes
 
-# TODO: Post other useful patterns once these are done (e.g. mix in T2s)
 grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1.txt
+grep -P "^T[12](,T[12])*\t" tmp-articles-linked-words.txt | grep T2 | grep T1 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1+2.txt
+grep -P "^T[123](,T[123])*\t" tmp-articles-linked-words.txt | grep T3 | grep T1 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1+3.txt
+grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | grep 'wikt:.*\.'| perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS+dot.txt
+
+# TODO: Once these are done, post:
+# (these require deactivating the above to prevent overlap)
+# * grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS.txt
+# * grep -P "^T[1S](,T[1S])*\t" tmp-articles-linked-words.txt | grep T1 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit1.txt
+# * grep -P "^T[12S](,T[12S])*\t" tmp-articles-linked-words.txt | grep T2 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit2.txt
+# * grep -P "^T[123S](,T[123S])*\t" tmp-articles-linked-words.txt | grep T3 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit3.txt
+#
+# * Enhance word_categorizer.py or moss_spell_check.py to look at all
+#   Wiktionaries and only leave words that don't appear in any
+#   language's dictionary (though all should appear in the English
+#   dictionary of all languages).  Possibly produce lists of untagged
+#   words by language, so people interested in those languages can go
+#   tag the English articles?  Produce most-common lists for English
+#   Wikipedia definition writers.
+# * If this is too expensive, try:
+#   * T1/T2/T3 mixed in with all other T#, segratating the higher T#s,
+#     starting with articles with the lowest number of typos?
+#   * (T4 are hardly ever misspellings, don't post those)
+# Also helps stats a lot:
+# * Tagging articles for {{cleanup HTML}} from the appropriate report
+# * Tagging articles with the most misspelled words with:
+#   {{cleanup |reason=Need to use {{tl|lang}} to tag non-English words so screen readers and automated spell check will work}}
+#   (probably the top 3000 or so articles with the most misspellings,
+#   down to about 20 or so, though there are many mixed in at lower
+#   frequencies)
+
 
 # grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-compound.txt
 # Posting by-frequency instead, to avoid mixing in whitespace errors
@@ -61,6 +90,9 @@ head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles
 
 
 # --- BY FREQUENCY ---
+
+echo "Beginning by-frequency post-processing"
+echo `date`
 
 grep ^TS tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
@@ -96,12 +128,18 @@ cat tmp-words-with-articles-truncated.txt | perl -pe 's/.*?\t//' | ../venv/bin/p
 
 # --- COLLECTION FOR POSTING ---
 
+echo "Beginning collection"
+echo `date`
+
 # This just automates the collection of some of the above output files
 # into a single file for posting to the moss project page.
 
 ../venv/bin/python3 ../collect.py > collected_by_article_and_freq.txt
 
 # --- BY WORD LENGTH ---
+
+echo "Beginning by-length post-processing"
+echo `date`
 
 cat tmp-words-with-articles.txt | ../venv/bin/python3 ../charlen_extractor.py | sort -k3 -nr > tmp-misspelled-words-charlen-cat.txt
 
@@ -137,6 +175,9 @@ echo "" >> collected_by_length.txt
 
 # --- STATS ---
 
+echo "Beginning stats"
+echo `date`
+
 echo "Possible typos per article: " > post-stats.txt
 cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py >> post-stats.txt
 echo "Parse errors: " >> post-stats.txt
@@ -146,6 +187,9 @@ echo "Possible typos by type: " >> post-stats.txt
 cat tmp-words-with-articles.txt | ../venv/bin/python3 ../count_by_rating.py >> post-stats.txt
 
 # --- DASHES ---
+
+echo "Beginning dash report"
+echo `date`
 
 grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ../sectionalizer.py > debug-dashes.txt
 # TODO: Are spaced emdashes more common than unspaced?  I like them
