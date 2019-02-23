@@ -57,7 +57,7 @@ def get_sections_from_file(filename, number_of_sections, suppression_list):
         return output
 
 
-def get_active_lines_from_file(filename, active_list, inactive_list):
+def get_active_lines_from_file(filename, active_list, inactive_list, exclude_dot=False):
     output = ""
     with open(filename, "r") as lines:
         for line in lines:
@@ -67,6 +67,8 @@ def get_active_lines_from_file(filename, active_list, inactive_list):
                 continue
             if first_letter not in active_list:
                 raise Exception('Unexpected character "%s" in "%s"' % (first_letter, word))
+            if exclude_dot and "." in word:
+                continue
             output += line
     return output
 
@@ -112,7 +114,7 @@ corrected. For each run, only words from half of the alphabet are
 shown, to avoid duplicate work from when new dumps are being
 processed.""")
 print("")
-print(get_active_lines_from_file("tmp-most-common-compound.txt", alpha_half_active, alpha_half_inactive))
+print(get_active_lines_from_file("tmp-most-common-compound.txt", alpha_half_active, alpha_half_inactive, exclude_dot=True))
 print("")
 
 print("=== Likely new words by frequency (%s) ===" % active_range_str)
