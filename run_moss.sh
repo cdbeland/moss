@@ -151,10 +151,11 @@ echo "" >> collected_by_length.txt
 # echo "==== Likely misspellings (longest) ====" >> collected_by_length.txt
 # grep -P "^T1\t" tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^T1\t//' | head -20 >> collected_by_length.txt
 
-echo "==== Likely missing whitespace ====" >> collected_by_length.txt
-grep ^TS tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^TS\t//' | head -200 >> collected_by_length.txt
+# Redundant to by-article
+# echo "==== Likely missing whitespace ====" >> collected_by_length.txt
+# grep ^TS tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^TS\t//' | head -200 >> collected_by_length.txt
+# echo "" >> collected_by_length.txt
 
-echo "" >> collected_by_length.txt
 echo "==== Likely chemistry words ====" >> collected_by_length.txt
 grep ^C tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^C\t//' | head -20 >> collected_by_length.txt
 echo "" >> collected_by_length.txt
