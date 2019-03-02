@@ -43,7 +43,7 @@ for line in fileinput.input("-"):
             # word_safe = re.sub(">", "%3E", word_safe)
             word_safe = re.sub(">", "", word)
 
-            word_safe = word_safe.replace("<", "\<")
+            word_safe = word_safe.replace("<", "\<\/?") # This also merges start and end tags
             word_safe = word_safe.replace("/", "\/")
             word_safe = urllib.parse.quote_plus(word_safe)
             better_line += " ... [https://en.wikipedia.org/w/index.php?search=insource%%3A%%2F%s%%2Fi&ns0=1 find all]" % word_safe

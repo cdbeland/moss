@@ -7,6 +7,7 @@
 # P = Pattern of some kind (rhyme scheme, reduplication)
 # D = DNA sequence
 # N = Numbers or punctuation
+# H = HTML/XML/SGML tag
 # I = International (non-ASCII characters)
 
 from collections import defaultdict
@@ -17,9 +18,10 @@ from nltk.metrics import distance
 import re
 try:
     from sectionalizer import get_word
+    from wikitext_util import html_tag_re
 except ImportError:
     from .sectionalizer import get_word
-
+    from .wikitext_util import html_tag_re
 
 enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
 az_re = re.compile("^[a-z]+$", flags=re.I)
@@ -37,6 +39,16 @@ chem_re = re.compile(
     "propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
     "cyclo|poly|iso)")
 
+known_html_bad = ["<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
+                  "<tr>", "<td>", "<i>", "<em>", "<dd>", "<dt>",
+                  "<dl>", "<cite>", "<p>", "<strong>", "<b>", "<hr>",
+                  "<hr/>", "<font>", "</br>", "<center>", "<strike>",
+                  "<ins>", "<samp>", "<q>", "<wbr>", "<ruby>", "<rt>",
+                  "<rp>"]
+known_bad_link = ["<http>", "<https>", "<http/>", "<https/>", "<www>"]
+not_html = ["<a>", "<name>", "<r>", "<h>"]
+# <a> is not turned into a link by Mediawiki, so it's almost always
+# intentional like linguistics markup.
 
 # Note: This may malfunction slightly if there are commas inside the
 # chemical name.
@@ -150,6 +162,18 @@ def get_word_category(word):
             category = "TS"
         else:
             category = "N"
+    elif html_tag_re.match(word):
+        category = "H"
+        if word in known_bad_link:
+            category = "HL"
+        elif word in not_html:
+            category = "N"
+        elif word in known_html_bad:
+            category = "HB"
+        else:
+            word = word.replace("/", "")
+            if word in known_html_bad:
+                category = "HB"
     else:
         category = "I"
     return category

@@ -88,7 +88,7 @@ grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | grep 'wikt:.*\.'| perl -pe
 # Posting by-frequency instead, to avoid mixing in whitespace errors
 
 head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
-
+head -1000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -200 > beland-articles-most-typos-refined.txt
 
 # --- BY FREQUENCY ---
 
@@ -99,8 +99,23 @@ grep ^TS tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../ven
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
 grep -P '^(?!T1|TS|I|P|D|C)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
 
-grep -P "\[\[wikt:<" tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all | grep -v "<nowiki></" | head -200 > post-html-tags-by-freq.txt
-# Skip </xxx> tags because they duplicate <xxx> tags.
+echo "===Known bad HTML tags===" > beland-html-by-freq.txt
+grep ^HB tmp-words-with-articles.txt | perl -pe 's/^HB\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> beland-html-by-freq.txt
+
+echo >> beland-html-by-freq.txt
+echo "===Bad link formatting===" >> beland-html-by-freq.txt
+echo 'Angle brackets are not used for external links (per {{section link|Wikipedia:Manual of Style/Computing|Exposed_URLs}}); "tags" like <nowiki><https> and <www></nowiki> are actually just bad link formatting.' >> beland-html-by-freq.txt
+echo "See [[Wikipedia:External links#How to link]] for external link syntax; use {{tl|cite web}} for footnotes." >> beland-html-by-freq.txt
+grep ^HL tmp-words-with-articles.txt | perl -pe 's/^HL\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> beland-html-by-freq.txt
+
+echo >> beland-html-by-freq.txt
+echo "===Unsorted===" >> beland-html-by-freq.txt
+grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> beland-html-by-freq.txt
+
+# TODO: Search for bad attributes on HTML tags:
+#  https://en.wikipedia.org/wiki/Wikipedia:HTML_5#Table_attributes
+#  https://en.wikipedia.org/wiki/Wikipedia:HTML_5#Other_obsolete_attributes
+
 
 # Dealing with these types without posting, since they can all be
 # fixed in one sitting

@@ -3,6 +3,11 @@
 import re
 from string import punctuation
 import sys
+try:
+    from wikitext_util import html_tag_re
+except ImportError:
+    from .wikitext_util import html_tag_re
+
 
 print("Loading spellcheck dictionary...", file=sys.stderr)
 
@@ -43,7 +48,6 @@ for filename in [
 abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)
 html_entity_re = re.compile(r"&#?[a-zA-Z]+;")
-html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
 period_splice_re = re.compile(r"^[a-zA-Z]*[a-z]\.[A-Z][a-zA-Z]*$")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
@@ -409,6 +413,7 @@ prohibited_list = [
 ]
 
 # Treated as separate words by NLTK tokenizer
+# This is the whitelist!
 allowed_list = [
 
     # Legitimate English prose punctuation
@@ -432,6 +437,7 @@ allowed_list = [
     "</poem>",
     "<abbr>",
     "</abbr>",
+    "<mapframe/>",
 
     # Allowed HTML entities per
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Text_formatting#HTML_character_entity_references

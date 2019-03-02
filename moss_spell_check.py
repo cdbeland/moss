@@ -303,9 +303,16 @@ def spellcheck_all_langs(article_title, article_text):
         # markup on the same page to be ignored.
         if word_mixedcase == "<li>" and "<li value=" in article_text_orig:
             continue
+        if word_mixedcase == "<li>" and "<ol start=" in article_text_orig:
+            continue
         if word_mixedcase == "<ol>" and "<ol start=" in article_text_orig:
             continue
+
+        # TODO: In some situations this might actually be replaced
+        # with a streamlined wiki-style list, or footnote syntax.
         if word_mixedcase == "<ol>" and "<ol type=" in article_text_orig:
+            continue
+        if word_mixedcase == "<li>" and "<ol type=" in article_text_orig:
             continue
 
         # Word is misspelled, so...

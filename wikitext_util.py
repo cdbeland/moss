@@ -3,6 +3,9 @@
 import re
 
 
+html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
+
+
 def remove_structure_nested(string, open_string, close_string):
     # TODO: Write tests
     # Sample inputs and outputs:
@@ -109,6 +112,9 @@ early_substitutions = [
     (re.compile(r"{{circle}}", flags=re.I), "￼"),
     (re.compile(r"{{angle bracket\|(.*?)}}", flags=re.I), "⟨\1⟩"),
     (re.compile(r"{{beta letter}}", flags=re.I), "β"),
+
+    (re.compile(r"{{em\|(.*?)}}", flags=re.I), "$1"),
+    (re.compile(r"{{strong\|(.*?)}}", flags=re.I), "$1"),
 
     # ---
 
