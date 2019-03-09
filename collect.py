@@ -99,7 +99,12 @@ a specific typo.  Only typos that are very close to known words are
 shown. The algorithm is not perfect, so some of these may still be
 words that need to be added to Wiktionary. For each run, only words
 from half of the alphabet are shown, to avoid duplicate work from when
-new dumps are being processed.""")
+new dumps are being processed.
+
+Legitimate misspellings are candidates for [[Wikipedia:Lists of common misspellings]].
+If there is an obvious correction, adding that to
+[[Wikipedia:Lists of common misspellings/For machines]] will help
+editors who use automated tools to fix cases faster.""")
 print("")
 print(get_active_lines_from_file("tmp-most-common-edit1.txt", alpha_half_active, alpha_half_inactive))
 print("")
