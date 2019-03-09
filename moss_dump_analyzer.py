@@ -75,7 +75,7 @@ def changer_callback(article_text, article_title):
         print(''.join(diff).encode('utf8'))
 
 
-def make_changes(input_wikitext):
+def make_changes(input_wikitext, aggressive=False):
     segments = segmentize(input_wikitext)
     output_wikitext = ''
     edit_summaries = []
@@ -90,7 +90,7 @@ def make_changes(input_wikitext):
 
             if dialect == 'american':
                 # American and Canadian English = U.S.
-                new_wikitext = re.sub("USA", "U.S.", wikitext)
+                new_wikitext = re.sub(r"USA", "U.S.", wikitext)
                 if new_wikitext != wikitext:
                     change_count += 1
                     wikitext = new_wikitext
@@ -106,13 +106,12 @@ def make_changes(input_wikitext):
                 edit_summaries.append('“” -> " per [[Wikipedia:Manual of Style#Quotation_marks]]')
                 wikitext = new_wikitext
 
-            """
-            new_wikitext = re.sub(r"(?!'')'(\w+)(?!'')'(?!\w)", r'"\1"', wikitext)
-            if new_wikitext != wikitext:
-                 change_count += 1
-                 edit_summaries.append("' -> \" per [[Wikipedia:Manual of Style#Quotation_marks]]")
-                 wikitext = new_wikitext
-            """
+            if aggressive:
+                new_wikitext = re.sub(r"(?!')'(\w+)'(?!')(?!\w)", r'"\1"', wikitext)
+                if new_wikitext != wikitext:
+                    change_count += 1
+                    edit_summaries.append("' -> \" per [[Wikipedia:Manual of Style#Quotation_marks]]")
+                    wikitext = new_wikitext
 
         output_wikitext += wikitext
     edit_summary = "; ".join(edit_summaries)
