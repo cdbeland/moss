@@ -84,8 +84,14 @@ number_formats_allowed_re = re.compile(
                        base_number_format,
                        "|".join(prefixed_number_formats)))
 
-
+# This is the blacklist!
 prohibited_list = [
+
+    # Per [[MOS:BLOCKQUOTE]]
+    "{{cquote",
+    # This type of string must be protected from template removal (see
+    # early_substitutions and substitutions in wikitext_util)
+
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Text_formatting#HTML_character_entity_references
     # Use "..." instead
     "…",

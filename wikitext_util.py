@@ -116,6 +116,10 @@ early_substitutions = [
     (re.compile(r"{{em\|(.*?)}}", flags=re.I), "$1"),
     (re.compile(r"{{strong\|(.*?)}}", flags=re.I), "$1"),
 
+    # Templates that should survive template removal because they are
+    # on the prohibited_list
+    (re.compile(r"{{(cquote\|.*?)}}", flags=re.I), "⁅⁅$1⁆⁆"),
+
     # ---
 
     # Must happen before table removal to prevent [[aa|{{bb}}-cc]] being changed to "aacc"
@@ -291,6 +295,10 @@ substitutions = [
     (re.compile(r"(?<!^)(?<![=\n✂\}\]\|])\n(?![\n=\*:;✂ \|])"), r" "),
     (re.compile(r"\n\n+"), r"\n"),
     (re.compile(r"  +"), " "),
+
+    # Unprotect items that moss protected internally
+    (re.compile(r"⁅⁅"), "{{"),
+    (re.compile(r"⁆⁆"), "}}"),
 ]
 
 
