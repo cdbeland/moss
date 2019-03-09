@@ -24,14 +24,14 @@ except ImportError:
     from .wikitext_util import html_tag_re
 
 enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
-az_re = re.compile("^[a-z]+$", flags=re.I)
-az_plus_re = re.compile("^[a-z|\d|\-|\.]+$", flags=re.I)
-az_dot_re = re.compile("^[a-z]+\.[a-z]+$", flags=re.I)
-ag_re = re.compile("^[a-g]+$")
-mz_re = re.compile("[m-z]")
-dna_re = re.compile("^[acgt]+$")
+az_re = re.compile(r"^[a-z]+$", flags=re.I)
+az_plus_re = re.compile(r"^[a-z|\d|\-|\.]+$", flags=re.I)
+az_dot_re = re.compile(r"^[a-z]+\.[a-z]+$", flags=re.I)
+ag_re = re.compile(r"^[a-g]+$")
+mz_re = re.compile(r"[m-z]")
+dna_re = re.compile(r"^[acgt]+$")
 chem_re = re.compile(
-    "(\d+\-|"
+    r"(\d+\-|"
     "mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
     "methyl|phenyl|acetate|ene|ine|ane|ide|hydro|nyl|ate$|ium$|acetyl|"
     "gluco|aminyl|galacto|pyro|benz|brom|amino|fluor|glycer|cholester|ase$|"
@@ -49,6 +49,7 @@ known_bad_link = ["<http>", "<https>", "<http/>", "<https/>", "<www>"]
 not_html = ["<a>", "<name>", "<r>", "<h>"]
 # <a> is not turned into a link by Mediawiki, so it's almost always
 # intentional like linguistics markup.
+
 
 # Note: This may malfunction slightly if there are commas inside the
 # chemical name.

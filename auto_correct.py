@@ -12,13 +12,13 @@ from unencode_entities import fix_text
 from urllib import parse
 
 
-input_safe = sys.argv[1].replace("<", "\<")
-input_safe = input_safe.replace("/", "\/")
+input_safe = sys.argv[1].replace("<", "\\<")
+input_safe = input_safe.replace("/", "\\/")
 query = "insource:/%s/" % input_safe
 
 results = []
 if sys.argv[1].startswith("titles:"):
-    title_list = re.sub("^titles:", "", sys.argv[1])
+    title_list = re.sub(r"^titles:", "", sys.argv[1])
     title_list = title_list.replace(" ", "_")
     title_list = title_list.split(",")
     site = Site()

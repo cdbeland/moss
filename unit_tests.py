@@ -83,9 +83,9 @@ class SpellTest(unittest.TestCase):
         # May also return "uncertain", which is the wrong answer (but
         # evaluates to True)
         self.assertTrue(is_word_spelled_correctly("entirely-wet") is True)
-        self.assertTrue(is_word_spelled_correctly("jelly—otherwise" is True))
-        self.assertTrue(is_word_spelled_correctly("entirely-wet" is True))
-        self.assertTrue(is_word_spelled_correctly("Arabic-based" is True))
+        self.assertTrue(is_word_spelled_correctly("jelly—otherwise") is True)
+        self.assertTrue(is_word_spelled_correctly("entirely-wet") is True)
+        self.assertTrue(is_word_spelled_correctly("Arabic-based") is True)
 
     def test_unknown_html_tag(self):
         from .spell import is_word_spelled_correctly

@@ -3,7 +3,7 @@ import fileinput
 import re
 
 
-instance_re = re.compile("\* (\d+)")
+instance_re = re.compile(r"\* (\d+)")
 ratings_uniques = defaultdict(int)
 ratings_instances = defaultdict(int)
 

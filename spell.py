@@ -51,7 +51,7 @@ html_entity_re = re.compile(r"&#?[a-zA-Z]+;")
 period_splice_re = re.compile(r"^[a-zA-Z]*[a-z]\.[A-Z][a-zA-Z]*$")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
-base_number_format = "(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
+base_number_format = r"(\d{1,4}|\d{1,3},\d\d\d|\d{1,3},\d\d\d,\d\d\d)(\.\d+)?"
 # (possibly incomplete list)
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Decimals
 # says that "0.02" is generally favored over ".02" except for

@@ -17,7 +17,7 @@ alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
 alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
-find_word_re = re.compile(" - \[\[wikt:(.*?)\]\] - ")
+find_word_re = re.compile(r" - \[\[wikt:(.*?)\]\] - ")
 
 
 # --- HELPER FUNCTIONS ---

@@ -2,7 +2,7 @@ import fileinput
 import math
 import re
 
-number_re = re.compile("\* (\d+)")
+number_re = re.compile(r"\* (\d+)")
 count_by_number_of_things = {}
 
 

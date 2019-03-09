@@ -46,7 +46,7 @@ ignore_sections_re = re.compile(
     r").*$",
     flags=re.I + re.S)
 ignore_headers_re = re.compile("=[^\n]+=\n")
-line_starts_with_space_re = re.compile("\n [^\n]*\n")
+line_starts_with_space_re = re.compile(r"\n [^\n]*\n")
 
 
 mysql_connection = mysql.connector.connect(user='beland',
@@ -76,13 +76,13 @@ def generate_stats(plaintext):
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Numbers
 # Includes integers, decimal fractions, ratios
-number_pattern = "(\d+|\d+.\d+|\d+:\d)"
+number_pattern = r"(\d+|\d+.\d+|\d+:\d)"
 conforming_number_re = re.compile(r"^%s$" % number_pattern)
 ordinal_re = re.compile(r"^\d*(1st|2nd|3rd|4th|5th|6th|7th|8th|9th|0th)$")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
 currency_pattern = "|".join(closed_lexicon["CUR"])
-currency_pattern = currency_pattern.replace("$", "\$")
+currency_pattern = currency_pattern.replace("$", "\\$")
 conforming_currency_re = re.compile("^(%s)%s(M|bn)?$" % (currency_pattern, number_pattern))
 # M for million, bn for billion per
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
