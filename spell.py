@@ -21,6 +21,34 @@ punctuation_re = re.compile(r"[ " + punctuation + r"]")
 compound_separators_re = re.compile(r"[—–/\-]")
 #                                      emdash, endash, slash, hyphen
 
+
+def add_tokens(line):
+    line = line.strip().lower()
+
+    # Mostly splitting on " ", but also ":", etc.
+    [all_words.add(title_word)
+     for title_word
+     in punctuation_re.split(line)
+     if title_word]
+
+    # Re-parse splitting only on " " to make sure forms like
+    # "'s" get added (for compatibility with the NLTK
+    # tokenizer)
+    [all_words.add(title_word)
+     for title_word
+     in line.split(" ")
+     if title_word]
+
+
+with open("/bulk-wikipedia/moss", "r") as moss_html_file:
+    moss_html = moss_html_file.read()
+    moss_html = re.sub(r'^.*?(<h3><span class="mw-headline" id="For_Wiktionary">For Wiktionary.*?)<h3>.*$', r'\1', moss_html, flags=re.S)
+    queued_matches = re.findall('"https://en.wiktionary.org/wiki/(.*?)"', moss_html)
+    if not queued_matches:
+        raise Exception("Empty Wikitionary queue; regex broken?")
+    for queued_match in queued_matches:
+        add_tokens(queued_match)
+
 for filename in [
         "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
         "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
@@ -29,21 +57,7 @@ for filename in [
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
-            line = line.strip().lower()
-
-            # Mostly splitting on " ", but also ":", etc.
-            [all_words.add(title_word)
-             for title_word
-             in punctuation_re.split(line)
-             if title_word]
-
-            # Re-parse splitting only on " " to make sure forms like
-            # "'s" get added (for compatibility with the NLTK
-            # tokenizer)
-            [all_words.add(title_word)
-             for title_word
-             in line.split(" ")
-             if title_word]
+            add_tokens(line)
 
 abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)

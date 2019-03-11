@@ -7,6 +7,9 @@ cd /bulk-wikipedia/
 rm -f Wikispecies:Requested_articles
 wget https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
 
+rm -f moss
+wget https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
+
 rm -f enwiktionary-latest-page.sql
 wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-page.sql.gz
 gunzip enwiktionary-latest-page.sql
