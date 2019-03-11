@@ -1,8 +1,17 @@
 #!/usr/bin/bash
 
-# Download and uncompress time: About 3 hours
+# Download, sort, and uncompress time: About 4 hours
+
+rm -rf /bulk-wikipedia/all-wiktionaries
+mkdir /bulk-wikipedia/all-wiktionaries
+venv/bin/python3 download_all_wiktionaries.py
 
 cd /bulk-wikipedia/
+
+gunzip all-wiktionaries/*
+cat all-wiktionaries/* > /tmp/all-wik-concat
+sort --unique all-wiktionaries/* > titles_all_wiktionaries_uniq.txt
+# This sort takes about 1 hour
 
 rm -f Wikispecies:Requested_articles
 wget https://species.wikimedia.org/wiki/Wikispecies:Requested_articles

@@ -1,3 +1,4 @@
+# W = Found in a non-English Wikitionary
 # R = Regular word (a-z only)
 # T1, T2, etc. = Typo likely in regular word; number gives edit
 #                distance to nearest common dictionary word
@@ -39,16 +40,29 @@ chem_re = re.compile(
     "propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
     "cyclo|poly|iso)")
 
-known_html_bad = ["<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
+known_html_bad = {"<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
                   "<tr>", "<td>", "<i>", "<em>", "<dd>", "<dt>",
                   "<dl>", "<cite>", "<p>", "<strong>", "<b>", "<hr>",
                   "<hr/>", "<font>", "</br>", "<center>", "<strike>",
                   "<ins>", "<samp>", "<q>", "<wbr>", "<ruby>", "<rt>",
-                  "<rp>"]
-known_bad_link = ["<http>", "<https>", "<http/>", "<https/>", "<www>"]
-not_html = ["<a>", "<name>", "<r>", "<h>"]
+                  "<rp>"}
+known_bad_link = {"<http>", "<https>", "<http/>", "<https/>", "<www>"}
+not_html = {"<a>", "<name>", "<r>", "<h>"}
 # <a> is not turned into a link by Mediawiki, so it's almost always
 # intentional like linguistics markup.
+
+
+# Slow and probably unnecessary, since any words in multi-word phrases
+# should also be listed as individual words.
+#
+# from spell import punctuation_re
+#
+# titles_all_wiktionaries = set()
+# with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
+#     for word in [punctuation_re.split(line) for line in title_list]:
+#        titles_all_wiktionaries.add(word)
+with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
+    titles_all_wiktionaries = set([line.strip() for line in title_list])
 
 
 # Note: This may malfunction slightly if there are commas inside the
@@ -143,7 +157,9 @@ def near_common_word(word):
 
 def get_word_category(word):
     category = None
-    if az_plus_re.match(word):
+    if word in titles_all_wiktionaries:
+        category = "W"
+    elif az_plus_re.match(word):
         if dna_re.match(word):
             category = "D"
         elif is_chemistry_word(word):
