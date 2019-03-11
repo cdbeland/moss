@@ -18,6 +18,7 @@ alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
 find_word_re = re.compile(r" - \[\[wikt:(.*?)\]\] - ")
+find_word_html_re = re.compile(r" - <nowiki><(.*?)></nowiki> - ")
 
 
 # --- HELPER FUNCTIONS ---
@@ -63,8 +64,10 @@ def get_active_lines_from_file(filename, active_list, inactive_list, exclude_dot
         for line in lines:
             match = find_word_re.search(line)
             if not match:
+                match = find_word_html_re.search(line)
+            if not match:
                 print(line)
-                raise Exception("Could not extract word from line")
+                raise Exception("Could not extract word from line '%s'" % line)
             word = match.group(1)
             first_letter = word[0]
             if first_letter in inactive_list:
