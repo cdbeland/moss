@@ -99,7 +99,7 @@ number_formats_allowed_re = re.compile(
                        "|".join(prefixed_number_formats)))
 
 # This is the blacklist!
-prohibited_list = [
+prohibited_list = {
 
     # Per [[MOS:BLOCKQUOTE]]
     "{{cquote",
@@ -430,11 +430,11 @@ prohibited_list = [
 
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
     "₤",
-]
+}
 
 # Treated as separate words by NLTK tokenizer
 # This is the whitelist!
-allowed_list = [
+allowed_list = {
 
     # Legitimate English prose punctuation
     ",",
@@ -474,7 +474,7 @@ allowed_list = [
     # TODO: Handle general mathematical notation in HTML here or in
     # regexes.  (<math>...</math> text will be removed.)  See:
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Mathematics#Using_HTML
-]
+}
 
 
 print("Done.", file=sys.stderr)
@@ -509,9 +509,8 @@ def is_word_spelled_correctly(word_mixedcase):
     if number_formats_allowed_re.match(word_mixedcase):
         return True
 
-    for substring in prohibited_list:
-        if substring in word_mixedcase:
-            return False
+    if any(substring in word_mixedcase for substring in prohibited_list):
+        return False
 
     # Possessive: NLTK parses e.g. "'s" as a separate word, which
     # Wikitionary has listed.
@@ -544,7 +543,7 @@ def is_word_spelled_correctly(word_mixedcase):
     if len(word_parts_mixedcase) > 1:
         result_list = [is_word_spelled_correctly(word_part) for word_part in word_parts_mixedcase]
 
-        # Results may be mixed (like "incorrrect-correct-Aaagjior"
+        # Results may be mixed (like "misspellledword-the-Captializedword"
         # would produce [False, True, "uncertain"]) so return the
         # "worst" value from the list.
         if False in result_list:
