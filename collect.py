@@ -61,7 +61,11 @@ def get_active_lines_from_file(filename, active_list, inactive_list, exclude_dot
     output = ""
     with open(filename, "r") as lines:
         for line in lines:
-            word = find_word_re.search(line).group(1)
+            match = find_word_re.search(line)
+            if not match:
+                print(line)
+                raise Exception("Could not extract word from line")
+            word = match.group(1)
             first_letter = word[0]
             if first_letter in inactive_list:
                 continue
