@@ -40,8 +40,8 @@ ignore_sections_re = re.compile(
     r"==\s*Sources\s*==|"
     r"==\s*Publications\s*==|"
     r"==\s*Filmography\s*==|"
-    r"==\s*Works\s*=="
-    r"==\s*Compositions\s*=="
+    r"==\s*Works\s*==|"
+    r"==\s*Compositions\s*==|"
     r"==\s*Recordings\s*=="
     r").*$",
     flags=re.I + re.S)
