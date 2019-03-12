@@ -9,6 +9,8 @@
 # D = DNA sequence
 # N = Numbers or punctuation
 # H = HTML/XML/SGML tag
+# HB = Known bad HTML tag, like <font>
+# HL = Bad HTML-like linking, like <http://...>
 # I = International (non-ASCII characters)
 
 from collections import defaultdict
