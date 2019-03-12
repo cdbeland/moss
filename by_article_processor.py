@@ -2,6 +2,18 @@ import fileinput
 from word_categorizer import get_word_category
 
 
+def get_word_categories_cached(word_list):
+    # This is to speed up categorization for articles with multiple
+    # typos that hare actually just the same word (which happens a
+    # lot)
+    word_lookup = {
+        word: get_word_category(word)
+        for word in set(word_list)
+    }
+    category_list = [word_lookup[word] for word in word_list]
+    return ",".join(category_list)
+
+
 for line in fileinput.input("-"):
     line = line.strip()
     columns = line.split("\t")
@@ -12,7 +24,7 @@ for line in fileinput.input("-"):
     word_list_linked = ""
     if num_typos:
         word_list = columns[3].split(" ")
-        category = ",".join([get_word_category(word) for word in word_list])
+        category = get_word_categories_cached(word_list)
         word_list_linked = ", ".join("[[wikt:%s]]" % word for word in word_list)
 
     article_link = article_title

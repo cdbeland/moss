@@ -3,6 +3,7 @@
 import re
 from string import punctuation
 import sys
+from lru import LRU
 try:
     from wikitext_util import html_tag_re
 except ImportError:
@@ -480,12 +481,26 @@ allowed_list = {
 print("Done.", file=sys.stderr)
 
 
+cached_answers = LRU(10000)
+
+
 # Returns True, False, or "uncertain"
 def is_word_spelled_correctly(word_mixedcase):
 
     if not word_mixedcase:
         return True
 
+    # For speed.  Should work well because in most articles the same
+    # words are used several times, and English has a small number of
+    # highly used words across all articles.
+    if word_mixedcase in cached_answers:
+        return cached_answers[word_mixedcase]
+    answer = _is_word_spelled_correctly_impl(word_mixedcase)
+    cached_answers[word_mixedcase] = answer
+    return answer
+
+
+def _is_word_spelled_correctly_impl(word_mixedcase):
     if word_mixedcase.lower() in all_words:
         return True
 

@@ -1,5 +1,7 @@
 flake8
 lxml
+lru-dict
+# Requires: sudo dnf install python3-devel
 mysql-connector-python
 nltk
 nose
