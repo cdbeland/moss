@@ -64,25 +64,44 @@ grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | grep 'wikt:.*\.'| perl -pe
 # * grep -P "^T[12S](,T[12S])*\t" tmp-articles-linked-words.txt | grep T2 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit2.txt
 # * grep -P "^T[123S](,T[123S])*\t" tmp-articles-linked-words.txt | grep T3 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit3.txt
 #
-# * Enhance word_categorizer.py or moss_spell_check.py to look at all
-#   Wiktionaries and only leave words that don't appear in any
-#   language's dictionary (though all should appear in the English
-#   dictionary of all languages).  Possibly produce lists of untagged
-#   words by language, so people interested in those languages can go
-#   tag the English articles?  Produce most-common lists for English
-#   Wikipedia definition writers.
-# * If this is too expensive, try:
-#   * T1/T2/T3 mixed in with all other T#, segratating the higher T#s,
-#     starting with articles with the lowest number of typos?
-#   * (T4 are hardly ever misspellings, don't post those)
+# Dealing with the remaining pile of typos:
+# * Mark valid mechanistic transliterations as IT and TT; these would
+#   not be eligible for Wiktionary.  (Will reduce R and T4+.)
+#   Probably want to make a separate step that runs at download time
+#   that makes a file of transliterated forms for spell.py to load.
+#    https://en.wikipedia.org/wiki/List_of_ISO_romanizations
+#    https://en.wikipedia.org/wiki/Romanization
+# * Refine "I" category to distinguish between human-language words
+#   (IW) and scientific notation and other characters (IS).  spell.py
+#   should generally be enhanced to ignore IS that complies with the
+#   Manual of Style.
+# * Post lists of words in other Wiktionaries missing from the English
+#   Wiktionary (W)
+# * Look at IW words and see what's left
+#   * May need to separate IW into those that are and aren't 1 edit
+#     away from a non-English word, and post IWT1 probable
+#     misspellings, non-English
+#   * May need to replace ispell hack for English, anyway?
+#   * Post IW probable new words, non-English
+#   * R and T4+ mixed in article with IW or IT are probably
+#     non-English; include these in lists, and update stats.
+# * Post T1/T2/T3 mixed in with all other T#, segregating the higher
+#   T#s, starting with articles with the lowest number of typos? (T4
+#   are hardly ever misspellings, don't post those)
+# * Some legit English T1s are marked as W or TT, recover those and
+#   post a list for people to sort them out.  Might help to have an
+#   English-only spell check list.
+# * Post lists of valid but untagged transliterations (IT) by script
+# * Post lists of in-Wiktionary but untagged words by language, so
+#   people interested in those languages can go tag the English
+#   articles (need to add language classifier)
 # Also helps stats a lot:
 # * Tagging articles for {{cleanup HTML}} from the appropriate report
 # * Tagging articles with the most misspelled words with:
-#   {{cleanup |reason=Need to use {{tl|lang}} to tag non-English words so screen readers and automated spell check will work}}
+#   {{cleanup |reason=Need to use {{tl|lang}} to tag non-English words for consistent formatting, screen readers, and automated spell checkers}}
 #   (probably the top 3000 or so articles with the most misspellings,
 #   down to about 20 or so, though there are many mixed in at lower
 #   frequencies)
-
 
 # grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-compound.txt
 # Posting by-frequency instead, to avoid mixing in whitespace errors
