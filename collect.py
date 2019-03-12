@@ -15,6 +15,7 @@ import re
 # By-frequency lists swap which half of the alphabet they suppress
 alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
 alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+other_active = True
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
 find_word_re = re.compile(r" - \[\[wikt:(.*?)\]\] - ")
@@ -73,7 +74,8 @@ def get_active_lines_from_file(filename, active_list, inactive_list, exclude_dot
             if first_letter in inactive_list:
                 continue
             if first_letter not in active_list:
-                raise Exception('Unexpected character "%s" in "%s"' % (first_letter, word))
+                if not other_active:
+                    continue
             if exclude_dot and "." in word:
                 continue
             output += line
