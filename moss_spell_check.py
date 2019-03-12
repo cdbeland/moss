@@ -104,6 +104,9 @@ def spellcheck_all_langs(article_title, article_text):
         print("S\tSKIPPING - list with requested species\t%s" % article_title)
         return
 
+    article_text_orig = article_text
+    article_text = wikitext_to_plaintext(article_text)
+
     # This can break wikitext_to_plaintext() in ways that cause wiki
     # syntax to be mistaken for prose.
     starters = start_template_re.findall(article_text)
@@ -111,9 +114,6 @@ def spellcheck_all_langs(article_title, article_text):
     if len(starters) != len(enders):
         print("!\t* [[%s]] - Mismatched {{ }}; try [https://tools.wmflabs.org/bracketbot/cgi-bin/find.py bracketbot]" % article_title)
         return
-
-    article_text_orig = article_text
-    article_text = wikitext_to_plaintext(article_text)
 
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Dashes
     # requires that emdashes be unspaced.
