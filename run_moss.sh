@@ -71,6 +71,14 @@ grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | grep 'wikt:.*\.'| perl -pe
 #   that makes a file of transliterated forms for spell.py to load.
 #    https://en.wikipedia.org/wiki/List_of_ISO_romanizations
 #    https://en.wikipedia.org/wiki/Romanization
+# * Refine "N" category:
+#   * Valid word + hyphen + invalid word - probably a typo especially
+#     if the invalid one is T1.  Maybe classify both sides?
+#   * Chemistry words with hypens
+#   * Chemistry words with hypens and numbers
+#   * Other words with numbers (need to manually {{not a typo}})
+#   * Remainders (sounding outs, non-English words?)
+
 # * Refine "I" category to distinguish between human-language words
 #   (IW) and scientific notation and other characters (IS).  spell.py
 #   should generally be enhanced to ignore IS that complies with the
@@ -141,7 +149,8 @@ grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/p
 # Dealing with these types without posting, since they can all be
 # fixed in one sitting
 grep ^P tmp-words-with-articles.txt | perl -pe 's/^P\t//' > beland-pattern-by-freq.txt
-grep ^D tmp-words-with-articles.txt | perl -pe 's/^P\t//' > beland-dna-by-freq.txt
+grep ^D tmp-words-with-articles.txt | perl -pe 's/^D\t//' > beland-dna-by-freq.txt
+grep ^N tmp-words-with-articles.txt | perl -pe 's/^N\t//'| grep -vP 'wikt:[\w-]+\]' > beland-punct-weirdness-by-freq.txt
 
 grep ^I tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 > tmp-words-with-articles-truncated.txt
 cat tmp-words-with-articles-truncated.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-misspellings-intl.txt
