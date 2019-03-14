@@ -399,6 +399,13 @@ def save_sample_articles():
 # --- GRAMMAR-MAKING HACK ---
 
 
+def fetch_parts_of_speech(word):
+    # Returns a LIST of parts of speech
+    word_categories = fetch_categories(word)
+    pos_list = [enwiktionary_cat_to_pos.get(category_name) for category_name in word_categories]
+    return [pos for pos in pos_list if pos]
+
+
 def fetch_categories(word):
     if not word:
         return []
@@ -453,11 +460,7 @@ def load_grammar_for_text(text):
         if word in vocab_overrides:
             word_pos_set = vocab_overrides[word]
         else:
-            word_categories = fetch_categories(word)
-            for category_name in word_categories:
-                new_pos = enwiktionary_cat_to_pos.get(category_name)
-                if new_pos:
-                    word_pos_set.add(new_pos)
+            [word_pos_set.add(pos) for pos in fetch_parts_of_speech(word)]
 
         if word_pos_set:
             word_to_pos[word] = list(word_pos_set)
