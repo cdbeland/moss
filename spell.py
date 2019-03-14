@@ -51,10 +51,10 @@ with open("/bulk-wikipedia/moss", "r") as moss_html_file:
         add_tokens(queued_match)
 
 for filename in [
-        "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
-        "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
-        "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
-        "/bulk-wikipedia/Wikispecies:Requested_articles",
+    "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
+    "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
+    "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
+    "/bulk-wikipedia/Wikispecies:Requested_articles",
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
@@ -524,6 +524,9 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
     if number_formats_allowed_re.match(word_mixedcase):
         return True
 
+    if is_science_expression(word_mixedcase):
+        return True
+
     if any(substring in word_mixedcase for substring in prohibited_list):
         return False
 
@@ -592,3 +595,41 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
         return "uncertain"
 
     return False
+
+
+numerator_words = {
+    "m³",
+    "km³",
+    "ft³",
+    "µg",
+    "g",
+    "l",
+    "µmol",
+    "people",  # Not persons
+    "inhabitants",  # Not inhab, hab
+    "kwh",
+    "cells",
+}
+
+demoninator_words = {
+    "m",
+    "m²",
+    "km²",
+    "cm³",
+    "mi²",
+    "µl",
+    "ml",  # or mL??
+    "dl",  # not dL?
+    "g",
+    "kg",
+    "s",
+    "second",
+    "day",
+    "year",
+}
+
+
+def is_science_expression(word):
+    parts = word.split("/")
+    if len(parts) == 2 and parts[0] in numerator_words and parts[1] in demoninator_words:
+        return True
