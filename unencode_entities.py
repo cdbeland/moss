@@ -6,7 +6,7 @@ import sys
 alert = [
     "™", "©", "®",
     "Ⅰ", "Ⅱ", "ⅰ", "ⅱ",
-    "¼", "½", "¾", "&frasl;"
+    "¼", "½", "¾", "&frasl;",
     "¹", "⁺", "ⁿ", "₁", "₊", "ₙ",
 
     # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
