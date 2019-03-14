@@ -5,6 +5,7 @@
 rm -rf /bulk-wikipedia/all-wiktionaries
 mkdir /bulk-wikipedia/all-wiktionaries
 venv/bin/python3 download_all_wiktionaries.py
+venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
 
 cd /bulk-wikipedia/
 
