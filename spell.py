@@ -6,9 +6,10 @@ import sys
 from lru import LRU
 try:
     from wikitext_util import html_tag_re
+    from unencode_entities import entities_re
 except ImportError:
     from .wikitext_util import html_tag_re
-
+    from .unencode_entities import entities_re
 
 print("Loading spellcheck dictionary...", file=sys.stderr)
 
@@ -62,7 +63,6 @@ for filename in [
 
 abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)
-html_entity_re = re.compile(r"&#?[a-zA-Z]+;")
 period_splice_re = re.compile(r"^[a-zA-Z]*[a-z]\.[A-Z][a-zA-Z]*$")
 
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Delimiting_.28grouping_of_digits.29
@@ -132,7 +132,6 @@ prohibited_list = {
     "⅝",
     "⅞",
     "⅟",
-    "&frasl;",
     "⁄",  # U+2044
     # Use <sup> and <sub> instead of Unicode subscripts and superscripts
     "²",
@@ -424,11 +423,6 @@ prohibited_list = {
     # horbar
     "―",
 
-    # Unnecessary whitespace
-    "&ensp;",
-    "&emsp;",
-    "&zwj;",
-
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
     "₤",
 }
@@ -459,18 +453,6 @@ allowed_list = {
     "<abbr>",
     "</abbr>",
     "<mapframe/>",
-
-    # Allowed HTML entities per
-    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Text_formatting#HTML_character_entity_references
-    # (May want to comment these out occasionaly and make sure the
-    # uses are legitimate, or convert some or all to <nowiki>?)
-    "&amp;",
-    "&lt;",
-    "&gt;",
-    "&#91;",
-    "&#93;",
-    "&apos;",
-    "&zwnj;",
 
     # TODO: Handle general mathematical notation in HTML here or in
     # regexes.  (<math>...</math> text will be removed.)  See:
@@ -507,14 +489,10 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
     if word_mixedcase in allowed_list:
         return True
 
-    if html_entity_re.match(word_mixedcase):
-        # Allowed HTML-escaped characters should have been converted
-        # to a real UTF-8 character in a previous phase of processing.
-        # If they have not, this is a sign that the rule for this
-        # particular character either isn't coded into moss or that it
-        # was violated by the wikitext.  Either way, it's an error
-        # that needs to be fixed.
-        return False
+    if entities_re.match(word_mixedcase):
+        # HTML entities show up in the entities report, and that looks
+        # at sections ignored by spell check.
+        return True
 
     if html_tag_re.match(word_mixedcase):
         # HTML tags should be whitelisted if allowed in wikitext, or

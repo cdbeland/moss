@@ -2,10 +2,9 @@
 
 from moss_dump_analyzer import read_en_article_text
 import re
-from unencode_entities import alert, keep, controversial, transform, greek_letters, find_char_num
+from unencode_entities import alert, keep, controversial, transform, greek_letters, find_char_num, entities_re
 
 
-entities_re = re.compile("&#?[a-zA-Z0-9]+;")
 alerts_found = {}
 controversial_found = {}
 uncontroversial_found = {}

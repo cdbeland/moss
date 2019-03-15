@@ -2,6 +2,10 @@ import fileinput
 import re
 import sys
 
+
+entities_re = re.compile(r"&#?[a-zA-Z0-9]+;")
+
+
 # Manual transformation probably required
 alert = [
     "™", "©", "®",
