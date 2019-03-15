@@ -1,12 +1,13 @@
 #!/usr/bin/bash
 
-# Download, sort, and uncompress time: About 4 hours
+# Download, extract, sort, and uncompress time: About 5 hours
 
 rm -rf /bulk-wikipedia/all-wiktionaries
 mkdir /bulk-wikipedia/all-wiktionaries
 venv/bin/python3 download_all_wiktionaries.py
 venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
 
+ORIG_DIR=`pwd`
 cd /bulk-wikipedia/
 
 gunzip all-wiktionaries/*
@@ -79,3 +80,7 @@ echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mysql -D enwikti
 # Query OK, 0 rows affected (5 min 27.56 sec)         
 echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D enwiktionary
 # Query OK, 0 rows affected (5 min 49.56 sec)         
+
+cd $ORIG_DIR
+venv/bin/python3 extract_english.py > /bulk-wikipedia/english_words_only.txt
+# extract_english.py takes about 40 minutes
