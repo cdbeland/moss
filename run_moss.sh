@@ -42,7 +42,7 @@ grep '^!' tmp-output.txt | perl -pe 's/.*?\t//' | sort > post-parse-failures.txt
 echo "Beginning word categorization run 2"
 echo `date`
 
-# Run time for this line: ~2h 23m
+# Run time for this line: ~3h
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---

@@ -1,17 +1,31 @@
-# W = Found in a non-English Wikitionary
-# R = Regular word (a-z only)
+# Probably a typo:
+#
+# H = HTML/XML/SGML tag
+# HB = Known bad HTML tag, like <font>
+# HL = Bad HTML-like linking, like <http://...>
 # T1, T2, etc. = Typo likely in regular word; number gives edit
 #                distance to nearest common dictionary word
 # TS = Typo likely in regular word; probably two words that need to be
 #      split by space or dash
+#
+# Probably OK:
+#
 # C = Chemistry
-# P = Pattern of some kind (rhyme scheme, reduplication)
 # D = DNA sequence
-# N = Numbers or punctuation
-# H = HTML/XML/SGML tag
-# HB = Known bad HTML tag, like <font>
-# HL = Bad HTML-like linking, like <http://...>
+# P = Pattern of some kind (rhyme scheme, reduplication)
+# W = Found in a non-English Wikitionary
+# L = Probable Romanization (transLiteration)
+# M = Probable coMpound
+# ME = Probable coMpound, English in English Wiktionary
+# MI = Probable coMpound, non-English (International) in English Wiktionary
+# MW = Probable coMpound, found in non-English Wiktionary
+# MT = Probable coMpound, Transliteration
+#
+# Relatively unsorted:
+#
+# R = Regular word (a-z only)
 # I = International (non-ASCII characters)
+# N = Numbers or punctuation
 
 from collections import defaultdict
 import difflib
@@ -19,6 +33,7 @@ import enchant
 import fileinput
 from nltk.metrics import distance
 import re
+import sys
 try:
     from sectionalizer import get_word
     from wikitext_util import html_tag_re
@@ -54,17 +69,27 @@ not_html = {"<a>", "<name>", "<r>", "<h>"}
 # intentional like linguistics markup.
 
 
-# Slow and probably unnecessary, since any words in multi-word phrases
-# should also be listed as individual words.
-#
-# from spell import punctuation_re
-#
-# titles_all_wiktionaries = set()
-# with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
-#     for word in [punctuation_re.split(line) for line in title_list]:
-#        titles_all_wiktionaries.add(word)
+# Any words in multi-word phrases should also be listed as individual
+# words, so don't bother tokenizing.  TODO: Drop multi-word phrases
+# (at list creation time?) since these won't be matched anyway.
+print("Loading all languages...", file=sys.stderr)
 with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
     titles_all_wiktionaries = set([line.strip() for line in title_list])
+
+print("Loading transliterations...", file=sys.stderr)
+with open("/bulk-wikipedia/transliterations.txt", "r") as title_list:
+    transliterations = set([line.strip().split("\t")[1] for line in title_list
+                            if "\t" in line.strip() and "_" not in line])
+
+print("Loading English Wiktionary...", file=sys.stderr)
+with open("/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0", "r") as title_list:
+    english_wiktionary = set([line.strip() for line in title_list if "_" not in line])
+
+print("Loading English words only...", file=sys.stderr)
+with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
+    english_words = set([line.strip() for line in title_list])
+
+print("Done loading.", file=sys.stderr)
 
 
 # Note: This may malfunction slightly if there are commas inside the
@@ -146,7 +171,10 @@ def near_common_word(word):
     if close_matches:
         if " " in close_matches[0] or "-" in close_matches[0]:
             return "S"
-        return distance.edit_distance(word, close_matches[0], transpositions=True)
+        this_distance = distance.edit_distance(word, close_matches[0], transpositions=True)
+        if this_distance <= 3:
+            # 4 and greater is fairly useless
+            return this_distance
     return False
 # Other spell check and spelling suggestion libraries:
 # https://textblob.readthedocs.io/en/dev/quickstart.html#spelling-correction
@@ -157,22 +185,58 @@ def near_common_word(word):
 # https://github.com/wolfgarbe/SymSpell
 
 
+def is_compound(word):
+    parts = word.split("-")
+    if len(parts) > 1:
+        if all(part in english_words for part in parts):
+            return "ME"
+        if all(part in english_wiktionary for part in parts):
+            return "MI"
+        if all(part in titles_all_wiktionaries for part in parts):
+            return "MW"
+        if all(part in transliterations for part in parts):
+            return "ML"
+        return False
+
+    pairs = [(word[0:i], word[i:]) for i in range(1, len(word))]
+    for (cat_letter, dictionary) in [("E", english_words),
+                                     ("I", english_wiktionary),
+                                     ("W", titles_all_wiktionaries),
+                                     ("T", transliterations)]:
+        for pair in pairs:
+            if pair[0] in dictionary and pair[1] in dictionary:
+                return "M" + cat_letter
+
+    return False
+
+
 def get_word_category(word):
     category = None
+
+    # Words in English Wiktionary (presumably including all known
+    # English words) are ignored by the spell checker, so no need to
+    # categorize words in english_words and english_wiktionary.
     if word in titles_all_wiktionaries:
-        category = "W"
-    elif az_plus_re.match(word):
-        if dna_re.match(word):
-            category = "D"
-        elif is_chemistry_word(word):
-            category = "C"
-        elif is_rhyme_scheme(word):
-            category = "P"
-        elif az_re.match(word):
+        return "W"
+
+    compound_cat = is_compound(word)
+
+    if az_plus_re.match(word):
+        if az_re.match(word):
             edit_distance = near_common_word(word)
             if edit_distance:
                 # Possibly TS
                 category = "T" + str(edit_distance)
+            elif word in transliterations:
+                category = "L"
+            elif compound_cat:
+                category = compound_cat
+            elif dna_re.match(word):
+                category = "D"
+            elif is_chemistry_word(word):
+                category = "C"
+            elif is_rhyme_scheme(word):
+                category = "P"
             else:
                 category = "R"
         elif az_dot_re.match(word):
@@ -194,7 +258,8 @@ def get_word_category(word):
             if word in known_html_bad:
                 category = "HB"
     else:
-        category = "I"
+        category = compound_cat or "I"
+
     return category
 
 
