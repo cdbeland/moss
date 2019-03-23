@@ -15,11 +15,11 @@
 # P = Pattern of some kind (rhyme scheme, reduplication)
 # W = Found in a non-English Wikitionary
 # L = Probable Romanization (transLiteration)
-# M = Probable coMpound
 # ME = Probable coMpound, English in English Wiktionary
 # MI = Probable coMpound, non-English (International) in English Wiktionary
 # MW = Probable coMpound, found in non-English Wiktionary
-# MT = Probable coMpound, Transliteration
+# ML = Probable coMpound, transLiteration
+# U = URL or computer file name
 #
 # Relatively unsorted:
 #
@@ -44,7 +44,7 @@ except ImportError:
 enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
 az_re = re.compile(r"^[a-z]+$", flags=re.I)
 az_plus_re = re.compile(r"^[a-z|\d|\-|\.]+$", flags=re.I)
-az_dot_re = re.compile(r"^[a-z]+\.[a-z]+$", flags=re.I)
+az_dot_re = re.compile(r"^[a-z]+(\-[a-z]+)?\.[a-z]+(\-[a-z]+)?$", flags=re.I)
 ag_re = re.compile(r"^[a-g]+$")
 mz_re = re.compile(r"[m-z]")
 dna_re = re.compile(r"^[acgt]+$")
@@ -106,6 +106,36 @@ def is_chemistry_word(word):
         return True
     return False
 
+
+def is_url(word):
+    if word.startswith("www."):
+        return True
+    if word.endswith(".org"):
+        return True
+    if word.endswith(".net"):
+        return True
+    if word.endswith(".int"):
+        return True
+    if word.endswith(".edu"):
+        return True
+    if word.endswith(".gov"):
+        return True
+    if word.endswith(".mil"):
+        return True
+    if word.endswith(".arpa"):
+        return True
+    if word.endswith(".co.uk"):
+        return True
+    if word.endswith(".de"):
+        return True
+    if word.endswith(".jp"):
+        return True
+    if word.endswith(".ru"):
+        return True
+    if word.endswith(".txt"):
+        return True
+    if word.endswith(".jar"):
+        return True
 
 def letters_introduced_alphabetically(word):
     # One of the distinctive characteristics of a rhyme scheme, at
@@ -202,7 +232,7 @@ def is_compound(word):
     for (cat_letter, dictionary) in [("E", english_words),
                                      ("I", english_wiktionary),
                                      ("W", titles_all_wiktionaries),
-                                     ("T", transliterations)]:
+                                     ("L", transliterations)]:
         for pair in pairs:
             if pair[0] in dictionary and pair[1] in dictionary:
                 return "M" + cat_letter
@@ -218,6 +248,9 @@ def get_word_category(word):
     # categorize words in english_words and english_wiktionary.
     if word in titles_all_wiktionaries:
         return "W"
+
+    if is_url(word):
+        return "U"
 
     compound_cat = is_compound(word)
 
