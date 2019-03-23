@@ -182,6 +182,11 @@ echo `date`
 
 ../venv/bin/python3 ../collect.py > collected_by_article_and_freq.txt
 
+# --- ARTICLES THAT NEED {{copyedit}} ---
+
+grep -v "I," tmp-articles-linked-words.txt | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* 0 -" | grep -v "* 1 -" | grep -v "* 2 -" > post-copyedit.txt
+
+
 # --- BY WORD LENGTH ---
 
 echo "Beginning by-length post-processing"
