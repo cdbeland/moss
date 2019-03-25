@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+set -e
+
 # Download, extract, sort, and uncompress time: About 5 hours
 
 rm -rf /bulk-wikipedia/all-wiktionaries
