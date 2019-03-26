@@ -4,18 +4,27 @@ set -e
 
 # Download, extract, sort, and uncompress time: About 5 hours
 
+echo `date`
+
 rm -rf /bulk-wikipedia/all-wiktionaries
 mkdir /bulk-wikipedia/all-wiktionaries
 venv/bin/python3 download_all_wiktionaries.py
-venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
+
+echo `date`
+echo "Uncompressing and sorting..."
 
 ORIG_DIR=`pwd`
 cd /bulk-wikipedia/
-
 gunzip all-wiktionaries/*
-cat all-wiktionaries/* > /tmp/all-wik-concat
 sort --unique all-wiktionaries/* > titles_all_wiktionaries_uniq.txt
 # This sort takes about 1 hour
+
+cd $ORIG_DIR
+echo `date`
+echo "Transliterating..."
+venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
+# Takes about a minute, as of commit 58e9e2
+cd /bulk-wikipedia/
 
 rm -f Wikispecies:Requested_articles
 wget https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
@@ -55,12 +64,18 @@ bunzip2 enwiki-latest-pages-articles-multistream.xml.bz2
 #  CREATE DATABASE enwiktionary;
 #  GRANT ALL PRIVILEGES ON enwiktionary TO 'beland'@'localhost' WITH GRANT OPTION;
 
-
+echo `date`
+echo "Loading enwiktionary-latest-categorylinks.sql..."
 cat enwiktionary-latest-categorylinks.sql | mysql -D enwiktionary
 # Load time: About 1 hour 10 minutes
 
+echo `date`
+echo "Loading enwiktionary-latest-page.sql..."
 cat enwiktionary-latest-page.sql | mysql -D enwiktionary
 # Load time: About 25 minutes
+
+echo `date`
+echo "Building page_categories table..."
 
 echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiktionary
 echo "CREATE TABLE page_categories (
@@ -84,5 +99,6 @@ echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D e
 # Query OK, 0 rows affected (5 min 49.56 sec)         
 
 cd $ORIG_DIR
+echo `date`
 venv/bin/python3 extract_english.py > /bulk-wikipedia/english_words_only.txt
 # extract_english.py takes about 40 minutes
