@@ -184,7 +184,7 @@ echo `date`
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
-grep -v "I," tmp-articles-linked-words.txt | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* 0 -" | grep -v "* 1 -" | grep -v "* 2 -" > post-copyedit.txt
+grep -v "I," tmp-articles-linked-words.txt | grep -v "U," | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* 0 -" | grep -v "* 1 -" | grep -v "* 2 -" > post-copyedit.txt
 
 
 # --- BY WORD LENGTH ---
