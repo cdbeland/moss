@@ -848,3 +848,26 @@ enwiktionary_cat_to_pos = {
 # English_verbs_with_base_form_identical_to_past_participle
 # English_verbs_with_placeholder_it
 # English_verbs_with_weak_preterite_but_strong_past_participle
+
+"""
+BOOK: https://www.amazon.com/Cambridge-Grammar-English-Language/dp/0521431468
+
+
+** TRY PARSING EVERYTHING WITH ONLY THE MOST COMMON POS FOR THAT WORD!
+-> for speed on correct sentences!
+https://en.wikipedia.org/wiki/Part-of-speech_tagging#Use_of_hidden_Markov_models
+-> says this is 90%+ accurate
+-> Can fall back to an all-possibilities parse
+
+Systems:
+* What moss uses from Wiktionary
+* http://universaldependencies.org/u/feat/index.html
+  separate from features: http://universaldependencies.org/u/feat/index.html
+  (used by spaCy's dependency parser)
+* https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+* https://en.wikipedia.org/wiki/Brown_Corpus#Part-of-speech_tags_used
+* More: https://en.wikipedia.org/wiki/Template:Corpus_linguistics
+
+https://en.wikipedia.org/wiki/Part-of-speech_tagging#Tag_sets
+-> 50 to 150 POSes are typical, over 1000 possible
+"""
