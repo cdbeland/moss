@@ -102,6 +102,10 @@ number_formats_allowed_re = re.compile(
 # This is the blacklist!
 prohibited_list = {
 
+    # Most of the time (experimental!)
+    "manned",
+    "unmanned",
+
     # Per [[MOS:BLOCKQUOTE]]
     "{{cquote",
     # This type of string must be protected from template removal (see
