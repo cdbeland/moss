@@ -137,6 +137,7 @@ def is_url(word):
     if word.endswith(".jar"):
         return True
 
+
 def letters_introduced_alphabetically(word):
     # One of the distinctive characteristics of a rhyme scheme, at
     # least for the first stanza, is that letters are used in
