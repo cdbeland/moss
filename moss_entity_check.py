@@ -15,6 +15,14 @@ unknown_numerical_high = {}
 non_entity_transform = [string for string in transform.keys() if not string.startswith("&")]
 worst_articles = {}
 
+article_blacklist = [
+    "Arabic diacritics",
+    "Bracket",  # Characters themselves are discussed
+    "Arabic script in Unicode",  # objection from Mahmudmasri
+    "Perso-Arabic Script Code for Information Interchange",
+    # https://en.wikipedia.org/w/index.php?title=Perso-Arabic_Script_Code_for_Information_Interchange&oldid=prev&diff=900347984&diffmode=source]
+]
+
 
 def add_safely(value, key, dictionary):
     existing_list = dictionary.get(key, [])
@@ -24,6 +32,9 @@ def add_safely(value, key, dictionary):
 
 
 def entity_check(article_title, article_text):
+
+    if article_title in article_blacklist:
+        return
 
     for string in alert:
         for instance in re.findall(string, article_text):
@@ -74,7 +85,7 @@ def entity_check(article_title, article_text):
 
 def dump_dict(section_title, dictionary):
     print("=== %s ===" % section_title)
-    sorted_items = sorted(dictionary.items(), key=lambda t: len(t[1]), reverse=True)
+    sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
     for (key, article_list) in sorted_items[0:50]:
         article_set = set(article_list)
         print("* %s/%s - %s - %s" % (
