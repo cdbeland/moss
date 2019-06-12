@@ -162,6 +162,14 @@ transform_unsafe = {
     # making a dash is easier.
     "&#124;": "-",
 
+    # These are usually spurious, per [[MOS:TMRULES]]
+    "&trade;": "",  # ™
+    "&reg;": "",  # ®
+    "&copy;": "",  # ©
+    "™": "",
+    "®": "",
+    "©": "",
+
     # Normalizing quote marks
     "‘": "'",
     "&lsquo;": "'",
@@ -222,9 +230,6 @@ transform = {
     "&#061;": "=",
     "&#037;": "%",
     "&quot;": '"',
-    "&trade;": "™",
-    "&copy;": "©",
-    "&reg;": "®",
 
     # "&lt;": "<",
     # "&gt;": ">",
@@ -252,6 +257,7 @@ transform = {
     "&Aacute;": "Á",
     "&aacute;": "á",
     "&acirc;": "â",
+    "&Acirc;": "Â",
     "&Agrave;": "À",
     "&agrave;": "à",
     "&Aring;": "Å",
@@ -338,9 +344,31 @@ transform = {
     "&#8212;": "—",   # emdash
     "&#X2014;": "—",  # emdash
 
-    # Broken
-    "&ccedi;": "ç",  # Typo on page
+    # Broken (typo on page)
+    "&ccedi;": "ç",
     "&Amp;": "&amp;",
+    "&6nbsp;": "&nbsp;",
+    "&Ndash;": "&ndash;",
+    "&nybsp;": "&nbsp;",
+    "&nbsop;": "&nbsp;",
+    "&ndsah;": "&ndash;",
+    "&ndaash;": "&ndash;",
+    "&ndsh;": "&ndash;",
+    "&nfash;": "&ndash;",
+    "&nbbsp;": "&nbsp;",
+    "&nhdash;": "&ndash;",
+    "&19ndash;": "&ndash;",
+    "&nsah;": "&ndash;",
+    "&nnbsp;": "&nbsp;",
+    "&NDASH;": "&ndash;",
+    "&mbsp;": "&nbsp;",
+    "&nadsh;": "&ndash;",
+    "&nash;": "&ndash;",
+    "&nbdash;": "&ndash;",
+    "&nsbp;": "&nbsp;",
+    "&uumml;": "&uuml;",
+    "&bsp;": "&nbsp;",
+    "&Quot;": '"',
 }
 
 greek_letters = {
