@@ -222,6 +222,7 @@ substitutions = [
     (re.compile(r"<code>.*?</code>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<chem>.*?</chem>", flags=re.I+re.S), ""),
     (re.compile(r"<score>.*?</score>", flags=re.I+re.S), ""),
+    (re.compile(r"<graph>.*?</graph>", flags=re.I+re.S), ""),
     (re.compile(r"<pre>.*?</pre>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<var>.*?</var>", flags=re.I+re.S), ""),
     (re.compile(r"<hiero>.*?</hiero>", flags=re.I+re.S), ""),
