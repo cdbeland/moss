@@ -67,11 +67,14 @@ keep = [
     "&lang;",   # 〈
     "&rang;",   # 〉
 
-    # Often unsafe to change
-    "&#x7C;",
-    "&#x007C;",
-    "&#x005B;",
-    "&#x005D;",
+    # Would otherwise break markup
+    "&lt;",    # <
+    "&gt;",    # >
+    "&#91;",   # [
+    "&#93;",   # ]
+    "&vert;",  # |
+    "&#123;",  # {
+    "&#125;",  # }
 ]
 
 controversial = {
@@ -88,7 +91,6 @@ controversial = {
     "&cap;": "∩",
     "&cup;": "∪",
     "&oplus;": "⊕",
-    "&plusmn;": "±",
     "&ne;": "≠",
     "&sube;": "⊆",
     "&not;": "¬",
@@ -99,10 +101,10 @@ controversial = {
     "&perp;": "⊥",
     "&alefsym;": "ℵ",
     "&isin;": "∈",
-    "&le;": "≤",
+    "&le;": "≤",  # available at the bottom of the wikitext edit window
     "&fnof;": "ƒ",
     "&infin;": "∞",
-    "&ge;": "≥",
+    "&ge;": "≥",  # available at the bottom of the wikitext edit window
     "&lowast;": "∗",
     "&cong;": "≅",
     "&weierp;": "℘",
@@ -133,13 +135,28 @@ transform_unsafe = {
     "¼": "{{frac|1|4}}",
     "½": "{{frac|1|2}}",
     "¾": "{{frac|3|4}}",
+    "&frac12": "{{frac|1|2}}",
+    "&frac14": "{{frac|1|4}}",
+    "&frac16": "{{frac|1|6}}",
+    "&frac34": "{{frac|3|4}}",
     "…": "...",
     "&hellip;": "...",
 
-    # Often breaks markup
-    "&#91;": "[",
-    "&#93;": "]",
-    "&#x7C;": "|",
+    # Often breaks wiki markup
+    # "&#91;": "[",
+    # "&#93;": "]",
+    "&#x005B;": "&#91;",
+    "&#x005D;": "&#93;",
+    "&#x091;": "&#91;",
+    "&#x093;": "&#93;",
+    "&#x5B;": "&#91;",
+    "&#x5D;": "&#93;",
+    "&#x7C;": "&vert;",
+    "&#x007C;": "&vert;",
+    "&#x3C;": "&lt;",
+    "&#x003C;": "&lt;",
+    "&#x3E;": "&gt;",
+    "&#x003E;": "&gt;",
 
     # This is a pipe, but usually happens in URL titles, in which case
     # making a dash is easier.
@@ -193,13 +210,13 @@ transform = {
 
     "&#0033;": "!",
     "&#0047;": "/",
-    "&#005B": "[",
+    "&#005B;": "&#91;",  # [
     "&#005C;": "\\",
-    "&#0060": "<",
+    "&#0060;": "&lt;",
     "&#0061;": "=",
-    "&#0062;": "<",
-    "&#0093": "]",
-    "&#0124;": "|",
+    "&#0062;": "&lt;",
+    "&#0093;": "&#93;",  # ]
+    "&#0124;": "&#124;",  # |
 
     "&#043;": "+",
     "&#061;": "=",
@@ -209,8 +226,8 @@ transform = {
     "&copy;": "©",
     "&reg;": "®",
 
-    "&lt;": "<",
-    "&gt;": ">",
+    # "&lt;": "<",
+    # "&gt;": ">",
     "&apos;": "'",
 
     # Common symbols, to change outside of math/science articles
@@ -229,6 +246,7 @@ transform = {
     "&spades;": "♠",
     "&deg;": "°",
     "&oline;": "‾",
+    "&plusmn;": "±",
 
     # Latin and Germanic letters
     "&Aacute;": "Á",
@@ -434,7 +452,8 @@ def fix_text(text, transform_greek=False):
         character = find_char(unknown_entity)
         if character:
             new_text = new_text.replace(unknown_entity, character)
-        print("unknown entity: %s  character: %s" % (unknown_entity, character))
+        print("unknown entity: %s  character: %s" % (unknown_entity, character),
+              file=sys.stderr)
 
     return new_text
 
