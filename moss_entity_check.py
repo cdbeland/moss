@@ -16,8 +16,11 @@ non_entity_transform = [string for string in transform.keys() if not string.star
 worst_articles = {}
 
 article_blacklist = [
+    # Characters themselves are discussed
+    "' (disambiguation)",
+    "Bracket",
+
     "Arabic diacritics",
-    "Bracket",  # Characters themselves are discussed
     "Arabic script in Unicode",  # objection from Mahmudmasri
     "Perso-Arabic Script Code for Information Interchange",
     # https://en.wikipedia.org/w/index.php?title=Perso-Arabic_Script_Code_for_Information_Interchange&oldid=prev&diff=900347984&diffmode=source]
