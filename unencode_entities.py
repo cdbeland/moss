@@ -53,6 +53,10 @@ keep = [
     "&amp;",  # dangerous for e.g. &amp;126;
     "&c;",    # Almost all are in archaic quotations and titles
 
+    # Should be excluded by <source> etc.
+    # "&a;",    # Used in computer articles as example of a pointer
+    # "&x;",    # Used in computer articles as example of a pointer
+
     # Allowed for math notation only
     "&prime;", "′", "&Prime;", "″",
 
@@ -75,6 +79,14 @@ keep = [
     "&vert;",  # |
     "&#123;",  # {
     "&#125;",  # }
+    # TODO: Maybe these should be converted to <nowiki>[</nowiki> etc.?
+
+    # https://en.wikipedia.org/wiki/Zero-width_non-joiner Used in
+    # German, Arabic, Hebrew, etc.  Sometimes abused to fix wikitext
+    # markup issues, but would require manual review to determine
+    # that.  TODO: Automate ignoring situations where this is inside
+    # {{lang}}.
+    "&zwnj;",
 ]
 
 controversial = {
@@ -161,6 +173,8 @@ transform_unsafe = {
     # This is a pipe, but usually happens in URL titles, in which case
     # making a dash is easier.
     "&#124;": "-",
+    # If a pipe character is needed, use {{!}}
+    # https://www.mediawiki.org/wiki/Help:Magic_words#Other
 
     # These are usually spurious, per [[MOS:TMRULES]]
     "&trade;": "",  # ™
@@ -191,13 +205,19 @@ transform_unsafe = {
     "&#8216;": "'",   # ‘ -> '
     "&#8217;": "'",   # ’ -> '
 
+    # NOT SURE THIS IS A GOOD IDEA.
     # Per [[MOS:CONFORM]]
-    "« ": '"',
-    " »": '"',
-    "«": '"',
-    "»": '"',
-    "&raquo;": '"',
-    "&laquo;": '"',
+    # "« ": '"',
+    # " »": '"',
+    # "«": '"',
+    # "»": '"',
+    # "&raquo;": '"',
+    # "&laquo;": '"',
+    #
+    # At least normalize to characters instead of HTML entities; there
+    # are 70k+ pages with « or », so those can be ignored for now.
+    "&laquo;" "«",
+    "&laquo;" "»",
 }
 
 # Automatically change, with the expectation there will be a
@@ -221,7 +241,7 @@ transform = {
     "&#005B;": "&#91;",  # [
     "&#005C;": "\\",
     "&#0060;": "&lt;",
-    "&#0061;": "=",
+    "&#0061;": "=",  # Will break markup inside templates
     "&#0062;": "&lt;",
     "&#0093;": "&#93;",  # ]
     "&#0124;": "&#124;",  # |
@@ -229,11 +249,17 @@ transform = {
     "&#043;": "+",
     "&#061;": "=",
     "&#037;": "%",
+
+    "&apos;": "'",
+    "&#8216;": "'",
+    "&#8217;": "'",
+
     "&quot;": '"',
+    "&#8220;": '"',
+    "&#8221;": '"',
 
     # "&lt;": "<",
     # "&gt;": ">",
-    "&apos;": "'",
 
     # Common symbols, to change outside of math/science articles
     "&iquest;": "¿",
@@ -289,6 +315,8 @@ transform = {
     "&ograve;": "ò",
     "&Oslash;": "Ø",
     "&oslash;": "ø",
+    "&otilde;": "õ",
+    "&Otilde;": "Õ",
     "&Ouml;": "Ö",
     "&ouml;": "ö",
     "&#X14D;": "ō",
