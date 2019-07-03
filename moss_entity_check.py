@@ -2,6 +2,7 @@
 
 from moss_dump_analyzer import read_en_article_text
 import re
+import unicodedata
 from unencode_entities import alert, keep, controversial, transform, greek_letters, find_char_num, entities_re, fix_text
 
 alerts_found = {}
@@ -10,7 +11,7 @@ uncontroversial_found = {}
 greek_letters_found = {}
 unknown_found = {}
 unknown_numerical_latin = {}
-unknown_numerical_low = {}
+unknown_numerical_med = {}
 unknown_numerical_high = {}
 non_entity_transform = [string for string in transform.keys() if not string.startswith("&")]
 worst_articles = {}
@@ -19,6 +20,11 @@ article_blacklist = [
     # Characters themselves are discussed
     "' (disambiguation)",
     "Bracket",
+    "Grave accent",
+    "ISO 5426",
+    "ISO 5428",
+    "Mojibake",
+    "List of Unicode characters",
 
     "Arabic diacritics",
     "Arabic script in Unicode",  # objection from Mahmudmasri
@@ -34,10 +40,21 @@ def add_safely(value, key, dictionary):
     return dictionary
 
 
+suppression_patterns = [
+    re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I+re.S),
+    re.compile(r"<source.*?</source>", flags=re.I+re.S),
+    re.compile(r"<code.*?</code>", flags=re.I+re.S),
+    re.compile(r"{{code\s*\|.*?}}", flags=re.I+re.S),
+]
+
+
 def entity_check(article_title, article_text):
 
     if article_title in article_blacklist:
         return
+
+    for pattern in suppression_patterns:
+        article_text = pattern.sub("", article_text)
 
     for string in alert:
         for instance in re.findall(string, article_text):
@@ -73,10 +90,13 @@ def entity_check(article_title, article_text):
         else:
             value = find_char_num(entity)
             if value:
-                if int(value) < 592:      # x0250
+                if unicodedata.combining(chr(value)):
+                    # Combining characters are too difficult to edit as themselves
+                    continue
+                elif int(value) < 592:      # x0250
                     add_safely(article_title, entity, unknown_numerical_latin)
                 elif int(value) < 12288:  # x3000
-                    add_safely(article_title, entity, unknown_numerical_low)
+                    add_safely(article_title, entity, unknown_numerical_med)
                 else:
                     add_safely(article_title, entity, unknown_numerical_high)
             else:
@@ -95,7 +115,7 @@ def dump_dict(section_title, dictionary):
             len(article_list),
             len(article_set),
             key,
-            ", ".join(["[[%s]]" % article for article in sorted(article_set)])
+            ", ".join(["[[%s]]" % article for article in sorted(article_set)][0:500])
             ))
 
 
@@ -103,36 +123,19 @@ def extract_entities(dictionary):
     return {entity for entity in dictionary.keys()}
 
 
-def dump_results():
-    sections = {
-        "Worst articles": worst_articles,
-        "Controversial entities": controversial_found,
-        "Greek letters": greek_letters_found,
-        "To avoid": alerts_found,
-        "Uncontroversial entities": uncontroversial_found,
-        "Unknown": unknown_found,
-        "Unknown numerical: Latin range": unknown_numerical_latin,
-        "Unknown low numerical": unknown_numerical_low,
-        "Unknown high numerical": unknown_numerical_high,
-    }
-    for (section_title, dictionary) in sections.items():
-        dump_dict(section_title, dictionary)
+def extract_articles(dictionary):
+    articles = set()
+    for article_list in dictionary.values():
+        # Skip articles that only have very common characters or
+        # entities that will need to be dealt with by a real bot
+        # someday.
+        if len(article_list) < 500:
+            articles.update(article_list)
+    return articles
 
-    print("= REGEXES FOR JWB =")
-    bad_entities = set()
-    for dictionary in [alerts_found, uncontroversial_found,
-                       unknown_found, unknown_numerical_latin, unknown_numerical_low,
-                       unknown_numerical_high]:
-        bad_entities.update(extract_entities(dictionary))
 
+def dump_for_jwb(bad_entities):
     for entity in sorted(bad_entities):
-        # Skip tens of thousands of CJK and other characters, just to
-        # keep the size of the config file reasonable (use
-        # auto_correct.py to fix these en masse until the number is
-        # reasonable again)
-        if re.match("&#x?[1-9a-fA-F][0-9a-fA-F]{3,5}", entity):
-            continue
-
         fixed_entity = fix_text(entity)
         if '"' == fixed_entity:
             fixed_entity = '\"'
@@ -146,6 +149,49 @@ def dump_results():
                 entity,
                 fixed_entity,
             ))
+
+
+def dump_results():
+    sections = {
+        "Worst articles": worst_articles,
+        "Controversial entities": controversial_found,
+        "Greek letters": greek_letters_found,
+        "To avoid": alerts_found,
+        "Uncontroversial entities": uncontroversial_found,
+        "Unknown": unknown_found,
+        "Unknown numerical: Latin range": unknown_numerical_latin,
+        "Unknown med numerical": unknown_numerical_med,
+        "Unknown high numerical": unknown_numerical_high,
+    }
+    for (section_title, dictionary) in sections.items():
+        dump_dict(section_title, dictionary)
+
+    print("= REGEXES FOR JWB - LOW =")
+    bad_entities = set()
+    for dictionary in [alerts_found, uncontroversial_found,
+                       unknown_found, unknown_numerical_latin]:
+        bad_entities.update(extract_entities(dictionary))
+    dump_for_jwb(bad_entities)
+
+    print("= ARTICLES FOR JWB - LOW =")
+
+    articles = set()
+    for dictionary in [alerts_found, uncontroversial_found,
+                       unknown_found, unknown_numerical_latin]:
+        articles.update(extract_articles(dictionary))
+    print("\n".join(sorted(articles)))
+
+    print("= REGEXES FOR JWB - MED =")
+    dump_for_jwb(extract_entities(unknown_numerical_med))
+
+    print("= ARTICLES FOR JWB - MED =")
+    print("\n".join(sorted(extract_articles(unknown_numerical_med))))
+
+    print("= REGEXES FOR JWB - HIGH =")
+    dump_for_jwb(extract_entities(unknown_numerical_high))
+
+    print("= ARTICLES FOR JWB - HIGH =")
+    print("\n".join(sorted(extract_articles(unknown_numerical_high))))
 
 
 read_en_article_text(entity_check)
