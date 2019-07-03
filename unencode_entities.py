@@ -216,13 +216,19 @@ transform_unsafe = {
     #
     # At least normalize to characters instead of HTML entities; there
     # are 70k+ pages with « or », so those can be ignored for now.
-    "&laquo;" "«",
-    "&laquo;" "»",
+    "&laquo;": "«",
+    "&raquo;": "»",
 }
 
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+
+    "&#x9": "&tab;",
+    "&#9": "&tab;",
+    "&#09": "&tab;",
+    "&#x09": "&tab;",
+    "&#x0009": "&tab;",
 
     # Per [[MOS:FRAC]]
     "&frac12;": "{{frac|1|2}}",
