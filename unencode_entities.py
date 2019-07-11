@@ -1,7 +1,16 @@
 import fileinput
 import re
 import sys
+import unicodedata
 
+# To make a string of all whitespace characters in Unicode:
+# s = ''.join(chr(c) for c in range(sys.maxunicode+1))
+# ws = ''.join(re.findall(r'\s', s))
+# https://stackoverflow.com/questions/37903317/is-there-a-python-constant-for-unicode-whitespace
+
+# To separate out control characters from printable and whitespace
+# characters, see the General Category attribute and subcategories:
+# http://www.unicode.org/versions/Unicode11.0.0/ch04.pdf#G91002
 
 entities_re = re.compile(r"&#?[a-zA-Z0-9]+;")
 
@@ -76,8 +85,8 @@ keep = [
     "&gt;",    # >
     "&#91;",   # [
     "&#93;",   # ]
-    "&vert;",  # |
     "&#123;",  # {
+    "&#124;",  # |  &vert; doesn't work
     "&#125;",  # }
     # TODO: Maybe these should be converted to <nowiki>[</nowiki> etc.?
 
@@ -154,21 +163,9 @@ transform_unsafe = {
     "…": "...",
     "&hellip;": "...",
 
-    # Often breaks wiki markup
+    # These often break wiki markup
     # "&#91;": "[",
     # "&#93;": "]",
-    "&#x005B;": "&#91;",
-    "&#x005D;": "&#93;",
-    "&#x091;": "&#91;",
-    "&#x093;": "&#93;",
-    "&#x5B;": "&#91;",
-    "&#x5D;": "&#93;",
-    "&#x7C;": "&vert;",
-    "&#x007C;": "&vert;",
-    "&#x3C;": "&lt;",
-    "&#x003C;": "&lt;",
-    "&#x3E;": "&gt;",
-    "&#x003E;": "&gt;",
 
     # This is a pipe, but usually happens in URL titles, in which case
     # making a dash is easier.
@@ -218,23 +215,97 @@ transform_unsafe = {
     # are 70k+ pages with « or », so those can be ignored for now.
     "&laquo;": "«",
     "&raquo;": "»",
+
+    "&ensp;": " ",
+    "&emsp;": " ",
+    "&emsp13;": " ",
+    "&emsp14;": " ",
+    "&thinsp;": " ",
+    "&numsp;": " ",
+    "&puncsp;": " ",
+    "&hairsp;": " ",
+    "&MediumSpace;": " ",
+
+    "&zwj;": "",
+    "&zwnj;": "",
 }
 
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+    "&#x2000;": "&ensp;",
+    "&#8192;": "&ensp;",
+    "&#x2002;": "&ensp;",
+    "&#8194;": "&ensp;",
+    "&#x2001;": "&emsp;",
+    "&#8193;": "&emsp;",
+    "&#x2003;": "&emsp;",
+    "&#8195;": "&emsp;",
 
-    "&#x9": "&tab;",
-    "&#9": "&tab;",
-    "&#09": "&tab;",
-    "&#x09": "&tab;",
-    "&#x0009": "&tab;",
+    "&#x2004;": "&emsp13;",
+    "&#8196;": "&emsp13;",
+    "&#x2005;": "&emsp14;",
+    "&#8127;": "&emsp14;",
+    "&#x2006;": "&thinsp;",
+    "&#8198;": "&thinsp;",
+    "&#x2007;": "&numsp;",
+    "&#8199;": "&numsp;",
+    "&#2008x;": "&puncsp;",
+    "&#8200;": "&puncsp;",
+    "&#x2009;": "&thinsp;",
+    "&#8201;": "&thinsp;",
+    "&#x200A;": "&hairsp;",
+    "&#8202;": "&hairsp;",
+    "&#x205F;": "&MediumSpace;",
+    "&#8287;": "&MediumSpace;",
+    "&#x200B;": "&zwsp;",
+    "&#8203;": "&zwsp;",
+    "&#x200C;": "&zwnj;",
+    "&#8204;": "&zwnj;",
+    "&#x200D;": "&zwj;",
+    "&#8205;": "&zwj;",
+    "&#x2060;": "&NoBreak;",
+    "&#8288;": "&NoBreak;",
+    "&#xFEFF;": "",
+    "&#65279;": "",
 
-    # Per [[MOS:FRAC]]
-    "&frac12;": "{{frac|1|2}}",
-    "&frac14;": "{{frac|1|4}}",
-    "&frac34;": "{{frac|3|4}}",
-    "&frac16;": "{{frac|1|6}}",
+    "&#x005B;": "&#91;",
+    "&#x005D;": "&#93;",
+    "&#091;": "&#91;",
+    "&#093;": "&#93;",
+    "&#0091;": "&#91;",
+    "&#0093;": "&#93;",
+    "&#x5B;": "&#91;",
+    "&#x5D;": "&#93;",
+    "&#x7C;": "&#124;",  # |
+    "&#x007C;": "&#124;",  # |
+    "&#0124;": "&#124;",  # |
+    "&#x3C;": "&lt;",
+    "&#x003C;": "&lt;",
+    "&#x3E;": "&gt;",
+    "&#x003E;": "&gt;",
+    "&#60;": "&lt;",
+    "&#060;": "&lt;",
+    "&#0060;": "&lt;",
+    "&#61;": "=",  # Will break markup inside templates
+    "&#061;": "=",  # Will break markup inside templates
+    "&#0061;": "=",  # Will break markup inside templates
+    "&#62;": "&gt;",
+    "&#062;": "&gt;",
+    "&#0062;": "&gt;",
+    "&#093;": "&#93;",  # ]
+    "&#0093;": "&#93;",  # ]
+
+    "&#160;": "&nbsp;",
+    "&#xA0;": "&nbsp;",
+    "&#x0A0;": "&nbsp;",
+    "&#x00A0;": "&nbsp;",
+
+    "&#x9;": "&tab;",
+    "&#9;": "&tab;",
+    "&#09;": "&tab;",
+    "&#x09;": "&tab;",
+    "&#x0009;": "&tab;",
 
     "&permil;": "‰",
 
@@ -244,16 +315,9 @@ transform = {
 
     "&#0033;": "!",
     "&#0047;": "/",
-    "&#005B;": "&#91;",  # [
     "&#005C;": "\\",
-    "&#0060;": "&lt;",
-    "&#0061;": "=",  # Will break markup inside templates
-    "&#0062;": "&lt;",
-    "&#0093;": "&#93;",  # ]
-    "&#0124;": "&#124;",  # |
 
     "&#043;": "+",
-    "&#061;": "=",
     "&#037;": "%",
 
     "&apos;": "'",
@@ -497,12 +561,14 @@ def fix_text(text, transform_greek=False):
     for (from_string, to_string) in conversion_dict.items():
         new_text = new_text.replace(from_string, to_string)
 
+    """
     for string in alert:
         if string in new_text:
             with_context_re = re.compile(r".{0,10}%s.{0,10}" % string)
             with_context_results = with_context_re.findall(text)
             print("FOUND BAD CHARACTER IN TEXT: %s" % " ".join(with_context_results),
                   file=sys.stderr)
+    """
 
     test_string = new_text
     for string in keep:
@@ -512,10 +578,10 @@ def fix_text(text, transform_greek=False):
             test_string = test_string.replace(string, "")
     for unknown_entity in re.findall("&#?[a-zA-Z0-9]+;", test_string):
         character = find_char(unknown_entity)
-        if character:
+        if character and not unicodedata.combining(character):
             new_text = new_text.replace(unknown_entity, character)
-        print("unknown entity: %s  character: %s" % (unknown_entity, character),
-              file=sys.stderr)
+        # print("unknown entity: %s  character: %s" % (unknown_entity, character),
+        #       file=sys.stderr)
 
     return new_text
 
