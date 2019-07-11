@@ -4,6 +4,9 @@
 #  &egrave;   (will do a search)
 #  titles:Article A, Article B   (will tee up fixes for all these articles)
 
+# Put --safe as the last argument for use by unencode_entities.py, if
+# desired.
+
 from pywikibot import pagegenerators, Page, Site
 import re
 from subprocess import call
