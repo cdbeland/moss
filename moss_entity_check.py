@@ -30,6 +30,7 @@ article_blacklist = [
     "Arabic script in Unicode",  # objection from Mahmudmasri
     "Perso-Arabic Script Code for Information Interchange",
     # https://en.wikipedia.org/w/index.php?title=Perso-Arabic_Script_Code_for_Information_Interchange&oldid=prev&diff=900347984&diffmode=source]
+    "Yiddish orthography",
 ]
 
 
@@ -49,7 +50,6 @@ suppression_patterns = [
 
 
 def entity_check(article_title, article_text):
-
     if article_title in article_blacklist:
         return
 
@@ -134,21 +134,29 @@ def extract_articles(dictionary):
     return articles
 
 
-def dump_for_jwb(bad_entities):
+def dump_for_jwb(pulldown_name, bad_entities):
+
+    output_string = '{"%s":' % pulldown_name
+    output_string += """{"string":{"articleList":"","summary":"convert HTML entities, punctuation","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":false,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n"""
+
     for entity in sorted(bad_entities):
         fixed_entity = fix_text(entity)
         if '"' == fixed_entity:
-            fixed_entity = '\"'
+            fixed_entity = r'\"'
         if fixed_entity == "\\":
             fixed_entity = "\\\\"
+        if fixed_entity == "\n":
+            fixed_entity = "\\n"
         if fixed_entity in ["\r", "\t", "", ""]:
-            continue
+            fixed_entity == " "
 
         if entity != fixed_entity:
-            print('{"replaceText":"%s","replaceWith":"%s","useRegex":true,"regexFlags":"g","ignoreNowiki":true},' % (
+            output_string += '{"replaceText":"%s","replaceWith":"%s","useRegex":true,"regexFlags":"g","ignoreNowiki":true},\n' % (
                 entity,
-                fixed_entity,
-            ))
+                fixed_entity)
+    output_string = output_string.rstrip.(",")
+    output_string += "]}}"
+    print(output_string)
 
 
 def dump_results():
@@ -171,7 +179,7 @@ def dump_results():
     for dictionary in [alerts_found, uncontroversial_found,
                        unknown_found, unknown_numerical_latin]:
         bad_entities.update(extract_entities(dictionary))
-    dump_for_jwb(bad_entities)
+    dump_for_jwb("low", bad_entities)
 
     print("= ARTICLES FOR JWB - LOW =")
 
@@ -182,13 +190,13 @@ def dump_results():
     print("\n".join(sorted(articles)))
 
     print("= REGEXES FOR JWB - MED =")
-    dump_for_jwb(extract_entities(unknown_numerical_med))
+    dump_for_jwb("med", extract_entities(unknown_numerical_med))
 
     print("= ARTICLES FOR JWB - MED =")
     print("\n".join(sorted(extract_articles(unknown_numerical_med))))
 
     print("= REGEXES FOR JWB - HIGH =")
-    dump_for_jwb(extract_entities(unknown_numerical_high))
+    dump_for_jwb("high", extract_entities(unknown_numerical_high))
 
     print("= ARTICLES FOR JWB - HIGH =")
     print("\n".join(sorted(extract_articles(unknown_numerical_high))))
