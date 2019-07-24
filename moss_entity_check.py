@@ -177,13 +177,14 @@ def dump_results():
     for (section_title, dictionary) in sections.items():
         dump_dict(section_title, dictionary)
 
-    with open("jwb-low.json") as lowj:
-        print("= REGEXES FOR JWB - LOW =", file=lowj)
+    with open("jwb-combo.json") as comboj:
+        print("= REGEXES FOR JWB - LOW =", file=comboj)
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
-                           unknown_found, unknown_numerical_latin]:
+                           unknown_found, unknown_numerical_latin,
+                           unknown_numerical_high]:
             bad_entities.update(extract_entities(dictionary))
-            dump_for_jwb("low", bad_entities, file=lowj)
+            dump_for_jwb("low", bad_entities, file=comboj)
 
     with open("jwb-articles-low.txt") as lowa:
         print("= ARTICLES FOR JWB - LOW =", file=lowa)
@@ -201,10 +202,6 @@ def dump_results():
     with open("jwb-articles-med.txt") as meda:
         print("= ARTICLES FOR JWB - MED =", file=meda)
         print("\n".join(sorted(extract_articles(unknown_numerical_med))), file=meda)
-
-    with open("jwb-high.json") as highj:
-        print("= REGEXES FOR JWB - HIGH =", file=highj)
-        dump_for_jwb("high", extract_entities(unknown_numerical_high), file=highj)
 
     with open("jwb-article.txt") as higha:
         print("= ARTICLES FOR JWB - HIGH =", file=higha)
