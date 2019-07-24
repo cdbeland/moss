@@ -13,7 +13,8 @@ import unicodedata
 # http://www.unicode.org/versions/Unicode11.0.0/ch04.pdf#G91002
 
 entities_re = re.compile(r"&#?[a-zA-Z0-9]+;")
-
+variant_selectors_re = re.compile(r"^&#x(FF0.|E01..|180B|180C|180D);$")
+# https://en.wikipedia.org/wiki/Variant_form_(Unicode)
 
 # Manual transformation probably required
 alert = [
@@ -43,6 +44,7 @@ alert = [
     "`", "&#96;",
 
     # Convert to straight quotes per [[MOS:CONFORM]]
+    # but NOT in foreign-language internal text
     "‹", "&lsaquo;", "›", "&rsaquo;",
     "«", "&lsaquo;", "»", "&rsaquo;",
 
@@ -59,6 +61,9 @@ alert = [
 
 # Ignore these if seen in articles
 keep = [
+    "ʻ",  # ʻOkina U+02BB. Wrong if used as apostrophe but OK in
+          # Hawaiian and maybe other languages.
+
     "&amp;",  # dangerous for e.g. &amp;126;
     "&c;",    # Almost all are in archaic quotations and titles
 
@@ -72,6 +77,20 @@ keep = [
     # Definitely confusing, keep forever
     "&ndash;", "&mdash;", "&minus;", "&shy;",
     "&nbsp;", "&lrm;", "&rlm;",
+
+    # Directionality controls
+    "&#x200E;",
+    "&#x200F;",
+    "&#x061C;",
+    "&#x202A;",
+    "&#x202B;",
+    "&#x202C;",
+    "&#x202D;",
+    "&#x202E;",
+    "&#x2066;",
+    "&#x2067;",
+    "&#x2068;",
+    "&#x2069;",
 
     # Definitely confusing, probably keep forever
     "&times;",  # ×
@@ -96,6 +115,29 @@ keep = [
     # that.  TODO: Automate ignoring situations where this is inside
     # {{lang}}.
     "&zwnj;",
+
+    "&#x1F610;",   # Emoji presentation selector, non-printing
+
+    # Combining characters, apparently unlabelled
+    "&#x114c1;",
+    "&#x114bf;",
+    "&#x114be;",
+    "&#x114bd;",
+    "&#x114bc;",
+    "&#x114bb;",
+    "&#x114ba;",
+    "&#x114b9;",
+    "&#x114b8;",
+    "&#x114b7;",
+    "&#x114b6;",
+    "&#x114b5;",
+    "&#x114b4;",
+    "&#x114b3;",
+    "&#x114b2;",
+    "&#x114b1;",
+    "&#x114b0;",
+
+    "ʾ",  # U+02BE Modifier Letter Right Half Ring - Hebrew, Arabic letter
 ]
 
 controversial = {
@@ -152,15 +194,24 @@ transform_unsafe = {
     # These transformations can't be made in places where the
     # character itself is being discussed.
 
+    "⋅": "-",
+    "&#x2010;": "-",  # Hyphen
+    "&#x2027;": "-",  # Hyphenation point
+    "‐": "-",         # U+2010 Hyphen to ASCII
+    "&#8209;": "-",   # U+2011 Non-breaking hyphen
+    "&#2027;": "&middot;",  # Changing from hyphenation point to middot
+
     # Per [[MOS:FRAC]]
     "¼": "{{frac|1|4}}",
     "½": "{{frac|1|2}}",
     "¾": "{{frac|3|4}}",
-    "&frac12": "{{frac|1|2}}",
-    "&frac14": "{{frac|1|4}}",
-    "&frac16": "{{frac|1|6}}",
-    "&frac34": "{{frac|3|4}}",
+    "&frac12;": "{{frac|1|2}}",
+    "&frac14;": "{{frac|1|4}}",
+    "&frac16;": "{{frac|1|6}}",
+    "&frac34;": "{{frac|3|4}}",
+    "&#8531;": "{{frac|1|3}}",
     "…": "...",
+    "&#8230;": "...",
     "&hellip;": "...",
 
     # These often break wiki markup
@@ -200,7 +251,11 @@ transform_unsafe = {
     "&#8220;": '"',  # “ -> "
     "&#8221;": '"',  # ” -> "
     "&#8216;": "'",   # ‘ -> '
+    "&#x2018;": "'",   # ’ -> '
     "&#8217;": "'",   # ’ -> '
+    "&#x2019;": "'",   # ’ -> '
+    "&#x201C;": '"',
+    "&#x201D;": '"',
 
     # NOT SURE THIS IS A GOOD IDEA.
     # Per [[MOS:CONFORM]]
@@ -233,6 +288,16 @@ transform_unsafe = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+    "&#6;": " ",   # ^F
+    "&#06;": " ",   # ^F
+    "&#22;": " ",   # ^V
+    "&#13;": "\n",   # ^M
+    "&#013;": "\n",   # ^M
+
+    "&#x02C6;": "&circ;",
+    "&#8242;": "&prime;",
+    "&#8243;": "&Prime;",  # Double prime
+
     "&#x2000;": "&ensp;",
     "&#8192;": "&ensp;",
     "&#x2002;": "&ensp;",
@@ -268,6 +333,8 @@ transform = {
     "&#8288;": "&NoBreak;",
     "&#xFEFF;": "",
     "&#65279;": "",
+
+    "&#8206;": "&lrm;",
 
     "&#x005B;": "&#91;",
     "&#x005D;": "&#93;",
@@ -427,6 +494,9 @@ transform = {
     "&AElig;": "Æ",
     "&OElig;": "Œ",
 
+    "㎆": "MB",
+    "㎅": "KB",
+
     # Greek letters only found in actual Greek words
     "&sigmaf;": "ς",  # Written this way when word-final
     "&#x1F7B;": "ύ",
@@ -578,10 +648,25 @@ def fix_text(text, transform_greek=False):
             test_string = test_string.replace(string, "")
     for unknown_entity in re.findall("&#?[a-zA-Z0-9]+;", test_string):
         character = find_char(unknown_entity)
-        if character and not unicodedata.combining(character):
+        if character:
+            if unicodedata.combining(character):
+                # Combining characters are too difficult to edit as themselves
+                continue
+            if variant_selectors_re.match(unknown_entity):
+                continue
+            value = find_char_num(unknown_entity)
+            if value >= 0xE000 and value <= 0xF8FF:
+                # Private Use Area
+                continue
+            if value >= 0xF0000 and value <= 0xFFFFD:
+                # Supplemental Private Use Area-A
+                continue
+            if value >= 0x100000 and value <= 0x10FFFD:
+                # Supplemental Private Use Area-B
+                continue
             new_text = new_text.replace(unknown_entity, character)
-        # print("unknown entity: %s  character: %s" % (unknown_entity, character),
-        #       file=sys.stderr)
+            # print("unknown entity: %s  character: %s" % (unknown_entity, character),
+            #       file=sys.stderr)
 
     return new_text
 
