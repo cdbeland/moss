@@ -198,8 +198,14 @@ transform_unsafe = {
     "&#x2010;": "-",  # Hyphen
     "&#x2027;": "-",  # Hyphenation point
     "‐": "-",         # U+2010 Hyphen to ASCII
-    "&#8209;": "-",   # U+2011 Non-breaking hyphen
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
+
+    # &#x2011; should be kept if it is at the beginning or end of a
+    # word, so the hyphen doesn't break onto a new line (due to bug in
+    # Chrome, reported 27 Jul 2019 - see
+    # https://en.wikipedia.org/wiki/Talk:B%C3%B6rje#Hyphens_and_linebreaks)
+    "&#8209;": "-",   # U+2011 Non-breaking hyphen
+    "&#x2011;": "-",   # U+2011 Non-breaking hyphen
 
     # Per [[MOS:FRAC]]
     "¼": "{{frac|1|4}}",
