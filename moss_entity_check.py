@@ -32,6 +32,10 @@ article_blacklist = [
     "Perso-Arabic Script Code for Information Interchange",
     # https://en.wikipedia.org/w/index.php?title=Perso-Arabic_Script_Code_for_Information_Interchange&oldid=prev&diff=900347984&diffmode=source]
     "Yiddish orthography",
+    "Eastern Arabic numerals",
+
+    # Correctly uses U+2011 Non-Breaking Hypens
+    "Börje",
 
     "Yasukuni Shrine",  # Variation issues, maybe needs a variant selector?
 ]
@@ -177,33 +181,32 @@ def dump_results():
     for (section_title, dictionary) in sections.items():
         dump_dict(section_title, dictionary)
 
-    with open("jwb-combo.json") as comboj:
-        print("= REGEXES FOR JWB - LOW =", file=comboj)
+    with open("jwb-combo.json", "w") as comboj:
+        print("= REGEXES FOR JWB - COMBO =", file=comboj)
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
                            unknown_found, unknown_numerical_latin,
                            unknown_numerical_high]:
             bad_entities.update(extract_entities(dictionary))
-            dump_for_jwb("low", bad_entities, file=comboj)
+        dump_for_jwb("combo", bad_entities, file=comboj)
 
-    with open("jwb-articles-low.txt") as lowa:
+    with open("jwb-med.json", "w") as medj:
+        print("= REGEXES FOR JWB - MED =", file=medj)
+        dump_for_jwb("med", extract_entities(unknown_numerical_med), file=medj)
+
+    with open("jwb-articles-low.txt", "w") as lowa:
         print("= ARTICLES FOR JWB - LOW =", file=lowa)
-
         articles = set()
         for dictionary in [alerts_found, uncontroversial_found,
                            unknown_found, unknown_numerical_latin]:
             articles.update(extract_articles(dictionary))
-            print("\n".join(sorted(articles)), file=lowa)
+        print("\n".join(sorted(articles)), file=lowa)
 
-    with open("jwb-med.json") as medj:
-        print("= REGEXES FOR JWB - MED =", file=medj)
-        dump_for_jwb("med", extract_entities(unknown_numerical_med), file=medj)
-
-    with open("jwb-articles-med.txt") as meda:
+    with open("jwb-articles-med.txt", "w") as meda:
         print("= ARTICLES FOR JWB - MED =", file=meda)
         print("\n".join(sorted(extract_articles(unknown_numerical_med))), file=meda)
 
-    with open("jwb-article.txt") as higha:
+    with open("jwb-articles-high.txt", "w") as higha:
         print("= ARTICLES FOR JWB - HIGH =", file=higha)
         print("\n".join(sorted(extract_articles(unknown_numerical_high))), file=higha)
 
