@@ -43,11 +43,37 @@ def split_big_sections(grouped_lines):
 
 def merge_small_sections(grouped_lines):
     new_hash = {}
-    previous_key = None
+    previous_key = ""
     for (group_key, line_list) in sorted(grouped_lines.items()):
-        if len(line_list) < MIN_SIZE and previous_key:
-            tmp_list = new_hash[previous_key]
-            if len(tmp_list) < MAX_SIZE - MIN_SIZE:
+
+        # Strong preference for splitting on first letter (since these
+        # are often posted to different pages) unless entire first
+        # letters fit per section.
+        ok_to_join = True
+        if len(previous_key) == 0:
+            pass
+        else:
+            if "-" in previous_key:
+                (_last_left_side, last_right_side) = previous_key.split("-", 1)
+            else:
+                last_right_side = previous_key
+
+            if len(last_right_side) == 1 and len(group_key) > 1:
+                ok_to_join = False
+            elif len(last_right_side) > 1 and len(group_key) == 1:
+                ok_to_join = False
+            elif len(last_right_side) > 1 and len(group_key) > 1 and last_right_side[0] != group_key[0]:
+                ok_to_join = False
+
+        if previous_key:
+            previous_size = len(new_hash[previous_key])
+        else:
+            previous_size = 999999
+
+        current_size = len(line_list)
+        if (current_size < MIN_SIZE or previous_size < MIN_SIZE) and previous_key and ok_to_join:
+            if previous_size + current_size < MAX_SIZE:
+                tmp_list = new_hash[previous_key]
                 tmp_list.extend(line_list)
                 del new_hash[previous_key]
                 key_parts = []
