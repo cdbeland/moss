@@ -26,6 +26,7 @@ article_blacklist = [
     "ISO 5428",
     "Mojibake",
     "List of Unicode characters",
+    "Windows Glyph List 4",
     "Quotation mark",
     "Arabic diacritics",
     "Arabic script in Unicode",  # objection from Mahmudmasri
@@ -37,7 +38,10 @@ article_blacklist = [
     # Correctly uses U+2011 Non-Breaking Hypens
     "Börje",
 
-    "Yasukuni Shrine",  # Variation issues, maybe needs a variant selector?
+    # Variation issues, maybe need a variant selector?
+    "Seong",
+    "Sung-mi",
+    "Yasukuni Shrine",
 ]
 
 
@@ -182,20 +186,14 @@ def dump_results():
         dump_dict(section_title, dictionary)
 
     with open("jwb-combo.json", "w") as comboj:
-        print("= REGEXES FOR JWB - COMBO =", file=comboj)
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
                            unknown_found, unknown_numerical_latin,
-                           unknown_numerical_high]:
+                           unknown_numerical_med, unknown_numerical_high]:
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=comboj)
 
-    with open("jwb-med.json", "w") as medj:
-        print("= REGEXES FOR JWB - MED =", file=medj)
-        dump_for_jwb("med", extract_entities(unknown_numerical_med), file=medj)
-
     with open("jwb-articles-low.txt", "w") as lowa:
-        print("= ARTICLES FOR JWB - LOW =", file=lowa)
         articles = set()
         for dictionary in [alerts_found, uncontroversial_found,
                            unknown_found, unknown_numerical_latin]:
@@ -203,11 +201,9 @@ def dump_results():
         print("\n".join(sorted(articles)), file=lowa)
 
     with open("jwb-articles-med.txt", "w") as meda:
-        print("= ARTICLES FOR JWB - MED =", file=meda)
         print("\n".join(sorted(extract_articles(unknown_numerical_med))), file=meda)
 
     with open("jwb-articles-high.txt", "w") as higha:
-        print("= ARTICLES FOR JWB - HIGH =", file=higha)
         print("\n".join(sorted(extract_articles(unknown_numerical_high))), file=higha)
 
 
