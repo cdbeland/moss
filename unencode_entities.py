@@ -13,8 +13,10 @@ import unicodedata
 # http://www.unicode.org/versions/Unicode11.0.0/ch04.pdf#G91002
 
 entities_re = re.compile(r"&#?[a-zA-Z0-9]+;")
-variant_selectors_re = re.compile(r"^&#x(FF0.|E01..|180B|180C|180D);$")
+variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);$", flags=re.I)
 # https://en.wikipedia.org/wiki/Variant_form_(Unicode)
+# U+1F3FB–U+1F3FF are emoji skin tone selectors
+# https://en.wikipedia.org/wiki/Miscellaneous_Symbols_and_Pictographs#Emoji_modifiers
 
 # Manual transformation probably required
 alert = [
@@ -80,13 +82,20 @@ keep = [
 
     # Directionality controls
     "&#x200E;",
-    "&#x200F;",
     "&#x061C;",
     "&#x202A;",
     "&#x202B;",
     "&#x202C;",
     "&#x202D;",
     "&#x202E;",
+    "&#x200e;",
+    "&#x061c;",
+    "&#x202a;",
+    "&#x202b;",
+    "&#x202c;",
+    "&#x202d;",
+    "&#x202e;",
+    "&#x2066;",
     "&#x2066;",
     "&#x2067;",
     "&#x2068;",
@@ -136,6 +145,10 @@ keep = [
     "&#x114b2;",
     "&#x114b1;",
     "&#x114b0;",
+    "&#x114c0;"
+    "&#x20DE;",
+    "&#x20E3;",
+    "&#x20e3;",
 
     "ʾ",  # U+02BE Modifier Letter Right Half Ring - Hebrew, Arabic letter
 ]
@@ -199,6 +212,7 @@ transform_unsafe = {
     "&#x2027;": "-",  # Hyphenation point
     "‐": "-",         # U+2010 Hyphen to ASCII
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
+    "&#x2116;": "No.",
 
     # &#x2011; should be kept if it is at the beginning or end of a
     # word, so the hyphen doesn't break onto a new line (due to bug in
@@ -300,6 +314,10 @@ transform = {
     "&#13;": "\n",   # ^M
     "&#013;": "\n",   # ^M
 
+    "&#x200C;": "&zwnj;",
+
+    "&#8207;": "&rlm;",
+    "&#x200F;": "&rlm;",
     "&#x02C6;": "&circ;",
     "&#8242;": "&prime;",
     "&#8243;": "&Prime;",  # Double prime
