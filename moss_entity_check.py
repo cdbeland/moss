@@ -24,16 +24,20 @@ article_blacklist = [
     "Grave accent",
     "ISO 5426",
     "ISO 5428",
-    "Mojibake",
+    "KPS 9566",
     "List of Unicode characters",
-    "Windows Glyph List 4",
+    "Mojibake",
+    "Numero sign",
     "Quotation mark",
+    "Windows Glyph List 4",
+
     "Arabic diacritics",
     "Arabic script in Unicode",  # objection from Mahmudmasri
     "Perso-Arabic Script Code for Information Interchange",
     # https://en.wikipedia.org/w/index.php?title=Perso-Arabic_Script_Code_for_Information_Interchange&oldid=prev&diff=900347984&diffmode=source]
     "Yiddish orthography",
     "Eastern Arabic numerals",
+    "List of XML and HTML character entity references",
 
     # Correctly uses U+2011 Non-Breaking Hypens
     "Börje",
