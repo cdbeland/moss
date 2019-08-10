@@ -63,8 +63,9 @@ alert = [
 
 # Ignore these if seen in articles
 keep = [
-    "ʻ",  # ʻOkina U+02BB. Wrong if used as apostrophe but OK in
-          # Hawaiian and maybe other languages.
+    # U+02BE Modifier Letter Right Half Ring - Hebrew, Arabic letter
+    "&#x02BE;",
+    "ʾ",
 
     "&amp;",  # dangerous for e.g. &amp;126;
     "&c;",    # Almost all are in archaic quotations and titles
@@ -74,7 +75,7 @@ keep = [
     # "&x;",    # Used in computer articles as example of a pointer
 
     # Allowed for math notation only
-    "&prime;", "′", "&Prime;", "″",
+    "&prime;", "′", "&Prime;", "″", "&x2034", "‴",
 
     # Definitely confusing, keep forever
     "&ndash;", "&mdash;", "&minus;", "&shy;",
@@ -149,8 +150,6 @@ keep = [
     "&#x20DE;",
     "&#x20E3;",
     "&#x20e3;",
-
-    "ʾ",  # U+02BE Modifier Letter Right Half Ring - Hebrew, Arabic letter
 ]
 
 controversial = {
@@ -213,6 +212,7 @@ transform_unsafe = {
     "‐": "-",         # U+2010 Hyphen to ASCII
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
     "&#x2116;": "No.",
+    "&#8470;": "No.",
 
     # &#x2011; should be kept if it is at the beginning or end of a
     # word, so the hyphen doesn't break onto a new line (due to bug in
@@ -225,6 +225,22 @@ transform_unsafe = {
     "¼": "{{frac|1|4}}",
     "½": "{{frac|1|2}}",
     "¾": "{{frac|3|4}}",
+
+    "&#x2150;": "{{frac|1|7}}",
+    "&#x2151;": "{{frac|1|9}}",
+    "&#x2152;": "{{frac|1|10}}",
+    "&#x2153;": "{{frac|1|3}}",
+    "&#x2154;": "{{frac|2|3}}",
+    "&#x2155;": "{{frac|1|5}}",
+    "&#x2156;": "{{frac|2|5}}",
+    "&#x2157;": "{{frac|3|5}}",
+    "&#x2158;": "{{frac|4|5}}",
+    "&#x2159;": "{{frac|1|6}}",
+    "&#x215A;": "{{frac|5|6}}",
+    "&#x215B;": "{{frac|1|8}}",
+    "&#x215C;": "{{frac|3|8}}",
+    "&#x215D;": "{{frac|5|8}}",
+    "&#x215E;": "{{frac|7|8}}",
     "&frac12;": "{{frac|1|2}}",
     "&frac14;": "{{frac|1|4}}",
     "&frac16;": "{{frac|1|6}}",
@@ -251,6 +267,7 @@ transform_unsafe = {
     "™": "",
     "®": "",
     "©": "",
+    "&8482;": "",   # ™
 
     # Normalizing quote marks
     "‘": "'",
@@ -308,6 +325,11 @@ transform_unsafe = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+    "ʻ": "{{okina}}",
+    "&#x02BB;": "{{okina}}",
+    # ʻOkina U+02BB. Wrong if used as apostrophe but OK in
+    # Hawaiian and maybe other languages.
+
     "&#6;": " ",   # ^F
     "&#06;": " ",   # ^F
     "&#22;": " ",   # ^V
@@ -316,11 +338,15 @@ transform = {
 
     "&#x200C;": "&zwnj;",
 
+    "&#702;": "&#x02BE;",
+
     "&#8207;": "&rlm;",
     "&#x200F;": "&rlm;",
     "&#x02C6;": "&circ;",
     "&#8242;": "&prime;",
+    "&#x2032;": "&prime;",
     "&#8243;": "&Prime;",  # Double prime
+    "&#x2033;": "&Prime;",  # Double prime
 
     "&#x2000;": "&ensp;",
     "&#8192;": "&ensp;",
@@ -414,6 +440,9 @@ transform = {
     "&apos;": "'",
     "&#8216;": "'",
     "&#8217;": "'",
+    "&#700;": "'",  # U+02BC
+    "ʼ": "'",  # U+02BC
+    "&#x02BC;": "'",
 
     "&quot;": '"',
     "&#8220;": '"',
