@@ -12,7 +12,6 @@ uncontroversial_found = {}
 greek_letters_found = {}
 unknown_found = {}
 unknown_numerical_latin = {}
-unknown_numerical_med = {}
 unknown_numerical_high = {}
 non_entity_transform = [string for string in transform.keys() if not string.startswith("&")]
 worst_articles = {}
@@ -28,6 +27,7 @@ article_blacklist = [
     "List of Unicode characters",
     "Mojibake",
     "Numero sign",
+    "Registered trademark symbol",
     "Quotation mark",
     "Windows Glyph List 4",
 
@@ -110,8 +110,6 @@ def entity_check(article_title, article_text):
                     continue
                 elif int(value) < 0x0250:
                     add_safely(article_title, entity, unknown_numerical_latin)
-                elif int(value) < 0x3000:
-                    add_safely(article_title, entity, unknown_numerical_med)
                 else:
                     add_safely(article_title, entity, unknown_numerical_high)
             else:
@@ -183,7 +181,6 @@ def dump_results():
         "Uncontroversial entities": uncontroversial_found,
         "Unknown": unknown_found,
         "Unknown numerical: Latin range": unknown_numerical_latin,
-        "Unknown med numerical": unknown_numerical_med,
         "Unknown high numerical": unknown_numerical_high,
     }
     for (section_title, dictionary) in sections.items():
@@ -193,7 +190,7 @@ def dump_results():
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
                            unknown_found, unknown_numerical_latin,
-                           unknown_numerical_med, unknown_numerical_high]:
+                           unknown_numerical_high]:
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=comboj)
 
@@ -203,9 +200,6 @@ def dump_results():
                            unknown_found, unknown_numerical_latin]:
             articles.update(extract_articles(dictionary))
         print("\n".join(sorted(articles)), file=lowa)
-
-    with open("jwb-articles-med.txt", "w") as meda:
-        print("\n".join(sorted(extract_articles(unknown_numerical_med))), file=meda)
 
     with open("jwb-articles-high.txt", "w") as higha:
         print("\n".join(sorted(extract_articles(unknown_numerical_high))), file=higha)
