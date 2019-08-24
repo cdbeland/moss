@@ -13,7 +13,7 @@ import unicodedata
 # http://www.unicode.org/versions/Unicode11.0.0/ch04.pdf#G91002
 
 entities_re = re.compile(r"&#?[a-zA-Z0-9]+;")
-variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);$", flags=re.I)
+variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);", flags=re.I)
 # https://en.wikipedia.org/wiki/Variant_form_(Unicode)
 # U+1F3FB–U+1F3FF are emoji skin tone selectors
 # https://en.wikipedia.org/wiki/Miscellaneous_Symbols_and_Pictographs#Emoji_modifiers
@@ -63,10 +63,6 @@ alert = [
 
 # Ignore these if seen in articles
 keep = [
-    # U+02BE Modifier Letter Right Half Ring - Hebrew, Arabic letter
-    "&#x02BE;",
-    "ʾ",
-
     "&amp;",  # dangerous for e.g. &amp;126;
     "&c;",    # Almost all are in archaic quotations and titles
 
@@ -204,7 +200,10 @@ keep.extend(controversial.keys())
 
 transform_unsafe = {
     # These transformations can't be made in places where the
-    # character itself is being discussed.
+    # character itself is being discussed, or are just rules of thumb
+    # based on observed misuse.
+
+    "&#x202F;": "",  # Narrow non-breaking space, usually not needed
 
     "⋅": "-",
     "&#x2010;": "-",  # Hyphen
@@ -218,8 +217,8 @@ transform_unsafe = {
     # word, so the hyphen doesn't break onto a new line (due to bug in
     # Chrome, reported 27 Jul 2019 - see
     # https://en.wikipedia.org/wiki/Talk:B%C3%B6rje#Hyphens_and_linebreaks)
-    "&#8209;": "-",   # U+2011 Non-breaking hyphen
-    "&#x2011;": "-",   # U+2011 Non-breaking hyphen
+    "&#8209;": "-",   # U+2011 Non-breaking hyphen to ASCII
+    "&#x2011;": "-",   # U+2011 Non-breaking hyphen to ASCII
 
     # Per [[MOS:FRAC]]
     "¼": "{{frac|1|4}}",
@@ -294,6 +293,24 @@ transform_unsafe = {
     "&#x201C;": '"',
     "&#x201D;": '"',
 
+    # ʻOkina is U+02BB.
+    "ʻ": "{{okina}}",
+    "&#x02BB;": "{{okina}}",
+    "&#x2bb;": "{{asper}}",
+    # Okina is wrong if used as an apostrophe but OK in Hawaiian and
+    # maybe other languages.  Per [[Talk:Wade-Giles]], [[spiritus
+    # asper]] is preferred (strongly over okina and weakly over
+    # apostrophes) for Chinese romanizations using that system.
+
+    "&#x02BE;": "'",
+    "&#702;": "'",
+    "ʾ": "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
+    # ASCII apostrophe is used in transliterations by default, per
+    # [[Wikipedia:Naming conventions (Hebrew)]] which uses the Hebrew Academy scheme at
+    # [[Romanization_of_Hebrew#Table]]
+    # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
+    # be clear from context it's not an apostrophe
+
     # NOT SURE THIS IS A GOOD IDEA.
     # Per [[MOS:CONFORM]]
     # "« ": '"',
@@ -325,10 +342,8 @@ transform_unsafe = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
-    "ʻ": "{{okina}}",
-    "&#x02BB;": "{{okina}}",
-    # ʻOkina U+02BB. Wrong if used as apostrophe but OK in
-    # Hawaiian and maybe other languages.
+
+    "&#8416;": "&#x20E0;",  # Combining Enclosing Circle Backslash
 
     "&#6;": " ",   # ^F
     "&#06;": " ",   # ^F
@@ -337,8 +352,6 @@ transform = {
     "&#013;": "\n",   # ^M
 
     "&#x200C;": "&zwnj;",
-
-    "&#702;": "&#x02BE;",
 
     "&#8207;": "&rlm;",
     "&#x200F;": "&rlm;",
@@ -374,6 +387,7 @@ transform = {
     "&#x205F;": "&MediumSpace;",
     "&#8287;": "&MediumSpace;",
     "&#x200B;": "&zwsp;",
+    "&#x200b;": "&zwsp;",
     "&#8203;": "&zwsp;",
     "&#x200C;": "&zwnj;",
     "&#8204;": "&zwnj;",
