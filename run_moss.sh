@@ -139,6 +139,7 @@ grep ^HL tmp-words-with-articles.txt | perl -pe 's/^HL\t//' | ../venv/bin/python
 
 echo >> beland-html-by-freq.txt
 echo "===Unsorted===" >> beland-html-by-freq.txt
+echo "Many of these can be replaced by {{tl|var}} (for text to be replaced) or {{tl|angbr}} (e.g. for linguistic notation)." >> beland-html-by-freq.txt
 grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> beland-html-by-freq.txt
 
 # TODO: Search for bad attributes on HTML tags:
@@ -184,8 +185,7 @@ echo `date`
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
-grep -v "I," tmp-articles-linked-words.txt | grep -v "U," | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* 0 -" | grep -v "* 1 -" | grep -v "* 2 -" > post-copyedit.txt
-
+grep -v "I," tmp-articles-linked-words.txt | grep -v "U," | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* [0123456] -" > post-copyedit.txt
 
 # --- BY WORD LENGTH ---
 
