@@ -19,17 +19,27 @@ worst_articles = {}
 article_blacklist = [
     # Characters themselves are discussed
     "' (disambiguation)",
+    "Basic Latin (Unicode block)",
     "Bracket",
+    "Code page 259",
+    "Devanagari transliteration",
     "Grave accent",
     "ISO 5426",
     "ISO 5428",
     "KPS 9566",
+    "Latin script in Unicode",
+    "List of Japanese typographic symbols",
     "List of Unicode characters",
+    "Mac OS Celtic",
+    "Mac OS Devanagari encoding",
+    "Mac OS Roman",
     "Mojibake",
     "Numero sign",
     "Registered trademark symbol",
     "Quotation mark",
     "Windows Glyph List 4",
+
+    "CEA-708",
 
     "Arabic diacritics",
     "Arabic script in Unicode",  # objection from Mahmudmasri
