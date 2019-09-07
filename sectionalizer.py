@@ -93,9 +93,9 @@ def merge_small_sections(grouped_lines):
     return new_hash
 
 
-if __name__ == '__main__':
+def group_lines(list_of_lines):
     grouped_lines = {}
-    for line in fileinput.input("-"):
+    for line in list_of_lines:
         line = line.strip()
         word = get_word(line)
         if not word:
@@ -104,9 +104,20 @@ if __name__ == '__main__':
         lines = grouped_lines.get(word[0], [])
         lines.append(line)
         grouped_lines[word[0]] = lines
+    return grouped_lines
+
+
+def sectionalize_lines(list_of_lines):
+    grouped_lines = group_lines(list_of_lines)
     grouped_lines = split_big_sections(grouped_lines)
     grouped_lines = merge_small_sections(grouped_lines)
+    output_string = ""
     for (group_key, line_list) in sorted(grouped_lines.items()):
-        print("==== %s ====" % group_key)
+        output_string += (f"==== {group_key} ====\n")
         for line in sorted(line_list, key=lambda line: get_word(line)):
-            print(line)
+            output_string += f"{line}\n"
+    return output_string
+
+
+if __name__ == '__main__':
+    print(sectionalize_lines(fileinput.input("-")))

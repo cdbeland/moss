@@ -52,18 +52,8 @@ echo `date`
 
 # Run time for here to beginning of HTML tag report: ~2 minutes
 
-grep -P "^T1(,T1)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1.txt
-grep -P "^T[12](,T[12])*\t" tmp-articles-linked-words.txt | grep T2 | grep T1 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1+2.txt
-grep -P "^T[123](,T[123])*\t" tmp-articles-linked-words.txt | grep T3 | grep T1 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-edit1+3.txt
-grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | grep 'wikt:.*\.'| perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS+dot.txt
+cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py > post-main-listings.txt
 
-# TODO: Once these are done, post:
-# (these require deactivating the above to prevent overlap)
-# * grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS.txt
-# * grep -P "^T[1S](,T[1S])*\t" tmp-articles-linked-words.txt | grep T1 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit1.txt
-# * grep -P "^T[12S](,T[12S])*\t" tmp-articles-linked-words.txt | grep T2 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit2.txt
-# * grep -P "^T[123S](,T[123S])*\t" tmp-articles-linked-words.txt | grep T3 | perl -pe 's/^.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-TS_edit3.txt
-#
 # Dealing with the remaining pile of typos:
 # * Mark valid mechanistic transliterations as IT and TT; these would
 #   not be eligible for Wiktionary.  (Will reduce R and T4+.)
@@ -93,9 +83,6 @@ grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | grep 'wikt:.*\.'| perl -pe
 #   * Post IW probable new words, non-English
 #   * R and T4+ mixed in article with IW or IT are probably
 #     non-English; include these in lists, and update stats.
-# * Post T1/T2/T3 mixed in with all other T#, segregating the higher
-#   T#s, starting with articles with the lowest number of typos? (T4
-#   are hardly ever misspellings, don't post those)
 # * Some legit English T1s are marked as W or TT, recover those and
 #   post a list for people to sort them out.  Might help to have an
 #   English-only spell check list.
@@ -110,9 +97,6 @@ grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | grep 'wikt:.*\.'| perl -pe
 #   (probably the top 3000 or so articles with the most misspellings,
 #   down to about 20 or so, though there are many mixed in at lower
 #   frequencies)
-
-# grep -P "^TS(,TS)*\t" tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../sectionalizer.py > post-by-article-compound.txt
-# Posting by-frequency instead, to avoid mixing in whitespace errors
 
 head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
 head -1000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -200 > beland-articles-most-typos-refined.txt
