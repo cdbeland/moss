@@ -25,6 +25,8 @@ alert = [
     "¼", "½", "¾", "&frasl;",
     "¹", "⁺", "ⁿ", "₁", "₊", "ₙ",
 
+    "₤",  # per [[MOS:CURRENCY]] should be £ for GBP, something else (?) for Italian Lira
+
     # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
     "µ", "&micro;",
 
@@ -66,12 +68,16 @@ keep = [
     "&amp;",  # dangerous for e.g. &amp;126;
     "&c;",    # Almost all are in archaic quotations and titles
 
+    "&#x0261;",  # g for gravity distinguished from g for gram
+
     # Should be excluded by <source> etc.
     # "&a;",    # Used in computer articles as example of a pointer
     # "&x;",    # Used in computer articles as example of a pointer
 
     # Allowed for math notation only
     "&prime;", "′", "&Prime;", "″", "&x2034", "‴",
+
+    "ʼ",  # U+02BC, used in IPA and a letter in some languages, including Klingon
 
     # Definitely confusing, keep forever
     "&ndash;", "&mdash;", "&minus;", "&shy;",
@@ -143,6 +149,7 @@ keep = [
     "&#x114b1;",
     "&#x114b0;",
     "&#x114c0;"
+    "&#x20DD;",
     "&#x20DE;",
     "&#x20E3;",
     "&#x20e3;",
@@ -203,7 +210,10 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
+    "µ": "μ",  # micro to mu
+
     "&#x202F;": "",  # Narrow non-breaking space, usually not needed
+    "&#x202f;": "",
 
     "⋅": "-",
     "&#x2010;": "-",  # Hyphen
@@ -293,14 +303,8 @@ transform_unsafe = {
     "&#x201C;": '"',
     "&#x201D;": '"',
 
-    # ʻOkina is U+02BB.
-    "ʻ": "{{okina}}",
-    "&#x02BB;": "{{okina}}",
-    "&#x2bb;": "{{asper}}",
-    # Okina is wrong if used as an apostrophe but OK in Hawaiian and
-    # maybe other languages.  Per [[Talk:Wade-Giles]], [[spiritus
-    # asper]] is preferred (strongly over okina and weakly over
-    # apostrophes) for Chinese romanizations using that system.
+    # CONFLICTING SUBSTITUTIONS FOR ARABIC VS. HEBREW:
+    "ʾ": "{{lenis}}", # For transliterated Arabic alpeh and hamza
 
     "&#x02BE;": "'",
     "&#702;": "'",
@@ -310,6 +314,21 @@ transform_unsafe = {
     # [[Romanization_of_Hebrew#Table]]
     # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
     # be clear from context it's not an apostrophe
+
+    # For transliterated Arabic ayin
+    "&#703;": "{{asper}}",
+    "ʿ": "{{asper}}",
+
+    # MISUSE OF OKINA FOR CHINESE
+    # ʻOkina is U+02BB.
+    "ʻ": "{{okina}}",
+    "&#x02BB;": "{{okina}}",
+    "&#x2bb;": "{{asper}}",
+    # Okina is wrong if used as an apostrophe but OK in Hawaiian and
+    # maybe other languages.  Per [[Talk:Wade-Giles]], [[spiritus
+    # asper]] is preferred (strongly over okina and weakly over
+    # apostrophes) for Chinese romanizations using that system.
+
 
     # NOT SURE THIS IS A GOOD IDEA.
     # Per [[MOS:CONFORM]]
@@ -329,7 +348,7 @@ transform_unsafe = {
     "&emsp;": " ",
     "&emsp13;": " ",
     "&emsp14;": " ",
-    "&thinsp;": " ",
+    "&thinsp;": "",
     "&numsp;": " ",
     "&puncsp;": " ",
     "&hairsp;": " ",
@@ -342,6 +361,8 @@ transform_unsafe = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+
+    "&#x22c5;": "&sdot;",
 
     "&#8416;": "&#x20E0;",  # Combining Enclosing Circle Backslash
 
@@ -356,6 +377,7 @@ transform = {
     "&#8207;": "&rlm;",
     "&#x200F;": "&rlm;",
     "&#x02C6;": "&circ;",
+    "&#x710;": "&circ;",
     "&#8242;": "&prime;",
     "&#x2032;": "&prime;",
     "&#8243;": "&Prime;",  # Double prime
@@ -402,6 +424,8 @@ transform = {
 
     "&#x005B;": "&#91;",
     "&#x005D;": "&#93;",
+    "&#x5b;": "&#91;",
+    "&#x5d;": "&#93;",
     "&#091;": "&#91;",
     "&#093;": "&#93;",
     "&#0091;": "&#91;",

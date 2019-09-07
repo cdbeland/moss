@@ -144,9 +144,6 @@ substitutions = [
     # Order in the below is very important!  Templates must be removed
     # before these are applied.
 
-    # TODO: Implement results of discussion at
-    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style#HTML_entities
-
     # Whitespace
     (re.compile(r"&nbsp;|&thinsp;|&hairsp;"), " "),
     (re.compile(r"<br.*?>", flags=re.I), " "),
