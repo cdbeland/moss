@@ -458,6 +458,12 @@ allowed_list = {
     "</abbr>",
     "<mapframe/>",
 
+    # TODO: This discussion was somewhat inconclusive:
+    # https://en.wikipedia.org/wiki/Wikipedia:Templates_for_discussion/Log/2019_March_17#Template:Dfn
+    # These should probably be converted to {{dfn}} or markup removed.
+    "<dfn>",
+    "</dfn>",
+
     # TODO: Handle general mathematical notation in HTML here or in
     # regexes.  (<math>...</math> text will be removed.)  See:
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Mathematics#Using_HTML
@@ -487,6 +493,9 @@ def is_word_spelled_correctly(word_mixedcase):
 
 
 def _is_word_spelled_correctly_impl(word_mixedcase):
+    if any(substring in word_mixedcase for substring in prohibited_list):
+        return False
+
     if word_mixedcase.lower() in all_words:
         return True
 
@@ -508,9 +517,6 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
 
     if is_science_expression(word_mixedcase):
         return True
-
-    if any(substring in word_mixedcase for substring in prohibited_list):
-        return False
 
     # Possessive: NLTK parses e.g. "'s" as a separate word, which
     # Wikitionary has listed.
@@ -585,6 +591,7 @@ numerator_words = {
     "ft³",
     "µg",
     "g",
+    "mg",
     "l",
     "µmol",
     "people",  # Not persons
@@ -596,16 +603,21 @@ numerator_words = {
 demoninator_words = {
     "m",
     "m²",
+    "m³",
     "km²",
+    "cm",
     "cm³",
     "mi²",
+    "ft²",
     "µl",
-    "ml",  # or mL??
-    "dl",  # not dL?
+    "ml",  # or mL?
+    "dl",  # or dL?
     "g",
     "kg",
     "s",
     "second",
+    "min",
+    "h",
     "day",
     "year",
 }
@@ -615,3 +627,4 @@ def is_science_expression(word):
     parts = word.split("/")
     if len(parts) == 2 and parts[0] in numerator_words and parts[1] in demoninator_words:
         return True
+    return False
