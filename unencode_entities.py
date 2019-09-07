@@ -304,7 +304,8 @@ transform_unsafe = {
     "&#x201D;": '"',
 
     # CONFLICTING SUBSTITUTIONS FOR ARABIC VS. HEBREW:
-    "ʾ": "{{lenis}}", # For transliterated Arabic alpeh and hamza
+    # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
+    # -> Or maybe make separate templates for these
 
     "&#x02BE;": "'",
     "&#702;": "'",
