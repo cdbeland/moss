@@ -8,7 +8,7 @@ from sectionalizer import sectionalize_lines
 
 unsorted = ["R", "I", "N", "P", "H", "U", "TS"]
 probably_wrong = ["T1", "TS+DOT", "T2", "T3", "HB", "HL"]
-probably_right = ["W", "L", "ME", "MI", "MW", "C", "D"]        
+probably_right = ["W", "L", "ME", "MI", "MW", "C", "D"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
 first_letters = ["BEFORE A"] + [letter for letter in string.ascii_uppercase] + ["AFTER Z"]
@@ -33,15 +33,15 @@ for line in fileinput.input("-"):
         continue
     groups = line_parser_re.match(line)
     if not groups:
-        print (f"FAILED TO PARSE: '{line}'")
+        print(f"FAILED TO PARSE: '{line}'")
     types = groups[1].split(",")
     article_title = groups[2]
     typo_links = groups[3].split(", ")
-    
+
     for (index, typo_link) in enumerate(typo_links):
         if types[index] == "TS" and "." in typo_link:
             types[index] = "TS+DOT"
-    
+
     if any(type_ in unsorted for type_ in types):
         continue
 
