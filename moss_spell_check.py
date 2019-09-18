@@ -155,7 +155,10 @@ def spellcheck_all_langs(article_title, article_text):
         if unmatched_item in article_text:
             matches = re.findall(r".{0,20}%s.{0,20}" % unmatched_item, article_text)
             excerpt = " ... ".join(matches)
-            print("!\t* [[%s]] - Unmatched %s near: %s" % (article_title, unmatched_item, excerpt))
+            if unmatched_item == '"' and ("“" in article_text or "”" in article_text):
+                print("!Q\t* [[%s]] - Unmatched %s probably due to violation of [[MOS:STRAIGHT]] near: %s" % (article_title, unmatched_item, excerpt))
+            else:
+                print("!\t* [[%s]] - Unmatched %s near: %s" % (article_title, unmatched_item, excerpt))
             # Often due to typo in wiki markup or mismatched English
             # punctuation, but might be due to moss misinterpreting
             # the markup.  (Either way, should be fixed because this
