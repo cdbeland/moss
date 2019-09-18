@@ -21,8 +21,10 @@ article_blacklist = [
     "' (disambiguation)",
     "Basic Latin (Unicode block)",
     "Bracket",
+    "CEA-708",
     "Code page 259",
     "Devanagari transliteration",
+    "German keyboard layout",
     "Grave accent",
     "ISO 5426",
     "ISO 5428",
@@ -35,11 +37,18 @@ article_blacklist = [
     "Mac OS Roman",
     "Mojibake",
     "Numero sign",
+    "Phags-pa (Unicode block)",
+    "Prime (symbol)",
     "Registered trademark symbol",
+    "RISC OS character set",
+    "Rough breathing",
     "Quotation mark",
+    "Schwarzian derivative",
+    "Tilde"
+    "TRON (encoding)",
+    "Windows-1252",
+    "Windows-1258",
     "Windows Glyph List 4",
-
-    "CEA-708",
 
     "Arabic diacritics",
     "Arabic script in Unicode",  # objection from Mahmudmasri
