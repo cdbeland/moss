@@ -14,6 +14,12 @@ def get_word_categories_cached(word_list):
     return ",".join(category_list)
 
 
+def escape(input_string):
+    output = input_string.replace("&", "&amp;")
+    output = output.replace("<", "&lt;")
+    output = output.replace(">", "&gt;")
+    return output
+
 for line in fileinput.input("-"):
     line = line.strip()
     columns = line.split("\t")
@@ -25,12 +31,7 @@ for line in fileinput.input("-"):
     if num_typos:
         word_list = columns[3].split(" ")
         category = get_word_categories_cached(word_list)
-        word_list_linked = ", ".join("[[wikt:%s]]" % word for word in word_list)
+        word_list_linked = ", ".join("[[wikt:%s]]" % escape(word) for word in word_list)
 
-    article_link = article_title
-    article_link = article_link.replace("&", "&amp;")
-    article_link = article_link.replace("<", "&lt;")
-    article_link = article_link.replace(">", "&gt;")
-    article_link = "[[%s]]" % article_link
-
+    article_link = "[[%s]]" % escape(article_title)
     print("%s\t* %s - %s - %s" % (category, num_typos, article_link, word_list_linked))

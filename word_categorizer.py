@@ -7,6 +7,8 @@
 #                distance to nearest common dictionary word
 # TS = Typo likely in regular word; probably two words that need to be
 #      split by space or dash
+# BW = Bad word
+# BC = Bad character
 #
 # Probably OK:
 #
@@ -36,9 +38,13 @@ import re
 import sys
 try:
     from sectionalizer import get_word
+    from spell import bad_characters
+    from spell import bad_words
     from wikitext_util import html_tag_re
 except ImportError:
     from .sectionalizer import get_word
+    from .spell import bad_characters
+    from .spell import bad_words
     from .wikitext_util import html_tag_re
 
 enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
@@ -243,6 +249,12 @@ def is_compound(word):
 
 def get_word_category(word):
     category = None
+
+    if word in bad_words:
+        return "BW"
+    if any([bad_char in word for bad_char in bad_characters]):
+        # (bad character or substring)
+        return "BC"
 
     # Words in English Wiktionary (presumably including all known
     # English words) are ignored by the spell checker, so no need to

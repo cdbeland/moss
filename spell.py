@@ -100,8 +100,7 @@ number_formats_allowed_re = re.compile(
                        base_number_format,
                        "|".join(prefixed_number_formats)))
 
-# This is the blacklist!
-prohibited_list = {
+bad_words = {
 
     # Most of the time (experimental!)
     "manned",
@@ -237,6 +236,10 @@ prohibited_list = {
     "you'll",
     "your",
     "you're",
+}
+
+bad_characters = {
+    # Also works for multi-character substrings
 
     # Per [[MOS:BLOCKQUOTE]]
     "{{cquote",
@@ -558,9 +561,6 @@ prohibited_list = {
     "∏",
     # horbar
     "―",
-
-    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
-    "₤",
 }
 
 # Treated as separate words by NLTK tokenizer
@@ -625,7 +625,12 @@ def is_word_spelled_correctly(word_mixedcase):
 
 
 def _is_word_spelled_correctly_impl(word_mixedcase):
-    if any(substring in word_mixedcase for substring in prohibited_list):
+
+    word_lower = word_mixedcase.lower()
+
+    if word_lower in bad_words:
+        return False
+    if any(substring in word_mixedcase for substring in bad_characters):
         return False
 
     if word_mixedcase.lower() in all_words:

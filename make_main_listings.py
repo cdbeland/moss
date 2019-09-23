@@ -7,7 +7,7 @@ import string
 from sectionalizer import sectionalize_lines
 
 unsorted = ["R", "I", "N", "P", "H", "U", "TS"]
-probably_wrong = ["T1", "TS+DOT", "T2", "T3", "HB", "HL"]
+probably_wrong = ["T1", "TS+DOT", "T2", "T3", "HB", "HL", "BC", "BW"]
 probably_right = ["W", "L", "ME", "MI", "MW", "C", "D"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
