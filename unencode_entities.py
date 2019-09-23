@@ -153,6 +153,7 @@ keep = [
     "&#x20DE;",
     "&#x20E3;",
     "&#x20e3;",
+    "&#x20e4;",  # Combining triangle
 ]
 
 controversial = {
