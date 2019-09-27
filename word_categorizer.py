@@ -250,7 +250,7 @@ def is_compound(word):
 def get_word_category(word):
     category = None
 
-    if word in bad_words:
+    if word.lower() in bad_words:
         return "BW"
     if any([bad_char in word for bad_char in bad_characters]):
         # (bad character or substring)
