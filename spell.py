@@ -102,9 +102,11 @@ number_formats_allowed_re = re.compile(
 
 bad_words = {
 
+    # TODO: Ignore articles with "unmanned aerial vehicle" to reduce
+    # false positives on this.
     # Most of the time (experimental!)
-    "manned",
-    "unmanned",
+    # "manned",
+    # "unmanned",
 
     # Per [[MOS:CONTRACTION]] and sourced from
     # https://en.wiktionary.org/wiki/Category:English_contractions
@@ -628,8 +630,13 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
 
     word_lower = word_mixedcase.lower()
 
-    if word_lower in bad_words:
+    # if word_lower in bad_words:
+    if word_mixedcase in bad_words:
+        # TODO: Ignoring capitalized words for now due to lots of
+        # false positives; may want to detect and ignore italics
+        # and/or multi-word proper nouns.
         return False
+
     if any(substring in word_mixedcase for substring in bad_characters):
         return False
 
