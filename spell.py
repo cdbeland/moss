@@ -628,7 +628,7 @@ def is_word_spelled_correctly(word_mixedcase):
 
 def _is_word_spelled_correctly_impl(word_mixedcase):
 
-    word_lower = word_mixedcase.lower()
+    # word_lower = word_mixedcase.lower()
 
     # if word_lower in bad_words:
     if word_mixedcase in bad_words:

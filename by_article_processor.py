@@ -20,6 +20,7 @@ def escape(input_string):
     output = output.replace(">", "&gt;")
     return output
 
+
 for line in fileinput.input("-"):
     line = line.strip()
     columns = line.split("\t")

@@ -86,6 +86,7 @@ end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
 spaced_emdash_re = re.compile(r".{0,10}—\s.{0,10}|.{0,10}\s—.{0,10}")
 newline_re = re.compile(r"\n")
+comma_missing_whitespace_re = re.compile(r"\w*[a-zA-Z],\w+|\w+,[a-zA-Z]\w*")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -263,6 +264,11 @@ def spellcheck_all_langs(article_title, article_text):
 
         i += 1
 
+    # NLTK tokenizer usually turns words with comma missing
+    # following whitespace into three tokens, e.g.
+    # "xxx,yyy" -> ['xxx', ',', 'yyy']
+    article_oops_list.extend(comma_missing_whitespace_re.findall(article_text))
+
     for word_mixedcase in word_list:
 
         # "." is specifically excluded from the below list, due to
@@ -271,11 +277,11 @@ def spellcheck_all_langs(article_title, article_text):
         word_mixedcase = word_mixedcase.strip(
             # Deal with symmetrical wiki markup
             "=" +
-            # Deal with, NLTK treatment of hyphenated and slashed words
+            # Deal with NLTK treatment of hyphenated and slashed words
             "––/-" +
 
             # TODO: NLTK tokenizer breaks on British quoting style
-            # (which is allowed in places): 'xxx'
+            # (which is allowed in a small number of circumstances): 'xxx'
             "'"
 
             # https://en.wikipedia.org/wiki/%CA%BBOkina#Names

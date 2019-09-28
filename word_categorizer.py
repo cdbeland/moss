@@ -267,6 +267,9 @@ def get_word_category(word):
 
     compound_cat = is_compound(word)
 
+    if "," in word:
+        # Usually whitespace missing after comma
+        category = "TS"
     if az_plus_re.match(word):
         if az_re.match(word):
             edit_distance = near_common_word(word)
