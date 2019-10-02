@@ -86,7 +86,7 @@ end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
 spaced_emdash_re = re.compile(r".{0,10}—\s.{0,10}|.{0,10}\s—.{0,10}")
 newline_re = re.compile(r"\n")
-comma_missing_whitespace_re = re.compile(r"\w*[a-zA-Z],\w+|\w+,[a-zA-Z]\w*")
+comma_missing_whitespace_re = re.compile(r"\w+[a-z],\w\w+|\w+\w,[a-zA-Z]\w+")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -267,7 +267,21 @@ def spellcheck_all_langs(article_title, article_text):
     # NLTK tokenizer usually turns words with comma missing
     # following whitespace into three tokens, e.g.
     # "xxx,yyy" -> ['xxx', ',', 'yyy']
-    article_oops_list.extend(comma_missing_whitespace_re.findall(article_text))
+    missing_comma_pairs = comma_missing_whitespace_re.findall(article_text)
+    for pair in missing_comma_pairs:
+        # Ignore chemistry notation
+        if pair in ["cis,cis", "trans,cis", "alpha,beta", "trans,trans"]:
+            continue
+        if re.match(r"\d(alpha|beta)", pair):
+            continue
+        if ",NAD" in pair:
+            continue
+        # Ignore genetics notation
+        if re.match(r"4\d,X[XY])", pair):
+            continue
+        word_list.append(pair)
+        # These will be matched against the dictionary and Wikipedia
+        # article titles; some forms are legitimate, like [[46,XX]].
 
     for word_mixedcase in word_list:
 
