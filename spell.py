@@ -320,8 +320,6 @@ bad_characters = {
     "ₚ",
     "ₛ",
     "ₜ",
-    "ª",
-    "º",
     "ⱽ",
     "ⱼ",
     "ꝰ",
@@ -563,6 +561,11 @@ bad_characters = {
     "∏",
     # horbar
     "―",
+
+    # Ordinal indicators allowed for non-English languages
+    # [[MOS:ORDINAL]]
+    # "ª",
+    # "º",
 }
 
 # Treated as separate words by NLTK tokenizer
