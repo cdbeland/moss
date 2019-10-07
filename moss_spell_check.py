@@ -96,6 +96,11 @@ with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_sp
 def spellcheck_all_langs(article_title, article_text):
     global article_count
 
+    # if article_title[0] not in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+    # if article_title[0] not in ["A"]:
+    #     print("S\tSKIPPING due to fast run\t%s" % article_title)
+    #     return
+
     if ignore_tags_re.search(article_text):
         print("S\tSKIPPING due to known cleanup tag\t%s" % article_title)
         return
@@ -277,11 +282,16 @@ def spellcheck_all_langs(article_title, article_text):
         if ",NAD" in pair:
             continue
         # Ignore genetics notation
-        if re.match(r"4\d,X[XY])", pair):
+        if re.match(r"4\d,X[XY]", pair):
             continue
-        word_list.append(pair)
-        # These will be matched against the dictionary and Wikipedia
-        # article titles; some forms are legitimate, like [[46,XX]].
+
+        if is_word_spelled_correctly(pair) in [False, "uncertain"]:
+            # The above matches against the dictionary and Wikipedia
+            # article titles; some forms are legitimate, like
+            # [[46,XX]].  But this is separate from the below loop
+            # because we count "uncertain" as misspelled rather than
+            # to be ignored.
+            article_oops_list.append(pair)
 
     for word_mixedcase in word_list:
 
