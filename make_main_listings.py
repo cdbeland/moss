@@ -7,7 +7,7 @@ import string
 from sectionalizer import sectionalize_lines
 
 unsorted = ["R", "I", "N", "P", "H", "U", "TS"]
-probably_wrong = ["T1", "TS+DOT", "T2", "T3", "HB", "HL", "BC", "BW"]
+probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+BRACKET", "TS+EXTRA", "T2", "T3", "HB", "HL", "BC", "BW"]
 probably_right = ["W", "L", "ME", "MI", "MW", "C", "D"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
@@ -17,6 +17,9 @@ typos_by_letter = {
     for letter in first_letters
 }
 before_a = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+comma_missing_ws_re = re.compile(r"\w,\w")
+extra_ws_re = re.compile(r"\w ,\w|\w .\w|\w \)\w|\w\( \w|\w\[ \w|\w ]\w")
+bracket_missing_ws_re = re.compile(r"\w[\[\]\(\)]\w")
 
 
 def get_first_letter(input_string):
@@ -41,6 +44,12 @@ for line in fileinput.input("-"):
     for (index, typo_link) in enumerate(typo_links):
         if types[index] == "TS" and "." in typo_link:
             types[index] = "TS+DOT"
+        if types[index] == "TS" and comma_missing_ws_re.search(typo_link):
+            types[index] = "TS+COMMA"
+        if types[index] == "TS" and extra_ws_re.search(typo_link):
+            types[index] = "TS+EXTRA"
+        if types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
+            types[index] = "TS+BRACKET"
 
     if any(type_ in unsorted for type_ in types):
         continue
