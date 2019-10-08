@@ -65,6 +65,14 @@ for line in fileinput.input("-"):
         continue
     typos_by_letter[get_first_letter(article_title)][best_type].append((article_title, types, typo_links))
 
+
+def clean_typo_link(typo_link):
+    if "&lt;" in typo_link:
+        typo_link = typo_link.replace("[[wikt:", "")
+        typo_link = typo_link.replace("]]", "")
+    return typo_link
+
+
 for (letter, typos_by_best_type) in typos_by_letter.items():
     print(f"= {letter} =")
     for (best_type, tuple_list) in typos_by_best_type.items():
@@ -74,6 +82,7 @@ for (letter, typos_by_best_type) in typos_by_letter.items():
             bad_typo_links = []
             not_typo_links = []
             for (index, type_) in enumerate(types):
+                typo_link = clean_typo_link(typo_link)
                 if type_ in probably_wrong:
                     bad_typo_links.append(typo_links[index])
                 else:
