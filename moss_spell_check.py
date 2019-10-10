@@ -87,6 +87,8 @@ unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
 spaced_emdash_re = re.compile(r".{0,10}—\s.{0,10}|.{0,10}\s—.{0,10}")
 newline_re = re.compile(r"\n")
 comma_missing_whitespace_re = re.compile(r"\w+[a-z],\w\w+|\w+\w,[a-zA-Z]\w+")
+bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\(\)][a-zA-Z]\w+")
+punct_extra_whitespace_re = re.compile(r"\w+ ,\w+|\w+ \.\w+|\w+ \)|\( \w+|\[ \w+|\w+ ]")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -269,29 +271,37 @@ def spellcheck_all_langs(article_title, article_text):
 
         i += 1
 
-    # NLTK tokenizer usually turns words with comma missing
+    # NLTK tokenizer usually turns e.g. words with comma missing
     # following whitespace into three tokens, e.g.
     # "xxx,yyy" -> ['xxx', ',', 'yyy']
-    missing_comma_pairs = comma_missing_whitespace_re.findall(article_text)
-    for pair in missing_comma_pairs:
+    missing_comma_typos = comma_missing_whitespace_re.findall(article_text)
+    for typo in missing_comma_typos:
         # Ignore chemistry notation
-        if pair in ["cis,cis", "trans,cis", "alpha,beta", "trans,trans"]:
+        if typo in ["cis,cis", "trans,cis", "alpha,beta", "trans,trans"]:
             continue
-        if re.match(r"\d(alpha|beta)", pair):
+        if re.match(r"\d(alpha|beta)", typo):
             continue
-        if ",NAD" in pair:
+        if ",NAD" in typo:
             continue
         # Ignore genetics notation
-        if re.match(r"4\d,X[XY]", pair):
+        if re.match(r"4\d,X[XY]", typo):
             continue
 
-        if is_word_spelled_correctly(pair) in [False, "uncertain"]:
+        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
             # The above matches against the dictionary and Wikipedia
             # article titles; some forms are legitimate, like
             # [[46,XX]].  But this is separate from the below loop
             # because we count "uncertain" as misspelled rather than
             # to be ignored.
-            article_oops_list.append(pair)
+            article_oops_list.append(typo)
+
+    for typo in bracket_missing_whitespace_re.findall(article_text):
+        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
+            article_oops_list.append(typo)
+
+    for typo in punct_extra_whitespace_re.findall(article_text):
+        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
+            article_oops_list.append(typo)
 
     for word_mixedcase in word_list:
 
@@ -361,7 +371,7 @@ def spellcheck_all_langs(article_title, article_text):
         # Index by article of mispelled words
         article_oops_list.append(word_mixedcase)
 
-    article_oops_string = u" ".join(article_oops_list)
+    article_oops_string = u"𝆃".join(article_oops_list)
     print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string))
 
     # if article_count % 100000 == 0:

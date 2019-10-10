@@ -67,9 +67,10 @@ for line in fileinput.input("-"):
 
 
 def clean_typo_link(typo_link):
-    if "&lt;" in typo_link:
-        typo_link = typo_link.replace("[[wikt:", "")
-        typo_link = typo_link.replace("]]", "")
+    core = typo_link.replace("[[wikt:", "")
+    core = core.replace("]]", "")
+    if any(substring in core for substring in ["&lt;", "[", "]"]):
+        typo_link = core
     return typo_link
 
 

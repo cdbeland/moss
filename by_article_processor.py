@@ -30,7 +30,7 @@ for line in fileinput.input("-"):
     category = ""
     word_list_linked = ""
     if num_typos:
-        word_list = columns[3].split(" ")
+        word_list = columns[3].split("𝆃")
         category = get_word_categories_cached(word_list)
         word_list_linked = ", ".join("[[wikt:%s]]" % escape(word) for word in word_list)
 

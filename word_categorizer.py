@@ -267,8 +267,8 @@ def get_word_category(word):
 
     compound_cat = is_compound(word)
 
-    if "," in word:
-        # Usually whitespace missing after comma
+    if any(char in word for char in [",", "(", ")", "[", "]", " "]):
+        # Extra or missing whitespace
         category = "TS"
     elif az_plus_re.match(word):
         if az_re.match(word):
