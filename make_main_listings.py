@@ -83,11 +83,10 @@ for (letter, typos_by_best_type) in typos_by_letter.items():
             bad_typo_links = []
             not_typo_links = []
             for (index, type_) in enumerate(types):
-                typo_link = clean_typo_link(typo_link)
                 if type_ in probably_wrong:
-                    bad_typo_links.append(typo_links[index])
+                    bad_typo_links.append(clean_typo_link(typo_links[index]))
                 else:
-                    not_typo_links.append(typo_links[index])
+                    not_typo_links.append(clean_typo_link(typo_links[index]))
             output_line = f'* {len(typo_links)} - [[{article_title}]] - {", ".join(bad_typo_links)}'
             if not_typo_links:
                 output_line += f'  (probably OK: {", ".join(not_typo_links)})'
