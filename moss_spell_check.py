@@ -4,7 +4,7 @@ import nltk
 import re
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
-from spell import is_word_spelled_correctly
+from spell import is_word_spelled_correctly, bad_words
 from grammar import prose_quote_re, ignore_sections_re, line_starts_with_space_re
 
 
@@ -98,8 +98,9 @@ with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_sp
 def spellcheck_all_langs(article_title, article_text):
     global article_count
 
-    # if article_title[0] not in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
-    # if article_title[0] not in ["A"]:
+    # if article_title[0] not in [
+    #         "A",
+    #         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
     #     print("S\tSKIPPING due to fast run\t%s" % article_title)
     #     return
 
@@ -302,6 +303,11 @@ def spellcheck_all_langs(article_title, article_text):
     for typo in punct_extra_whitespace_re.findall(article_text):
         if is_word_spelled_correctly(typo) in [False, "uncertain"]:
             article_oops_list.append(typo)
+
+    # The NLTK tokenizer splits contractions in two
+    for bad_word in bad_words:
+        if "'" in bad_word and bad_word in article_text:
+            article_oops_list.append(bad_word)
 
     for word_mixedcase in word_list:
 
