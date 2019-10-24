@@ -61,7 +61,7 @@ chem_re = re.compile(
     "gluco|aminyl|galacto|pyro|benz|brom|amino|fluor|glycer|cholester|ase$|"
     "chlor|oxy|nitr|silic|phosph|nickel|copper|iron|carb|sulf|alumin|arsen|magnesium|mercury|lead|calcium|"
     "propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
-    "cyclo|poly|iso)")
+    "cyclo|poly|iso|^Bis)")
 
 known_html_bad = {"<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
                   "<tr>", "<td>", "<i>", "<em>", "<dd>", "<dt>",
@@ -97,6 +97,22 @@ with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
 
 print("Done loading.", file=sys.stderr)
 
+element_symbols = [
+    "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S",
+    "Cl", "Ar", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga",
+    "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd",
+    "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe", "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm",
+    "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os",
+    "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn", "Fr", "Ra", "Ac", "Th", "Pa",
+    "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg",
+    "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"]
+
+chem_roman_numerals = ["II", "III", "IV", "VI", "VII", "VIII", "IX"]
+
+element_alternation = "|".join(element_symbols)
+roman_alternation = "|".join(chem_roman_numerals)
+
+chem_formula_re = re.compile(rf"^({element_alternation})+[\(\),]({element_alternation}|{roman_alternation})+$|\(({roman_alternation})$")
 
 # Note: This may malfunction slightly if there are commas inside the
 # chemical name.
@@ -110,6 +126,20 @@ def is_chemistry_word(word):
             return True
     if len(small_word) < len(word) * .25:
         return True
+    if word in ["cis,cis", "trans,cis", "alpha,beta", "trans,trans"]:
+        return True
+    if re.match(r"\d(alpha|beta)", word):
+        return True
+    if ",NAD" in word or "methyl" in word:
+        return True
+    if "phenoxy)" in word or "propyl)" in word or "phenyl)" in word or "oxyimino)" in word or "ethyl)" in word:
+        return True
+    if "dinyl)" in word or "(propylene" in word or "bis(" in word:
+        return True
+
+    if chem_formula_re.match(word):
+        return True
+
     return False
 
 

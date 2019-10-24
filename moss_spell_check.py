@@ -5,6 +5,7 @@ import re
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly, bad_words
+from word_categorizer import is_chemistry_word
 from grammar import prose_quote_re, ignore_sections_re, line_starts_with_space_re
 
 
@@ -79,7 +80,7 @@ def dump_results():
         print(output_string)
 
 
-ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup|[Ww]hich lang(uage)?|[Tt]ypo help inline|[Cc]opyedit).*?}}")
+ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup|[Ww]hich lang(uage)?|[Tt]ypo help inline|[Yy]ou|[Tt]one|[Cc]opyedit).*?}}")
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I+re.S)
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
@@ -121,7 +122,7 @@ def spellcheck_all_langs(article_title, article_text):
     starters = start_template_re.findall(article_text)
     enders = end_template_re.findall(article_text)
     if len(starters) != len(enders):
-        print("!\t* [[%s]] - Mismatched {{ }}; try [https://tools.wmflabs.org/bracketbot/cgi-bin/find.py bracketbot]" % article_title)
+        print("!\t* [[%s]] - Mismatched {{ }}" % article_title)
         return
 
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Dashes
@@ -278,12 +279,9 @@ def spellcheck_all_langs(article_title, article_text):
     missing_comma_typos = comma_missing_whitespace_re.findall(article_text)
     for typo in missing_comma_typos:
         # Ignore chemistry notation
-        if typo in ["cis,cis", "trans,cis", "alpha,beta", "trans,trans"]:
+        if is_chemistry_word(typo):
             continue
-        if re.match(r"\d(alpha|beta)", typo):
-            continue
-        if ",NAD" in typo:
-            continue
+
         # Ignore genetics notation
         if re.match(r"4\d,X[XY]", typo):
             continue
@@ -298,7 +296,8 @@ def spellcheck_all_langs(article_title, article_text):
 
     for typo in bracket_missing_whitespace_re.findall(article_text):
         if is_word_spelled_correctly(typo) in [False, "uncertain"]:
-            article_oops_list.append(typo)
+            if not is_chemistry_word(typo):
+                article_oops_list.append(typo)
 
     for typo in punct_extra_whitespace_re.findall(article_text):
         if is_word_spelled_correctly(typo) in [False, "uncertain"]:
