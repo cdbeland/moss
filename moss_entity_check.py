@@ -106,6 +106,10 @@ def entity_check(article_title, article_text):
                 # times as the string appears
 
     for entity in entities_re.findall(article_text):
+        if entity == "½" and "chess" in article_text:
+            # Per [[MOS:FRAC]]
+            continue
+
         if entity in alert:
             continue
         elif entity in controversial:
