@@ -317,9 +317,12 @@ transform_unsafe = {
     # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
     # be clear from context it's not an apostrophe
 
+    # For native [[Greek numerals]]
+    "&#x0374;": "{{keraia}}",
+
     # For transliterated Arabic ayin
-    "&#703;": "{{asper}}",
-    "ʿ": "{{asper}}",
+    "&#703;": "{{ayin}}",
+    "ʿ": "{{ayin}}",
 
     # MISUSE OF OKINA FOR CHINESE
     # ʻOkina is U+02BB.
@@ -713,6 +716,33 @@ def find_char(entity):
         return None
 
 
+def make_character_or_ignore(entity):
+    # Returns the Unicode character for this entity, or None if the
+    # entity should not be changed.
+
+    character = find_char(entity)
+    if not character:
+        return None
+
+    if unicodedata.combining(character):
+        # Combining characters are too difficult to edit as themselves
+        return None
+    if variant_selectors_re.match(entity):
+        return None
+    value = find_char_num(entity)
+    if value >= 0xE000 and value <= 0xF8FF:
+        # Private Use Area
+        return None
+    if value >= 0xF0000 and value <= 0xFFFFD:
+        # Supplemental Private Use Area-A
+        return None
+    if value >= 0x100000 and value <= 0x10FFFD:
+        # Supplemental Private Use Area-B
+        return None
+
+    return character
+
+
 def fix_text(text, transform_greek=False):
 
     if transform_greek:
@@ -725,15 +755,6 @@ def fix_text(text, transform_greek=False):
     for (from_string, to_string) in conversion_dict.items():
         new_text = new_text.replace(from_string, to_string)
 
-    """
-    for string in alert:
-        if string in new_text:
-            with_context_re = re.compile(r".{0,10}%s.{0,10}" % string)
-            with_context_results = with_context_re.findall(text)
-            print("FOUND BAD CHARACTER IN TEXT: %s" % " ".join(with_context_results),
-                  file=sys.stderr)
-    """
-
     test_string = new_text
     for string in keep:
         test_string = test_string.replace(string, "")
@@ -741,26 +762,9 @@ def fix_text(text, transform_greek=False):
         for string in greek_letters:
             test_string = test_string.replace(string, "")
     for unknown_entity in re.findall("&#?[a-zA-Z0-9]+;", test_string):
-        character = find_char(unknown_entity)
-        if character:
-            if unicodedata.combining(character):
-                # Combining characters are too difficult to edit as themselves
-                continue
-            if variant_selectors_re.match(unknown_entity):
-                continue
-            value = find_char_num(unknown_entity)
-            if value >= 0xE000 and value <= 0xF8FF:
-                # Private Use Area
-                continue
-            if value >= 0xF0000 and value <= 0xFFFFD:
-                # Supplemental Private Use Area-A
-                continue
-            if value >= 0x100000 and value <= 0x10FFFD:
-                # Supplemental Private Use Area-B
-                continue
+        character = make_character_or_ignore(unknown_entity)
+        if character is not None:
             new_text = new_text.replace(unknown_entity, character)
-            # print("unknown entity: %s  character: %s" % (unknown_entity, character),
-            #       file=sys.stderr)
 
     return new_text
 

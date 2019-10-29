@@ -4,7 +4,9 @@ from moss_dump_analyzer import read_en_article_text
 import re
 import sys
 import unicodedata
-from unencode_entities import alert, keep, controversial, transform, greek_letters, find_char_num, entities_re, fix_text
+from unencode_entities import (
+    alert, keep, controversial, transform, greek_letters, find_char_num,
+    entities_re, fix_text, make_character_or_ignore)
 
 alerts_found = {}
 controversial_found = {}
@@ -109,7 +111,8 @@ def entity_check(article_title, article_text):
         if entity == "½" and "chess" in article_text:
             # Per [[MOS:FRAC]]
             continue
-
+        if make_character_or_ignore(entity) is None:
+            continue
         if entity in alert:
             continue
         elif entity in controversial:
