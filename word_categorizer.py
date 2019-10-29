@@ -114,6 +114,7 @@ roman_alternation = "|".join(chem_roman_numerals)
 
 chem_formula_re = re.compile(rf"^({element_alternation})+[\(\),]({element_alternation}|{roman_alternation})+$|\(({roman_alternation})$")
 
+
 # Note: This may malfunction slightly if there are commas inside the
 # chemical name.
 # https://en.wikipedia.org/wiki/IUPAC_nomenclature_of_inorganic_chemistry
