@@ -60,6 +60,8 @@ REGEX_SUBSTITUTIONS = [
 
     # https://en.wikipedia.org/wiki/Wikipedia:Use_modern_language
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch
+
+    # https://en.wikipedia.org/wiki/User:Tony1/How_to_improve_your_writing
 ]
 
 
