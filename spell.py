@@ -100,6 +100,7 @@ number_formats_allowed_re = re.compile(
                        base_number_format,
                        "|".join(prefixed_number_formats)))
 
+# Word blacklist
 bad_words = {
 
     # TODO: Ignore articles with "unmanned aerial vehicle" to reduce
@@ -238,6 +239,9 @@ bad_words = {
     "you'll",
     "your",
     "you're",
+
+    # Per [[MOS:COMMONALITY]]
+    "gaol",  # should be "jail"
 }
 
 bad_characters = {
