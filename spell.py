@@ -239,9 +239,6 @@ bad_words = {
     "you'll",
     "your",
     "you're",
-
-    # Per [[MOS:COMMONALITY]]
-    "gaol",  # should be "jail"
 }
 
 bad_characters = {
