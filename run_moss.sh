@@ -140,6 +140,7 @@ grep ^N tmp-words-with-articles.txt | perl -pe 's/^N\t//'| grep -vP 'wikt:[\w-]+
 
 grep ^I tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 > tmp-words-with-articles-truncated.txt
 cat tmp-words-with-articles-truncated.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-misspellings-intl.txt
+rm -f tmp-words-with-articles-truncated.txt
 # TODO for intl:
 # * Separate words into the scripts they use:
 #  -> See https://en.wikipedia.org/wiki/Wikipedia:Language_recognition_chart
