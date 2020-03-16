@@ -90,14 +90,58 @@ newline_re = re.compile(r"\n")
 comma_missing_whitespace_re = re.compile(r"\w+[a-z],\w\w+|\w+\w,[a-zA-Z]\w+")
 bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\(\)][a-zA-Z]\w+")
 punct_extra_whitespace_re = re.compile(r"\w+ ,\w+|\w+ \.\w+|\w+ \)|\( \w+|\[ \w+|\w+ ]")
+caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
+batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
     requested_species_html = requested_species_file.read()
 
 
+def ignore_typo_in_context(word_mixedcase, article_text_orig):
+
+    # Hack to avoid having to do even more complicated token
+    # re-assembly, though this may cause some unnecessary HTML
+    # markup on the same page to be ignored.
+    if word_mixedcase == "<li>" and "<li value=" in article_text_orig:
+        return True
+    if word_mixedcase == "<li>" and "<ol start=" in article_text_orig:
+        return True
+    if word_mixedcase == "<ol>" and "<ol start=" in article_text_orig:
+        return True
+
+    # TODO: In some situations this might actually be replaced
+    # with a streamlined wiki-style list, or footnote syntax.
+    if word_mixedcase == "<ol>" and "<ol type=" in article_text_orig:
+        return True
+    if word_mixedcase == "<li>" and "<ol type=" in article_text_orig:
+        return True
+
+    # Exceptions made by
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Decimals
+    if caliber_re.search(word_mixedcase) and ("caliber" in article_text_orig or "calibre" in article_text_orig):
+        return True
+    if batting_average_re.search(word_mixedcase):
+        if "batting average" in article_text_orig:
+            return True
+        if "fielding percentage" in article_text_orig:
+            return True
+        if "slugging percentage" in article_text_orig:
+            return True
+
+    # e.g. "Microsoft .NET"
+    if " " in word_mixedcase:
+        words = word_mixedcase.split()
+        if all(is_word_spelled_correctly(word) is True for word in words):
+            return True
+
+    return False
+
+
 def spellcheck_all_langs(article_title, article_text):
     global article_count
+
+    # -- Skip article entirely if appropriate --
 
     # if article_title[0] not in [
     #         "A",
@@ -114,6 +158,8 @@ def spellcheck_all_langs(article_title, article_text):
         print("S\tSKIPPING - list with requested species\t%s" % article_title)
         return
 
+    # -- Fatal problems --
+
     article_text_orig = article_text
     article_text = wikitext_to_plaintext(article_text)
 
@@ -125,6 +171,8 @@ def spellcheck_all_langs(article_title, article_text):
         print("!\t* [[%s]] - Mismatched {{ }}" % article_title)
         return
 
+    # -- Dashes --
+
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Dashes
     # requires that emdashes be unspaced.
     article_text_safe = newline_re.sub(" ", article_text)
@@ -134,6 +182,8 @@ def spellcheck_all_langs(article_title, article_text):
             len(bad_emdash_context_list),
             article_title,
             " ... ".join(bad_emdash_context_list)))
+
+    # -- Non-body-text sections and blocks --
 
     # TODO: Get smarter about these sections.  But for now, ignore
     # them, since they are full of proper nouns and URL words.
@@ -161,6 +211,8 @@ def spellcheck_all_langs(article_title, article_text):
         #  [[340B Drug Pricing Program]] - [s]tretch
         #  [[Zachery Kouwe]] - appropriat[ing]
 
+    # -- More fatal problems --
+
     for unmatched_item in ["<ref", "</ref>", "<blockquote", "</blockquote>", "}}", "{{", '"', "colspan", "rowspan", "cellspacing"]:
         if unmatched_item in article_text:
             matches = re.findall(r".{0,20}%s.{0,20}" % unmatched_item, article_text)
@@ -182,10 +234,51 @@ def spellcheck_all_langs(article_title, article_text):
     #     print("W\tWARNING: Unknown HTML tag(s) present: %s \t%s" % ("  ".join(html_tag_matches), article_title))
     #     print("W\t%s" % article_text)
 
+    # -- Initialization for main spell check --
+
     article_count += 1
     article_oops_list = []
-
     article_text = article_text.replace("✂", " ")
+
+    # -- Punctuation and whitespace errors not using word_list --
+
+    # NLTK tokenizer usually turns e.g. words with comma missing
+    # following whitespace into three tokens, e.g.
+    # "xxx,yyy" -> ['xxx', ',', 'yyy']
+    missing_comma_typos = comma_missing_whitespace_re.findall(article_text)
+    for typo in missing_comma_typos:
+        # Ignore chemistry notation
+        if is_chemistry_word(typo):
+            continue
+
+        # Ignore genetics notation
+        if re.match(r"4\d,X[XY]", typo):
+            continue
+
+        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
+            # The above matches against the dictionary and Wikipedia
+            # article titles; some forms are legitimate, like
+            # [[46,XX]].  But this is separate from the below loop
+            # because we count "uncertain" as misspelled rather than
+            # to be ignored.
+            article_oops_list.append(typo)
+
+    for typo in bracket_missing_whitespace_re.findall(article_text):
+        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
+            if not is_chemistry_word(typo):
+                article_oops_list.append(typo)
+
+    for typo in punct_extra_whitespace_re.findall(article_text):
+        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
+            article_oops_list.append(typo)
+
+    # The NLTK tokenizer splits contractions in two
+    for bad_word in bad_words:
+        if "'" in bad_word and bad_word in article_text:
+            article_oops_list.append(bad_word)
+
+    # -- Generate and fix tokenization of word_list --
+
     word_list = nltk.word_tokenize(article_text)
 
     # Old-fashioned loop to allow lookahead and cope with the fact
@@ -273,40 +366,7 @@ def spellcheck_all_langs(article_title, article_text):
 
         i += 1
 
-    # NLTK tokenizer usually turns e.g. words with comma missing
-    # following whitespace into three tokens, e.g.
-    # "xxx,yyy" -> ['xxx', ',', 'yyy']
-    missing_comma_typos = comma_missing_whitespace_re.findall(article_text)
-    for typo in missing_comma_typos:
-        # Ignore chemistry notation
-        if is_chemistry_word(typo):
-            continue
-
-        # Ignore genetics notation
-        if re.match(r"4\d,X[XY]", typo):
-            continue
-
-        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
-            # The above matches against the dictionary and Wikipedia
-            # article titles; some forms are legitimate, like
-            # [[46,XX]].  But this is separate from the below loop
-            # because we count "uncertain" as misspelled rather than
-            # to be ignored.
-            article_oops_list.append(typo)
-
-    for typo in bracket_missing_whitespace_re.findall(article_text):
-        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
-            if not is_chemistry_word(typo):
-                article_oops_list.append(typo)
-
-    for typo in punct_extra_whitespace_re.findall(article_text):
-        if is_word_spelled_correctly(typo) in [False, "uncertain"]:
-            article_oops_list.append(typo)
-
-    # The NLTK tokenizer splits contractions in two
-    for bad_word in bad_words:
-        if "'" in bad_word and bad_word in article_text:
-            article_oops_list.append(bad_word)
+    # -- Main spellcheck loop --
 
     for word_mixedcase in word_list:
 
@@ -345,25 +405,10 @@ def spellcheck_all_langs(article_title, article_text):
             print("G\t%s\t%s" % (word_mixedcase, article_title))
             # "G" for "iGnored but maybe shouldn't be"
             continue
-
-        # Hack to avoid having to do even more complicated token
-        # re-assembly, though this may cause some unnecessary HTML
-        # markup on the same page to be ignored.
-        if word_mixedcase == "<li>" and "<li value=" in article_text_orig:
-            continue
-        if word_mixedcase == "<li>" and "<ol start=" in article_text_orig:
-            continue
-        if word_mixedcase == "<ol>" and "<ol start=" in article_text_orig:
+        if ignore_typo_in_context(word_mixedcase, article_text_orig):
             continue
 
-        # TODO: In some situations this might actually be replaced
-        # with a streamlined wiki-style list, or footnote syntax.
-        if word_mixedcase == "<ol>" and "<ol type=" in article_text_orig:
-            continue
-        if word_mixedcase == "<li>" and "<ol type=" in article_text_orig:
-            continue
-
-        # Word is misspelled, so...
+        # - Word is misspelled -
 
         # Normalize for report rollup purposes, even if this is incorrect capitalization
         word_lower = word_mixedcase.lower()
