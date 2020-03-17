@@ -852,6 +852,10 @@ enwiktionary_cat_to_pos = {
 """
 BOOK: https://www.amazon.com/Cambridge-Grammar-English-Language/dp/0521431468
 
+** TRY GENERATING ALL VALID POS SEQUENCES
+* Instead of parsing every sentence, just POS tag and see if ANY
+  possible POS sequence for the sentence is grammatically valid
+
 
 ** TRY PARSING EVERYTHING WITH ONLY THE MOST COMMON POS FOR THAT WORD!
 -> for speed on correct sentences!
@@ -870,4 +874,5 @@ Systems:
 
 https://en.wikipedia.org/wiki/Part-of-speech_tagging#Tag_sets
 -> 50 to 150 POSes are typical, over 1000 possible
+
 """
