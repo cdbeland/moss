@@ -9,6 +9,7 @@
 #      split by space or dash
 # BW = Bad word
 # BC = Bad character
+# Z = Decimal fraction missing leading zero
 #
 # Probably OK:
 #
@@ -54,6 +55,7 @@ az_dot_re = re.compile(r"^[a-z]+(\-[a-z]+)?\.[a-z]+(\-[a-z]+)?$", flags=re.I)
 ag_re = re.compile(r"^[a-g]+$")
 mz_re = re.compile(r"[m-z]")
 dna_re = re.compile(r"^[acgt]+$")
+missing_leading_zero_re = re.compile(r"[^ ]\.\d")
 chem_re = re.compile(
     r"(\d+\-|"
     "mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
@@ -301,6 +303,8 @@ def get_word_category(word):
     if any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
         category = "TS"
+    elif missing_leading_zero_re.search(word):
+        category = "Z"
     elif az_plus_re.match(word):
         if az_re.match(word):
             edit_distance = near_common_word(word)
