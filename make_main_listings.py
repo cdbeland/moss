@@ -6,9 +6,27 @@ import string
 
 from sectionalizer import sectionalize_lines
 
-unsorted = ["Z", "R", "I", "N", "P", "H", "U", "TS"]
-probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+BRACKET", "TS+EXTRA", "T2", "T3", "HB", "HL", "BC", "BW"]
-probably_right = ["W", "L", "ME", "MI", "MW", "C", "D"]
+unsorted = [
+    "BW",
+    # TODO: BW needs to ignore italics and capital letters for "You"
+    # in titles etc.  See [[1947]], [[1972 in film]]
+
+    "W",
+    # TODO: Contractions like "I'm" are mixed in, should be in BW
+    # Most of these need {{lang}}
+
+    "I",
+    # TODO: "/" and other punctuation needs to be sorted out
+
+    "MW",
+    "MI",
+    # TODO: Making compounds that combine English and non-English
+    # words lets a lot of misspellings in.  Non-English words need
+    # {{lang}} anyway.
+
+    "Z", "R", "N", "P", "H", "U", "TS"]
+probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+BRACKET", "TS+EXTRA", "T2", "T3", "HB", "HL", "BC"]
+probably_right = ["L", "ME", "C", "D"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
 first_letters = ["BEFORE A"] + [letter for letter in string.ascii_uppercase] + ["AFTER Z"]
