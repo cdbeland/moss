@@ -596,6 +596,10 @@ allowed_list = {
     "</abbr>",
     "<mapframe/>",
 
+    # Allowed HTML
+    "<samp>",  # Replaces <tt>, {{samp}} can't do multi-line
+    "</samp>",
+
     # TODO: This discussion was somewhat inconclusive:
     # https://en.wikipedia.org/wiki/Wikipedia:Templates_for_discussion/Log/2019_March_17#Template:Dfn
     # These should probably be converted to {{dfn}} or markup removed.
