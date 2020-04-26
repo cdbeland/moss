@@ -58,20 +58,20 @@ dna_re = re.compile(r"^[acgt]+$")
 missing_leading_zero_re = re.compile(r"[^ ]\.\d")
 chem_re = re.compile(
     r"(\d+\-|\d+,\d\-?|N\d+,N\d+\-?|,\d+|"
-    "mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
-    "hydrogen"
-    "methyl|phenyl|acetate|ene|ine|ane|ide|hydro|nyl|ate$|ium$|acetyl|"
-    "gluco|aminyl|galacto|pyro|benz|brom|amino|fluor|glyc|cholester|ase$|"
-    "chlor|oxy|nitr|silic|phosph|nickel|copper|iron|carb|sulf|alumin|arsen|magnesium|mercury|lead|calcium|"
-    "propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
-    "cyclo|poly|iso|^Bis|methan|ase|delta\d+|late$|meth|ate$|dione)+",
+    r"mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
+    r"hydrogen"
+    r"methyl|phenyl|acetate|ene|ine|ane|ide|hydro|nyl|ate$|ium$|acetyl|"
+    r"gluco|aminyl|galacto|pyro|benz|brom|amino|fluor|glyc|cholester|ase$|"
+    r"chlor|oxy|nitr|silic|phosph|nickel|copper|iron|carb|sulf|alumin|arsen|magnesium|mercury|lead|calcium|"
+    r"propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
+    r"cyclo|poly|iso|^Bis|methan|ase|delta\d+|late$|meth|ate$|dione)+",
     flags=re.I)
 
 known_html_bad = {"<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
                   "<tr>", "<td>", "<i>", "<em>", "<dd>", "<dt>",
                   "<dl>", "<cite>", "<p>", "<strong>", "<b>", "<hr>",
                   "<hr/>", "<font>", "</br>", "<center>", "<strike>",
-                  "<ins>", "<samp>", "<q>", "<wbr>", "<ruby>", "<rt>",
+                  "<ins>", "<q>", "<wbr>", "<ruby>", "<rt>",
                   "<rp>"}
 known_bad_link = {"<http>", "<https>", "<http/>", "<https/>", "<www>"}
 not_html = {"<a>", "<name>", "<r>", "<h>"}
