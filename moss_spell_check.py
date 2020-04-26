@@ -92,10 +92,15 @@ bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\
 punct_extra_whitespace_re = re.compile(r"\w+ ,\w+|\w+ \.\w+|\w+ \)|\( \w+|\[ \w+|\w+ ]")
 caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
 batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
+roman_num_parens_re = re.compile(r"\([IVX]+$")  # closing paren intentionally omitted
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
     requested_species_html = requested_species_file.read()
+
+article_skip_list = [
+    "Unicode subscripts and superscripts",  # Really only need to suppress BC for this article
+]
 
 
 def ignore_typo_in_context(word_mixedcase, article_text_orig):
@@ -103,12 +108,20 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
     # Hack to avoid having to do even more complicated token
     # re-assembly, though this may cause some unnecessary HTML
     # markup on the same page to be ignored.
-    if word_mixedcase == "<li>" and "<li value=" in article_text_orig:
-        return True
-    if word_mixedcase == "<li>" and "<ol start=" in article_text_orig:
-        return True
-    if word_mixedcase == "<ol>" and "<ol start=" in article_text_orig:
-        return True
+    if word_mixedcase == "<li>":
+        if "<li value=" in article_text_orig:
+            return True
+        if "<li value =" in article_text_orig:
+            return True
+        if "<ol start=" in article_text_orig:
+            return True
+        if "<ol start =" in article_text_orig:
+            return True
+    if word_mixedcase == "<ol>":
+        if "<ol start=" in article_text_orig:
+            return True
+        if "<ol start =" in article_text_orig:
+            return True
 
     # TODO: In some situations this might actually be replaced
     # with a streamlined wiki-style list, or footnote syntax.
@@ -148,6 +161,14 @@ def spellcheck_all_langs(article_title, article_text):
     #         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
     #     print("S\tSKIPPING due to fast run\t%s" % article_title)
     #     return
+
+    # if not article_title.startswith("List"):
+    #     print("S\tSKIPPING due to fast run\t%s" % article_title)
+    #     return
+
+    if article_title in article_skip_list:
+        print("S\tSKIPPING due to article skip list\t%s" % article_title)
+        return
 
     if ignore_tags_re.search(article_text):
         print("S\tSKIPPING due to known cleanup tag\t%s" % article_title)
@@ -195,7 +216,7 @@ def spellcheck_all_langs(article_title, article_text):
     quotation_list.extend(prose_quote_re.findall(article_text))
     if quotation_list:
         article_text = blockquote_re.sub(" ", article_text)
-        article_text = prose_quote_re.sub("", article_text)
+        article_text = prose_quote_re.sub("✂", article_text)
 
         # (Works, but disabled to save space because output is not being used.)
         # print("Q\t%s\t%s" % (article_title, u"\t".join(quotation_list)))
@@ -296,6 +317,13 @@ def spellcheck_all_langs(article_title, article_text):
         # semicolon.
 
         # TODO: Parameterize to avoid code duplication
+
+        # Two-token sequences
+        if i < len(word_list) - 1:
+            if word_list[i + 1] == ")" and roman_num_parens_re.match(word_list[i]):
+                # e.g. "Chromium(IV)" where the ")" is incorrecty parsed as a separate token
+                word_list[i] = word_list[i] + ")"
+                del word_list[i + 1]
 
         # Three-token sequences
         if i < len(word_list) - 2:
