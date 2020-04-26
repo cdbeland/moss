@@ -102,3 +102,10 @@ cd $ORIG_DIR
 echo `date`
 venv/bin/python3 extract_english.py > /bulk-wikipedia/english_words_only.txt
 # extract_english.py takes about 40 minutes
+
+
+# 1. From this script, run pywikibot in a Python script and get all
+# the names of articles in
+# https://en.wikipedia.org/w/index.php?title=Category:Redirects_from_misspellings
+# 2. At spell-check time load these into memory. Use them to mark
+# words as known misspellings.
