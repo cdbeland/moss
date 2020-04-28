@@ -88,11 +88,14 @@ unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
 spaced_emdash_re = re.compile(r".{0,10}—\s.{0,10}|.{0,10}\s—.{0,10}")
 newline_re = re.compile(r"\n")
 comma_missing_whitespace_re = re.compile(r"\w+[a-z],\w\w+|\w+\w,[a-zA-Z]\w+")
-bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\(\)][a-zA-Z]\w+")
+
+bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\(\)][a-zA-Z]\w+([\]\)])?")
+# Includes optional closing ] or ) to deal with situations like
+# "Chromium(IV)", which is correctly spelled
+
 punct_extra_whitespace_re = re.compile(r"\w+ ,\w+|\w+ \.\w+|\w+ \)|\( \w+|\[ \w+|\w+ ]")
 caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
 batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
-roman_num_parens_re = re.compile(r"\([IVX]+$")  # closing paren intentionally omitted
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -317,13 +320,6 @@ def spellcheck_all_langs(article_title, article_text):
         # semicolon.
 
         # TODO: Parameterize to avoid code duplication
-
-        # Two-token sequences
-        if i < len(word_list) - 1:
-            if word_list[i + 1] == ")" and roman_num_parens_re.match(word_list[i]):
-                # e.g. "Chromium(IV)" where the ")" is incorrecty parsed as a separate token
-                word_list[i] = word_list[i] + ")"
-                del word_list[i + 1]
 
         # Three-token sequences
         if i < len(word_list) - 2:
