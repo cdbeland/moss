@@ -29,6 +29,9 @@
 # R = Regular word (a-z only)
 # I = International (non-ASCII characters)
 # N = Numbers or punctuation
+# ND = Number, Decimal fraction (could be caliber or batting average;
+#      otherwise, an MOS violation if it's missing a leading zero)
+
 
 from collections import defaultdict
 import difflib
@@ -38,11 +41,13 @@ from nltk.metrics import distance
 import re
 import sys
 try:
+    from moss_spell_check import batting_average_re, caliber_re
     from sectionalizer import get_word
     from spell import bad_characters
     from spell import bad_words
     from wikitext_util import html_tag_re
 except ImportError:
+    from .moss_spell_check import batting_average_re, caliber_re
     from .sectionalizer import get_word
     from .spell import bad_characters
     from .spell import bad_words
@@ -330,7 +335,12 @@ def get_word_category(word):
             # a sentence
             category = "TS"
         else:
-            category = "N"
+            if batting_average_re.search(word):
+                category = "ND"
+            elif caliber_re.search(word):
+                category = "ND"
+            else:
+                category = "N"
     elif html_tag_re.match(word):
         category = "H"
         if word in known_bad_link:

@@ -24,6 +24,10 @@ unsorted = [
     # words lets a lot of misspellings in.  Non-English words need
     # {{lang}} anyway.
 
+    "ND",
+    # TODO: Special report for batting averages and calibers, possibly
+    # geared for JWB
+
     "Z", "R", "N", "P", "H", "U", "TS"]
 probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+BRACKET", "TS+EXTRA", "T2", "T3", "HB", "HL", "BC"]
 probably_right = ["L", "ME", "C", "D"]
