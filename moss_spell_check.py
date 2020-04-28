@@ -5,7 +5,7 @@ import re
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly, bad_words
-from word_categorizer import is_chemistry_word
+from word_categorizer import is_chemistry_word, batting_average_re, caliber_re
 from grammar import prose_quote_re, ignore_sections_re, line_starts_with_space_re
 
 
@@ -31,15 +31,6 @@ from grammar import prose_quote_re, ignore_sections_re, line_starts_with_space_r
 #   "{{[\w]+(misspelling|incorrect)[\w* ]+}}" pages on enwiki and
 #   prepare batch edits for these
 # * Is there an equivalent for misspellings on wiktionary?
-
-# TODO: Use enwiktionary-20141129-pages-articles.xml and look for
-# r"=\s*English" and part-of-speech headers or whatever.  This sorts
-# out the non-English words for spellcheck purposes, and also produces
-# dict values for part-of-speech tagging
-# {'the': 'article'}
-#
-# ALTERNATIVELY, use category memberships??  Cross-check these two
-# lists?
 
 # TODOs:
 # * Handle multi-word phrases properly, or slice up article titles?
@@ -82,6 +73,7 @@ def dump_results():
 
 ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup|[Ww]hich lang(uage)?|[Tt]ypo help inline|[Yy]ou|[Tt]one|[Cc]opyedit).*?}}")
 blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I+re.S)
+line_starts_with_colon_re = re.compile(r"\n:[^\n]*\n")
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
@@ -94,8 +86,6 @@ bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\
 # "Chromium(IV)", which is correctly spelled
 
 punct_extra_whitespace_re = re.compile(r"\w+ ,\w+|\w+ \.\w+|\w+ \)|\( \w+|\[ \w+|\w+ ]")
-caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
-batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
 
 requested_species_html = ""
 with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
@@ -214,6 +204,8 @@ def spellcheck_all_langs(article_title, article_text):
     article_text = ignore_sections_re.sub("", article_text)
     # Many of these are computer programming code snippets
     article_text = line_starts_with_space_re.sub("\n", article_text)
+    # These are generally quotes or technical content
+    article_text = line_starts_with_colon_re.sub("\n", article_text)
 
     quotation_list = blockquote_re.findall(article_text)
     quotation_list.extend(prose_quote_re.findall(article_text))

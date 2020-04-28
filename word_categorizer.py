@@ -39,13 +39,11 @@ from nltk.metrics import distance
 import re
 import sys
 try:
-    from moss_spell_check import batting_average_re, caliber_re
     from sectionalizer import get_word
     from spell import bad_characters
     from spell import bad_words
     from wikitext_util import html_tag_re
 except ImportError:
-    from .moss_spell_check import batting_average_re, caliber_re
     from .sectionalizer import get_word
     from .spell import bad_characters
     from .spell import bad_words
@@ -59,6 +57,8 @@ ag_re = re.compile(r"^[a-g]+$")
 mz_re = re.compile(r"[m-z]")
 dna_re = re.compile(r"^[acgt]+$")
 missing_leading_zero_re = re.compile(r"[^ ]\.\d")
+caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
+batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
 chem_re = re.compile(
     r"(\d+\-|\d+,\d\-?|N\d+,N\d+\-?|,\d+|"
     r"mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
