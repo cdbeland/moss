@@ -9,7 +9,8 @@
 #      split by space or dash
 # BW = Bad word
 # BC = Bad character
-# Z = Decimal fraction missing leading zero
+# Z = Decimal fraction missing leading zero (includes calibers and
+#     batting averages that need a link in the article)
 #
 # Probably OK:
 #
@@ -29,9 +30,6 @@
 # R = Regular word (a-z only)
 # I = International (non-ASCII characters)
 # N = Numbers or punctuation
-# ND = Number, Decimal fraction (could be caliber or batting average;
-#      otherwise, an MOS violation if it's missing a leading zero)
-
 
 from collections import defaultdict
 import difflib
@@ -336,9 +334,9 @@ def get_word_category(word):
             category = "TS"
         else:
             if batting_average_re.search(word):
-                category = "ND"
+                category = "Z"
             elif caliber_re.search(word):
-                category = "ND"
+                category = "Z"
             else:
                 category = "N"
     elif html_tag_re.match(word):
