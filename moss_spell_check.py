@@ -5,7 +5,7 @@ import re
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext
 from spell import is_word_spelled_correctly, bad_words
-from word_categorizer import is_chemistry_word, batting_average_re, caliber_re
+from word_categorizer import is_chemistry_word
 from grammar import prose_quote_re, ignore_sections_re, line_starts_with_space_re
 
 
@@ -80,6 +80,8 @@ unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
 spaced_emdash_re = re.compile(r".{0,10}—\s.{0,10}|.{0,10}\s—.{0,10}")
 newline_re = re.compile(r"\n")
 comma_missing_whitespace_re = re.compile(r"\w+[a-z],\w\w+|\w+\w,[a-zA-Z]\w+")
+caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
+batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
 
 bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\(\)][a-zA-Z]\w+([\]\)])?")
 # Includes optional closing ] or ) to deal with situations like

@@ -56,9 +56,7 @@ az_dot_re = re.compile(r"^[a-z]+(\-[a-z]+)?\.[a-z]+(\-[a-z]+)?$", flags=re.I)
 ag_re = re.compile(r"^[a-g]+$")
 mz_re = re.compile(r"[m-z]")
 dna_re = re.compile(r"^[acgt]+$")
-missing_leading_zero_re = re.compile(r"[^ ]\.\d")
-caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
-batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
+missing_leading_zero_re = re.compile(r"[ ^]\.\d")
 chem_re = re.compile(
     r"(\d+\-|\d+,\d\-?|N\d+,N\d+\-?|,\d+|"
     r"mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
@@ -333,12 +331,7 @@ def get_word_category(word):
             # a sentence
             category = "TS"
         else:
-            if batting_average_re.search(word):
-                category = "Z"
-            elif caliber_re.search(word):
-                category = "Z"
-            else:
-                category = "N"
+            category = "N"
     elif html_tag_re.match(word):
         category = "H"
         if word in known_bad_link:
