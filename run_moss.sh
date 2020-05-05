@@ -37,7 +37,7 @@ rm -rf /tmp/sorted_by_article.txt
 # grep ^@ tmp-output.txt | sort -nr -k2 | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 
 grep -P '^!\t' tmp-output.txt | perl -pe 's/.*?\t//' | sort > post-parse-failures.txt
-grep -P '^\!Q' tmp-output.txt | perl -pe 's/^\!Q\t\* \[\[(.*?)\]\].*$/$1/' | sort > jwb-straight-quotes-unbalanced.txt
+grep -P '^\!Q' tmp-output.txt | perl -pe 's/^\!Q\t\* \[\[(.*?)\]\].*$/$1/' | sort | ../venv/bin/python3 ../sectionalizer.py LARGE > jwb-straight-quotes-unbalanced.txt
 # grep '^G' tmp-output.txt | sort > debug-spellcheck-ignored.txt  # Not currently used, may reactivate in future
 
 echo "Beginning word categorization run 2"

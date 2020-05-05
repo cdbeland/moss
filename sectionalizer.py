@@ -12,9 +12,11 @@ def get_word(line):
     match_result = re.search(r"\[\[(.*?)\]\]",
                              line)
     if not match_result or not match_result.group(1):
-        print("Word not found in line: '%s'" % line,
-              file=sys.stderr)
-        return None
+        # print("Word not found in line: '%s'" % line,
+        #       file=sys.stderr)
+        # return None
+        return line
+
     word = match_result.group(1)
     if word.startswith("wikt:"):
         word = word.replace("wikt:", "")
@@ -120,4 +122,7 @@ def sectionalize_lines(list_of_lines):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == "LARGE":
+        MAX_SIZE = 150
+        MIN_SIZE = 100
     print(sectionalize_lines(fileinput.input("-")))
