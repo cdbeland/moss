@@ -63,11 +63,19 @@ article_blacklist = [
     # Correctly uses U+2011 Non-Breaking Hypens
     "Börje",
 
+    # Correctly uses center dots
+    "Additive category",
+
     # Variation issues, maybe need a variant selector?
     "Seong",
     "Sung-mi",
     "Yasukuni Shrine",
 ]
+
+
+# Max number of articles a character can appear in before it's ignored
+# for JWB purposes.
+JWB_ARTICLE_CUTOFF = 1100
 
 
 def add_safely(value, key, dictionary):
@@ -108,7 +116,7 @@ def entity_check(article_title, article_text):
                 # times as the string appears
 
     for entity in entities_re.findall(article_text):
-        if entity == "½" and "chess" in article_text:
+        if entity == "½" and ("chess" in article_text.lower() or "chess" in article_title.lower()):
             # Per [[MOS:FRAC]]
             continue
         if make_character_or_ignore(entity) is None:
@@ -147,6 +155,18 @@ def entity_check(article_title, article_text):
 
 def dump_dict(section_title, dictionary):
     print("=== %s ===" % section_title)
+
+    if section_title == "To avoid":
+        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+    elif section_title == "Uncontroversial entities":
+        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+    elif section_title == "Unknown":
+        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+    elif section_title == "Unknown numerical: Latin range":
+        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+    elif section_title == "Unknown high numerical":
+        print(f"Fix automatically with jwb-articles-high.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
     for (key, article_list) in sorted_items[0:50]:
         article_set = set(article_list)
@@ -155,7 +175,11 @@ def dump_dict(section_title, dictionary):
             len(article_set),
             key,
             ", ".join(["[[%s]]" % article for article in sorted(article_set)][0:500])
-            ))
+            # Limit at 500 to avoid sorting 100,000+ titles, several
+            # times.  Sampled articles aren't always the ones at the
+            # beginning of the alphabet as a result, but this doesn't
+            # really matter.
+        ))
 
 
 def extract_entities(dictionary):
@@ -168,7 +192,7 @@ def extract_articles(dictionary):
         # Skip articles that only have very common characters or
         # entities that will need to be dealt with by a real bot
         # someday.
-        if len(article_list) < 500:
+        if len(article_list) < JWB_ARTICLE_CUTOFF:
             articles.update(article_list)
     return articles
 
@@ -179,7 +203,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += """{"string":{"articleList":"","summary":"convert special characters","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":false,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n"""  # noqa
 
     for entity in sorted(bad_entities):
-        fixed_entity = fix_text(entity)
+        fixed_entity = fix_text(entity, transform_greek=True)
         if fixed_entity == '"':
             fixed_entity = r'\"'
         if fixed_entity == "\\":
