@@ -211,6 +211,8 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
+    "&#8239; ": "&nbsp;",    # narrow no-break space
+
     "µ": "μ",  # micro to mu
 
     "&#x202F;": "",  # Narrow non-breaking space, usually not needed
@@ -235,6 +237,8 @@ transform_unsafe = {
     "¼": "{{frac|1|4}}",
     "½": "{{frac|1|2}}",
     "¾": "{{frac|3|4}}",
+    "⅓": "{{frac|1|3}}",
+    "⅔": "{{frac|2|3}}",
 
     "&#x2150;": "{{frac|1|7}}",
     "&#x2151;": "{{frac|1|9}}",
@@ -608,6 +612,10 @@ transform = {
 
     "&#8212;": "—",   # emdash
     "&#X2014;": "—",  # emdash
+    "&#x2014;": "—",  # emdash
+
+    "&#x2013;": "–",  # endash
+    "&#8211;": "–",  # endash
 
     # Broken (typo on page)
     "&ccedi;": "ç",
