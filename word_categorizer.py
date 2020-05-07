@@ -303,11 +303,11 @@ def get_word_category(word):
 
     compound_cat = is_compound(word)
 
-    if any(char in word for char in [",", "(", ")", "[", "]", " "]):
+    if missing_leading_zero_re.search(word):
+        category = "Z"
+    elif any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
         category = "TS"
-    elif missing_leading_zero_re.search(word):
-        category = "Z"
     elif az_plus_re.match(word):
         if az_re.match(word):
             edit_distance = near_common_word(word)
