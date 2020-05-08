@@ -28,9 +28,15 @@ unsorted = [
     # TODO: Special report for batting averages and calibers, possibly
     # geared for JWB
 
+    "BC",
+    # Processing these with JWB (starting with
+    # jwb-articles-blocked-bad-chars.txt) instead; there are too many to do
+    # manually, and the benefit small.
+
     "R", "N", "P", "H", "U", "TS"]
-probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+BRACKET", "TS+EXTRA", "T2", "T3", "HB", "HL", "BC"]
+probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+BRACKET", "TS+EXTRA", "T2", "T3", "HB", "HL"]
 probably_right = ["L", "ME", "C", "D"]
+jwb_types = probably_wrong + ["BC"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
 first_letters = ["BEFORE A"] + [letter for letter in string.ascii_uppercase] + ["AFTER Z"]
@@ -52,6 +58,7 @@ def get_first_letter(input_string):
     return "AFTER Z"
 
 
+jwb_articles = set()
 for line in fileinput.input("-"):
     line = line.strip()
     if line.startswith("* 0 -"):
@@ -73,9 +80,6 @@ for line in fileinput.input("-"):
         if types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
             types[index] = "TS+BRACKET"
 
-    if any(type_ in unsorted for type_ in types):
-        continue
-
     best_type = None
     for type_ in probably_wrong:
         if type_ in types:
@@ -85,7 +89,17 @@ for line in fileinput.input("-"):
     if not best_type:
         # Ignore any article that does have at least one probably wrong typo
         continue
+
+    if any(type_ in unsorted for type_ in types):
+        if best_type and "BC" in types and all(type_ in jwb_types for type_ in types):
+            jwb_articles.add(article_title)
+        continue
+
     typos_by_letter[get_first_letter(article_title)][best_type].append((article_title, types, typo_links))
+
+
+with open("jwb-articles-blocked-bad-chars.txt", "w") as blocked:
+    print("\n".join(sorted(jwb_articles)), file=blocked)
 
 
 def clean_typo_link(typo_link):
