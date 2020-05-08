@@ -3,15 +3,6 @@ import re
 
 # --- HELPER VARIABLES AND CONFIG ---
 
-# # Focus letters that were posted on the last run, and should take a
-# # rest this run to avoid duplicate work.
-# by_article_suppress = ["1", "2"]
-
-# previously run: "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-# "Aa", "Ab", "Ba", "J", "Q", "X", "Y", "Z", "Á", "Å", "Ç", "É", "Ö",
-# "Ø", "Ş"
-
-
 # By-frequency lists swap which half of the alphabet they suppress
 alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
 alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
@@ -23,40 +14,6 @@ find_word_html_re = re.compile(r" - <nowiki><(.*?)></nowiki> - ")
 
 
 # --- HELPER FUNCTIONS ---
-
-
-def get_sections_from_file(filename, number_of_sections, suppression_list):
-    output = ""
-    sections_seen = 0
-    skip_this_section = False
-    with open(filename, "r") as lines:
-        for line in lines:
-            if line.startswith("="):
-                skip_this_section = False
-                result = re.match(r"==== ([^\-].*?)(\-.+)? ====", line)
-                if not result:
-                    # If the first character is itself a dash
-                    result = re.match(r"==== (\-)(\-.+)? ====", line)
-                start = result.group(1)
-                end = ""
-                if result.group(2):
-                    end = result.group(2)
-                    end = end.strip("-")
-                for prefix in suppression_list:
-                    if start.startswith(prefix) or end.startswith(prefix):
-                        skip_this_section = True
-                        break
-
-                if not skip_this_section:
-                    sections_seen += 1
-
-            if sections_seen > number_of_sections:
-                return output
-            if skip_this_section:
-                continue
-            else:
-                output += line
-        return output
 
 
 def get_active_lines_from_file(filename, active_list, inactive_list, exclude_dot=False):
@@ -83,23 +40,6 @@ def get_active_lines_from_file(filename, active_list, inactive_list, exclude_dot
 
 
 # --- MAIN PRINTOUT ---
-
-# Now uploading these on separate pages, entire letter at a time.
-
-# print("=== Likely misspellings by article ===")
-# print("")
-# print("""The most efficient list to work on if all you want to do is fix
-# misspellings.  All typos from a given article are shown, but only
-# typos that are very close to known words are shown.  The algorithm is
-# not perfect, so some of these may still be words that need to be added
-# to Wiktionary. A different part of the alphabet is posted on each run
-# to avoid duplicate work, and because the whole list is too long to
-# post all at once.""")
-# print("")
-#
-#
-# print(get_sections_from_file("tmp-by-article-edit1.txt", 80, by_article_suppress))
-
 
 print("=== Likely misspellings by frequency (%s) ===" % active_range_str)
 print("")
