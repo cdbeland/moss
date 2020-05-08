@@ -34,7 +34,7 @@ unsorted = [
     # manually, and the benefit small.
 
     "R", "N", "P", "H", "U", "TS"]
-probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+BRACKET", "TS+EXTRA", "T2", "T3", "HB", "HL"]
+probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "T2", "T3", "HB", "HL"]
 probably_right = ["L", "ME", "C", "D"]
 jwb_types = probably_wrong + ["BC"]
 
@@ -47,6 +47,9 @@ typos_by_letter = {
 before_a = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 comma_missing_ws_re = re.compile(r"\w,\w")
 extra_ws_re = re.compile(r"\w ,\w|\w .\w|\w \)\w|\w\( \w|\w\[ \w|\w ]\w")
+
+# "TS+BRACKET"
+# TODO: NLTK parser splits these across multiple words, so we need to fix this in some other way
 bracket_missing_ws_re = re.compile(r"\w[\[\]\(\)]\w")
 
 
@@ -77,8 +80,9 @@ for line in fileinput.input("-"):
             types[index] = "TS+COMMA"
         if types[index] == "TS" and extra_ws_re.search(typo_link):
             types[index] = "TS+EXTRA"
-        if types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
-            types[index] = "TS+BRACKET"
+        # if types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
+        #     types[index] = "TS+BRACKET"
+        # (broken, see above)
 
     best_type = None
     for type_ in probably_wrong:
