@@ -113,19 +113,19 @@ grep -P '^(?!T1|TS|I|P|D|C|H|W)' tmp-words-with-articles.txt | head -200 | perl 
 
 grep ^W tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-non-english-wiktionary.txt
 
-echo "===Known bad HTML tags===" > beland-html-by-freq.txt
-grep ^HB tmp-words-with-articles.txt | perl -pe 's/^HB\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> beland-html-by-freq.txt
+echo "===Known bad HTML tags===" > post-html-by-freq.txt
+grep ^HB tmp-words-with-articles.txt | perl -pe 's/^HB\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
 
-echo >> beland-html-by-freq.txt
-echo "===Bad link formatting===" >> beland-html-by-freq.txt
-echo 'Angle brackets are not used for external links (per {{section link|Wikipedia:Manual of Style/Computing|Exposed_URLs}}); "tags" like <nowiki><https> and <www></nowiki> are actually just bad link formatting.' >> beland-html-by-freq.txt
-echo "See [[Wikipedia:External links#How to link]] for external link syntax; use {{tl|cite web}} for footnotes." >> beland-html-by-freq.txt
-grep ^HL tmp-words-with-articles.txt | perl -pe 's/^HL\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> beland-html-by-freq.txt
+echo >> post-html-by-freq.txt
+echo "===Bad link formatting===" >> post-html-by-freq.txt
+echo 'Angle brackets are not used for external links (per {{section link|Wikipedia:Manual of Style/Computing|Exposed_URLs}}); "tags" like <nowiki><https> and <www></nowiki> are actually just bad link formatting.' >> post-html-by-freq.txt
+echo "See [[Wikipedia:External links#How to link]] for external link syntax; use {{tl|cite web}} for footnotes." >> post-html-by-freq.txt
+grep ^HL tmp-words-with-articles.txt | perl -pe 's/^HL\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
 
-echo >> beland-html-by-freq.txt
-echo "===Unsorted===" >> beland-html-by-freq.txt
-echo "Many of these can be replaced by {{tl|var}} (for text to be replaced) or {{tl|angbr}} (e.g. for linguistic notation)." >> beland-html-by-freq.txt
-grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> beland-html-by-freq.txt
+echo >> post-html-by-freq.txt
+echo "===Unsorted===" >> post-html-by-freq.txt
+echo "Many of these can be replaced by {{tl|var}} (for text to be replaced) or {{tl|angbr}} (e.g. for linguistic notation)." >> post-html-by-freq.txt
+grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
 
 # TODO: Search for bad attributes on HTML tags:
 #  https://en.wikipedia.org/wiki/Wikipedia:HTML_5#Table_attributes
