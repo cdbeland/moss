@@ -305,6 +305,8 @@ def get_word_category(word):
 
     if missing_leading_zero_re.search(word):
         category = "Z"
+    elif is_chemistry_word(word):
+        category = "C"
     elif any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
         category = "TS"
@@ -320,8 +322,6 @@ def get_word_category(word):
                 category = compound_cat
             elif dna_re.match(word):
                 category = "D"
-            elif is_chemistry_word(word):
-                category = "C"
             elif is_rhyme_scheme(word):
                 category = "P"
             else:
