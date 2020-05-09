@@ -724,6 +724,26 @@ def find_char(entity):
         return None
 
 
+def should_keep_as_is(entity):
+    num_value = find_char_num(entity)
+    if unicodedata.combining(chr(num_value)):
+        # Combining characters are too difficult to edit as themselves
+        return True
+    if variant_selectors_re.match(entity):
+        return True
+    if num_value >= 0xE000 and num_value <= 0xF8FF:
+        # Private Use Area
+        return True
+    if num_value >= 0xF0000 and num_value <= 0xFFFFD:
+        # Supplemental Private Use Area-A
+        return True
+    if num_value >= 0x100000 and num_value <= 0x10FFFD:
+        # Supplemental Private Use Area-B
+        return True
+
+    return False
+
+
 def make_character_or_ignore(entity):
     # Returns the Unicode character for this entity, or None if the
     # entity should not be changed.
@@ -731,23 +751,8 @@ def make_character_or_ignore(entity):
     character = find_char(entity)
     if not character:
         return None
-
-    if unicodedata.combining(character):
-        # Combining characters are too difficult to edit as themselves
+    if should_keep_as_is(entity):
         return None
-    if variant_selectors_re.match(entity):
-        return None
-    value = find_char_num(entity)
-    if value >= 0xE000 and value <= 0xF8FF:
-        # Private Use Area
-        return None
-    if value >= 0xF0000 and value <= 0xFFFFD:
-        # Supplemental Private Use Area-A
-        return None
-    if value >= 0x100000 and value <= 0x10FFFD:
-        # Supplemental Private Use Area-B
-        return None
-
     return character
 
 

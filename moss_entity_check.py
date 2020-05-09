@@ -3,10 +3,9 @@
 from moss_dump_analyzer import read_en_article_text
 import re
 import sys
-import unicodedata
 from unencode_entities import (
     alert, keep, controversial, transform, greek_letters, find_char_num,
-    entities_re, fix_text, make_character_or_ignore)
+    entities_re, fix_text, should_keep_as_is)
 
 alerts_found = {}
 controversial_found = {}
@@ -131,21 +130,17 @@ def entity_check(article_title, article_text):
             add_safely(article_title, entity, greek_letters_found)
             add_safely(entity, article_title, worst_articles)
             continue
-        elif make_character_or_ignore(entity) is None:
-            # Ignore unfixable things
-            continue
 
         add_safely(entity, article_title, worst_articles)
 
         if entity in transform:
             add_safely(article_title, entity, uncontroversial_found)
         else:
+            if should_keep_as_is(entity):
+                continue
             value = find_char_num(entity)
             if value:
-                if unicodedata.combining(chr(value)):
-                    # Combining characters are too difficult to edit as themselves
-                    continue
-                elif int(value) < 0x0250:
+                if int(value) < 0x0250:
                     add_safely(article_title, entity, unknown_numerical_latin)
                 else:
                     add_safely(article_title, entity, unknown_numerical_high)
@@ -162,8 +157,6 @@ def dump_dict(section_title, dictionary):
     if section_title == "To avoid":
         print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
     elif section_title == "Uncontroversial entities":
-        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
-    elif section_title == "Unknown":
         print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
     elif section_title == "Unknown numerical: Latin range":
         print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
