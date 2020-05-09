@@ -726,11 +726,9 @@ def find_char(entity):
 
 def should_keep_as_is(entity):
     num_value = find_char_num(entity)
-    if unicodedata.combining(chr(num_value)):
-        # Combining characters are too difficult to edit as themselves
-        return True
-    if variant_selectors_re.match(entity):
-        return True
+    if num_value is None:
+        return False
+
     if num_value >= 0xE000 and num_value <= 0xF8FF:
         # Private Use Area
         return True
@@ -739,6 +737,11 @@ def should_keep_as_is(entity):
         return True
     if num_value >= 0x100000 and num_value <= 0x10FFFD:
         # Supplemental Private Use Area-B
+        return True
+    if unicodedata.combining(chr(num_value)):
+        # Combining characters are too difficult to edit as themselves
+        return True
+    if variant_selectors_re.match(entity):
         return True
 
     return False
