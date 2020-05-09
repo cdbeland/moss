@@ -29,14 +29,12 @@ unsorted = [
     # geared for JWB
 
     "BC",
-    # Processing these with JWB (starting with
-    # jwb-articles-blocked-bad-chars.txt) instead; there are too many to do
-    # manually, and the benefit small.
+    # Processing these with JWB via moss_entity_check.py; there are
+    # too many to do manually, and the benefit is usually small.
 
     "R", "N", "P", "H", "U", "TS"]
 probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "T2", "T3", "HB", "HL"]
 probably_right = ["L", "ME", "C", "D"]
-jwb_types = probably_wrong + ["BC"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
 first_letters = ["BEFORE A"] + [letter for letter in string.ascii_uppercase] + ["AFTER Z"]
@@ -61,7 +59,6 @@ def get_first_letter(input_string):
     return "AFTER Z"
 
 
-jwb_articles = set()
 for line in fileinput.input("-"):
     line = line.strip()
     if line.startswith("* 0 -"):
@@ -95,15 +92,13 @@ for line in fileinput.input("-"):
         continue
 
     if any(type_ in unsorted for type_ in types):
-        if best_type and "BC" in types and all(type_ in jwb_types for type_ in types):
-            jwb_articles.add(article_title)
-        continue
+        filtered_tuples = [tuple_ for tuple_ in zip(types, typo_links) if tuple_[0] in probably_wrong]
+        if not filtered_tuples:
+            continue
+        typo_links = [tuple_[1] for tuple_ in filtered_tuples]
+        types = [tuple_[0] for tuple_ in filtered_tuples]
 
     typos_by_letter[get_first_letter(article_title)][best_type].append((article_title, types, typo_links))
-
-
-with open("jwb-articles-blocked-bad-chars.txt", "w") as blocked:
-    print("\n".join(sorted(jwb_articles)), file=blocked)
 
 
 def clean_typo_link(typo_link):
