@@ -58,14 +58,14 @@ mz_re = re.compile(r"[m-z]")
 dna_re = re.compile(r"^[acgt]+$")
 missing_leading_zero_re = re.compile(r"[ ^]\.\d")
 chem_re = re.compile(
-    r"(\d+\-|\d+,\d\-?|N\d+,N\d+\-?|,\d+|"
+    r"(\d+\-|(D\-|\-)?\d+,\d\-?|N\d+,N\d+\-?|,\d+|"
     r"mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
-    r"hydrogen"
+    r"hydrogen|hydroxy|"
     r"methyl|phenyl|acetate|ene|ine|ane|ide|hydro|nyl|ate$|ium$|acetyl|"
     r"gluco|aminyl|galacto|pyro|benz|brom|amino|fluor|glyc|cholester|ase$|"
     r"chlor|oxy|nitr|silic|phosph|nickel|copper|iron|carb|sulf|alumin|arsen|magnesium|mercury|lead|calcium|"
     r"propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
-    r"cyclo|poly|iso|^Bis|methan|ase|delta\d+|late$|meth|ate$|dione)+",
+    r"cyclo|poly|iso|^Bis|methan|ase|delta\d+|late$|meth|ate$|dione|butan)+",
     flags=re.I)
 
 known_html_bad = {"<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
@@ -126,15 +126,19 @@ chem_formula_re = re.compile(rf"^({element_alternation})+[\(\),]({element_altern
 # https://en.wikipedia.org/wiki/IUPAC_nomenclature_of_organic_chemistry
 # https://en.wikipedia.org/wiki/Chemical_nomenclature
 def is_chemistry_word(word):
-    small_word = chem_re.sub("", word)
-    small_word = chem_re.sub("", small_word)
-    small_word = chem_re.sub("", small_word)
+    small_word = None
+    small_word_last = word
+    while True:
+        small_word = chem_re.sub("", small_word_last)
+        if small_word == small_word_last:
+            break
+        small_word_last = small_word
     if len(word) > 14:
         if len(small_word) < len(word) * .50:
             return True
     if len(small_word) < len(word) * .25:
         return True
-    if word in ["cis,cis", "trans,cis", "alpha,beta", "trans,trans"]:
+    if word.lower() in ["cis,cis", "trans,cis", "alpha,beta", "trans,trans", "alpha,alpha", "gamma,delta"]:
         return True
     if re.match(r"\d(alpha|beta)", word):
         return True
