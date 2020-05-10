@@ -72,7 +72,7 @@ def dump_results():
 
 
 ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup|[Ww]hich lang(uage)?|[Tt]ypo help inline|[Yy]ou|[Tt]one|[Cc]opyedit).*?}}")
-blockquote_re = re.compile(r"<blockquote.*?</blockquote>", flags=re.I+re.S)
+blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>)", flags=re.I+re.S)
 line_starts_with_colon_re = re.compile(r"\n:[^\n]*\n")
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
