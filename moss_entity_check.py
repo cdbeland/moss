@@ -99,8 +99,17 @@ def entity_check(article_title, article_text):
     for pattern in suppression_patterns:
         article_text = pattern.sub("", article_text)
 
+    article_text_lower = article_text.lower()
+
     for string in alert:
         for instance in re.findall(string, article_text):
+            if instance == "½" and ("chess" in article_text_lower):
+                # Per [[MOS:FRAC]]
+                continue
+            if instance == "₤" and ("lira" in article_text_lower):
+                # Per [[MOS:CURRENCY]]
+                continue
+
             add_safely(article_title, string, alerts_found)
             add_safely(string, article_title, worst_articles)
             # This intentionally adds the article title as many times
@@ -115,10 +124,8 @@ def entity_check(article_title, article_text):
                 # times as the string appears
 
     for entity in entities_re.findall(article_text):
-        if entity == "½" and ("chess" in article_text.lower() or "chess" in article_title.lower()):
-            # Per [[MOS:FRAC]]
-            continue
-        elif entity in alert:
+        if entity in alert:
+            # Handled above
             continue
         elif entity in controversial:
             add_safely(article_title, entity, controversial_found)
@@ -152,12 +159,16 @@ def entity_check(article_title, article_text):
 
 
 def dump_dict(section_title, dictionary):
-    print("=== %s ===" % section_title)
+    print("\n=== %s ===" % section_title)
 
     if section_title == "To avoid":
         print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
     elif section_title == "Uncontroversial entities":
         print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+    elif section_title == "Greek letters":
+        print(f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+    elif section_title == "Controversial entities":
+        print(f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
     elif section_title == "Unknown numerical: Latin range":
         print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
     elif section_title == "Unknown high numerical":
@@ -239,6 +250,12 @@ def dump_results():
                            unknown_numerical_high]:
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=comboj)
+
+    with open("jwb-articles-controversial.txt", "w") as contro:
+        articles = set()
+        for dictionary in [controversial_found, greek_letters_found]:
+            articles.update(extract_articles(dictionary))
+        print("\n".join(sorted(articles)), file=contro)
 
     with open("jwb-articles-low.txt", "w") as lowa:
         articles = set()
