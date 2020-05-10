@@ -22,10 +22,11 @@ variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);",
 alert = [
     "™", "©", "®",
     "Ⅰ", "Ⅱ", "ⅰ", "ⅱ",
-    "¼", "½", "¾", "&frasl;",
+    "¼", "¾", "&frasl;",
     "¹", "⁺", "ⁿ", "₁", "₊", "ₙ",
 
-    "₤",  # per [[MOS:CURRENCY]] should be £ for GBP, something else (?) for Italian Lira
+    "½",  # Allowed in chess articles only
+    "₤",  # per [[MOS:CURRENCY]] should be £ for GBP, but this is used for Italian Lira
 
     # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
     "µ", "&micro;",
@@ -431,14 +432,16 @@ transform = {
 
     "&#8206;": "&lrm;",
 
-    "&#x005B;": "&#91;",
-    "&#x005D;": "&#93;",
+    "&#x005B;": "&#91;",  # [
+    "&#x005D;": "&#93;",  # ]
     "&#x5b;": "&#91;",
     "&#x5d;": "&#93;",
     "&#091;": "&#91;",
     "&#093;": "&#93;",
     "&#0091;": "&#91;",
     "&#0093;": "&#93;",
+    "&#00091;": "&#91;",
+    "&#00093;": "&#93;",
     "&#x5B;": "&#91;",
     "&#x5D;": "&#93;",
     "&#x7C;": "&#124;",  # |
@@ -460,6 +463,8 @@ transform = {
     "&#0062;": "&gt;",
     "&#093;": "&#93;",  # ]
     "&#0093;": "&#93;",  # ]
+    "&lsqb;": "&#91;",
+    "&rsqb;": "&#93;",
 
     "&#160;": "&nbsp;",
     "&#xA0;": "&nbsp;",
@@ -516,6 +521,19 @@ transform = {
     "&deg;": "°",
     "&oline;": "‾",
     "&plusmn;": "±",
+    "&cent;": "¢",
+    "&circ;": "ˆ",
+    "&yen;": "¥",
+    "&Tcedil;": "Ţ",
+    "&tcedil;": "ţ",
+    "&Scedil;": "Ş",
+    "&scedil;": "ş",
+
+    "㎆": "MB",
+    "㎅": "KB",
+    "&#x00B4;": "&acute;",
+    "&ordf;": "ª",
+    "&ang;": "∠",
 
     # Latin and Germanic letters
     "&Aacute;": "Á",
@@ -569,6 +587,7 @@ transform = {
     "&ugrave;": "ù",
     "&Uuml;": "Ü",
     "&uuml;": "ü",
+    "&yacute;": "ý",
 
     "&#214;": "Ö",
     "&#225;": "á",
@@ -595,9 +614,6 @@ transform = {
     "&AElig;": "Æ",
     "&OElig;": "Œ",
 
-    "㎆": "MB",
-    "㎅": "KB",
-
     # Greek letters only found in actual Greek words
     "&sigmaf;": "ς",  # Written this way when word-final
     "&#x1F7B;": "ύ",
@@ -607,15 +623,15 @@ transform = {
     "&#x1FF7;": "ῷ",
     "&#x1FC6;": "ῆ",
 
-    "&#x00B4;": "&acute;",
-    "&ordf;": "ª",
-
     "&#8212;": "—",   # emdash
     "&#X2014;": "—",  # emdash
     "&#x2014;": "—",  # emdash
 
     "&#x2013;": "–",  # endash
     "&#8211;": "–",  # endash
+
+    # Usually a typo for &ndash;
+    # "&dash;": "-",  # ASCII hyphen
 
     # Broken (typo on page)
     "&ccedi;": "ç",
@@ -639,6 +655,17 @@ transform = {
     "&nash;": "&ndash;",
     "&nbdash;": "&ndash;",
     "&nsbp;": "&nbsp;",
+    "&nbps;": "&nbsp;",
+    "&bnsp;": "&nbsp;",
+    "&spnb;": "&nbsp;",
+    "&ndsp;": "&nbsp;",
+    "&nbp;": "&nbsp;",
+    "&nhsp;": "&nbsp;",
+    "&ngsp;": "&nbsp;",
+    "&nbvsp;": "&nbsp;",
+    "&nbsvp;": "&nbsp;",
+    "&nbsb;": "&nbsp;",
+    "&nbnsp;": "&nbsp;",
     "&uumml;": "&uuml;",
     "&bsp;": "&nbsp;",
     "&Quot;": '"',
