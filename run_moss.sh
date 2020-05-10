@@ -18,7 +18,6 @@ echo "Beginning main spell check"
 echo `date`
 
 RUN_NAME=run-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T"`
-
 mkdir $RUN_NAME
 venv/bin/python3 moss_spell_check.py > $RUN_NAME/tmp-output.txt
 
@@ -139,7 +138,7 @@ grep ^D tmp-words-with-articles.txt | perl -pe 's/^D\t//' > beland-dna-by-freq.t
 grep ^N tmp-words-with-articles.txt | perl -pe 's/^N\t//'| grep -vP 'wikt:[\w-]+\]' > beland-punct-weirdness-by-freq.txt
 
 grep ^I tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 > tmp-words-with-articles-truncated.txt
-cat tmp-words-with-articles-truncated.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-misspellings-intl.txt
+cat tmp-words-with-articles-truncated.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-misspellings-intl.txt
 rm -f tmp-words-with-articles-truncated.txt
 # TODO for intl:
 # * Separate words into the scripts they use:
@@ -168,6 +167,12 @@ echo `date`
 # into a single file for posting to the moss project page.
 
 ../venv/bin/python3 ../collect.py > collected_by_article_and_freq.txt
+
+echo "=== Likely new words by frequency (non-English) ===" >> collected_by_article_and_freq.txt
+echo "These are good candidates to add to the English Wiktionary (which provides English definitions for words in all languages), as it seems English Wikipedia readers will frequently encounter them." >> collected_by_article_and_freq.txt
+echo "" >> collected_by_article_and_freq.txt
+cat tmp-most-common-misspellings-intl.txt >> collected_by_article_and_freq.txt
+rm tmp-most-common-misspellings-intl.txt
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
