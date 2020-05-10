@@ -295,6 +295,9 @@ def spellcheck_all_langs(article_title, article_text):
         if "'" in bad_word and bad_word in article_text:
             article_oops_list.append(bad_word)
 
+    article_oops_list = [oops for oops in article_oops_list
+                         if not ignore_typo_in_context(oops, article_text_orig)]
+
     # -- Generate and fix tokenization of word_list --
 
     word_list = nltk.word_tokenize(article_text)
