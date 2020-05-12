@@ -47,8 +47,10 @@ comma_missing_ws_re = re.compile(r"\w,\w")
 extra_ws_re = re.compile(r"\w ,\w|\w .\w|\w \)\w|\w\( \w|\w\[ \w|\w ]\w")
 
 # "TS+BRACKET"
-# TODO: NLTK parser splits these across multiple words, so we need to fix this in some other way
-bracket_missing_ws_re = re.compile(r"\w[\[\]\(\)]\w")
+# TODO: NLTK parser splits these across multiple words,
+# so we need to look for this not using word_list (as we do for other
+# TS issues)
+bracket_missing_ws_re = re.compile(r"(\w\[|\w\(|\)\w|\]\w)")
 
 
 def get_first_letter(input_string):
@@ -71,15 +73,15 @@ for line in fileinput.input("-"):
     typo_links = groups[3].split(", ")
 
     for (index, typo_link) in enumerate(typo_links):
-        if types[index] == "TS" and "." in typo_link:
+        if types[index] == "TS" and "." in typo_link and " " not in typo_link:
             types[index] = "TS+DOT"
-        if types[index] == "TS" and comma_missing_ws_re.search(typo_link):
+        elif types[index] == "TS" and comma_missing_ws_re.search(typo_link):
             types[index] = "TS+COMMA"
-        if types[index] == "TS" and extra_ws_re.search(typo_link):
+        elif types[index] == "TS" and extra_ws_re.search(typo_link):
             types[index] = "TS+EXTRA"
-        # if types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
+        # elif types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
         #     types[index] = "TS+BRACKET"
-        # (broken, see above)
+        #     (broken, see above)
 
     best_type = None
     for type_ in probably_wrong:
