@@ -46,10 +46,7 @@ before_a = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 comma_missing_ws_re = re.compile(r"\w,\w")
 extra_ws_re = re.compile(r"\w ,\w|\w .\w|\w \)\w|\w\( \w|\w\[ \w|\w ]\w")
 
-# "TS+BRACKET"
-# TODO: NLTK parser splits these across multiple words,
-# so we need to look for this not using word_list (as we do for other
-# TS issues)
+# Simpler than bracket_missing_whitespace_re for performance reasons
 bracket_missing_ws_re = re.compile(r"(\w\[|\w\(|\)\w|\]\w)")
 
 
@@ -79,9 +76,8 @@ for line in fileinput.input("-"):
             types[index] = "TS+COMMA"
         elif types[index] == "TS" and extra_ws_re.search(typo_link):
             types[index] = "TS+EXTRA"
-        # elif types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
-        #     types[index] = "TS+BRACKET"
-        #     (broken, see above)
+        elif types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
+            types[index] = "TS+BRACKET"
 
     best_type = None
     for type_ in probably_wrong:
