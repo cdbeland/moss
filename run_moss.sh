@@ -106,11 +106,9 @@ head -1000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\
 echo "Beginning by-frequency post-processing"
 echo `date`
 
-grep ^TS tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
+grep  -P '^(TS|ME)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
-grep -P '^(?!T1|TS|I|P|D|C|H|W)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
-
-grep ^W tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > debug-most-common-non-english-wiktionary.txt
+grep -P '^(?!T1|TS|I|P|D|C|H|U|W|BC|BW|MI|N|Z)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
 
 echo "===Known bad HTML tags===" > post-html-by-freq.txt
 grep ^HB tmp-words-with-articles.txt | perl -pe 's/^HB\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
@@ -137,7 +135,7 @@ grep ^P tmp-words-with-articles.txt | perl -pe 's/^P\t//' > beland-pattern-by-fr
 grep ^D tmp-words-with-articles.txt | perl -pe 's/^D\t//' > beland-dna-by-freq.txt
 grep ^N tmp-words-with-articles.txt | perl -pe 's/^N\t//'| grep -vP 'wikt:[\w-]+\]' > beland-punct-weirdness-by-freq.txt
 
-grep ^I tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 > tmp-words-with-articles-truncated.txt
+grep -P "^(I|W|MI|MW)" tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -100 > tmp-words-with-articles-truncated.txt
 cat tmp-words-with-articles-truncated.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-misspellings-intl.txt
 rm -f tmp-words-with-articles-truncated.txt
 # TODO for intl:
@@ -189,15 +187,6 @@ echo "=== Possible typos by length ==="  > collected_by_length.txt
 echo "Longest or shortest in certain categories are shown, sometimes just for fun and sometimes because they form a useful group. Please use strikethrough (or leave a note) for this section rather than removing lines, to avoid repeating work done while the dumps were being processed. Thanks!" >> collected_by_length.txt
 echo "" >> collected_by_length.txt
 
-# Redundant to by-article and by-frequency
-# echo "==== Likely misspellings (longest) ====" >> collected_by_length.txt
-# grep -P "^T1\t" tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^T1\t//' | head -20 >> collected_by_length.txt
-
-# Redundant to by-article
-# echo "==== Likely missing whitespace ====" >> collected_by_length.txt
-# grep ^TS tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^TS\t//' | head -200 >> collected_by_length.txt
-# echo "" >> collected_by_length.txt
-
 echo "==== Likely chemistry words ====" >> collected_by_length.txt
 grep ^C tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^C\t//' | head -20 >> collected_by_length.txt
 echo "" >> collected_by_length.txt
@@ -208,13 +197,6 @@ echo "Every character should either have a Wikipedia article, redirect to a Wiki
 echo "" >> collected_by_length.txt
 grep -P '^I\t\* 1 -' tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^I\t//' >> collected_by_length.txt
 echo "" >> collected_by_length.txt
-
-# Mix of foreign words and whitespace problems; redundant to
-# by-article so skipping for now.
-# grep -P "^T(?\!1\t)\d+" tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^.*?\t//' > post-longest-shortest-other.txt
-
-# Skipping in favor of most-common-misspellings-intl (see below)
-# grep '^[IN]' tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^[IN]\t//' > post-longest-shortest-intl.txt
 
 # --- STATS ---
 

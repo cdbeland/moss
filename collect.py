@@ -84,7 +84,7 @@ print(restrict_misspellings(get_active_lines_from_file("tmp-most-common-edit1.tx
 print("")
 
 
-print("=== Likely new compounds by frequency (%s) ===" % active_range_str)
+print("=== Likely new English compounds by frequency (%s) ===" % active_range_str)
 print("")
 print("""The best list to work on if you want to add variations of known
 words to Wiktionary, mostly compound words.  The algorithm is not
