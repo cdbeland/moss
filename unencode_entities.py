@@ -366,6 +366,40 @@ transform_unsafe = {
 
     "&zwj;": "",
     "&zwnj;": "",
+
+    # https://en.wikipedia.org/wiki/Numerals_in_Unicode#Roman_numerals
+    "Ⅰ": "I",
+    "Ⅱ": "II",
+    "Ⅲ": "III",
+    "Ⅳ": "IV",
+    "Ⅴ": "V",
+    "Ⅵ": "VI",
+    "Ⅶ": "VII",
+    "Ⅷ": "VIII",
+    "Ⅸ": "IX",
+    "Ⅹ": "X",
+    "Ⅺ": "XI",
+    "Ⅻ": "XII",
+    "Ⅼ": "L",
+    "Ⅽ": "C",
+    "Ⅾ": "D",
+    "Ⅿ": "M",
+    "ⅰ": "i",
+    "ⅱ": "ii",
+    "ⅲ": "iii",
+    "ⅳ": "iv",
+    "ⅴ": "v",
+    "ⅵ": "vi",
+    "ⅶ": "vii",
+    "ⅷ": "viii",
+    "ⅸ": "ix",
+    "ⅹ": "x",
+    "ⅺ": "xi",
+    "ⅻ": "xii",
+    "ⅼ": "l",
+    "ⅽ": "c",
+    "ⅾ": "d",
+    "ⅿ": "m",
 }
 
 # Automatically change, with the expectation there will be a
@@ -373,7 +407,6 @@ transform_unsafe = {
 transform = {
 
     "&#x22c5;": "&sdot;",
-
     "&#8416;": "&#x20E0;",  # Combining Enclosing Circle Backslash
 
     "&#6;": " ",   # ^F
