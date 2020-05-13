@@ -39,6 +39,31 @@ def get_active_lines_from_file(filename, active_list, inactive_list, exclude_dot
     return output
 
 
+def restrict_misspellings(input_lines_str):
+    output_str = ""
+    for line in input_lines_str.split("\n"):
+        if not line:
+            continue
+
+        match = re.match(r"\* (\d+) - ", line)
+        if not match:
+            raise Exception(f"Could not find number of instances from '{line}'")
+        number = int(match.group(1))
+
+        # There will always be a low level of typos; below 5 probably
+        # not frequent enough to put on lists of frequent typos, and
+        # at that point this report will probably be obsolete.
+        if number <= 5:
+            continue
+
+        # Skip words that only appear in one article
+        if not re.search(r"\]\],", line):
+            continue
+
+        output_str += f"{line}\n"
+    return output_str
+
+
 # --- MAIN PRINTOUT ---
 
 print("=== Likely misspellings by frequency (%s) ===" % active_range_str)
@@ -55,7 +80,7 @@ If there is an obvious correction, adding that to
 [[Wikipedia:Lists of common misspellings/For machines]] will help
 editors who use automated tools to fix cases faster.""")
 print("")
-print(get_active_lines_from_file("tmp-most-common-edit1.txt", alpha_half_active, alpha_half_inactive))
+print(restrict_misspellings(get_active_lines_from_file("tmp-most-common-edit1.txt", alpha_half_active, alpha_half_inactive)))
 print("")
 
 
