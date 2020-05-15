@@ -33,7 +33,7 @@ unsorted = [
     # too many to do manually, and the benefit is usually small.
 
     "R", "N", "P", "H", "U", "TS"]
-probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "T2", "T3", "HB", "HL"]
+probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "TS+BRACKET", "T2", "T3", "HB", "HL"]
 probably_right = ["L", "ME", "C", "D"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")

@@ -83,10 +83,12 @@ comma_missing_whitespace_re = re.compile(r"\w+[a-z],\w\w+|\w+\w,[a-zA-Z]\w+")
 caliber_re = re.compile(r"[^ ]?\.\d\ds?$")
 batting_average_re = re.compile(r"[^ ]?\.\d\d\d$")
 
-bracket_missing_whitespace_re = re.compile(r"\w+[a-z][\[\]\(\)]\w\w+|\w+\w[\[\]\(\)][a-zA-Z]\w+(?![\]\)])?")
+bracket_missing_whitespace_re = re.compile(r"([a-zA-Z]+\([a-zA-Z]+\)?"
+                                           r"|[a-zA-Z]+\)[a-zA-Z]+"
+                                           r"|[a-zA-Z]+\[[a-zA-Z]+\]?"
+                                           r"|[a-zA-Z]+\][a-zA-Z]+)")
 # Includes optional closing ] or ) to deal with situations like
-# "Chromium(IV)", which is correctly spelled.  Must be non-matching to
-# avoid bracking calling code.
+# "Chromium(IV)", which is correctly spelled.
 
 punct_extra_whitespace_re = re.compile(r"\w+ ,\w+|\w+ \.\w+|\w+ \)|\( \w+|\[ \w+|\w+ ]")
 
