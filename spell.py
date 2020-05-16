@@ -25,6 +25,7 @@ compound_separators_re = re.compile(r"[—–/\-]")
 
 
 def add_tokens(line):
+    line = line.replace("_", " ")
     line = line.strip().lower()
 
     # Mostly splitting on " ", but also ":", etc.
