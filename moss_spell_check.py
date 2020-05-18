@@ -399,19 +399,18 @@ def spellcheck_all_langs(article_title, article_text):
         # Normalize for report rollup purposes, even if this is incorrect capitalization
         word_lower = word_mixedcase.lower()
 
-        # Index by misspelled word of article titles
-        (freq, existing_list) = misspelled_words.get(word_lower, (0, []))
-        existing_list.append(article_title)
-        misspelled_words[word_lower] = (len(existing_list), existing_list)
-
-        # Index by article of mispelled words
+        # Index typo by article
         article_oops_list.append(word_mixedcase)
 
     article_oops_string = u"𝆃".join(article_oops_list)
     print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string))
 
-    # if article_count % 100000 == 0:
-    #     dump_results()
+    # Index article by typo
+    for word_mixedcase in article_oops_list:
+        word_lower = word_mixedcase.lower()
+        (freq, existing_list) = misspelled_words.get(word_lower, (0, []))
+        existing_list.append(article_title)
+        misspelled_words[word_lower] = (len(existing_list), existing_list)
 
 
 if __name__ == '__main__':
