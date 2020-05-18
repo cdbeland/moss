@@ -10,3 +10,4 @@ stopit
 unidecode
 wikipedia
 git+https://github.com/wikimedia/pywikibot.git
+textstat
