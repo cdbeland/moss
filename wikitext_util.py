@@ -322,3 +322,70 @@ def wikitext_to_plaintext(string):
         string = regex.sub(replacement, string)
 
     return string
+
+
+prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
+# "" because the contents may have been removed by a previous replacement
+parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?\S\]|\[\S\]')
+ignore_sections_re = re.compile(
+    r"(==\s*See also\s*==|"
+    r"==\s*External links\s*==|"
+    r"==\s*References\s*==|"
+    r"==\s*Bibliography\s*==|"
+    r"==\s*Further reading\s*==|"
+    r"==\s*Sources\s*==|"
+    r"==\s*Publications\s*==|"
+    r"==\s*Filmography\s*==|"
+    r"==\s*Discography\s*==|"
+    r"==\s*Works\s*==|"
+    r"==\s*Compositions\s*==|"
+    r"==\s*Recordings\s*=="
+    r").*$",
+    flags=re.I + re.S)
+ignore_headers_re = re.compile("=[^\n]+=\n")
+line_starts_with_space_re = re.compile(r"\n [^\n]*\n")
+line_starts_with_colon_re = re.compile(r"\n:[^\n]*\n")
+
+
+def get_main_body_wikitext(wikitext_input, strong=False):
+    # Ignore non-prose and segments not parsed for grammar, spelling, etc.
+
+    # TODO: Get smarter about these sections.  But for now, ignore
+    # them, since they are full of proper nouns and URL words.
+    wikitext_working = ignore_sections_re.sub("", wikitext_input)
+
+    wikitext_working = prose_quote_re.sub("✂", wikitext_working)
+    wikitext_working = ignore_headers_re.sub("", wikitext_working)
+
+    # Many of these are computer programming code snippets
+    wikitext_working = line_starts_with_space_re.sub("\n", wikitext_working)
+
+    # These are generally quotes or technical content
+    wikitext_working = line_starts_with_colon_re.sub("\n", wikitext_working)
+
+    if strong:
+        wikitext_working = parenthetical_re.sub("", wikitext_working)
+
+    """
+    quotation_list = blockquote_re.findall(article_text)
+    quotation_list.extend(prose_quote_re.findall(article_text))
+    if quotation_list:
+        article_text = blockquote_re.sub(" ", article_text)
+        article_text = prose_quote_re.sub("✂", article_text)
+
+        # (Works, but disabled to save space because output is not being used.)
+        # print("Q\t%s\t%s" % (article_title, u"\t".join(quotation_list)))
+        # TODO: Spell-check quotations, but publish typos in them in a
+        #  separate list, since they need to be verified against the
+        #  original source, or at least corrected more carefully.
+        #  Archaic spelling should be retained and added to Wiktionary.
+        #  Spelling errors should be corrected, or if important to
+        #  keep, tagged with {{typo|}} and {{sic}}.  For now, we have
+        #  plenty of typos to fix without bothering with quotations.
+        #  See: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Quotations
+        # TODO: Handle notation for fixes to quotes like:
+        #  [[340B Drug Pricing Program]] - [s]tretch
+        #  [[Zachery Kouwe]] - appropriat[ing]
+    """
+
+    return wikitext_working

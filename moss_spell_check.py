@@ -3,10 +3,9 @@
 import nltk
 import re
 from moss_dump_analyzer import read_en_article_text
-from wikitext_util import wikitext_to_plaintext
+from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
 from spell import is_word_spelled_correctly, bad_words
 from word_categorizer import is_chemistry_word
-from grammar import prose_quote_re, ignore_sections_re, line_starts_with_space_re
 
 
 # TODO:
@@ -73,7 +72,6 @@ def dump_results():
 
 ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup|[Ww]hich lang(uage)?|[Tt]ypo help inline|[Yy]ou|[Tt]one|[Cc]opyedit).*?}}")
 blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>)", flags=re.I+re.S)
-line_starts_with_colon_re = re.compile(r"\n:[^\n]*\n")
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
@@ -181,6 +179,7 @@ def spellcheck_all_langs(article_title, article_text):
 
     article_text_orig = article_text
     article_text = wikitext_to_plaintext(article_text)
+    article_text = get_main_body_wikitext(article_text)
 
     # This can break wikitext_to_plaintext() in ways that cause wiki
     # syntax to be mistaken for prose.
@@ -202,36 +201,6 @@ def spellcheck_all_langs(article_title, article_text):
             article_title,
             " ... ".join(bad_emdash_context_list)))
 
-    # -- Non-body-text sections and blocks --
-
-    # TODO: Get smarter about these sections.  But for now, ignore
-    # them, since they are full of proper nouns and URL words.
-    article_text = ignore_sections_re.sub("", article_text)
-    # Many of these are computer programming code snippets
-    article_text = line_starts_with_space_re.sub("\n", article_text)
-    # These are generally quotes or technical content
-    article_text = line_starts_with_colon_re.sub("\n", article_text)
-
-    quotation_list = blockquote_re.findall(article_text)
-    quotation_list.extend(prose_quote_re.findall(article_text))
-    if quotation_list:
-        article_text = blockquote_re.sub(" ", article_text)
-        article_text = prose_quote_re.sub("✂", article_text)
-
-        # (Works, but disabled to save space because output is not being used.)
-        # print("Q\t%s\t%s" % (article_title, u"\t".join(quotation_list)))
-        # TODO: Spell-check quotations, but publish typos in them in a
-        #  separate list, since they need to be verified against the
-        #  original source, or at least corrected more carefully.
-        #  Archaic spelling should be retained and added to Wiktionary.
-        #  Spelling errors should be corrected, or if important to
-        #  keep, tagged with {{typo|}} and {{sic}}.  For now, we have
-        #  plenty of typos to fix without bothering with quotations.
-        #  See: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Quotations
-        # TODO: Handle notation for fixes to quotes like:
-        #  [[340B Drug Pricing Program]] - [s]tretch
-        #  [[Zachery Kouwe]] - appropriat[ing]
-
     # -- More fatal problems --
 
     for unmatched_item in ["<ref", "</ref>", "<blockquote", "</blockquote>", "}}", "{{", '"', "colspan", "rowspan", "cellspacing"]:
@@ -247,13 +216,6 @@ def spellcheck_all_langs(article_title, article_text):
             # the markup.  (Either way, should be fixed because this
             # blocks spell-checking the entire article.)
             return
-
-    # These are now in a report; this is only needed for debugging.
-    # unknown_html_tag_re = re.compile(r"<[/!?a-zA-Z].*?>")
-    # html_tag_matches = unknown_html_tag_re.findall(article_text)
-    # if html_tag_matches:
-    #     print("W\tWARNING: Unknown HTML tag(s) present: %s \t%s" % ("  ".join(html_tag_matches), article_title))
-    #     print("W\t%s" % article_text)
 
     # -- Initialization for main spell check --
 

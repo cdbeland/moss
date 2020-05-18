@@ -26,28 +26,7 @@ from english_grammar import (enwiktionary_cat_to_pos,
                              closed_lexicon,
                              vocab_overrides)
 from pywikibot import Page, Site
-from wikitext_util import wikitext_to_plaintext
-
-prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
-# "" because the contents may have been removed on a previous replacement
-parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?\S\]|\[\S\]')
-ignore_sections_re = re.compile(
-    r"(==\s*See also\s*==|"
-    r"==\s*External links\s*==|"
-    r"==\s*References\s*==|"
-    r"==\s*Bibliography\s*==|"
-    r"==\s*Further reading\s*==|"
-    r"==\s*Sources\s*==|"
-    r"==\s*Publications\s*==|"
-    r"==\s*Filmography\s*==|"
-    r"==\s*Discography\s*==|"
-    r"==\s*Works\s*==|"
-    r"==\s*Compositions\s*==|"
-    r"==\s*Recordings\s*=="
-    r").*$",
-    flags=re.I + re.S)
-ignore_headers_re = re.compile("=[^\n]+=\n")
-line_starts_with_space_re = re.compile(r"\n [^\n]*\n")
+from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
 
 
 mysql_connection = mysql.connector.connect(user='beland',
@@ -104,14 +83,6 @@ def check_english(plaintext, title):
     #    print("!\tArticle parse broken?\t%s" % title)
     #    return
 
-    # Quotations, parentheticals, and list-based sections are not
-    # inspected for grammar
-    plaintext = ignore_sections_re.sub("", plaintext)
-    plaintext = prose_quote_re.sub("✂", plaintext)
-    plaintext = parenthetical_re.sub("", plaintext)
-    plaintext = ignore_headers_re.sub("", plaintext)
-    plaintext = line_starts_with_space_re.sub("\n", plaintext)
-
     sentences = []
 
     # Tokenizing paragraphs individually helps prevent NLTK from
@@ -140,7 +111,7 @@ def check_english(plaintext, title):
         # TODO: Skip this inside <poem>...</poem>
         is_grammatical = None
         with stopit.SignalTimeout(3, swallow_exc=True) as timeout_result:
-            is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string)
+            is_grammatical = is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string)
 
         elapsed = time.time() - start_time
 
@@ -198,7 +169,7 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
             # Including Chris, NASA, GmbH, A380
             pos_list = ["N"]
             expand_grammar = True
-        if not pos_list and word == "'" and previous_word[-1].lower() == "s":
+        if not pos_list and (word == "'" and previous_word[-1].lower() == "s") or word == "'s":
             pos_list = ["POSS"]
             expand_grammar = True
         if "-" in word:
@@ -316,7 +287,8 @@ def is_sentence_grammatical_nltk(word_list):
 def fetch_article_plaintext(title):
     site = Site()
     page = Page(site, title=title)
-    return wikitext_to_plaintext(page.text)
+    plaintext = wikitext_to_plaintext(page.text)
+    return get_main_body_wikitext(plaintext, strong=True)
 
 
 # TODO: For later command-line use
