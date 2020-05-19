@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import re
 import textstat
+import sys
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
 
@@ -44,4 +46,6 @@ def check_reading_level(article_title, article_text):
 
 
 if __name__ == '__main__':
+    print(f"Started at {datetime.datetime.now().isoformat()}", file=sys.stderr)
     read_en_article_text(check_reading_level)
+    print(f"Finished at {datetime.datetime.now().isoformat()}", file=sys.stderr)
