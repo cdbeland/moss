@@ -39,9 +39,6 @@ def check_reading_level(article_title, article_text):
 
     article_grade_level = textstat.text_standard(article_text, float_output=True)
 
-    if "#REDIRECT" in article_text:
-        print(article_text)
-
     print(f"* {article_grade_level} - [[{article_title}]]")
 
 
