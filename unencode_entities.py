@@ -60,12 +60,22 @@ alert = [
     # needed?
     "&zwj;", "&zwnj;"
 
-    # Probably wants to be wiki-list syntax
-    "•", "&bull;", "·", "&middot;", "⋅", "&sdot;",
+    # Might want to be wiki-list syntax
+    "•",
+    "&bull;",
+
+    # Convert to dot form
+    "&middot;",
+    "&sdot;",
+
 ]
 
 # Ignore these if seen in articles
 keep = [
+    # Used in math, tables, horizontal list formatting, so keep
+    "·",  # middot
+    "⋅",  # sdot
+
     "&amp;",  # dangerous for e.g. &amp;126;
     "&c;",    # Almost all are in archaic quotations and titles
 
@@ -219,7 +229,9 @@ transform_unsafe = {
     "&#x202F;": "",  # Narrow non-breaking space, usually not needed
     "&#x202f;": "",
 
-    "⋅": "-",
+    # Used in math and tables and horizontal list formatting
+    # "⋅": "-",
+
     "&#x2010;": "-",  # Hyphen
     "&#x2027;": "-",  # Hyphenation point
     "‐": "-",         # U+2010 Hyphen to ASCII
