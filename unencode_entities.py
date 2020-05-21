@@ -22,10 +22,9 @@ variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);",
 alert = [
     "™", "©", "®",
     "Ⅰ", "Ⅱ", "ⅰ", "ⅱ",
-    "¼", "¾", "&frasl;",
+    "&frasl;",
     "¹", "⁺", "ⁿ", "₁", "₊", "ₙ",
 
-    "½",  # Allowed in chess articles only
     "₤",  # per [[MOS:CURRENCY]] should be £ for GBP, but this is used for Italian Lira
 
     # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
@@ -248,7 +247,7 @@ transform_unsafe = {
 
     # Per [[MOS:FRAC]]
     "¼": "{{frac|1|4}}",
-    "½": "{{frac|1|2}}",
+    "½": "{{frac|1|2}}",  # Except ½ is allowed in chess articles
     "¾": "{{frac|3|4}}",
     "⅓": "{{frac|1|3}}",
     "⅔": "{{frac|2|3}}",

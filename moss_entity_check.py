@@ -102,20 +102,21 @@ def entity_check(article_title, article_text):
     article_text_lower = article_text.lower()
 
     for string in alert:
-        for instance in re.findall(string, article_text):
-            if instance == "½" and ("chess" in article_text_lower):
-                # Per [[MOS:FRAC]]
-                continue
-            if instance == "₤" and ("lira" in article_text_lower):
-                # Per [[MOS:CURRENCY]]
-                continue
+        if string == "₤" and ("lira" in article_text_lower):
+            # Per [[MOS:CURRENCY]]
+            continue
 
+        for instance in re.findall(string, article_text):
             add_safely(article_title, string, alerts_found)
             add_safely(string, article_title, worst_articles)
             # This intentionally adds the article title as many times
             # as the string appears
 
     for string in non_entity_transform:
+        if string == "½" and ("chess" in article_text_lower):
+            # Per [[MOS:FRAC]]
+            continue
+
         if string in article_text:
             for instance in re.findall(string, article_text):
                 add_safely(article_title, string, uncontroversial_found)
