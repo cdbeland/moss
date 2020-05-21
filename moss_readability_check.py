@@ -21,6 +21,8 @@ def check_reading_level(article_title, article_text):
         return
     if article_title.startswith("Outline of"):
         return
+    if article_title.startswith("Table of"):
+        return
     if year_in_re.match(article_title):
         return
     if article_text.startswith("#REDIRECT") or article_text.startswith("# REDIRECT"):
@@ -37,9 +39,8 @@ def check_reading_level(article_title, article_text):
     if not article_text.strip():
         return
 
-    article_grade_level = textstat.text_standard(article_text, float_output=True)
-
-    print(f"* {article_grade_level} - [[{article_title}]]")
+    article_difficulty_level = textstat.dale_chall_readability_score(article_text)
+    print(f"* {article_difficulty_level} - [[{article_title}]]")
 
 
 if __name__ == '__main__':
