@@ -101,6 +101,8 @@ cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py
 head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
 head -1000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -200 > beland-articles-most-typos-refined.txt
 
+grep BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|prepositions)\]\]" | head -200 | perl -pe 's/.*?\t//' > post-you.txt
+
 # --- BY FREQUENCY ---
 
 echo "Beginning by-frequency post-processing"
