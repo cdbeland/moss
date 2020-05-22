@@ -214,7 +214,7 @@ substitutions = [
     (re.compile(r"<references/>", flags=re.I), "\n\n"),
     (re.compile(r"<references>.*?</\s*references>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<source[^>]*>.*?</source>", flags=re.I+re.S), "\n\n"),
-    (re.compile(r"<syntaxhighlight>.*?</syntaxhighlight>", flags=re.I+re.S), "\n\n"),
+    (re.compile(r"<syntaxhighlight[^>]*>.*?</syntaxhighlight>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<timeline>.*?</timeline>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<code>.*?</code>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<chem>.*?</chem>", flags=re.I+re.S), ""),
@@ -290,7 +290,7 @@ substitutions = [
     # list and table items on their own lines
     (re.compile(r"\n\s*\n+"), r"\n\n"),
     (re.compile(r"^\s*\n+"), r"\n"),
-    (re.compile(r"(?<!^)(?<![=\n✂\}\]\|])\n(?![\n=\*:;✂ \|])"), r" "),
+    (re.compile(r"(?<!^)(?<![=\n✂\}\]\|])\n(?![\n=\*#:;✂ \|])"), r" "),
     (re.compile(r"\n\n+"), r"\n"),
     (re.compile(r"  +"), " "),
 
@@ -345,6 +345,7 @@ ignore_sections_re = re.compile(
 ignore_headers_re = re.compile("=[^\n]+=\n")
 line_starts_with_space_re = re.compile(r"\n [^\n]*\n")
 line_starts_with_colon_re = re.compile(r"\n:[^\n]*\n")
+ignore_lists_re = re.compile(r"\n[\*\#;][^\n]*")
 
 
 def get_main_body_wikitext(wikitext_input, strong=False):
@@ -365,6 +366,7 @@ def get_main_body_wikitext(wikitext_input, strong=False):
 
     if strong:
         wikitext_working = parenthetical_re.sub("", wikitext_working)
+        wikitext_working = ignore_lists_re.sub("", wikitext_working)
 
     """
     quotation_list = blockquote_re.findall(article_text)
