@@ -175,10 +175,7 @@ controversial = {
     "&otimes;": "⊗",
     "&exist;": "∃",
     "&nabla;": "∇",
-    "&sub;": "⊂",
     "&equiv;": "≡",
-    "&cap;": "∩",
-    "&cup;": "∪",
     "&oplus;": "⊕",
     "&ne;": "≠",
     "&sube;": "⊆",
@@ -212,6 +209,11 @@ controversial = {
     "&rceil;": "⌉",
     "&lceil;": "⌈",
     "&real;": "ℜ",
+
+    # Most easily confused with English letters.  Maybe.  8|
+    # "&cap;": "∩",
+    # "&cup;": "∪",
+    # "&sub;": "⊂",
 }
 
 keep.extend(controversial.keys())
@@ -835,6 +837,7 @@ def fix_text(text, transform_greek=False):
     if transform_greek:
         conversion_dict = transform.copy()
         conversion_dict.update(greek_letters)
+        conversion_dict.update(controversial)
     else:
         conversion_dict = transform
 
