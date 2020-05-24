@@ -10,4 +10,7 @@ for (language_code, _dump_status) in language_codes:
     file_name = "%swiktionary-latest-all-titles-in-ns0.gz" % language_code
     dump_url = "https://dumps.wikimedia.org/%swiktionary/latest/%s" % (language_code, file_name)
     print("Downloading %s" % dump_url)
-    urllib.request.urlretrieve(dump_url, "/bulk-wikipedia/all-wiktionaries/%s" % file_name)
+    try:
+        urllib.request.urlretrieve(dump_url, "/bulk-wikipedia/all-wiktionaries/%s" % file_name)
+    except urllib.error.HTTPError:
+        print("FAILED, skipping...")
