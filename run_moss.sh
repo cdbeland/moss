@@ -101,7 +101,7 @@ cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py
 head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
 head -1000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -200 > beland-articles-most-typos-refined.txt
 
-grep BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|prepositions)\]\]" | head -200 | perl -pe 's/.*?\t//' > post-you.txt
+grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|verbs|syntax|contractions|prepositions|mood)\]\]" | head -200 | perl -pe 's/.*?\t//' > post-you.txt
 
 # --- BY FREQUENCY ---
 
@@ -176,7 +176,7 @@ rm tmp-most-common-misspellings-intl.txt
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
-grep -v "I," tmp-articles-linked-words.txt | grep -v "U," | grep -v "Z,Z,Z" | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* [0123456] -" > post-copyedit.txt
+grep -v "I," tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* [0123456] -" > post-copyedit.txt
 
 # --- BY WORD LENGTH ---
 
@@ -242,7 +242,19 @@ echo `date`
 # Run time for this segment: ~2h
 
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
-cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
+mv tmp-worst.txt post-entities.txt
+cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all >> post-entities.txt
+
+# --- READABILITY ---
+
+echo "Beginning readability check"
+echo `date`
+
+# Run time for this segment: ~10.5h
+
+../venv/bin/python3 ../moss_readability_check.py > tmp-readability.txt
+sort -k2 -nr tmp-readability.txt > post-readability.txt
+rm tmp-readability.txt
 
 echo "Done"
 echo `date`

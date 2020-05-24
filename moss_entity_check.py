@@ -14,7 +14,9 @@ greek_letters_found = {}
 unknown_found = {}
 unknown_numerical_latin = {}
 unknown_numerical_high = {}
-non_entity_transform = [string for string in transform.keys() if not string.startswith("&")]
+non_entity_transform = [string for string
+                        in list(transform.keys()) + list(controversial.keys())
+                        if not string.startswith("&")]
 worst_articles = {}
 
 article_blacklist = [
@@ -73,8 +75,8 @@ article_blacklist = [
 
 
 # Max number of articles a character can appear in before it's ignored
-# for JWB purposes.
-JWB_ARTICLE_CUTOFF = 1100
+# for JWB article-list-generation purposes.
+JWB_ARTICLE_CUTOFF = 100
 
 
 def add_safely(value, key, dictionary):
@@ -93,6 +95,7 @@ suppression_patterns = [
 
 
 def entity_check(article_title, article_text):
+
     if article_title in article_blacklist:
         return
 
@@ -160,25 +163,39 @@ def entity_check(article_title, article_text):
 
 
 def dump_dict(section_title, dictionary):
-    print("\n=== %s ===" % section_title)
+    output = f"=== {section_title} ===\n"
 
     if section_title == "To avoid":
-        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+        output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
     elif section_title == "Uncontroversial entities":
-        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+        output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
     elif section_title == "Greek letters":
-        print(f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+        output += f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
     elif section_title == "Controversial entities":
-        print(f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+        output += f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
     elif section_title == "Unknown numerical: Latin range":
-        print(f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+        output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
     elif section_title == "Unknown high numerical":
-        print(f"Fix automatically with jwb-articles-high.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n")
+        output += f"Fix automatically with jwb-articles-high.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
+
+    if section_title == "Worst articles":
+        for (article_title, entities) in sorted_items[0:50]:
+            distinct_entities = set(entities)
+            output += f"* {len(entities)}/{len(distinct_entities)} - [[{article_title}]] - "
+            output += ", ".join([entity for entity in sorted(distinct_entities)])
+            output += "\n"
+        with open("jwb-articles-worst.txt", "w") as worsta:
+            print("\n".join([article_title
+                             for (article_title, entities)
+                             in sorted_items[0:50]]),
+                  file=worsta)
+        return output
+
     for (key, article_list) in sorted_items[0:50]:
         article_set = set(article_list)
-        print("* %s/%s - %s - %s" % (
+        output += "* %s/%s - %s - %s\n" % (
             len(article_list),
             len(article_set),
             key,
@@ -187,7 +204,8 @@ def dump_dict(section_title, dictionary):
             # times.  Sampled articles aren't always the ones at the
             # beginning of the alphabet as a result, but this doesn't
             # really matter.
-        ))
+        )
+    return output
 
 
 def extract_entities(dictionary):
@@ -242,13 +260,19 @@ def dump_results():
         "Unknown high numerical": unknown_numerical_high,
     }
     for (section_title, dictionary) in sections.items():
-        dump_dict(section_title, dictionary)
+        output = dump_dict(section_title, dictionary)
+        if section_title == "Worst articles":
+            with open("tmp-worst.txt", "w") as worst:
+                print(output, file=worst)
+        else:
+            print(output)
 
     with open("jwb-combo.json", "w") as comboj:
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
                            unknown_found, unknown_numerical_latin,
-                           unknown_numerical_high]:
+                           unknown_numerical_high,
+                           controversial_found, greek_letters_found]:
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=comboj)
 
