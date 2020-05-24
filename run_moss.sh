@@ -10,6 +10,21 @@
 
 set -e
 
+RUN_NAME=run-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T"`
+mkdir $RUN_NAME
+cd $RUN_NAME
+
+# --- HTML ENTITIES ---
+
+echo "Beginning HTML entity check"
+echo `date`
+
+# Run time for this segment: ~2h
+
+../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
+mv tmp-worst.txt post-entities.txt
+cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all >> post-entities.txt
+
 # --- MAIN SPELL CHECK ---
 
 # Run time for this segment: ~26h 07m
@@ -17,11 +32,7 @@ set -e
 echo "Beginning main spell check"
 echo `date`
 
-RUN_NAME=run-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T"`
-mkdir $RUN_NAME
-venv/bin/python3 moss_spell_check.py > $RUN_NAME/tmp-output.txt
-
-cd $RUN_NAME
+../venv/bin/python3 ../moss_spell_check.py > tmp-output.txt
 
 # --- SPELL CHECK WORD CATEGORIZATION AND PARSE FAILURE POST-PROCESSING ---
 
@@ -233,17 +244,6 @@ grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ..
 #    characters exactly are before and after (count before and after
 #    separately, or else there are too many combinations)
 
-
-# --- HTML ENTITIES ---
-
-echo "Beginning HTML entity check"
-echo `date`
-
-# Run time for this segment: ~2h
-
-../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
-mv tmp-worst.txt post-entities.txt
-cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all >> post-entities.txt
 
 # --- READABILITY ---
 
