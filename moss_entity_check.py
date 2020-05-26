@@ -128,14 +128,14 @@ def entity_check(article_title, article_text):
                 # times as the string appears
 
     for entity in entities_re.findall(article_text):
-        if entity in alert:
+        if entity in keep:
+            continue
+        elif entity in alert:
             # Handled above
             continue
         elif entity in controversial:
             add_safely(article_title, entity, controversial_found)
             add_safely(entity, article_title, worst_articles)
-            continue
-        elif entity in keep:
             continue
         elif entity in greek_letters:
             add_safely(article_title, entity, greek_letters_found)
