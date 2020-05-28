@@ -79,7 +79,6 @@ not_html = {"<a>", "<name>", "<r>", "<h>"}
 # <a> is not turned into a link by Mediawiki, so it's almost always
 # intentional like linguistics markup.
 
-
 # Any words in multi-word phrases should also be listed as individual
 # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
 # (at list creation time?) since these won't be matched anyway.
@@ -114,10 +113,15 @@ element_symbols = [
 
 chem_roman_numerals = ["II", "III", "IV", "VI", "VII", "VIII", "IX"]
 
-element_alternation = "|".join(element_symbols)
-roman_alternation = "|".join(chem_roman_numerals)
+element_alternation = "(" + "|".join(element_symbols) + ")"
+roman_alternation = "(" + "|".join(chem_roman_numerals) + ")"
 
-chem_formula_re = re.compile(rf"^({element_alternation})+[\(\),]({element_alternation}|{roman_alternation})+$|\(({roman_alternation})$")
+chem_formula_regexes = [
+    rf"^{element_alternation}+$",                            # NaCl
+    rf"^{element_alternation}+\({element_alternation}+\)$",  # Ca(OH)
+    rf"^{element_alternation}+\({roman_alternation}\)$",     # Mn(II)
+]
+chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
 
 
 # Note: This may malfunction slightly if there are commas inside the
