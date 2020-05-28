@@ -10,6 +10,10 @@ rm -rf /bulk-wikipedia/all-wiktionaries
 mkdir /bulk-wikipedia/all-wiktionaries
 venv/bin/python3 download_all_wiktionaries.py
 
+rm -rf /bulk-wikipedia/moss-subpages
+mkdir /bulk-wikipedia/moss-subpages
+venv/bin/python3 download_moss_subpages.py
+
 echo `date`
 echo "Uncompressing and sorting..."
 

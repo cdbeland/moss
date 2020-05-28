@@ -3,7 +3,7 @@
 import fileinput
 import re
 import string
-
+from urllib.parse import unquote
 from sectionalizer import sectionalize_lines
 
 unsorted = [
@@ -107,12 +107,38 @@ def clean_typo_link(typo_link):
     return typo_link
 
 
+def extract_linked_articles():
+    linked_articles = set()
+    for letter in ["before_A"] + list(string.ascii_uppercase) + ["after_Z"]:
+        with open(f"/bulk-wikipedia/moss-subpages/{letter}", "r") as subpage_file:
+            subpage_html = subpage_file.read()
+            linked_articles_this_page = re.findall('<a href="/wiki/([^"]+)"', subpage_html)
+            linked_articles_this_page = linked_articles.update(linked_articles_this_page)
+
+    linked_articles = [unquote(title).replace("_", " ")
+                       for title in linked_articles
+                       if not (title.startswith("Wikipedia:")
+                               or title.startswith("Wikipedia_talk:")
+                               or title.startswith("User:")
+                               or title.startswith("User_talk:")
+                               or title.startswith("MOS:")
+                               or title.startswith("Talk:")
+                               or title.startswith("Help:")
+                               or title.startswith("Special:")
+                               or "#" in title)]
+    return linked_articles
+
+
+articles_to_ignore = extract_linked_articles()
+
 for (letter, typos_by_best_type) in typos_by_letter.items():
     print(f"= {letter} =")
     for (best_type, tuple_list) in typos_by_best_type.items():
         print(f"=== {best_type}+ ===")
         output_lines = []
         for (article_title, types, typo_links) in sorted(tuple_list):
+            if article_title in articles_to_ignore:
+                continue
             bad_typo_links = []
             not_typo_links = []
             for (index, type_) in enumerate(types):
