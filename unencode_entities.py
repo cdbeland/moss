@@ -120,6 +120,9 @@ keep = [
     "&or;",     # ∨
     "&lang;",   # 〈
     "&rang;",   # 〉
+    "&cap;",    # ∩
+    "&cup;",    # ∪
+    "&sub;",    # ⊂
 
     # Would otherwise break markup
     "&lt;",    # <
@@ -209,11 +212,6 @@ controversial = {
     "&rceil;": "⌉",
     "&lceil;": "⌈",
     "&real;": "ℜ",
-
-    # Most easily confused with English letters.  Maybe.  8|
-    # "&cap;": "∩",
-    # "&cup;": "∪",
-    # "&sub;": "⊂",
 }
 
 keep.extend(controversial.keys())
@@ -488,6 +486,8 @@ transform = {
     "&#0093;": "&#93;",
     "&#00091;": "&#91;",
     "&#00093;": "&#93;",
+    "&00091;": "&#91;",
+    "&00093;": "&#93;",
     "&#x5B;": "&#91;",
     "&#x5D;": "&#93;",
     "&#x7C;": "&#124;",  # |
@@ -501,9 +501,9 @@ transform = {
     "&#60;": "&lt;",
     "&#060;": "&lt;",
     "&#0060;": "&lt;",
-    "&#61;": "=",  # Will break markup inside templates
-    "&#061;": "=",  # Will break markup inside templates
-    "&#0061;": "=",  # Will break markup inside templates
+    "&#61;": "{{=}}",  # Will break markup inside templates
+    "&#061;": "{{=}}",  # Will break markup inside templates
+    "&#0061;": "{{=}}",  # Will break markup inside templates
     "&#62;": "&gt;",
     "&#062;": "&gt;",
     "&#0062;": "&gt;",
@@ -574,6 +574,7 @@ transform = {
     "&tcedil;": "ţ",
     "&Scedil;": "Ş",
     "&scedil;": "ş",
+    "&divide;": "÷",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -607,6 +608,7 @@ transform = {
     "&#X1E24;": "Ḥ",
     "&iacute;": "í",
     "&Iacute;": "Í",
+    "&icirc;": "î",
     "&igrave;": "ì",
     "&iuml;": "ï",
     "&Ntilde;": "Ñ",
@@ -682,6 +684,7 @@ transform = {
     # Broken (typo on page)
     "&ccedi;": "ç",
     "&Amp;": "&amp;",
+    "&AMP;": "&amp;",
     "&6nbsp;": "&nbsp;",
     "&Ndash;": "&ndash;",
     "&nybsp;": "&nbsp;",
@@ -700,6 +703,10 @@ transform = {
     "&nadsh;": "&ndash;",
     "&nash;": "&ndash;",
     "&nbdash;": "&ndash;",
+    "&endash;": "&ndash;",
+    "&bdash;": "&ndash;",
+    "&ndahs;": "&ndash;",
+    "&ndasgh;": "&ndash;",
     "&nsbp;": "&nbsp;",
     "&nbps;": "&nbsp;",
     "&bnsp;": "&nbsp;",
