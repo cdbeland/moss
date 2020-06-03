@@ -122,8 +122,10 @@ echo `date`
 grep -P '^(TS|ME)' tmp-words-with-articles.txt | grep -vP 'wikt:[^\]]+[\(\[\),\.]' | grep -vP "\w\]\w" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
 
-grep -P '^(?!T1|TS|P|D|C|H|U|BC|BW|N|Z)' tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
+grep -P '^(?!T1|TS|P|D|C|H|U|BC|BW|N|Z)' tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | grep -P "wikt:[\p{L}]{3,}\]\]" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
 # No longer excluding I, W, MI, MW - most remaining words are no longer in English anyway.
+# Two characters or less gets a lot of math and IPA notation.
+#
 # TODO to speed processing of non-English words:
 # * Separate words into the scripts they use:
 #  -> See https://en.wikipedia.org/wiki/Wikipedia:Language_recognition_chart
