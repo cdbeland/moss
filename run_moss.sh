@@ -112,14 +112,14 @@ cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py
 head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
 head -1000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -200 > beland-articles-most-typos-refined.txt
 
-grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|verbs|syntax|contractions|prepositions|mood)\]\]" | head -200 | perl -pe 's/.*?\t//' > post-you.txt
+grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|verbs|syntax|contractions|prepositions|mood)\]\]" | head -50 | perl -pe 's/.*?\t//' > post-you.txt
 
 # --- BY FREQUENCY ---
 
 echo "Beginning by-frequency post-processing"
 echo `date`
 
-grep  -P '^(TS|ME)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
+grep  -P '^(TS|ME)' tmp-words-with-articles.txt | grep -vP '[\(\[\),]' | grep -vP "\w\]\w" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
 grep -P '^(?!T1|TS|I|P|D|C|H|U|W|BC|BW|MI|N|Z)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
 
@@ -135,7 +135,7 @@ grep ^HL tmp-words-with-articles.txt | perl -pe 's/^HL\t//' | ../venv/bin/python
 echo >> post-html-by-freq.txt
 echo "===Unsorted===" >> post-html-by-freq.txt
 echo "Many of these can be replaced by {{tl|var}} (for text to be replaced) or {{tl|angbr}} (e.g. for linguistic notation)." >> post-html-by-freq.txt
-grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
+grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/python3 ../summarizer.py --find-all | head -50 >> post-html-by-freq.txt
 
 # TODO: Search for bad attributes on HTML tags:
 #  https://en.wikipedia.org/wiki/Wikipedia:HTML_5#Table_attributes
@@ -187,7 +187,8 @@ rm tmp-most-common-misspellings-intl.txt
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
-grep -v "I," tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v \< | grep -P "[a-z]\.[A-z]" | grep -v "* [0123456] -" > post-copyedit.txt
+grep -v "I," tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z]\.[A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' > post-copyedit.txt
+
 
 # --- BY WORD LENGTH ---
 
