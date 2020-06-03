@@ -121,7 +121,26 @@ echo `date`
 
 grep -P '^(TS|ME)' tmp-words-with-articles.txt | grep -vP 'wikt:[^\]]+[\(\[\),\.]' | grep -vP "\w\]\w" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
-grep -P '^(?!T1|TS|I|P|D|C|H|U|W|BC|BW|MI|N|Z)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
+
+grep -P '^(?!T1|TS|P|D|C|H|U|BC|BW|N|Z)' tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
+# No longer excluding I, W, MI, MW - most remaining words are no longer in English anyway.
+# TODO to speed processing of non-English words:
+# * Separate words into the scripts they use:
+#  -> See https://en.wikipedia.org/wiki/Wikipedia:Language_recognition_chart
+# * Start with an easy-to-identify language (like Hebrew, Arabic,
+#   Korean, Japanese, Chinese, German [with ß])
+# * Download all Wikipedias and Wiktionaries (titles only) for
+#   languages that use this script
+# * Produce a list of words from this language which might be typos or
+#   might need to be added to the English or non-English Wiktionary or
+#   Wikipedia.
+# * If there's no way to distinguish proper nouns in a language, we
+#   may just need to ignore all text from that language so we don't
+#   alert on non-notable proper names.  But do such entities deserve
+#   translation in the English Wikipedia?  If so, it would be nice to
+#   have editors manually check the spelling of such words and add
+#   {{proper name}} to those instances.  Though we don't do that for
+#   English proper names.
 
 echo "===Known bad HTML tags===" > post-html-by-freq.txt
 grep ^HB tmp-words-with-articles.txt | perl -pe 's/^HB\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
@@ -148,27 +167,6 @@ grep ^P tmp-words-with-articles.txt | perl -pe 's/^P\t//' > beland-pattern-by-fr
 grep ^D tmp-words-with-articles.txt | perl -pe 's/^D\t//' > beland-dna-by-freq.txt
 grep ^N tmp-words-with-articles.txt | perl -pe 's/^N\t//'| grep -vP 'wikt:[\w-]+\]' > beland-punct-weirdness-by-freq.txt
 
-grep -P "^(I|W|MI|MW)" tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | head -100 > tmp-words-with-articles-truncated.txt
-cat tmp-words-with-articles-truncated.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-misspellings-intl.txt
-rm -f tmp-words-with-articles-truncated.txt
-# TODO for intl:
-# * Separate words into the scripts they use:
-#  -> See https://en.wikipedia.org/wiki/Wikipedia:Language_recognition_chart
-# * Start with an easy-to-identify language (like Hebrew, Arabic,
-#   Korean, Japanese, Chinese, German [with ß])
-# * Download all Wikipedias and Wiktionaries (titles only) for
-#   languages that use this script
-# * Produce a list of words from this language which might be typos or
-#   might need to be added to the English or non-English Wiktionary or
-#   Wikipedia.
-# * If there's no way to distinguish proper nouns in a language, we
-#   may just need to ignore all text from that language so we don't
-#   alert on non-notable proper names.  But do such entities deserve
-#   translation in the English Wikipedia?  If so, it would be nice to
-#   have editors manually check the spelling of such words and add
-#   {{proper name}} to those instances.  Though we don't do that for
-#   English proper names.
-
 # --- COLLECTION FOR POSTING ---
 
 echo "Beginning collection"
@@ -178,12 +176,6 @@ echo `date`
 # into a single file for posting to the moss project page.
 
 ../venv/bin/python3 ../collect.py > collected_by_article_and_freq.txt
-
-echo "=== Likely new words by frequency (non-English) ===" >> collected_by_article_and_freq.txt
-echo "These are good candidates to add to the English Wiktionary (which provides English definitions for words in all languages), as it seems English Wikipedia readers will frequently encounter them." >> collected_by_article_and_freq.txt
-echo "" >> collected_by_article_and_freq.txt
-cat tmp-most-common-misspellings-intl.txt >> collected_by_article_and_freq.txt
-rm tmp-most-common-misspellings-intl.txt
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 

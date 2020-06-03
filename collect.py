@@ -96,20 +96,21 @@ print("")
 print(get_active_lines_from_file("tmp-most-common-compound.txt", alpha_half_active, alpha_half_inactive, exclude_dot=True))
 print("")
 
-print("=== Likely new words by frequency (%s) ===" % active_range_str)
+print("=== Likely new words by frequency, all languages (%s) ===" % active_range_str)
 print("")
-print("""The best list to work on if you want to add completely new words to
-Wiktionary. The algorithm is not perfect, so some of these might be
-common mistakes that need to corrected. For each run, only words from
-half of the alphabet are shown, to avoid duplicate work from when new
-dumps are being processed.
 
-Some of the words might not be from English.  To get these words off
-this list, you can either add an entry to the English Wiktionary
-(which provides English definitions for words in all languages) or tag
-all instances of the word on the English Wikipedia with {{tl|lang}}.
-Wiktionary does not accept Romanizations for some languages, so those
-cases must be tagged as {{tl|transl}} or {{tl|lang}}.""")
+print("""Good candidates for words to add to the English Wiktionary (which
+provides English definitions for words in all languages), as it seems
+English Wikipedia readers will frequently encounter them.  For each
+run, only words from half of the alphabet are shown, to avoid
+duplicate work from when new dumps are being processed.
+
+Most of the words are not from English.  To get them off this list,
+you can either add an entry to the English Wiktionary (which provides
+English definitions for words in all languages) or tag all instances
+of the word on the English Wikipedia with {{tl|lang}}.  Wiktionary
+does not accept Romanizations for some languages, so those cases must
+be tagged as {{tl|transl}} or {{tl|lang}}.""")
 print("")
 print(get_active_lines_from_file("tmp-most-common-new-words.txt", alpha_half_active, alpha_half_inactive))
 print("")
