@@ -20,7 +20,7 @@ non_entity_transform = [string for string
 worst_articles = {}
 
 article_blacklist = [
-    # Characters themselves are discussed
+    # Characters themselves are discussed or listed as part of a mapping
     "' (disambiguation)",
     "Basic Latin (Unicode block)",
     "Bracket",
@@ -29,8 +29,12 @@ article_blacklist = [
     "Devanagari transliteration",
     "German keyboard layout",
     "Grave accent",
+    "Greek script in Unicode",
+    "ISO/IEC 10367",
     "ISO 5426",
     "ISO 5428",
+    "ITU T.61",
+    "JIS X 0208",
     "KPS 9566",
     "Latin script in Unicode",
     "List of Japanese typographic symbols",
@@ -47,11 +51,16 @@ article_blacklist = [
     "Rough breathing",
     "Quotation mark",
     "Schwarzian derivative",
-    "Tilde"
+    "Tilde",
     "TRON (encoding)",
     "Windows-1252",
     "Windows-1258",
     "Windows Glyph List 4",
+    "Xerox Character Code Standard",
+    # Note: Characters like &Ohm; and &#x2F802; are changed by
+    # Normalization Form Canonical Composition and appear as different
+    # Unicode characters, like &Omega;.  Using the HTML entity instead
+    # of the raw Unicode character prevents this.
 
     "Arabic diacritics",
     "Arabic script in Unicode",  # objection from Mahmudmasri
@@ -95,7 +104,6 @@ suppression_patterns = [
 
 
 def entity_check(article_title, article_text):
-
     if article_title in article_blacklist:
         return
 
@@ -166,17 +174,17 @@ def dump_dict(section_title, dictionary):
     output = f"=== {section_title} ===\n"
 
     if section_title == "To avoid":
-        output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
+        output += f"Not included in JWB scripts; may need to isolate instances in main body text, add automatic substitutions, or fix manually.\n\n"
     elif section_title == "Uncontroversial entities":
         output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
     elif section_title == "Greek letters":
-        output += f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
+        output += f"Fix automatically with jwb-articles-greek.txt (avoiding STEM articles)\n\n"
     elif section_title == "Controversial entities":
-        output += f"Fix automatically with jwb-articles-controversial.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
+        output += f"Fix automatically with jwb-articles-controversial.txt (avoiding STEM articles)\n\n"
     elif section_title == "Unknown numerical: Latin range":
         output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
     elif section_title == "Unknown high numerical":
-        output += f"Fix automatically with jwb-articles-high.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
+        output += f"Fix automatically with jwb-articles-high.txt\n\n"
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
 
@@ -193,7 +201,12 @@ def dump_dict(section_title, dictionary):
                   file=worsta)
         return output
 
-    for (key, article_list) in sorted_items[0:50]:
+    for (key, article_list) in sorted_items[0:100]:
+        if section_title == "To avoid":
+            # Exclude overlapping entities
+            if key in uncontroversial_found:
+                continue
+
         article_set = set(article_list)
         output += "* %s/%s - %s - %s\n" % (
             len(article_list),
@@ -212,14 +225,15 @@ def extract_entities(dictionary):
     return {entity for entity in dictionary.keys()}
 
 
-def extract_articles(dictionary):
+def extract_articles(dictionary, limit=True):
     articles = set()
     for article_list in dictionary.values():
         # Skip articles that only have very common characters or
         # entities that will need to be dealt with by a real bot
         # someday.
-        if len(article_list) < JWB_ARTICLE_CUTOFF:
+        if not limit or len(article_list) < JWB_ARTICLE_CUTOFF:
             articles.update(article_list)
+
     return articles
 
 
@@ -267,30 +281,39 @@ def dump_results():
         else:
             print(output)
 
-    with open("jwb-combo.json", "w") as comboj:
+    with open("jwb-combo-no-greek-no-controversial.json", "w") as combojng:
+        bad_entities = set()
+        for dictionary in [alerts_found, uncontroversial_found,
+                           unknown_found, unknown_numerical_latin,
+                           unknown_numerical_high]:
+            bad_entities.update(extract_entities(dictionary))
+        dump_for_jwb("combo", bad_entities, file=combojng)
+
+    with open("jwb-combo-full.json", "w") as combof:
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
                            unknown_found, unknown_numerical_latin,
                            unknown_numerical_high,
                            controversial_found, greek_letters_found]:
             bad_entities.update(extract_entities(dictionary))
-        dump_for_jwb("combo", bad_entities, file=comboj)
+        dump_for_jwb("combo", bad_entities, file=combof)
 
     with open("jwb-articles-controversial.txt", "w") as contro:
-        articles = set()
-        for dictionary in [controversial_found, greek_letters_found]:
-            articles.update(extract_articles(dictionary))
+        articles = extract_articles(controversial_found, limit=False)
         print("\n".join(sorted(articles)), file=contro)
+
+    with open("jwb-articles-greek.txt", "w") as greek:
+        articles = extract_articles(greek_letters_found, limit=False)
+        print("\n".join(sorted(articles)), file=greek)
 
     with open("jwb-articles-low.txt", "w") as lowa:
         articles = set()
-        for dictionary in [alerts_found, uncontroversial_found,
-                           unknown_found, unknown_numerical_latin]:
+        for dictionary in [uncontroversial_found, unknown_found, unknown_numerical_latin]:
             articles.update(extract_articles(dictionary))
         print("\n".join(sorted(articles)), file=lowa)
 
     with open("jwb-articles-high.txt", "w") as higha:
-        print("\n".join(sorted(extract_articles(unknown_numerical_high))), file=higha)
+        print("\n".join(sorted(extract_articles(unknown_numerical_high, limit=False))), file=higha)
 
 
 read_en_article_text(entity_check)

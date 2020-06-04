@@ -214,7 +214,7 @@ controversial = {
     "&real;": "ℜ",
 }
 
-keep.extend(controversial.keys())
+# keep.extend(controversial.keys())
 
 transform_unsafe = {
     # These transformations can't be made in places where the
