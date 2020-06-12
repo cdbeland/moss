@@ -38,6 +38,7 @@ article_blacklist = [
     "KPS 9566",
     "Latin script in Unicode",
     "List of Japanese typographic symbols",
+    "List of Latin letters by shape",
     "List of Unicode characters",
     "Mac OS Celtic",
     "Mac OS Devanagari encoding",
