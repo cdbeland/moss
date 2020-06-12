@@ -130,7 +130,7 @@ keep = [
     "&#91;",   # [
     "&#93;",   # ]
     "&#123;",  # {
-    "&#124;",  # |  &vert; doesn't work
+    # "&#124;",  # |  &vert; doesn't work, but {{!}} does
     "&#125;",  # }
     # TODO: Maybe these should be converted to <nowiki>[</nowiki> etc.?
 
@@ -280,10 +280,8 @@ transform_unsafe = {
     # "&#91;": "[",
     # "&#93;": "]",
 
-    # This is a pipe, but usually happens in URL titles, in which case
-    # making a dash is easier.
-    "&#124;": "-",
-    # If a pipe character is needed, use {{!}}
+    # This is a pipe, but usually happens in URL titles
+    "&#124;": "{{!}}",
     # https://www.mediawiki.org/wiki/Help:Magic_words#Other
 
     # These are usually spurious, per [[MOS:TMRULES]]
@@ -490,10 +488,10 @@ transform = {
     "&00093;": "&#93;",
     "&#x5B;": "&#91;",
     "&#x5D;": "&#93;",
-    "&#x7C;": "&#124;",  # |
-    "&#x7c;": "&#124;",  # |
-    "&#x007C;": "&#124;",  # |
-    "&#0124;": "&#124;",  # |
+    "&#x7C;": "{{!}}",  # |
+    "&#x7c;": "{{!}}",  # |
+    "&#x007C;": "{{!}}",  # |
+    "&#0124;": "{{!}}",  # |
     "&#x3C;": "&lt;",
     "&#x003C;": "&lt;",
     "&#x3E;": "&gt;",
@@ -682,6 +680,8 @@ transform = {
     # "&dash;": "-",  # ASCII hyphen
 
     # Broken (typo on page)
+    "&#150;": "-",
+    "&#151;": "-",
     "&ccedi;": "ç",
     "&Amp;": "&amp;",
     "&AMP;": "&amp;",
@@ -706,6 +706,7 @@ transform = {
     "&endash;": "&ndash;",
     "&bdash;": "&ndash;",
     "&ndahs;": "&ndash;",
+    "&dnash;": "&ndash;",
     "&ndasgh;": "&ndash;",
     "&nsbp;": "&nbsp;",
     "&nbps;": "&nbsp;",
