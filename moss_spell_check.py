@@ -70,7 +70,7 @@ def dump_results():
         print(output_string)
 
 
-ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup|[Ww]hich lang(uage)?|[Tt]ypo help inline|[Yy]ou|[Tt]one|[Cc]opyedit).*?}}")
+ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+|[Nn]ot English|[Cc]leanup HTML|[Cc]leanup|[Ww]hich lang(uage)?|[Tt]ypo help inline|[Yy]ou|[Tt]one|[Cc]opyedit|[Mm]anual|[Hh]ow\-?to).*?}}")
 blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>)", flags=re.I+re.S)
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
