@@ -825,6 +825,14 @@ def should_keep_as_is(entity):
     if variant_selectors_re.match(entity):
         return True
 
+    # Avoid changing entities into characters that would normalized
+    # into a different
+    # character.
+    # https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization
+    transformed = unicodedata.normalize("NFC", entity)
+    if entity != transformed:
+        return True
+
     return False
 
 
