@@ -109,8 +109,8 @@ cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py
 #   down to about 20 or so, though there are many mixed in at lower
 #   frequencies)
 
-head -200 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
-head -1000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -200 > beland-articles-most-typos-refined.txt
+head -50 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
+head -10000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -50 > beland-articles-most-typos-refined.txt
 
 grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|verbs|syntax|contractions|prepositions|mood)\]\]" | head -50 | perl -pe 's/.*?\t//' > post-you.txt
 
