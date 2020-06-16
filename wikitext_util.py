@@ -335,6 +335,7 @@ ignore_sections_re = re.compile(
     r"==\s*Further reading\s*==|"
     r"==\s*Sources\s*==|"
     r"==\s*Publications\s*==|"
+    r"==\s*Selected publications\s*==|"
     r"==\s*Filmography\s*==|"
     r"==\s*Discography\s*==|"
     r"==\s*Works\s*==|"
