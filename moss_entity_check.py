@@ -86,7 +86,7 @@ article_blacklist = [
 
 # Max number of articles a character can appear in before it's ignored
 # for JWB article-list-generation purposes.
-JWB_ARTICLE_CUTOFF = 100
+JWB_ARTICLE_CUTOFF = 50
 
 
 def add_safely(value, key, dictionary):
