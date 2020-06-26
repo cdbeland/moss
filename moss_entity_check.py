@@ -190,6 +190,7 @@ def dump_dict(section_title, dictionary):
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
 
     if section_title == "Worst articles":
+        output += "Fix automatically with jwb-articles-worst.txt\n"
         for (article_title, entities) in sorted_items[0:50]:
             distinct_entities = set(entities)
             output += f"* {len(entities)}/{len(distinct_entities)} - [[{article_title}]] - "
