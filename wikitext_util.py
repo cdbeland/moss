@@ -74,6 +74,10 @@ early_substitutions = [
 
     (re.compile(r"{{(·|bold middot|dot|middot)}}"), " · "),
     (re.compile(r"{{(•|bull)}}"), " • "),
+
+    (re.compile(r"<syntaxhighlight[^>]*>.*?</syntaxhighlight>", flags=re.I+re.S), "\n\n"),
+    # include <math.h> will mess up <math>...</math>
+
     (re.compile(r"<math[^>]*>.*?</math>", flags=re.I+re.S), ""),  # Sometimes contain {{ / }}, which can look like template start/end
 
     (re.compile(r"{{ISBN\|(.*?)}}"), r"\1"),
@@ -214,7 +218,6 @@ substitutions = [
     (re.compile(r"<references/>", flags=re.I), "\n\n"),
     (re.compile(r"<references>.*?</\s*references>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<source[^>]*>.*?</source>", flags=re.I+re.S), "\n\n"),
-    (re.compile(r"<syntaxhighlight[^>]*>.*?</syntaxhighlight>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<timeline>.*?</timeline>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<code>.*?</code>", flags=re.I+re.S), "\n\n"),
     (re.compile(r"<chem>.*?</chem>", flags=re.I+re.S), ""),
