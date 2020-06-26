@@ -196,6 +196,7 @@ echo "Longest or shortest in certain categories are shown, sometimes just for fu
 echo "" >> collected_by_length.txt
 
 echo "==== Likely chemistry words ====" >> collected_by_length.txt
+echo "These need to be checked by a chemist and marked as {{tl|not a typo}}." >> collected_by_length.txt
 grep ^C tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^C\t//' | head -20 >> collected_by_length.txt
 echo "" >> collected_by_length.txt
 
