@@ -127,8 +127,8 @@ keep = [
     # Would otherwise break markup
     "&lt;",    # <
     "&gt;",    # >
-    "&#91;",   # [
-    "&#93;",   # ]
+    "&#91;",   # [  {{!(}} will also work
+    "&#93;",   # ]  {{)!}} will also work
     "&#123;",  # {
     # "&#124;",  # |  &vert; doesn't work, but {{!}} does
     "&#125;",  # }
@@ -211,6 +211,8 @@ controversial = {
     "&int;": "∫",
     "&rceil;": "⌉",
     "&lceil;": "⌈",
+    "&rfloor;": "⌋",
+    "&lfloor;": "⌊",
     "&real;": "ℜ",
 }
 
@@ -294,7 +296,8 @@ transform_unsafe = {
     # "&#93;": "]",
 
     # This is a pipe, but usually happens in URL titles
-    "&#124;": "{{!}}",
+    "&#124;": "{{pipe}}",
+    # {{!}} in tables?
     # https://www.mediawiki.org/wiki/Help:Magic_words#Other
 
     # These are usually spurious, per [[MOS:TMRULES]]
@@ -702,8 +705,10 @@ transform = {
     "&Ndash;": "&ndash;",
     "&nybsp;": "&nbsp;",
     "&nbsop;": "&nbsp;",
+    "&nbdsp;": "&nbsp;",
     "&ndsah;": "&ndash;",
     "&ndaash;": "&ndash;",
+    "&ndssh;": "&ndash;",
     "&ndsh;": "&ndash;",
     "&nfash;": "&ndash;",
     "&nbbsp;": "&nbsp;",
