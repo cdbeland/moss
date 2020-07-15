@@ -25,7 +25,7 @@ import re
 #  Need to tag token-by-token and maintain context (ref, template,
 #  table, quote, etc.)
 
-# * Get article blacklist (manual check needed) working
+# * Get article blocklist (manual check needed) working
 #   -> Category filter
 # * Get web server fired up with API-based editing
 # * Generalize changes - in: method, edit summary, result object with

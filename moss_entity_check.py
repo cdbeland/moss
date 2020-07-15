@@ -19,7 +19,7 @@ non_entity_transform = [string for string
                         if not string.startswith("&")]
 worst_articles = {}
 
-article_blacklist = [
+article_blocklist = [
     # Characters themselves are discussed or listed as part of a mapping
     "' (disambiguation)",
     "Basic Latin (Unicode block)",
@@ -27,6 +27,8 @@ article_blacklist = [
     "CEA-708",
     "Code page 259",
     "Devanagari transliteration",
+    "Ellipsis",
+    "En (typography)",
     "German keyboard layout",
     "Grave accent",
     "Greek script in Unicode",
@@ -105,7 +107,7 @@ suppression_patterns = [
 
 
 def entity_check(article_title, article_text):
-    if article_title in article_blacklist:
+    if article_title in article_blocklist:
         return
 
     for pattern in suppression_patterns:

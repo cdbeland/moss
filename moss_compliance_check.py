@@ -54,7 +54,7 @@ REGEX_SUBSTITUTIONS = [
     # <big> should be quite rare, maybe also <small>
     # <u> should usually be replaced with '', <s> should be rare
 
-    # insource:/ layman/ or just blacklist "layman"
+    # insource:/ layman/ or just blocklist "layman"
     # -> sometimes a last name, sometimes accurate because it refers
     # -> to a male individual.
 

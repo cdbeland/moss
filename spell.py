@@ -101,7 +101,7 @@ number_formats_allowed_re = re.compile(
                        base_number_format,
                        "|".join(prefixed_number_formats)))
 
-# Word blacklist
+# Word blocklist
 bad_words = {
 
     # TODO: Ignore articles with "unmanned aerial vehicle" to reduce
@@ -571,8 +571,7 @@ bad_characters = {
 }
 
 # Treated as separate words by NLTK tokenizer
-# This is the whitelist!
-allowed_list = {
+allow_list = {
 
     # Legitimate English prose punctuation
     ",",
@@ -652,7 +651,7 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
     if word_mixedcase.lower() in all_words:
         return True
 
-    if word_mixedcase in allowed_list:
+    if word_mixedcase in allow_list:
         return True
 
     if entities_re.match(word_mixedcase):

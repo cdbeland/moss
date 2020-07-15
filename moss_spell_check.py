@@ -23,7 +23,7 @@ from word_categorizer import is_chemistry_word
 # TODO LONG TERM:
 # * Suppress items on
 #   https://en.wiktionary.org/wiki/Category:English_misspellings from
-#   the whitelist (maybe conditionally, if that is also a correct
+#   the allow list (maybe conditionally, if that is also a correct
 #   spelling of some other word)
 #   (suggested by User:-sche)
 # * Do a separate run for redirects matching
