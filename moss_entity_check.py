@@ -41,6 +41,7 @@ article_blocklist = [
     "Latin script in Unicode",
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
+    "List of precomposed Latin characters in Unicode",
     "List of Unicode characters",
     "Mac OS Celtic",
     "Mac OS Devanagari encoding",
@@ -54,8 +55,11 @@ article_blocklist = [
     "Rough breathing",
     "Quotation mark",
     "Schwarzian derivative",
+    "Symbol (typeface)",
+    "T.51/ISO/IEC 6937",
     "Tilde",
     "TRON (encoding)",
+    "Videotex character set",
     "Windows-1252",
     "Windows-1258",
     "Windows Glyph List 4",
@@ -191,6 +195,8 @@ def dump_dict(section_title, dictionary):
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
 
+    """
+    # Disabled - mostly low-priority MOS:STRAIGHT violations
     if section_title == "Worst articles":
         output += "Fix automatically with jwb-articles-worst.txt\n"
         for (article_title, entities) in sorted_items[0:50]:
@@ -204,6 +210,7 @@ def dump_dict(section_title, dictionary):
                              in sorted_items[0:50]]),
                   file=worsta)
         return output
+    """
 
     for (key, article_list) in sorted_items[0:100]:
         if section_title == "To avoid":
@@ -279,11 +286,15 @@ def dump_results():
     }
     for (section_title, dictionary) in sections.items():
         output = dump_dict(section_title, dictionary)
+        print(output)
+        """
+        # Disabled - mostly low-priority MOS:STRAIGHT violations
         if section_title == "Worst articles":
             with open("tmp-worst.txt", "w") as worst:
                 print(output, file=worst)
         else:
             print(output)
+        """
 
     with open("jwb-combo-no-greek-no-controversial.json", "w") as combojng:
         bad_entities = set()
