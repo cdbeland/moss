@@ -223,7 +223,7 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
-    "&#8239; ": "&nbsp;",    # narrow no-break space
+    "&#8239;": "&nbsp;",    # narrow no-break space
 
     "µ": "μ",  # micro to mu
 
