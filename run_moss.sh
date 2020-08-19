@@ -64,7 +64,7 @@ tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tm
 echo "Beginning by-article post-processing"
 echo `date`
 
-# Run time for here to beginning of HTML tag report: ~2 minutes
+# Run time for here to beginning of readability report: ~2 minutes
 
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py > post-main-listings.txt
 
