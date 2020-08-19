@@ -22,11 +22,14 @@ worst_articles = {}
 article_blocklist = [
     # Characters themselves are discussed or listed as part of a mapping
     "' (disambiguation)",
+    "ARIB STD B24 character set",
     "Basic Latin (Unicode block)",
+    "Big5",
     "Bracket",
     "CEA-708",
     "Code page 259",
     "Devanagari transliteration",
+    "Duplicate characters in Unicode",
     "Ellipsis",
     "En (typography)",
     "German keyboard layout",
@@ -38,6 +41,7 @@ article_blocklist = [
     "ITU T.61",
     "JIS X 0208",
     "KPS 9566",
+    "KS X 1001",
     "Latin script in Unicode",
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
@@ -47,11 +51,14 @@ article_blocklist = [
     "Mac OS Devanagari encoding",
     "Mac OS Roman",
     "Mojibake",
+    "Number forms",
+    "Numerals in Unicode",
     "Numero sign",
     "Phags-pa (Unicode block)",
     "Prime (symbol)",
     "Registered trademark symbol",
     "RISC OS character set",
+    "Roman numerals",
     "Rough breathing",
     "Quotation mark",
     "Schwarzian derivative",
@@ -59,6 +66,9 @@ article_blocklist = [
     "T.51/ISO/IEC 6937",
     "Tilde",
     "TRON (encoding)",
+    "Unicode compatibility characters",
+    "Unicode equivalence",
+    "Unicode subscripts and superscripts",
     "Videotex character set",
     "Windows-1252",
     "Windows-1258",
@@ -87,6 +97,12 @@ article_blocklist = [
     "Seong",
     "Sung-mi",
     "Yasukuni Shrine",
+
+    # African language needs slash in link
+    "2011 South African municipal elections",
+
+    # File name
+    "2019 in India",
 ]
 
 
@@ -195,9 +211,10 @@ def dump_dict(section_title, dictionary):
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
 
-    """
-    # Disabled - mostly low-priority MOS:STRAIGHT violations
     if section_title == "Worst articles":
+        # Disabled - mostly low-priority MOS:STRAIGHT violations
+        return
+    """
         output += "Fix automatically with jwb-articles-worst.txt\n"
         for (article_title, entities) in sorted_items[0:50]:
             distinct_entities = set(entities)
