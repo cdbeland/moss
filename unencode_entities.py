@@ -186,6 +186,7 @@ controversial = {
     "&radic;": "√",
     "&forall;": "∀",
     "&sup;": "⊃",
+    "&supe;": "⊇",
     "&sim;": "∼",
     "&perp;": "⊥",
     "&alefsym;": "ℵ",
@@ -338,6 +339,14 @@ transform_unsafe = {
     # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
     # -> Or maybe make separate templates for these
 
+    # Probably a miscoding of a Hebrew or Arabic letter
+    "&#700;": "???",  # U+02BC
+    "ʼ": "???",  # U+02BC
+    "&#x02BC;": "???",
+
+    "&#701;": "???",
+    "&#x02BD;": "???",
+
     "&#x02BE;": "'",
     "&#702;": "'",
     "ʾ": "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
@@ -346,6 +355,7 @@ transform_unsafe = {
     # [[Romanization_of_Hebrew#Table]]
     # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
     # be clear from context it's not an apostrophe
+    # For Arabic, this is should be changed to {{hamza}}
 
     # For native [[Greek numerals]]
     "&#x0374;": "{{keraia}}",
@@ -550,12 +560,9 @@ transform = {
     "&#043;": "+",
     "&#037;": "%",
 
-    "&apos;": "'",
+    "&apos;": "'",  # Or {{'}}
     "&#8216;": "'",
     "&#8217;": "'",
-    "&#700;": "'",  # U+02BC
-    "ʼ": "'",  # U+02BC
-    "&#x02BC;": "'",
 
     "&quot;": '"',
     "&#8220;": '"',
