@@ -24,6 +24,7 @@ article_blocklist = [
     "' (disambiguation)",
     "ANSEL",
     "ARIB STD B24 character set",
+    "ASMO 449",
     "Basic Latin (Unicode block)",
     "Big5",
     "Bracket",
@@ -40,6 +41,7 @@ article_blocklist = [
     "ELOT 927",
     "En (typography)",
     "German keyboard layout",
+    "GOST 10859",
     "Grave accent",
     "Greek script in Unicode",
     "Hashtag",
@@ -112,12 +114,16 @@ article_blocklist = [
     "Yiddish orthography",
     "Eastern Arabic numerals",
     "List of XML and HTML character entity references",
+    "Bengali–Assamese script",
 
     # Correctly uses U+2011 Non-Breaking Hypens
     "Börje",
 
     # Correctly uses center dots
     "Additive category",
+
+    # Legitimate uses of ©
+    "Bobbsey Twins",
 
     # Variation issues, maybe need a variant selector?
     "Seong",
@@ -133,9 +139,12 @@ article_blocklist = [
     "Ichikawa Danjūrō IX",
     "Kamakura Gongorō Kagemasa",
     "OptiX",
+    "Aragoto",
+    "Collection (publishing)",
 
     # Chess with ½
     "World Chess960 Championship",
+    "Algebraic notation (chess)",
 ]
 
 
@@ -292,7 +301,7 @@ def extract_articles(dictionary, limit=True):
         # Skip articles that only have very common characters or
         # entities that will need to be dealt with by a real bot
         # someday.
-        if not limit or len(article_list) < JWB_ARTICLE_CUTOFF:
+        if not limit or len(set(article_list)) < JWB_ARTICLE_CUTOFF:
             articles.update(article_list)
 
     return articles
