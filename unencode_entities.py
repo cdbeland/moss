@@ -394,7 +394,7 @@ transform_unsafe = {
     "&emsp13;": " ",
     "&emsp14;": " ",
     "&thinsp;": "",
-    "&numsp;": " ",
+    "&numsp;": "{{figure space}}",
     "&puncsp;": " ",
     "&hairsp;": " ",
     "&MediumSpace;": " ",
