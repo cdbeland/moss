@@ -32,6 +32,8 @@ article_blocklist = [
     "CER-GS",
     "Chinese Character Code for Information Interchange",
     "Code page 259",
+    "Code page 293",
+    "Colon (punctuation)",
     "Computer Braille Code",
     "Devanagari transliteration",
     "DEC Hebrew",
@@ -116,6 +118,8 @@ article_blocklist = [
     "List of XML and HTML character entity references",
     "Bengali–Assamese script",
 
+    "List of jōyō kanji",  # Breaks display of certain characters
+
     # Correctly uses U+2011 Non-Breaking Hypens
     "Börje",
 
@@ -141,6 +145,7 @@ article_blocklist = [
     "OptiX",
     "Aragoto",
     "Collection (publishing)",
+    "Group A",
 
     # Chess with ½
     "World Chess960 Championship",
