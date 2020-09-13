@@ -86,6 +86,7 @@ article_blocklist = [
     "Slash (punctuation)",
     "Symbol (typeface)",
     "T.51/ISO/IEC 6937",
+    "Tab key",
     "Teletext character set",
     "Thai Industrial Standard 620-2533",
     "Tilde",
