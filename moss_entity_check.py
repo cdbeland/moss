@@ -100,6 +100,7 @@ article_blocklist = [
     "VT52",
     "Wang International Standard Code for Information Interchange",
     "Warmian-Masurian Voivodeship",
+    "Whitespace (programming language)",
     "Windows-1252",
     "Windows-1258",
     "Windows Glyph List 4",
