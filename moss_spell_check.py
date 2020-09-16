@@ -152,9 +152,9 @@ def spellcheck_all_langs(article_title, article_text):
 
     # -- Skip article entirely if appropriate --
 
-    if article_title[0] != "X":
-        print("S\tSKIPPING due to fast run\t%s" % article_title)
-        return
+    # if article_title[0] != "X":
+    #     print("S\tSKIPPING due to fast run\t%s" % article_title)
+    #     return
 
     # if not article_title.startswith("List"):
     #     print("S\tSKIPPING due to fast run\t%s" % article_title)
