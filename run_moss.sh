@@ -51,7 +51,7 @@ rm -rf /tmp/sorted_by_article.txt
 
 grep -P '^!\t' tmp-output.txt | perl -pe 's/.*?\t//' | sort > post-parse-failures.txt
 grep -P '^\!Q' tmp-output.txt | perl -pe 's/^\!Q\t\* \[\[(.*?)\]\].*$/$1/' | sort | ../venv/bin/python3 ../sectionalizer.py LARGE > jwb-straight-quotes-unbalanced.txt
-# grep '^G' tmp-output.txt | sort > debug-spellcheck-ignored.txt  # Not currently used, may reactivate in future
+grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2 > debug-spellcheck-ignored.txt
 
 echo "Beginning word categorization run 2"
 echo `date`

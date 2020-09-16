@@ -152,11 +152,9 @@ def spellcheck_all_langs(article_title, article_text):
 
     # -- Skip article entirely if appropriate --
 
-    # if article_title[0] not in [
-    #         "A",
-    #         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
-    #     print("S\tSKIPPING due to fast run\t%s" % article_title)
-    #     return
+    if article_title[0] != "X":
+        print("S\tSKIPPING due to fast run\t%s" % article_title)
+        return
 
     # if not article_title.startswith("List"):
     #     print("S\tSKIPPING due to fast run\t%s" % article_title)
@@ -282,6 +280,14 @@ def spellcheck_all_langs(article_title, article_text):
         # semicolon.
 
         # TODO: Parameterize to avoid code duplication
+
+        # Two-token sequences
+        if i < len(word_list) - 1:
+            # Sometimes tokenization separates final period from the
+            # rest of the acronym.
+            if "." in word_list[i] and word_list[i + 1] == ".":
+                word_list[i] += "."
+                del word_list[i + 1]
 
         # Three-token sequences
         if i < len(word_list) - 2:
