@@ -84,6 +84,7 @@ article_blocklist = [
     "Quotation mark",
     "Schwarzian derivative",
     "Secondary articulation",
+    "Service mark",
     "SI 960",
     "Six-bit character code",
     "Slash (punctuation)",
@@ -153,6 +154,8 @@ article_blocklist = [
     "Collection (publishing)",
     "Group A",
     "Kobee",
+    "Luanping County",
+    "Radio masts and towers",
 
     # Chess with ½
     "World Chess960 Championship",
