@@ -182,6 +182,7 @@ controversial = {
     "&oplus;": "⊕",
     "&ne;": "≠",
     "&sube;": "⊆",
+    "&subseteq;": "⊆",
     "&not;": "¬",
     "&radic;": "√",
     "&forall;": "∀",
@@ -224,6 +225,8 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
+    "&equals;": "=",
+
     "&#8239;": "&nbsp;",    # narrow no-break space
 
     "µ": "μ",  # micro to mu
@@ -237,6 +240,11 @@ transform_unsafe = {
     "&#x2010;": "-",  # Hyphen
     "&#x2027;": "-",  # Hyphenation point
     "‐": "-",         # U+2010 Hyphen to ASCII
+
+    # Usually a typo for &ndash;
+    # "&dash;": "-",  # ASCII hyphen
+    "&dash;": "&ndash;",  # ASCII hyphen
+
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
     "&#x2116;": "No.",
     "&#8470;": "No.",
@@ -283,9 +291,11 @@ transform_unsafe = {
     "&#x215C;": "{{frac|3|8}}",
     "&#x215D;": "{{frac|5|8}}",
     "&#x215E;": "{{frac|7|8}}",
+    "&half;": "{{frac|1|2}}",
     "&frac12;": "{{frac|1|2}}",
     "&frac14;": "{{frac|1|4}}",
     "&frac16;": "{{frac|1|6}}",
+    "&frac18;": "{{frac|1|8}}",
     "&frac34;": "{{frac|3|4}}",
     "&#8531;": "{{frac|1|3}}",
     "…": "...",
@@ -559,8 +569,12 @@ transform = {
 
     "&#043;": "+",
     "&#037;": "%",
+    "&colon;": ":",  # {{colon}} is also available
+    "&check;": "✓",
+    "&therefore;": "∴",
 
     "&apos;": "'",  # Or {{'}}
+    "&Apos;": "'",  # Or {{'}}
     "&#8216;": "'",
     "&#8217;": "'",
 
@@ -698,9 +712,6 @@ transform = {
 
     "&#x2013;": "–",  # endash
     "&#8211;": "–",  # endash
-
-    # Usually a typo for &ndash;
-    # "&dash;": "-",  # ASCII hyphen
 
     # Broken (typo on page)
     "&#150;": "-",
