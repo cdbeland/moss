@@ -240,6 +240,9 @@ bad_words = {
     "you'll",
     "your",
     "you're",
+
+    # Bad syntax, requires argument
+    "{{formatnum:}}",
 }
 
 bad_characters = {
@@ -599,6 +602,13 @@ allow_list = {
     # Allowed HTML
     "<samp>",  # Replaces <tt>, {{samp}} can't do multi-line
     "</samp>",
+
+    # Bidirectional text
+    # For example when Latin and Hebrew characters are mixed.
+    # Sometimes used spuriously. Might be replaced by using {{lro}},
+    # {{rlo}}, etc.?
+    "<bdi>",
+    "</bdi>",
 
     # TODO: This discussion was somewhat inconclusive:
     # https://en.wikipedia.org/wiki/Wikipedia:Templates_for_discussion/Log/2019_March_17#Template:Dfn
