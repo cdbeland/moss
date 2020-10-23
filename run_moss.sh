@@ -147,17 +147,19 @@ grep -P '^(?!T1|TS|P|D|C|H|U|BC|BW|N|Z)' tmp-words-with-articles.txt | grep -vP 
 #   {{proper name}} to those instances.  Though we don't do that for
 #   English proper names.
 
-echo "===Known bad HTML tags===" > post-html-by-freq.txt
+echo "===Known bad HTML tags (HB) ===" > post-html-by-freq.txt
+echo "These are also included in the main listings." >> post-html-by-freq.txt
 grep ^HB tmp-words-with-articles.txt | perl -pe 's/^HB\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
 
 echo >> post-html-by-freq.txt
-echo "===Bad link formatting===" >> post-html-by-freq.txt
+echo "===Bad link formatting (HL) ===" >> post-html-by-freq.txt
+echo "These are also included in the main listings." >> post-html-by-freq.txt
 echo 'Angle brackets are not used for external links (per {{section link|Wikipedia:Manual of Style/Computing|Exposed_URLs}}); "tags" like <nowiki><https> and <www></nowiki> are actually just bad link formatting.' >> post-html-by-freq.txt
 echo "See [[Wikipedia:External links#How to link]] for external link syntax; use {{tl|cite web}} for footnotes." >> post-html-by-freq.txt
 grep ^HL tmp-words-with-articles.txt | perl -pe 's/^HL\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-html-by-freq.txt
 
 echo >> post-html-by-freq.txt
-echo "===Unsorted===" >> post-html-by-freq.txt
+echo "===Unsorted (H) ===" >> post-html-by-freq.txt
 echo "Many of these can be replaced by {{tl|var}} (for text to be replaced) or {{tl|angbr}} (e.g. for linguistic notation)." >> post-html-by-freq.txt
 grep -P '^H\t' tmp-words-with-articles.txt | perl -pe 's/^H\t//' | ../venv/bin/python3 ../summarizer.py --find-all | head -50 >> post-html-by-freq.txt
 
