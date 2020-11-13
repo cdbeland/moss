@@ -25,6 +25,7 @@ article_blocklist = [
     "ANSEL",
     "ARIB STD B24 character set",
     "ASMO 449",
+    "AZERTY",
     "Basic Latin (Unicode block)",
     "Big5",
     "Bookshelf Symbol 7",
@@ -34,6 +35,22 @@ article_blocklist = [
     "Chinese Character Code for Information Interchange",
     "Code page 259",
     "Code page 293",
+    "Code page 897",
+    "Code page 903",
+    "Code page 904",
+    "Code page 921",
+    "Code page 950",
+    "Code page 1006",
+    "Code page 1008",
+    "Code page 1040",
+    "Code page 1042",
+    "Code page 1043",
+    "Code page 1046",
+    "Code page 1115",
+    "Code page 1127",
+    "Code page 1169",
+    "Code page 1287",
+    "Code page 1288",
     "Colon (punctuation)",
     "Computer Braille Code",
     "Devanagari transliteration",
@@ -44,19 +61,46 @@ article_blocklist = [
     "ELOT 927",
     "En (typography)",
     "Extensions to the International Phonetic Alphabet",
+    "GB 2312",
     "German keyboard layout",
     "GOST 10859",
     "Grave accent",
     "Greek script in Unicode",
     "Hashtag",
     "HP Roman",
+    "IBM 2741",
+    "IBM 3270",
     "ISO/IEC 646",
     "ISO/IEC 10367",
     "ISO 5426",
     "ISO 5428",
+    "ISO-IR-111",
+    "ISO-IR-200",
+    "ISO/IEC 8859-1",
+    "ISO/IEC 8859-10",
+    "ISO/IEC 8859-11",
+    "ISO/IEC 8859-13",
+    "ISO/IEC 8859-14",
+    "ISO/IEC 8859-15",
+    "ISO/IEC 8859-16",
+    "ISO/IEC 8859-2",
+    "ISO/IEC 8859-3",
+    "ISO/IEC 8859-4",
+    "ISO/IEC 8859-5",
+    "ISO/IEC 8859-6",
+    "ISO/IEC 8859-7",
+    "ISO/IEC 8859-8",
+    "ISO/IEC 8859-9",
     "ITU T.61",
     "Jeremy Burge",
+    "JIS X 0201",
     "JIS X 0208",
+    "KOI-8",
+    "KOI8-B",
+    "KOI8-F",
+    "KOI8-R",
+    "KOI8-RU",
+    "KOI8-U",
     "KPS 9566",
     "KS X 1001",
     "Latin script in Unicode",
@@ -74,6 +118,7 @@ article_blocklist = [
     "Number Forms",
     "Numerals in Unicode",
     "Numero sign",
+    "PETSCII",
     "Phags-pa (Unicode block)",
     "Prime (symbol)",
     "Regional indicator symbol",
@@ -88,29 +133,48 @@ article_blocklist = [
     "SI 960",
     "Six-bit character code",
     "Slash (punctuation)",
+    "Slashed zero",
     "Symbol (typeface)",
     "T.51/ISO/IEC 6937",
     "Tab key",
     "Teletext character set",
     "Thai Industrial Standard 620-2533",
+    "Tibetan (Unicode block)",
     "Tilde",
     "TRON (encoding)",
     "Unicode compatibility characters",
     "Unicode equivalence",
     "Unicode input",
     "Unicode subscripts and superscripts",
+    "UTF-8",
+    "UTF-EBCDIC",
     "Ventura International",
     "Videotex character set",
+    "VISCII",
+    "VSCII",
+    "VT100 encoding",
     "VT52",
     "Wade–Giles",
     "Wang International Standard Code for Information Interchange",
     "Warmian-Masurian Voivodeship",
     "Whitespace (programming language)",
+    "Windows-1250",
+    "Windows-1251",
     "Windows-1252",
+    "Windows-1253",
+    "Windows-1254",
+    "Windows-1257",
     "Windows-1258",
+    "Windows-1270",
+    "Windows Cyrillic + Finnish",
+    "Windows Cyrillic + French",
+    "Windows Cyrillic + German",
     "Windows Glyph List 4",
+    "Windows Polytonic Greek",
     "Xerox Character Code Standard",
+    "YUSCII",
     "Zero-width space",
+
     # Note: Characters like &Ohm; and &#x2F802; are changed by
     # Normalization Form Canonical Composition and appear as different
     # Unicode characters, like &Omega;.  Using the HTML entity instead
@@ -144,7 +208,7 @@ article_blocklist = [
     # African language needs slash in link
     "2011 South African municipal elections",
 
-    # File name (which could theoretically be fixed)
+    # Unwanted character in file name (which could theoretically be fixed)
     "2019 in India",
     "Graham Sutton (musician)",
     "Ichikawa Danjūrō IX",
@@ -156,10 +220,35 @@ article_blocklist = [
     "Kobee",
     "Luanping County",
     "Radio masts and towers",
+    "Baden VI c",
+    "Découvertes Gallimard",
+    "Tokyo International Conference on African Development",
 
     # Chess with ½
     "World Chess960 Championship",
     "Algebraic notation (chess)",
+
+    # !! in table (&#33;)
+    "Cledus T. Judd",
+    "Frank Sinatra discography",
+    "Kis-My-Ft2",
+    "Kunio-kun",
+    "Lattice tower",
+    "List of Castlevania media",
+    "List of Dragon Ball films",
+    "List of Enix games",
+    "List of Iwata Asks interviews",
+    "List of Sega Saturn games",
+    "The Aquabats",
+    "The Chats",
+    "V6 discography",
+
+    # # in external link
+    "WalangForever",
+
+    # . in citation for abbreviation
+    "Clintonia andrewsiana",
+    "Clintonia borealis",
 ]
 
 
@@ -312,12 +401,29 @@ def extract_entities(dictionary):
 
 def extract_articles(dictionary, limit=True):
     articles = set()
-    for article_list in dictionary.values():
+    for (entity, article_list) in dictionary.items():
+
+        # Above-cutoff characters to work on next
+        if entity in [
+                "&sect;",
+                # "&copy;", "&#8220;", "&#8221;", "&#8212;", "&apos;", "&hellip;"
+        ]:
+            articles.update(article_list)
+            continue
+
         # Skip articles that only have very common characters or
         # entities that will need to be dealt with by a real bot
         # someday.
-        if not limit or len(set(article_list)) < JWB_ARTICLE_CUTOFF:
-            articles.update(article_list)
+        if limit and len(set(article_list)) > JWB_ARTICLE_CUTOFF:
+            continue
+
+        if entity in [
+                # Too many STEM articles; temporarily skipping
+                "&plusmn;",
+        ]:
+            continue
+
+        articles.update(article_list)
 
     return articles
 
