@@ -20,40 +20,23 @@ variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);",
 
 # Manual transformation probably required
 alert = [
-    "™", "©", "®",
-    "Ⅰ", "Ⅱ", "ⅰ", "ⅱ",
     "&frasl;",
-    "¹", "⁺", "ⁿ", "₁", "₊", "ₙ",
 
     "₤",  # per [[MOS:CURRENCY]] should be £ for GBP, but this is used for Italian Lira
-
-    # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
-    "µ", "&micro;",
 
     # Probably would be controversial to change these
     "∑", "&sum;",
     "∏",
 
-    # Try &mdash instead
-    "―", "&horbar;",
-
-    # Convert to straight quotes, or keep &-encoded version
-    "‘", "&lsquo;",
-    "’", "&rsquo;",
-    "‚", "&sbquo;",
-    "“", "&ldquo;",
-    "”", "&rdquo;",
-    "„", "&bdquo;",
-    "´", "&acute;",
-    "`", "&#96;",
-
     # Convert to straight quotes per [[MOS:CONFORM]]
-    # but NOT in foreign-language internal text
-    "‹", "&lsaquo;", "›", "&rsaquo;",
-    "«", "&lsaquo;", "»", "&rsaquo;",
-
-    # Probably convert to regular space or no space
-    "&ensp;", "&emsp;", "&thinsp;", "&hairsp;",
+    # but LEAVE when internal to non-English text per [[MOS:STRAIGHT]]
+    # Also seen in URL titles (used as stylized field separators)
+    # TODO: Detect these in the moss_spell_check run.
+    # "‹",  # lsaquo
+    # "›",  # rsaquo
+    # "«",  # laquo
+    # "»",  # rsaquo
+    # "„",  # bdquo
 
     # &zwj; usually wants to be &zwnj; and probably that usually isn't
     # needed?
@@ -63,18 +46,48 @@ alert = [
     "•",
     "&bull;",
 
-    # Convert to dot form
-    "&middot;",
-    "&sdot;",
+    # CONFLICTING SUBSTITUTIONS FOR ARABIC VS. HEBREW:
+    # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
+    # -> Or maybe make separate templates for these
 
+    # Probably a miscoding of a Hebrew or Arabic letter
+    "&#700;",  # U+02BC
+    "ʼ",  # U+02BC
+    "&#x02BC;",
+
+    "&#701;",
+    "&#x02BD;",
+
+    "&#x02BE;",  # : "'",
+    "&#702;",  # : "'",
+    "ʾ",       #: "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
+    # ASCII apostrophe is used in transliterations by default, per
+    # [[Wikipedia:Naming conventions (Hebrew)]] which uses the Hebrew Academy scheme at
+    # [[Romanization_of_Hebrew#Table]]
+    # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
+    # be clear from context it's not an apostrophe
+    # For Arabic, this is should be changed to {{hamza}}
+
+    # For native [[Greek numerals]]
+    "&#x0374;",  # : "{{keraia}}",
+
+    # For transliterated Arabic ayin
+    "&#703;",  # : "{{ayin}}",
+    "ʿ",  # : "{{ayin}}",
+
+    # MISUSE OF OKINA FOR CHINESE
+    # ʻOkina is U+02BB.
+    "ʻ",         # : "{{okina}}",
+    "&#x02BB;",  # : "{{okina}}",
+    "&#x2bb;",   # : "{{asper}}",
+    # Okina is wrong if used as an apostrophe but OK in Hawaiian and
+    # maybe other languages.  Per [[Talk:Wade-Giles]], [[spiritus
+    # asper]] is preferred (strongly over okina and weakly over
+    # apostrophes) for Chinese romanizations using that system.
 ]
 
 # Ignore these if seen in articles
 keep = [
-    # Used in math, tables, horizontal list formatting, so keep
-    "·",  # middot
-    "⋅",  # sdot
-
     "&amp;",  # dangerous for e.g. &amp;126;
     "&c;",    # Almost all are in archaic quotations and titles
 
@@ -129,9 +142,6 @@ keep = [
     "&gt;",    # >
     "&#91;",   # [  {{!(}} will also work
     "&#93;",   # ]  {{)!}} will also work
-    "&#123;",  # {
-    # "&#124;",  # |  &vert; doesn't work, but {{!}} does
-    "&#125;",  # }
     # TODO: Maybe these should be converted to <nowiki>[</nowiki> etc.?
 
     # https://en.wikipedia.org/wiki/Zero-width_non-joiner Used in
@@ -142,6 +152,8 @@ keep = [
     "&zwnj;",
 
     "&#x1F610;",   # Emoji presentation selector, non-printing
+
+    "&#xFA9A;",  # Compatibility character identical with U+6F22
 
     # Combining characters, apparently unlabelled
     "&#x114c1;",
@@ -167,6 +179,7 @@ keep = [
     "&#x20E3;",
     "&#x20e3;",
     "&#x20e4;",  # Combining triangle
+    "&#x20E0;",  # Combining prohibition sign
 ]
 
 controversial = {
@@ -216,6 +229,7 @@ controversial = {
     "&rfloor;": "⌋",
     "&lfloor;": "⌊",
     "&real;": "ℜ",
+    "&sdot;": "⋅",  # Multiplication dot, not to be confused with middot
 }
 
 # keep.extend(controversial.keys())
@@ -229,7 +243,20 @@ transform_unsafe = {
 
     "&#8239;": "&nbsp;",    # narrow no-break space
 
+    # Probably convert to regular space or no space
+    "&ensp;": " ",
+    "&emsp;": " ",
+    "&thinsp;": "{{thin space}}",
+    "&hairsp;": "{{hair space}}",
+    "&emsp13;": " ",
+    "&emsp14;": " ",
+    "&numsp;": "{{figure space}}",
+    "&puncsp;": " ",
+    "&MediumSpace;": " ",
+
+    # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
     "µ": "μ",  # micro to mu
+    "&micro;": "μ",  # micro to mu
 
     "&#x202F;": "",  # Narrow non-breaking space, usually not needed
     "&#x202f;": "",
@@ -296,18 +323,19 @@ transform_unsafe = {
     "&frac14;": "{{frac|1|4}}",
     "&frac16;": "{{frac|1|6}}",
     "&frac18;": "{{frac|1|8}}",
+    "&frac23;": "{{frac|2|3}}",
     "&frac34;": "{{frac|3|4}}",
     "&#8531;": "{{frac|1|3}}",
     "…": "...",
     "&#8230;": "...",
     "&hellip;": "...",
 
-    # These often break wiki markup
-    # "&#91;": "[",
-    # "&#93;": "]",
+    "&#123;": "&lbrace;"  # {
+    "&#125;": "&rbrace;"  # }
 
-    # This is a pipe, but usually happens in URL titles
+    # This is a pipe, and usually happens in URL titles
     "&#124;": "{{pipe}}",
+    "&VerticalLine;": "{{pipe}}",
     # {{!}} in tables?
     # https://www.mediawiki.org/wiki/Help:Magic_words#Other
 
@@ -332,6 +360,8 @@ transform_unsafe = {
     "´": "'",
     "&acute;": "'",
     "`": "'",
+    "&bdquo;": "„",  # OK when internal to non-English text
+
     "&#x27;": "'",
     "&#39;": "'",
     "&#039;": "'",
@@ -344,46 +374,6 @@ transform_unsafe = {
     "&#x2019;": "'",   # ’ -> '
     "&#x201C;": '"',
     "&#x201D;": '"',
-
-    # CONFLICTING SUBSTITUTIONS FOR ARABIC VS. HEBREW:
-    # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
-    # -> Or maybe make separate templates for these
-
-    # Probably a miscoding of a Hebrew or Arabic letter
-    "&#700;": "???",  # U+02BC
-    "ʼ": "???",  # U+02BC
-    "&#x02BC;": "???",
-
-    "&#701;": "???",
-    "&#x02BD;": "???",
-
-    "&#x02BE;": "'",
-    "&#702;": "'",
-    "ʾ": "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
-    # ASCII apostrophe is used in transliterations by default, per
-    # [[Wikipedia:Naming conventions (Hebrew)]] which uses the Hebrew Academy scheme at
-    # [[Romanization_of_Hebrew#Table]]
-    # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
-    # be clear from context it's not an apostrophe
-    # For Arabic, this is should be changed to {{hamza}}
-
-    # For native [[Greek numerals]]
-    "&#x0374;": "{{keraia}}",
-
-    # For transliterated Arabic ayin
-    "&#703;": "{{ayin}}",
-    "ʿ": "{{ayin}}",
-
-    # MISUSE OF OKINA FOR CHINESE
-    # ʻOkina is U+02BB.
-    "ʻ": "{{okina}}",
-    "&#x02BB;": "{{okina}}",
-    "&#x2bb;": "{{asper}}",
-    # Okina is wrong if used as an apostrophe but OK in Hawaiian and
-    # maybe other languages.  Per [[Talk:Wade-Giles]], [[spiritus
-    # asper]] is preferred (strongly over okina and weakly over
-    # apostrophes) for Chinese romanizations using that system.
-
 
     # NOT SURE THIS IS A GOOD IDEA.
     # Per [[MOS:CONFORM]]
@@ -398,16 +388,6 @@ transform_unsafe = {
     # are 70k+ pages with « or », so those can be ignored for now.
     "&laquo;": "«",
     "&raquo;": "»",
-
-    "&ensp;": " ",
-    "&emsp;": " ",
-    "&emsp13;": " ",
-    "&emsp14;": " ",
-    "&thinsp;": "",
-    "&numsp;": "{{figure space}}",
-    "&puncsp;": " ",
-    "&hairsp;": " ",
-    "&MediumSpace;": " ",
 
     "&zwj;": "",
     "&zwnj;": "",
@@ -453,7 +433,6 @@ transform = {
 
     "&#x22c5;": "&sdot;",
     "&#8416;": "&#x20E0;",  # Combining Enclosing Circle Backslash
-
     "&#6;": " ",   # ^F
     "&#06;": " ",   # ^F
     "&#22;": " ",   # ^V
@@ -484,16 +463,16 @@ transform = {
     "&#8196;": "&emsp13;",
     "&#x2005;": "&emsp14;",
     "&#8127;": "&emsp14;",
-    "&#x2006;": "&thinsp;",
-    "&#8198;": "&thinsp;",
+    "&#x2006;": "{{thin space}}",
+    "&#8198;": "{{thin space}}",
     "&#x2007;": "&numsp;",
     "&#8199;": "&numsp;",
     "&#2008x;": "&puncsp;",
     "&#8200;": "&puncsp;",
-    "&#x2009;": "&thinsp;",
-    "&#8201;": "&thinsp;",
-    "&#x200A;": "&hairsp;",
-    "&#8202;": "&hairsp;",
+    "&#x2009;": "{{thin space}}",
+    "&#8201;": "{{thin space}}",
+    "&#x200A;": "{{hair space}}",
+    "&#8202;": "{{hair space}}",
     "&#x205F;": "&MediumSpace;",
     "&#8287;": "&MediumSpace;",
     "&#x200B;": "&zwsp;",
@@ -563,6 +542,13 @@ transform = {
     "&sup2;": "<sup>2</sup>",
     "&sup3;": "<sup>3</sup>",
 
+    "¹": "<sup>1</sup>",
+    "⁺": "<sup>+</sup>",
+    "ⁿ": "<sup>n</sup>",
+    "₁": "<sub>1</sub>",
+    "₊": "<sub>+</sub>",
+    "ₙ": "<sub>n</sub>",
+
     "&#0033;": "!",
     "&#0047;": "/",
     "&#005C;": "\\",
@@ -571,7 +557,6 @@ transform = {
     "&#037;": "%",
     "&colon;": ":",  # {{colon}} is also available
     "&check;": "✓",
-    "&therefore;": "∴",
 
     "&apos;": "'",  # Or {{'}}
     "&Apos;": "'",  # Or {{'}}
@@ -610,6 +595,18 @@ transform = {
     "&Scedil;": "Ş",
     "&scedil;": "ş",
     "&divide;": "÷",
+
+    "&leq;": "≤",
+    "&rationals;": "ℚ",
+    "&integers;": "ℤ",
+    "&reals;": "ℝ",
+    "&mp;": "∓",
+    "&therefore;": "∴",
+    "&in;": "∈",
+    "&epsi;": "ε",
+    "&Ropf;": "ℝ",
+    "&Kopf;": "𝕂",
+    "&Copf; ": "ℂ",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -710,6 +707,9 @@ transform = {
     "&#X2014;": "—",  # emdash
     "&#x2014;": "—",  # emdash
 
+    "―": "—",  # horbar to emdash
+    "&horbar;": "&mdash;",
+
     "&#x2013;": "–",  # endash
     "&#8211;": "–",  # endash
 
@@ -738,6 +738,7 @@ transform = {
     "&mbsp;": "&nbsp;",
     "&nadsh;": "&ndash;",
     "&nash;": "&ndash;",
+    "&nsash;": "&ndash;",
     "&nbdash;": "&ndash;",
     "&endash;": "&ndash;",
     "&bdash;": "&ndash;",
@@ -755,10 +756,15 @@ transform = {
     "&nbvsp;": "&nbsp;",
     "&nbsvp;": "&nbsp;",
     "&nbsb;": "&nbsp;",
+    "&nvsp;": "&nbsp;",
     "&nbnsp;": "&nbsp;",
+    "&knbsp;": "&nbsp;",
     "&uumml;": "&uuml;",
     "&bsp;": "&nbsp;",
     "&Quot;": '"',
+
+    # Used in tables, horizontal list formatting
+    "&middot;": "·",
 }
 
 greek_letters = {
@@ -854,6 +860,47 @@ def should_keep_as_is(entity):
         return True
     if num_value >= 0x100000 and num_value <= 0x10FFFD:
         # Supplemental Private Use Area-B
+        return True
+
+    # Non-characters
+    # http://www.unicode.org/faq/private_use.html
+    if num_value >= 0xFDD0 and num_value <= 0xFDEF:
+        return True
+    if num_value in [
+            "0000FFFE",
+            "0001FFFE",
+            "0002FFFE",
+            "0003FFFE",
+            "0004FFFE",
+            "0005FFFE",
+            "0006FFFE",
+            "0007FFFE",
+            "0008FFFE",
+            "0009FFFE",
+            "000AFFFE",
+            "000BFFFE",
+            "000CFFFE",
+            "000DFFFE",
+            "000EFFFE",
+            "000FFFFE",
+            "0010FFFE",
+            "0000FFFF",
+            "0001FFFF",
+            "0002FFFF",
+            "0003FFFF",
+            "0004FFFF",
+            "0005FFFF",
+            "0006FFFF",
+            "0007FFFF",
+            "0008FFFF",
+            "0009FFFF",
+            "000AFFFF",
+            "000BFFFF",
+            "000CFFFF",
+            "000DFFFF",
+            "000EFFFF",
+            "000FFFFF",
+            "0010FFFF"]:
         return True
     if unicodedata.combining(chr(num_value)):
         # Combining characters are too difficult to edit as themselves
