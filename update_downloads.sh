@@ -87,6 +87,7 @@ echo "CREATE TABLE page_categories (
   category_name varbinary(255) NOT NULL DEFAULT '',
   PRIMARY KEY (title, category_name)
 );" | mysql -D enwiktionary
+# Load time: About 2.5 hours
 
 echo "DELETE FROM page WHERE page_namespace != 0;" | mysql -D enwiktionary
 # Query OK, 569828 rows affected (2 min 30.10 sec)
