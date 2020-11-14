@@ -330,8 +330,8 @@ transform_unsafe = {
     "&#8230;": "...",
     "&hellip;": "...",
 
-    "&#123;": "&lbrace;"  # {
-    "&#125;": "&rbrace;"  # }
+    "&#123;": "&lbrace;",  # {
+    "&#125;": "&rbrace;",  # }
 
     # This is a pipe, and usually happens in URL titles
     "&#124;": "{{pipe}}",
