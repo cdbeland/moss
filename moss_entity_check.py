@@ -26,15 +26,20 @@ article_blocklist = [
     "ARIB STD B24 character set",
     "ASMO 449",
     "AZERTY",
+    "AltGr key",
+    "Apostrophe",
     "Basic Latin (Unicode block)",
     "Big5",
     "Bookshelf Symbol 7",
     "Bracket",
     "CEA-708",
     "CER-GS",
+    "Casio calculator character sets",
     "Chinese Character Code for Information Interchange",
     "Code page 259",
     "Code page 293",
+    "Code page 310",
+    "Code page 361",
     "Code page 897",
     "Code page 903",
     "Code page 904",
@@ -60,6 +65,7 @@ article_blocklist = [
     "Ellipsis",
     "ELOT 927",
     "En (typography)",
+    "Extended Latin-8",
     "Extensions to the International Phonetic Alphabet",
     "GB 2312",
     "German keyboard layout",
@@ -106,6 +112,7 @@ article_blocklist = [
     "Latin script in Unicode",
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
+    "List of Latin-script letters",
     "List of precomposed Latin characters in Unicode",
     "List of Unicode characters",
     "Lotus Multi-Byte Character Set",
@@ -114,7 +121,9 @@ article_blocklist = [
     "Mac OS Devanagari encoding",
     "Mac OS Gaelic",
     "Mac OS Roman",
+    "Mathematical operators and symbols in Unicode",
     "Mojibake",
+    "Multinational Character Set",
     "Number Forms",
     "Numerals in Unicode",
     "Numero sign",
@@ -163,6 +172,7 @@ article_blocklist = [
     "Windows-1252",
     "Windows-1253",
     "Windows-1254",
+    "Windows-1256",
     "Windows-1257",
     "Windows-1258",
     "Windows-1270",
@@ -249,6 +259,12 @@ article_blocklist = [
     # . in citation for abbreviation
     "Clintonia andrewsiana",
     "Clintonia borealis",
+
+    # DISPLAYTITLE issues
+    "Rosa Graham Thomas",
+
+    # IPA issues
+    "X-SAMPA",
 ]
 
 
@@ -405,8 +421,8 @@ def extract_articles(dictionary, limit=True):
 
         # Above-cutoff characters to work on next
         if entity in [
-                "&sect;",
-                # "&copy;", "&#8220;", "&#8221;", "&#8212;", "&apos;", "&hellip;"
+                "&sect;", "&#8220;", "&#8221;",
+                # "&copy;", "&#8212;", "&apos;", "&hellip;"
         ]:
             articles.update(article_list)
             continue
