@@ -222,7 +222,6 @@ controversial = {
     "&uarr;": "↑",
     "&uArr;": "⇑",
     "&crarr;": "↵",
-    "&prop;": "∝",
     "&int;": "∫",
     "&rceil;": "⌉",
     "&lceil;": "⌈",
@@ -326,6 +325,19 @@ transform_unsafe = {
     "&frac23;": "{{frac|2|3}}",
     "&frac34;": "{{frac|3|4}}",
     "&#8531;": "{{frac|1|3}}",
+
+    "&sol;": "/",
+
+    # [[MOS:1ST]]
+    "ˢᵗ": "st",
+    "ⁿᵈ": "nd",
+    "ʳᵈ": "rd",
+    "ᵗʰ": "th",
+    # (This may not work due to these being multiple characters; see
+    # [[William Delbert Gann]] for test case)
+    #
+    # TODO: https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts
+
     "…": "...",
     "&#8230;": "...",
     "&hellip;": "...",
@@ -336,6 +348,8 @@ transform_unsafe = {
     # This is a pipe, and usually happens in URL titles
     "&#124;": "{{pipe}}",
     "&VerticalLine;": "{{pipe}}",
+    "&verbar;": "{{pipe}}",
+    "&vert;": "{{pipe}}",
     # {{!}} in tables?
     # https://www.mediawiki.org/wiki/Help:Magic_words#Other
 
@@ -606,7 +620,9 @@ transform = {
     "&epsi;": "ε",
     "&Ropf;": "ℝ",
     "&Kopf;": "𝕂",
-    "&Copf; ": "ℂ",
+    "&Copf;": "ℂ",
+    "&approx;": "≈",
+    "&prop;": "∝",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -762,6 +778,7 @@ transform = {
     "&uumml;": "&uuml;",
     "&bsp;": "&nbsp;",
     "&Quot;": '"',
+    "&sbquo;": "‚",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
