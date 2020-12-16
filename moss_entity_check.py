@@ -39,6 +39,7 @@ article_blocklist = [
     "Code page 259",
     "Code page 293",
     "Code page 310",
+    "Code page 351",
     "Code page 361",
     "Code page 897",
     "Code page 903",
@@ -233,6 +234,7 @@ article_blocklist = [
     "Baden VI c",
     "Découvertes Gallimard",
     "Tokyo International Conference on African Development",
+    "Swallow-tailed Hems and Flying Ribbons clothing",
 
     # Chess with ½
     "World Chess960 Championship",
