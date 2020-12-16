@@ -7,7 +7,7 @@ import difflib
 import lxml.etree
 import re
 
-# Runtime: ~1 hour
+# Runtime: ~1.5 hours (with a simple callback)
 
 # TODO:
 # * Get segmentizer working
