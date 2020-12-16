@@ -89,6 +89,7 @@ alert = [
 # Ignore these if seen in articles
 keep = [
     "&amp;",  # dangerous for e.g. &amp;126;
+    "&num;",  # hash symbol, needed in rare cases for section link in template call
     "&c;",    # Almost all are in archaic quotations and titles
 
     "&#x0261;",  # g for gravity distinguished from g for gram
@@ -333,9 +334,6 @@ transform_unsafe = {
     "ⁿᵈ": "nd",
     "ʳᵈ": "rd",
     "ᵗʰ": "th",
-    # (This may not work due to these being multiple characters; see
-    # [[William Delbert Gann]] for test case)
-    #
     # TODO: https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts
 
     "…": "...",
@@ -444,6 +442,8 @@ transform_unsafe = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+
+    "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
     "&#x22c5;": "&sdot;",
     "&#8416;": "&#x20E0;",  # Combining Enclosing Circle Backslash
@@ -557,11 +557,56 @@ transform = {
     "&sup3;": "<sup>3</sup>",
 
     "¹": "<sup>1</sup>",
+    "²": "<sup>2</sup>",
+    "³": "<sup>3</sup>",
+    "⁴": "<sup>4</sup>",
+    "⁵": "<sup>5</sup>",
+    "⁶": "<sup>6</sup>",
+    "⁷": "<sup>7</sup>",
+    "⁸": "<sup>8</sup>",
+    "⁹": "<sup>9</sup>",
+    "⁰": "<sup>0</sup>",
+    "ⁱ": "<sup>i</sup>",
+
     "⁺": "<sup>+</sup>",
+    "⁻": "<sup>-</sup>",
+    "⁼": "<sup>=</sup>",
+    "⁽": "<sup>(</sup>",
+    "⁾": "<sup>)</sup>",
     "ⁿ": "<sup>n</sup>",
+
+    "₀": "<sub>0</sub>",
     "₁": "<sub>1</sub>",
+    "₂": "<sub>2</sub>",
+    "₃": "<sub>3</sub>",
+    "₄": "<sub>4</sub>",
+    "₅": "<sub>5</sub>",
+    "₆": "<sub>6</sub>",
+    "₇": "<sub>7</sub>",
+    "₈": "<sub>8</sub>",
+    "₉": "<sub>9</sub>",
     "₊": "<sub>+</sub>",
+    "₋": "<sub>-</sub>",
+    "₌": "<sub>=</sub>",
+    "₍": "<sub>(</sub>",
+    "₎": "<sub>)</sub>",
+
+    "ₐ": "<sub>a</sub>",
+    "ₑ": "<sub>e</sub>",
+    "ₒ": "<sub>o</sub>",
+    "ₓ": "<sub>x</sub>",
+    "ₔ": "<sub>Ə</sub>",
+    "ₕ": "<sub>h</sub>",
+    "ₖ": "<sub>k</sub>",
+    "ₗ": "<sub>l</sub>",
+    "ₘ": "<sub>m</sub>",
     "ₙ": "<sub>n</sub>",
+    "ₚ": "<sub>p</sub>",
+    "ₛ": "<sub>s</sub>",
+    "ₜ": "<sub>t</sub>",
+
+    "ꟹ": "<sup>oe</sup>",
+    "ⱼ": "<sub>j</sub>",
 
     "&#0033;": "!",
     "&#0047;": "/",
@@ -623,6 +668,7 @@ transform = {
     "&Copf;": "ℂ",
     "&approx;": "≈",
     "&prop;": "∝",
+    "&complexes;": "ℂ",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -637,6 +683,7 @@ transform = {
     "&Acirc;": "Â",
     "&Agrave;": "À",
     "&agrave;": "à",
+    "&amacr;": "ā",
     "&Aring;": "Å",
     "&aring;": "å",
     "&Atilde;": "Ã",
@@ -779,6 +826,14 @@ transform = {
     "&bsp;": "&nbsp;",
     "&Quot;": '"',
     "&sbquo;": "‚",
+    "&nbs;": "&nbsp;",
+    "&nbspb;": "&nbsp;",
+    "&ndassh;": "&ndash;",
+    "&nndash;": "&nndash;",
+    "&npsb;": "&nbsp;",
+    "&nsp;": "&nbsp;",
+    "&124;": "&#124;",
+    "&tbsp;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
