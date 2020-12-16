@@ -115,7 +115,10 @@ cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py
 head -50 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' > beland-articles-most-typos-raw.txt
 head -10000 tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | grep -P '^[\[\] \-\w\*,:]+$' | head -50 > beland-articles-most-typos-refined.txt
 
-grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|verbs|syntax|contractions|prepositions|mood)\]\]" | head -50 | perl -pe 's/.*?\t//' > post-you.txt
+grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[\[[^\]]+ (grammar|languages?|dialect|tenses|phrases|pronoun|verbs|syntax|contractions|prepositions|mood)\]\]" | grep -vP "(Latin indirect speech|WYSIWYG|Stress and vowel reduction in English|Wh-movement|Tag question|Southern American English|The Mad Magazine Game|Field sobriety testing|Cardiff English)" | head -50 | perl -pe 's/.*?\t//' > post-you.txt
+# TODO: Suppression of language-related articles and specific titles
+# can be relaxed once "you" and contractions can be ignored inside
+# italics.
 
 # --- BY FREQUENCY ---
 
