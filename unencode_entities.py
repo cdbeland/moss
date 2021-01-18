@@ -489,6 +489,34 @@ transform_unsafe = {
 
     # SMALL CAPS SUPERSCRIPT:
     # ᶦ ᶧ ᶫ ᶰ ʶ ᶸ
+
+    # [[MOS:BBB]]
+    "𝔸": "<math>\mathbb{A}</math>",
+    "𝔹": "<math>\mathbb{B}</math>",
+    "ℂ": "<math>\mathbb{C}</math>",
+    "𝔻": "<math>\mathbb{D}</math>",
+    "𝔼": "<math>\mathbb{E}</math>",
+    "𝔽": "<math>\mathbb{F}</math>",
+    "𝔾": "<math>\mathbb{G}</math>",
+    "ℍ": "<math>\mathbb{H}</math>",
+    "𝕀": "<math>\mathbb{I}</math>",
+    "𝕁": "<math>\mathbb{J}</math>",
+    "𝕂": "<math>\mathbb{K}</math>",
+    "𝕃": "<math>\mathbb{L}</math>",
+    "𝕄": "<math>\mathbb{M}</math>",
+    "ℕ": "<math>\mathbb{N}</math>",
+    "𝕆": "<math>\mathbb{O}</math>",
+    "ℙ": "<math>\mathbb{P}</math>",
+    "ℚ": "<math>\mathbb{Q}</math>",
+    "ℝ": "<math>\mathbb{R}</math>",
+    "𝕊": "<math>\mathbb{S}</math>",
+    "𝕋": "<math>\mathbb{T}</math>",
+    "𝕌": "<math>\mathbb{U}</math>",
+    "𝕍": "<math>\mathbb{V}</math>",
+    "𝕎": "<math>\mathbb{W}</math>",
+    "𝕏": "<math>\mathbb{X}</math>",
+    "𝕐": "<math>\mathbb{Y}</math>",
+    "ℤ": "<math>\mathbb{Z}</math>",
 }
 
 # Automatically change, with the expectation there will be a
@@ -603,6 +631,8 @@ transform = {
     "&#x0009;": "&tab;",
 
     "&permil;": "‰",
+
+    # [[MOS:SUPERSCRIPT]]
 
     "&sup1;": "<sup>1</sup>",
     "&sup2;": "<sup>2</sup>",
