@@ -1,4 +1,5 @@
 from moss_dump_analyzer import read_en_article_text
+from moss_entity_check import jwb_escape
 import re
 
 
@@ -91,12 +92,6 @@ def dump_dict(section_title, dictionary):
             key,
             ", ".join(["[[%s]]" % article for article in sorted(article_set)])
             ))
-
-
-def jwb_escape(text):
-    text = text.replace('"', '\"')
-    text = text.replace("\\", "\\\\")
-    return text
 
 
 def dump_results(change_tuples, loop_number):

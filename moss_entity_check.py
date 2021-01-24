@@ -278,6 +278,12 @@ article_blocklist = [
 JWB_ARTICLE_CUTOFF = 125
 
 
+def jwb_escape(text):
+    text = text.replace("\\", "\\\\")  # e.g. for <math> markup
+    text = text.replace('"', '\\"')
+    return text
+
+
 def add_safely(value, key, dictionary):
     existing_list = dictionary.get(key, [])
     existing_list.append(value)
@@ -456,10 +462,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
 
     for entity in sorted(bad_entities):
         fixed_entity = fix_text(entity, transform_greek=True)
-        if fixed_entity == '"':
-            fixed_entity = r'\"'
-        if fixed_entity == "\\":
-            fixed_entity = "\\\\"
+        fixed_entity = jwb_escape(fixed_entity)
         if fixed_entity in ["\n"]:
             fixed_entity = r"\n"
         if fixed_entity in ["\r", "\t", "", ""]:  # \r is ^M
