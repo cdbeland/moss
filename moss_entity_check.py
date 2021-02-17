@@ -275,7 +275,7 @@ article_blocklist = [
 
 # Max number of articles a character can appear in before it's ignored
 # for JWB article-list-generation purposes.
-JWB_ARTICLE_CUTOFF = 125
+JWB_ARTICLE_CUTOFF = 15
 
 
 def jwb_escape(text):
@@ -432,8 +432,12 @@ def extract_articles(dictionary, limit=True):
 
         # Above-cutoff characters to work on next
         if entity in [
-                "&sect;", "&#8220;", "&#8221;",
-                # "&copy;", "&#8212;", "&apos;", "&hellip;"
+                "&Xi;"
+                # "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ", "Ⅼ", "Ⅽ", "Ⅾ", "Ⅿ", "ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ", "ⅷ", "ⅸ", "ⅹ", "ⅺ", "ⅻ", "ⅼ", "ⅽ", "ⅾ", "ⅿ",
+                # TODO next with JWB_ARTICLE_CUTOFF set at 25:
+                # "&larr;", "&uarr;", "&darr;", "&sup;", "&rfloor;", "&lfloor;", "&subseteq;"
+                # Numerous but satisfying:
+                # "&rarr;", "&copy;", "&#8212;", "&apos;", "&hellip;", "&alpha;"
         ]:
             articles.update(article_list)
             continue
