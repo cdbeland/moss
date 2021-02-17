@@ -145,6 +145,7 @@ article_blocklist = [
     "Service mark",
     "SI 960",
     "Six-bit character code",
+    "Specials (Unicode block)",
     "Slash (punctuation)",
     "Slashed zero",
     "Symbol (typeface)",
@@ -464,7 +465,17 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string = '{"%s":' % pulldown_name
     output_string += """{"string":{"articleList":"","summary":"convert special characters","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":true,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n"""  # noqa
 
+    bad_entities_sorted = []
+    bad_entities_last = []
     for entity in sorted(bad_entities):
+        if entity[0] == "<":
+            # </sup><sup> etc. operate on the output of previous regexes
+            bad_entities_last.append(entity)
+        else:
+            bad_entities_sorted.append(entity)
+    bad_entities_sorted.extend(bad_entities_last)
+
+    for entity in bad_entities_sorted:
         fixed_entity = fix_text(entity, transform_greek=True)
         fixed_entity = jwb_escape(fixed_entity)
         if fixed_entity in ["\n"]:
