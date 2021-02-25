@@ -91,6 +91,7 @@ keep = [
     "&amp;",  # dangerous for e.g. &amp;126;
     "&num;",  # hash symbol, needed in rare cases for section link in template call
     "&c;",    # Almost all are in archaic quotations and titles
+    "&period;",  # When needed to stop template from dropping "." from abbreviations
 
     "&#x0261;",  # g for gravity distinguished from g for gram
 
@@ -181,6 +182,47 @@ keep = [
     "&#x20e3;",
     "&#x20e4;",  # Combining triangle
     "&#x20E0;",  # Combining prohibition sign
+    "𝕒",
+    "𝕓",
+    "𝕔",
+    "𝕕",
+    "𝕖",
+    "𝕗",
+    "𝕘",
+    "𝕙",
+    "𝕚",
+    "𝕛",
+    "𝕜",
+    "𝕝",
+    "𝕞",
+    "𝕟",
+    "𝕠",
+    "𝕡",
+    "𝕢",
+    "𝕣",
+    "𝕤",
+    "𝕥",
+    "𝕦",
+    "𝕧",
+    "𝕨",
+    "𝕩",
+    "𝕪",
+    "𝕫",
+    "ℾ",
+    "ℽ",
+    "ℿ",
+    "ℼ",
+    "⅀",
+    "𝟘",
+    "𝟙",
+    "𝟚",
+    "𝟛",
+    "𝟜",
+    "𝟝",
+    "𝟞",
+    "𝟟",
+    "𝟠",
+    "𝟡",
 ]
 
 controversial = {
@@ -230,6 +272,7 @@ controversial = {
     "&lfloor;": "⌊",
     "&real;": "ℜ",
     "&sdot;": "⋅",  # Multiplication dot, not to be confused with middot
+    "&rightleftharpoons;": "⇌",
 }
 
 # keep.extend(controversial.keys())
@@ -240,6 +283,7 @@ transform_unsafe = {
     # based on observed misuse.
 
     "&equals;": "=",
+    "&lowbar;": "_",
 
     "&#8239;": "&nbsp;",    # narrow no-break space
 
@@ -320,6 +364,7 @@ transform_unsafe = {
     "&#x215E;": "{{frac|7|8}}",
     "&half;": "{{frac|1|2}}",
     "&frac12;": "{{frac|1|2}}",
+    "&frac13;": "{{frac|1|3}}",
     "&frac14;": "{{frac|1|4}}",
     "&frac16;": "{{frac|1|6}}",
     "&frac18;": "{{frac|1|8}}",
@@ -583,20 +628,20 @@ transform = {
 
     "&#8206;": "&lrm;",
 
-    "&#x005B;": "&#91;",  # [
-    "&#x005D;": "&#93;",  # ]
-    "&#x5b;": "&#91;",
-    "&#x5d;": "&#93;",
-    "&#091;": "&#91;",
-    "&#093;": "&#93;",
-    "&#0091;": "&#91;",
-    "&#0093;": "&#93;",
-    "&#00091;": "&#91;",
-    "&#00093;": "&#93;",
-    "&00091;": "&#91;",
-    "&00093;": "&#93;",
-    "&#x5B;": "&#91;",
-    "&#x5D;": "&#93;",
+    "&#x005B;": "&lbrack;",  # [
+    "&#x005D;": "&rbrack;",  # ]
+    "&#x5b;": "&lbrack;",
+    "&#x5d;": "&rbrack;",
+    "&#091;": "&lbrack;",
+    "&#093;": "&rbrack;",
+    "&#0091;": "&lbrack;",
+    "&#0093;": "&rbrack;",
+    "&#00091;": "&lbrack;",
+    "&#00093;": "&rbrack;",
+    "&00091;": "&lbrack;",
+    "&00093;": "&rbrack;",
+    "&#x5B;": "&lbrack;",
+    "&#x5D;": "&rbrack;",
     "&#x7C;": "{{!}}",  # |
     "&#x7c;": "{{!}}",  # |
     "&#x007C;": "{{!}}",  # |
@@ -614,10 +659,12 @@ transform = {
     "&#62;": "&gt;",
     "&#062;": "&gt;",
     "&#0062;": "&gt;",
-    "&#093;": "&#93;",  # ]
-    "&#0093;": "&#93;",  # ]
-    "&lsqb;": "&#91;",
-    "&rsqb;": "&#93;",
+    "&#093;": "&rbrack;",  # ]
+    "&#0093;": "&rbrack;",  # ]
+    "&#91;": "&lbrack;",
+    "&#93;": "&rbrack;",
+    "&lsqb;": "&lbrack;",
+    "&rsqb;": "&rbrack;",
 
     "&#160;": "&nbsp;",
     "&#xA0;": "&nbsp;",
@@ -772,6 +819,8 @@ transform = {
 
     # TODO: https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts#Other_superscript_and_subscript_characters
     # TODO: https://en.wikipedia.org/wiki/Secondary_articulation#Unicode_support_of_superscript_IPA_letters
+
+    "&#46;": "&period;",  # When needed to stop template from dropping "." from abbreviations
 
     "&#0033;": "!",
     "&#0047;": "/",
@@ -978,6 +1027,7 @@ transform = {
     "&endash;": "&ndash;",
     "&bdash;": "&ndash;",
     "&ndahs;": "&ndash;",
+    "&ndas;": "&ndash;",
     "&dnash;": "&ndash;",
     "&ndasgh;": "&ndash;",
     "&mdasg;": "&mdash;",
