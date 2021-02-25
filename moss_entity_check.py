@@ -31,8 +31,11 @@ article_blocklist = [
     "AZERTY",
     "AltGr key",
     "Apostrophe",
+    "Ayin",
     "Basic Latin (Unicode block)",
     "Big5",
+    "Bitstream International Character Set",
+    "Blackboard bold",
     "Bookshelf Symbol 7",
     "Bracket",
     "CEA-708",
@@ -62,6 +65,7 @@ article_blocklist = [
     "Code page 1288",
     "Colon (punctuation)",
     "Computer Braille Code",
+    "Dash",
     "Devanagari transliteration",
     "DEC Hebrew",
     "DKOI",
@@ -71,6 +75,7 @@ article_blocklist = [
     "En (typography)",
     "Extended Latin-8",
     "Extensions to the International Phonetic Alphabet",
+    "G",
     "GB 2312",
     "German keyboard layout",
     "GOST 10859",
@@ -80,6 +85,7 @@ article_blocklist = [
     "HP Roman",
     "IBM 2741",
     "IBM 3270",
+    "INIS-8",
     "ISO/IEC 646",
     "ISO/IEC 10367",
     "ISO 5426",
@@ -125,6 +131,7 @@ article_blocklist = [
     "Mac OS Devanagari encoding",
     "Mac OS Gaelic",
     "Mac OS Roman",
+    "Mathematical Alphanumeric Symbols",
     "Mathematical operators and symbols in Unicode",
     "Mojibake",
     "Multinational Character Set",
@@ -225,6 +232,7 @@ article_blocklist = [
 
     # Unwanted character in file name (which could theoretically be fixed)
     "2019 in India",
+    "Charles Francis Adams III",
     "Graham Sutton (musician)",
     "Ichikawa Danjūrō IX",
     "Kamakura Gongorō Kagemasa",
@@ -239,6 +247,14 @@ article_blocklist = [
     "Découvertes Gallimard",
     "Tokyo International Conference on African Development",
     "Swallow-tailed Hems and Flying Ribbons clothing",
+    "China Railway DF5",
+    "H-IIB",
+    "Housing in Japan",
+    "KARI KSR-3",
+    "Keisei Narita Airport Line",
+    "List of Daihatsu vehicles",
+    "List of National Treasures of Japan (temples)",
+    "List of Places of Scenic Beauty of Japan (Kyōto)",
 
     # Chess with ½
     "World Chess960 Championship",
@@ -261,10 +277,6 @@ article_blocklist = [
 
     # # in external link
     "WalangForever",
-
-    # . in citation for abbreviation
-    "Clintonia andrewsiana",
-    "Clintonia borealis",
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
