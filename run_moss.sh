@@ -224,11 +224,11 @@ echo "Possible typos per article: " > post-stats.txt
 cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py >> post-stats.txt
 echo "Parse errors: " >> post-stats.txt
 wc -l post-parse-failures.txt >> post-stats.txt
-
-echo "Possible typos by type: " >> post-stats.txt
-cat tmp-words-with-articles.txt | ../venv/bin/python3 ../count_by_rating.py >> post-stats.txt
 echo "Parse errors with [[MOS:STRAIGHT]] violations:" >> post-stats.txt
 wc -l jwb-straight-quotes-unbalanced.txt >> post-stats.txt
+echo "Possible typos by type: " >> post-stats.txt
+cat tmp-words-with-articles.txt | ../venv/bin/python3 ../count_by_rating.py >> post-stats.txt
+
 
 # --- DASHES ---
 
