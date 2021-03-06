@@ -38,10 +38,15 @@ def check_reading_level(article_title, article_text):
         return
     if article_title.startswith("Glossary of"):
         return
+    if article_title.startswith("Timeline of"):
+        return
     if year_in_re.match(article_title):
         return
     if article_text.startswith("#REDIRECT") or article_text.startswith("# REDIRECT"):
         return
+    if article_title.endswith("season") or article_title.endswith("roster") or article_title.endswith("squads"):
+        if article_title[0:4].isnumeric():
+            return
     if ignore_tags_re.search(article_text):
         return
 
