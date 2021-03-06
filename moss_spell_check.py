@@ -81,6 +81,7 @@ ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+"
                             r"|[Cc]opy ?edit"
                             r"|[Gg]rammar"
                             r"|[Mm]anual"
+                            r"|[Ll]like resume"
                             r"|[Hh]ow\-?to).*?}}")
 blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>)", flags=re.I+re.S)
 start_template_re = re.compile(r"{{")
