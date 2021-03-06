@@ -138,6 +138,7 @@ article_blocklist = [
     "Number Forms",
     "Numerals in Unicode",
     "Numero sign",
+    "Palatal hook",
     "PETSCII",
     "Phags-pa (Unicode block)",
     "Prime (symbol)",
@@ -150,16 +151,20 @@ article_blocklist = [
     "Schwarzian derivative",
     "Secondary articulation",
     "Service mark",
+    "Sharp pocket computer character sets",
     "SI 960",
+    "Sinclair QL character set",
     "Six-bit character code",
     "Specials (Unicode block)",
     "Slash (punctuation)",
     "Slashed zero",
+    "Superior letter",
     "Symbol (typeface)",
     "T.51/ISO/IEC 6937",
     "Tab key",
     "Teletext character set",
     "Thai Industrial Standard 620-2533",
+    "TI calculator character sets",
     "Tibetan (Unicode block)",
     "Tilde",
     "TRON (encoding)",
@@ -193,6 +198,7 @@ article_blocklist = [
     "Windows Cyrillic + German",
     "Windows Glyph List 4",
     "Windows Polytonic Greek",
+    "World glyph set",
     "Xerox Character Code Standard",
     "YUSCII",
     "Zero-width space",
@@ -255,12 +261,25 @@ article_blocklist = [
     "List of Daihatsu vehicles",
     "List of National Treasures of Japan (temples)",
     "List of Places of Scenic Beauty of Japan (Kyōto)",
+    "Nanzen-ji",
+    "National Central University",
+    "National Chung-Shan Institute of Science and Technology",
+    "Nomura Securities",
+    "Norinchukin Bank",
+    "Palette Town",
+    "Piano Concerto (Khachaturian)",
+    "Sanxingdui",
+    "Shibuya Hikarie",
+    "Skyliner",
+    "Tokyo Skytree",
+    "Tree of life",
+    "Tricable gondola lift",
 
     # Chess with ½
     "World Chess960 Championship",
     "Algebraic notation (chess)",
 
-    # !! in table (&#33;)
+    # !! in table (&#33; or &#x21;)
     "Cledus T. Judd",
     "Frank Sinatra discography",
     "Kis-My-Ft2",
@@ -271,6 +290,9 @@ article_blocklist = [
     "List of Enix games",
     "List of Iwata Asks interviews",
     "List of Sega Saturn games",
+    "Rina Aiuchi discography",
+    "Super Junior discography",
+    "Super Junior-T",
     "The Aquabats",
     "The Chats",
     "V6 discography",
@@ -309,6 +331,7 @@ suppression_patterns = [
     re.compile(r"<source.*?</source>", flags=re.I+re.S),
     re.compile(r"<code.*?</code>", flags=re.I+re.S),
     re.compile(r"{{code\s*\|.*?}}", flags=re.I+re.S),
+    # re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
 ]
 
 
@@ -338,6 +361,7 @@ def entity_check(article_title, article_text):
             continue
 
         if string in article_text:
+            print("finding " + string)
             for instance in re.findall(string, article_text):
                 add_safely(article_title, string, uncontroversial_found)
                 add_safely(string, article_title, worst_articles)
