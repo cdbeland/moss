@@ -94,9 +94,10 @@ closed_lexicon = {
     "TERM": [".", "!", "?"],
     "COMMA": [","],
     "SEMCOL": [";"],
+    "COLON": [":"],
     "PERC": ["%"],
     "CUR": ["$", "€", "£", "¥", "₹", "US$", "A$", "Can$"],
-    "POSS": ["'s"],
+    "POSS": ["'s", "'"],  # "'" is for words that end in "s"
 
     "QUOTE": ["✂"],
     # Quotations are not inspected for grammar, but must be retained
@@ -382,6 +383,9 @@ phrase_structures = {
 
         # Implied "you"
         ["VP", "TERM"],
+
+        # Introducing a list, e.g. "The districts of the province are:"
+        ["NP", "CORE_V", "COLON"],
     ],
 
     "AVP": [
@@ -415,9 +419,10 @@ enwiktionary_cat_to_pos = {
     "English_auxiliary_verbs": "AUXV",
 
     # Inflected
+    "English_adjectives": "ADJ",
     "English_adjective_forms": "ADJ",
-    "English_adjective_comparative_forms": "ADJ",
-    "English_adjective_superlative_forms": "ADJ",
+    "English_comparative_adjectives": "ADJ",
+    "English_superlative_adjectives": "ADJ",
     "English_adverb_forms": "ADV",
     "English_adverb_comparative_forms": "ADJ",
     "English_adverb_superlative_forms": "ADJ",

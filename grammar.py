@@ -26,7 +26,7 @@ from english_grammar import (enwiktionary_cat_to_pos,
                              closed_lexicon,
                              vocab_overrides)
 from pywikibot import Page, Site
-from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
+from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, blockquote_re
 
 
 mysql_connection = mysql.connector.connect(user='beland',
@@ -67,13 +67,38 @@ conforming_currency_re = re.compile("^(%s)%s(M|bn)?$" % (currency_pattern, numbe
 # M for million, bn for billion per
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
 
+# Must be an integer
+SENTENCE_TIMEOUT_SEC = 1
 
-def check_english(plaintext, title):
+
+repair_dot_re = re.compile(r"([A-Z]\.[A-Z]$)|(^[A-Z]$)")
+
+
+def repair_tokenization(words_in):
+    # Fix "i.e.", "R.E.M.", etc.
+    words_out = []
+    for word in words_in:
+        # No word to append to
+        if not words_out:
+            words_out.append(word)
+            continue
+
+        if word == "." and repair_dot_re.search(words_out[-1]):
+            words_out[-1] += word
+            continue
+
+        words_out.append(word)
+
+    return words_out
+
+
+def check_english(wikitext, title):
     # Output is to stdout with tab-separated fields:
     # * Type of message
     #   S = spelling problem
     #   G = grammar problem
     #   L = length issues
+    #   U = Unsupported construct
     #   ! = parse failure
     # * Article title
     # * Message
@@ -83,6 +108,20 @@ def check_english(plaintext, title):
     #    print("!\tArticle parse broken?\t%s" % title)
     #    return
 
+    # TODO: Block equations can be introduced with lines like "Then"
+    # or "Maxwell's laws are" and lots of different variations.
+    if "<math>" in wikitext:
+        print(f"U\t{title}\t<math> detected, skipping article")
+        return
+
+    if "#REDIRECT" in wikitext:
+        print(f"U\t{title}\tRedirect detected, skipping article")
+        return
+
+    # Ignore bad grammar in quotations and poems
+    wikitext = blockquote_re.sub("✂", wikitext)
+
+    plaintext = get_main_body_wikitext(wikitext_to_plaintext(wikitext), strong=True)
     sentences = []
 
     # Tokenizing paragraphs individually helps prevent NLTK from
@@ -102,43 +141,52 @@ def check_english(plaintext, title):
     for sentence in sentences:
         start_time = time.time()
 
-        (grammar_string, word_to_pos) = load_grammar_for_text(sentence)
+        if "✂" in sentence:
+            # These represent suppressions (hiding things from spell
+            # check and grammar check) during the transformation from
+            # wikitext, such as templates and quotations.
+
+            # TODO: Handle quote marks
+            # * They can replace any part of speech, if they parse as that
+            #   part of speech themselves.
+            # * They can contain novel words and errors.
+            # * They can be a literal quotation with a "said"
+            #   construction, in which case they don't need to be any
+            #   particular part of speech.  (Though maybe they are usually
+            #   full sentences, unless it's someone blurting out a partial
+            #   utterance?)
+            print("U\t%s\tSuppression detected, skipping sentence\t%s" % (title, sentence))
+            continue
 
         words = nltk.word_tokenize(sentence)
+        words = repair_tokenization(words)
         if len(words) > 200:
             print("L\t%s\tOverly long sentence?\t%s words\t%s" % (title, len(words), sentence))
+            continue
 
-        # TODO: Skip this inside <poem>...</poem>
+        if len(words) > 15:
+            print("U\t%s\t%s words, skipping sentence\t%s" % (title, len(words), sentence))
+            continue
+
+        (grammar_string, word_to_pos) = load_grammar_for_word_list(words)
         is_grammatical = None
-        with stopit.SignalTimeout(3, swallow_exc=True) as timeout_result:
+        with stopit.SignalTimeout(SENTENCE_TIMEOUT_SEC, swallow_exc=True) as timeout_result:
             is_grammatical = is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string)
 
         elapsed = time.time() - start_time
 
         if timeout_result.state == timeout_result.TIMED_OUT:
-            print("T\t%s\t%s\tTIMEOUT\t%s" % (title, elapsed, sentence))
+            print("T\t%s\t%s\tTIMEOUT\t%s" % (elapsed, title, sentence))
             continue
 
         elapsed = time.time() - start_time
         if is_grammatical:
-            print("Y\t%s\t%s\tYay, parsed sentence successfully!\t%s" % (title, elapsed, sentence))
+            print("Y\t%s\t%s\tYay, parsed sentence successfully!\t%s" % (elapsed, title, sentence))
         else:
-            print("G\t%s\t%s\tUngrammatical sentence?\t%s" % (title, elapsed, sentence))
+            print("G\t%s\t%s\tUngrammatical sentence?\t%s" % (elapsed, title, sentence))
 
 
 def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, grammar_string):
-
-    if "✂" in word_list:
-        # TODO: Handle quote marks
-        # * They can replace any part of speech, if they parse as that
-        #   part of speech themselves.
-        # * They can contain novel words and errors.
-        # * They can be a literal quotation with a "said"
-        #   construction, in which case they don't need to be any
-        #   particular part of speech.  (Though maybe they are usually
-        #   full sentences, unless it's someone blurting out a partial
-        #   utterance?)
-        return True
 
     word_train = []
 
@@ -228,7 +276,7 @@ def is_sentence_grammatical_beland(word_list, word_to_pos, title, sentence, gram
                     expand_grammar = True
 
         if not pos_list:
-            print("S\t%s\tNo POS for word\t%s" % (word, word_list))
+            print("S\t%s\t%s\tNo POS for word\t%s" % (word, title, word_list))
             return True
 
         if expand_grammar:
@@ -284,6 +332,12 @@ def is_sentence_grammatical_nltk(word_list):
     return True
 
 
+def fetch_article_wikitext(title):
+    site = Site()
+    page = Page(site, title=title)
+    return page.text
+
+
 def fetch_article_plaintext(title):
     site = Site()
     page = Page(site, title=title)
@@ -293,8 +347,8 @@ def fetch_article_plaintext(title):
 
 # TODO: For later command-line use
 def check_article(title):
-    plaintext = fetch_article_plaintext(title)
-    check_english(plaintext, title)
+    wikitext = fetch_article_wikitext(title)
+    check_english(wikitext, title)
 
 
 # BOOTSTRAPPING
@@ -356,17 +410,17 @@ def check_samples_from_disk():
     for title in sample_featured_articles:
         title_safe = title.replace(" ", "_")
         with open("samples/%s" % title_safe, "r") as text_file:
-            plaintext = text_file.read()
-            check_english(plaintext, title)
+            wikitext = text_file.read()
+            check_english(wikitext, title)
             # generate_stats(plaintext)
 
 
 def save_sample_articles():
     for title in sample_featured_articles:
-        plaintext = fetch_article_plaintext(title)
+        wikitext = fetch_article_wikitext(title)
         title_safe = title.replace(" ", "_")
         with open("samples/%s" % title_safe, "w") as text_file:
-            text_file.write(plaintext)
+            text_file.write(wikitext)
 
 
 # --- GRAMMAR-MAKING HACK ---
@@ -392,7 +446,7 @@ def fetch_categories(word):
     return result
 
 
-def load_grammar_for_text(text):
+def load_grammar_for_word_list(word_list):
     grammar_string = ""
 
     # ---
@@ -412,7 +466,7 @@ def load_grammar_for_text(text):
     # Load limited vocabulary (only for words in this text, to
     # minimize the size of the grammar).
 
-    word_set = set(nltk.word_tokenize(text))
+    word_set = set(word_list)
 
     # Deal with the possibility that some words are only capitalized
     # because they begin a sentence.  No harm here in loading a few
