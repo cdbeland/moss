@@ -331,7 +331,23 @@ suppression_patterns = [
     re.compile(r"<source.*?</source>", flags=re.I+re.S),
     re.compile(r"<code.*?</code>", flags=re.I+re.S),
     re.compile(r"{{code\s*\|.*?}}", flags=re.I+re.S),
+
+    re.compile(r"[[File:.*?]]", flags=re.I+re.S),
+    re.compile(r"[[Image:.*?]]", flags=re.I+re.S),
+
+    # Uncomment these once reversal is done:
     # re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
+    # re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
+    # re.compile(r"{{PIE.*?}}", flags=re.I+re.S),
+    # (Chinese tone letters should be HTML as well, when rendered as numbers.)
+
+    # It's unclear if these and if text outside of templates should be
+    # converted to Unicode or HTML superscripts/subscripts.  Produce a
+    # report after IPA revert is complete.
+    # re.compile(r"{{lang.*?}}", flags=re.I+re.S),
+    #
+    # It's unclear if tones like <sup>H</sup> in IPA templates should
+    # be converted to Unicode.
 ]
 
 
@@ -362,7 +378,7 @@ def entity_check(article_title, article_text):
 
         if string in article_text:
             print("finding " + string)
-            for instance in re.findall(string, article_text):
+            for instance in re.findall(re.escape(string), article_text):
                 add_safely(article_title, string, uncontroversial_found)
                 add_safely(string, article_title, worst_articles)
                 # This intentionally adds the article title as many

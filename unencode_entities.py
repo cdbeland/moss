@@ -812,9 +812,13 @@ transform = {
     "ˀ": "<sup>ʔ</sup>",
 
     "ₔ": "<sub>Ə</sub>",
+
+    "ᵑ": "<sup>ŋ</sup>",
     """
 
     ### Reversal for IPA templates
+
+    "<sup>ŋ</sup>": "ᵑ",
 
     "<sup>1</sup>": "¹",
     "<sup>2</sup>": "²",
@@ -828,11 +832,11 @@ transform = {
     "<sup>0</sup>": "⁰",
     "<sup>i</sup>": "ⁱ",
 
-    r"<sup>\+</sup>": "⁺",
+    r"<sup>+</sup>": "⁺",
     r"<sup>-</sup>": "⁻",
     r"<sup>=</sup>": "⁼",
-    r"<sup>\(</sup>": "⁽",
-    r"<sup>\)</sup>": "⁾",
+    r"<sup>(</sup>": "⁽",
+    r"<sup>)</sup>": "⁾",
 
     "<sup>a</sup>": "ᵃ",
     "<sup>b</sup>": "ᵇ",
@@ -859,25 +863,6 @@ transform = {
     "<sup>x</sup>": "ˣ",
     "<sup>y</sup>": "ʸ",
     "<sup>z</sup>": "ᶻ",
-    "<sup>A</sup>": "ᴬ",
-    "<sup>B</sup>": "ᴮ",
-    "<sup>D</sup>": "ᴰ",
-    "<sup>E</sup>": "ᴱ",
-    "<sup>G</sup>": "ᴳ",
-    "<sup>H</sup>": "ᴴ",
-    "<sup>I</sup>": "ᴵ",
-    "<sup>J</sup>": "ᴶ",
-    "<sup>K</sup>": "ᴷ",
-    "<sup>L</sup>": "ᴸ",
-    "<sup>M</sup>": "ᴹ",
-    "<sup>N</sup>": "ᴺ",
-    "<sup>O</sup>": "ᴼ",
-    "<sup>P</sup>": "ᴾ",
-    "<sup>R</sup>": "ᴿ",
-    "<sup>T</sup>": "ᵀ",
-    "<sup>U</sup>": "ᵁ",
-    "<sup>V</sup>": "ⱽ",
-    "<sup>W</sup>": "ᵂ",
 
     "<sub>0</sub>": "₀",
     "<sub>1</sub>": "₁",
@@ -890,11 +875,11 @@ transform = {
     "<sub>8</sub>": "₈",
     "<sub>9</sub>": "₉",
 
-    r"<sub>\+</sub>": "₊",
+    r"<sub>+</sub>": "₊",
     r"<sub>-</sub>": "₋",
     r"<sub>=</sub>": "₌",
-    r"<sub>\(</sub>": "₍",
-    r"<sub>\)</sub>": "₎",
+    r"<sub>(</sub>": "₍",
+    r"<sub>)</sub>": "₎",
 
     "<sub>a</sub>": "ₐ",
     "<sub>e</sub>": "ₑ",
