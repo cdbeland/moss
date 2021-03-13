@@ -4,6 +4,7 @@ import re
 
 
 html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
+blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>)", flags=re.I+re.S)
 
 
 def remove_structure_nested(string, open_string, close_string):
