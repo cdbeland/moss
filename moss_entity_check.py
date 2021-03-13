@@ -302,9 +302,6 @@ article_blocklist = [
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
-
-    # IPA issues
-    "X-SAMPA",
 ]
 
 
@@ -335,11 +332,9 @@ suppression_patterns = [
     re.compile(r"[[File:.*?]]", flags=re.I+re.S),
     re.compile(r"[[Image:.*?]]", flags=re.I+re.S),
 
-    # Uncomment these once reversal is done:
-    # re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
-    # re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
-    # re.compile(r"{{PIE.*?}}", flags=re.I+re.S),
-    # (Chinese tone letters should be HTML as well, when rendered as numbers.)
+    re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
+    re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
+    re.compile(r"{{PIE.*?}}", flags=re.I+re.S),
 
     # It's unclear if these and if text outside of templates should be
     # converted to Unicode or HTML superscripts/subscripts.  Produce a
