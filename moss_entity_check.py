@@ -305,6 +305,9 @@ article_blocklist = [
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
+
+    # Blackboard bold characters used as anchors
+    "Glossary of mathematical symbols",
 ]
 
 

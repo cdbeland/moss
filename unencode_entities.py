@@ -666,6 +666,12 @@ transform = {
     "&lsqb;": "&lbrack;",
     "&rsqb;": "&rbrack;",
 
+    "&gtdot;": "",
+    "&ltdot;": "",
+    "&esdot;": "",
+    "&geq;": "",
+    "&bullet;": "•",
+
     "&#160;": "&nbsp;",
     "&#xA0;": "&nbsp;",
     "&#x0A0;": "&nbsp;",
@@ -1025,6 +1031,7 @@ transform = {
     "&nadsh;": "&ndash;",
     "&nash;": "&ndash;",
     "&nsash;": "&ndash;",
+    "&ndashl;": "&ndash;",
     "&nbdash;": "&ndash;",
     "&endash;": "&ndash;",
     "&bdash;": "&ndash;",
