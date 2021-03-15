@@ -300,6 +300,9 @@ article_blocklist = [
     # # in external link
     "WalangForever",
 
+    # Unicode superscript in URL in bidirectional text
+    "Almah",
+
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
 ]
@@ -372,7 +375,6 @@ def entity_check(article_title, article_text):
             continue
 
         if string in article_text:
-            print("finding " + string)
             for instance in re.findall(re.escape(string), article_text):
                 add_safely(article_title, string, uncontroversial_found)
                 add_safely(string, article_title, worst_articles)
