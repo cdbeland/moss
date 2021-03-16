@@ -92,7 +92,6 @@ keep = [
     "&num;",  # hash symbol, needed in rare cases for section link in template call
     "&c;",    # Almost all are in archaic quotations and titles, and "&c" is in Wiktionary (as archaic)
     "&period;",  # When needed to stop template from dropping "." from abbreviations
-    "&ast;",  # * causes problems sometimes because it's used to mark a list in wiki syntax
 
     "&#x0261;",  # g for gravity distinguished from g for gram
 
@@ -258,6 +257,7 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
+    "&ast;": "*",  # * causes problems sometimes because it's used to mark a list in wiki syntax
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
 
@@ -355,7 +355,6 @@ transform_unsafe = {
     "ⁿᵈ": "nd",
     "ʳᵈ": "rd",
     "ᵗʰ": "th",
-    # TODO: https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts
 
     "…": "...",
     "&#8230;": "...",
@@ -802,7 +801,7 @@ transform = {
     "</sub><sub>": "",
 
     # TODO: https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts#Other_superscript_and_subscript_characters
-    # TODO: https://en.wikipedia.org/wiki/Secondary_articulation#Unicode_support_of_superscript_IPA_letters
+
 
     "&#46;": "&period;",  # When needed to stop template from dropping "." from abbreviations
 

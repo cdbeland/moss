@@ -391,14 +391,22 @@ def entity_check(article_title, article_text):
     for entity in entities_re.findall(article_text):
         if entity in keep:
             continue
-        elif entity in alert:
+        if entity in alert:
             # Handled above
             continue
-        elif entity in controversial:
+
+        if entity == "&ast;":
+            if ("{{Infobox Chinese" in article_text
+                    or "{{infobox Chinese" in article_text
+                    or "{{Chinese" in article_text):
+                # Legitimate use to prevent interpretation as wikitext list syntax
+                continue
+
+        if entity in controversial:
             add_safely(article_title, entity, controversial_found)
             add_safely(entity, article_title, worst_articles)
             continue
-        elif entity in greek_letters:
+        if entity in greek_letters:
             add_safely(article_title, entity, greek_letters_found)
             add_safely(entity, article_title, worst_articles)
             continue
