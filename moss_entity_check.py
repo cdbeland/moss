@@ -69,6 +69,7 @@ article_blocklist = [
     "Devanagari transliteration",
     "DEC Hebrew",
     "DKOI",
+    "DIN 66303",
     "Duplicate characters in Unicode",
     "Ellipsis",
     "ELOT 927",
@@ -218,6 +219,14 @@ article_blocklist = [
     "Bengali–Assamese script",
 
     "List of jōyō kanji",  # Breaks display of certain characters
+
+    # &zwj; apparently needed
+    "Rasm",
+    "The Partisan",
+    "44th Kerala State Film Awards",
+    "Sumana Amarasinghe",
+    "Gopi Sundar",
+    "SASM/GNC romanization",
 
     # Correctly uses U+2011 Non-Breaking Hypens
     "Börje",
@@ -486,11 +495,17 @@ def extract_articles(dictionary, limit=True):
         # Above-cutoff characters to work on next
         if entity in [
                 "&Xi;"
-                # "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ", "Ⅼ", "Ⅽ", "Ⅾ", "Ⅿ", "ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ", "ⅷ", "ⅸ", "ⅹ", "ⅺ", "ⅻ", "ⅼ", "ⅽ", "ⅾ", "ⅿ",
-                # TODO next with JWB_ARTICLE_CUTOFF set at 25:
-                # "&larr;", "&uarr;", "&darr;", "&sup;", "&rfloor;", "&lfloor;", "&subseteq;"
+                "&larr;", "&uarr;", "&darr;", "&sup;", "&rfloor;", "&lfloor;", "&subseteq;"
+                "&frac12;", "&#x202F;",
+
+                # Next batch:
+                # "&nabla;", "&cong;", "&rArr;", "&harr;", "&hArr;", "&notin;", "&perp;", "&alefsym;", "&rightleftharpoons;",
                 # Numerous but satisfying:
+                # "&#x20;", "&#32;",
                 # "&rarr;", "&copy;", "&#8212;", "&apos;", "&hellip;", "&alpha;"
+
+                # Completed but present in lots of file names:
+                # "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ", "Ⅼ", "Ⅽ", "Ⅾ", "Ⅿ", "ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ", "ⅷ", "ⅸ", "ⅹ", "ⅺ", "ⅻ", "ⅼ", "ⅽ", "ⅾ", "ⅿ",
         ]:
             articles.update(article_list)
             continue
@@ -503,7 +518,7 @@ def extract_articles(dictionary, limit=True):
 
         if entity in [
                 # Too many STEM articles; temporarily skipping
-                "&plusmn;",
+                # "&plusmn;",
         ]:
             continue
 
