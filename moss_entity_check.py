@@ -320,11 +320,6 @@ article_blocklist = [
 ]
 
 
-# Max number of articles a character can appear in before it's ignored
-# for JWB article-list-generation purposes.
-JWB_ARTICLE_CUTOFF = 15
-
-
 def jwb_escape(text):
     text = text.replace("\\", "\\\\")  # e.g. for <math> markup
     text = text.replace('"', '\\"')
@@ -432,15 +427,17 @@ def dump_dict(section_title, dictionary):
     output = f"=== {section_title} ===\n"
 
     if section_title == "To avoid":
-        output += f"Not included in JWB scripts; may need to isolate instances in main body text, add automatic substitutions, or fix manually.\n\n"
+        output += f"Not included in JWB scripts; fix manually or update moss code.\n\n"
+    elif section_title == "Unknown":
+        output += f"Not included in JWB scripts; fix manually or update moss code.\n\n"
     elif section_title == "Uncontroversial entities":
-        output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
+        output += f"Fix automatically with jwb-articles-low.txt\n\n"
     elif section_title == "Greek letters":
         output += f"Fix automatically with jwb-articles-greek.txt (avoiding STEM articles)\n\n"
     elif section_title == "Controversial entities":
         output += f"Fix automatically with jwb-articles-controversial.txt (avoiding STEM articles)\n\n"
     elif section_title == "Unknown numerical: Latin range":
-        output += f"Fix automatically with jwb-articles-low.txt (cutoff at {JWB_ARTICLE_CUTOFF} articles)\n\n"
+        output += f"Fix automatically with jwb-articles-low.txt\n\n"
     elif section_title == "Unknown high numerical":
         output += f"Fix automatically with jwb-articles-high.txt\n\n"
 
@@ -488,42 +485,29 @@ def extract_entities(dictionary):
     return {entity for entity in dictionary.keys()}
 
 
-def extract_articles(dictionary, limit=True):
-    articles = set()
-    for (entity, article_list) in dictionary.items():
+def extract_articles(dictionary):
+    # Returns a list sorted by frequency of least-frequent entity occurrance, low to high
+    articles = list()
+    for (entity, article_list) in sorted(dictionary.items(),
+                                         key=lambda ent: len(dictionary[ent])):
 
-        # Above-cutoff characters to work on next
-        if entity in [
-                "&Xi;"
-                "&larr;", "&uarr;", "&darr;", "&sup;", "&rfloor;", "&lfloor;", "&subseteq;"
-                "&frac12;", "&#x202F;",
-
-                # Next batch:
-                # "&nabla;", "&cong;", "&rArr;", "&harr;", "&hArr;", "&notin;", "&perp;", "&alefsym;", "&rightleftharpoons;",
-                # Numerous but satisfying:
-                # "&#x20;", "&#32;",
-                # "&rarr;", "&copy;", "&#8212;", "&apos;", "&hellip;", "&alpha;"
-
-                # Completed but present in lots of file names:
-                # "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ", "Ⅼ", "Ⅽ", "Ⅾ", "Ⅿ", "ⅰ", "ⅱ", "ⅲ", "ⅳ", "ⅴ", "ⅵ", "ⅶ", "ⅷ", "ⅸ", "ⅹ", "ⅺ", "ⅻ", "ⅼ", "ⅽ", "ⅾ", "ⅿ",
-        ]:
-            articles.update(article_list)
-            continue
-
-        # Skip articles that only have very common characters or
-        # entities that will need to be dealt with by a real bot
-        # someday.
-        if limit and len(set(article_list)) > JWB_ARTICLE_CUTOFF:
-            continue
-
-        if entity in [
-                # Too many STEM articles; temporarily skipping
-                # "&plusmn;",
+        # For doing special runs:
+        """
+        if entity not in [
+                "&Xi;",
+                "&alpha;",
+                "&rarr;",
+                "&copy;",
+                "&#8212;",
+                "&apos;",
+                "&hellip;",
         ]:
             continue
+        """
 
-        articles.update(article_list)
+        articles.extend(sorted(article_list))
 
+    articles = list(dict.fromkeys(articles))  # uniqify
     return articles
 
 
@@ -608,10 +592,11 @@ def dump_results():
         print("\n".join(sorted(articles)), file=greek)
 
     with open("jwb-articles-low.txt", "w") as lowa:
-        articles = set()
-        for dictionary in [uncontroversial_found, unknown_found, unknown_numerical_latin]:
-            articles.update(extract_articles(dictionary))
-        print("\n".join(sorted(articles)), file=lowa)
+        articles = list()
+        for dictionary in [unknown_numerical_latin, uncontroversial_found]:
+            articles.extend(extract_articles(dictionary))
+        articles = list(dict.fromkeys(articles))  # uniqify across sublists
+        print("\n".join(articles[0:500]), file=lowa)
 
     with open("jwb-articles-high.txt", "w") as higha:
         print("\n".join(sorted(extract_articles(unknown_numerical_high, limit=False))), file=higha)
