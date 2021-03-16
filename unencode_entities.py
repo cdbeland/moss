@@ -39,7 +39,7 @@ alert = [
     # "„",  # bdquo
 
     # &zwj; usually wants to be &zwnj; and probably that usually isn't
-    # needed?
+    # needed
     "&zwj;", "&zwnj;"
 
     # Might want to be wiki-list syntax
@@ -90,8 +90,9 @@ alert = [
 keep = [
     "&amp;",  # dangerous for e.g. &amp;126;
     "&num;",  # hash symbol, needed in rare cases for section link in template call
-    "&c;",    # Almost all are in archaic quotations and titles
+    "&c;",    # Almost all are in archaic quotations and titles, and "&c" is in Wiktionary (as archaic)
     "&period;",  # When needed to stop template from dropping "." from abbreviations
+    "&ast;",  # * causes problems sometimes because it's used to mark a list in wiki syntax
 
     "&#x0261;",  # g for gravity distinguished from g for gram
 
@@ -226,7 +227,7 @@ keep = [
 ]
 
 controversial = {
-    # Possibly controversial (math and science people have been somewhat upset)
+    # Possibly controversial (but Deacon Vorbis might be the only objector, and they have retired)
     "&asymp;": "≈",
     "&empty;": "∅",
     "&part;": "∂",
@@ -237,8 +238,6 @@ controversial = {
     "&equiv;": "≡",
     "&oplus;": "⊕",
     "&ne;": "≠",
-    "&sube;": "⊆",
-    "&subseteq;": "⊆",
     "&not;": "¬",
     "&radic;": "√",
     "&forall;": "∀",
@@ -246,33 +245,14 @@ controversial = {
     "&supe;": "⊇",
     "&sim;": "∼",
     "&perp;": "⊥",
-    "&alefsym;": "ℵ",
     "&isin;": "∈",
-    "&le;": "≤",  # available at the bottom of the wikitext edit window
     "&fnof;": "ƒ",
     "&infin;": "∞",
-    "&ge;": "≥",  # available at the bottom of the wikitext edit window
     "&lowast;": "∗",
     "&cong;": "≅",
-    "&weierp;": "℘",
-    "&hArr;": "⇔",
-    "&rArr;": "⇒",
-    "&rarr;": "→",
-    "&larr;": "←",
-    "&lArr;": "⇐",
-    "&harr;": "↔",
-    "&darr;": "↓",
-    "&uarr;": "↑",
-    "&uArr;": "⇑",
-    "&crarr;": "↵",
     "&int;": "∫",
-    "&rceil;": "⌉",
-    "&lceil;": "⌈",
-    "&rfloor;": "⌋",
-    "&lfloor;": "⌊",
     "&real;": "ℜ",
     "&sdot;": "⋅",  # Multiplication dot, not to be confused with middot
-    "&rightleftharpoons;": "⇌",
 }
 
 # keep.extend(controversial.keys())
@@ -282,8 +262,8 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
-    "&equals;": "=",
-    "&lowbar;": "_",
+    "&equals;": "=",  # Can mess up wikitext
+    "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
 
     "&#8239;": "&nbsp;",    # narrow no-break space
 
@@ -666,10 +646,10 @@ transform = {
     "&lsqb;": "&lbrack;",
     "&rsqb;": "&rbrack;",
 
-    "&gtdot;": "",
-    "&ltdot;": "",
-    "&esdot;": "",
-    "&geq;": "",
+    "&gtdot;": "⋗",
+    "&ltdot;": "⋖",
+    "&esdot;": "⋖",
+    "&geq;": "≥",
     "&bullet;": "•",
 
     "&#160;": "&nbsp;",
@@ -851,7 +831,7 @@ transform = {
     # "&lt;": "<",
     # "&gt;": ">",
 
-    # Common symbols, to change outside of math/science articles
+    # Common symbols
     "&iquest;": "¿",
     "&pound;": "£",
     "&#163;": "£",
@@ -898,6 +878,27 @@ transform = {
     "&subsetneq;": "⊊",
     "&cir;": "○",
     "&compfn;": "∘",
+    "&rightleftharpoons;": "⇌",
+    "&darr;": "↓",
+    "&sube;": "⊆",
+    "&subseteq;": "⊆",
+    "&rceil;": "⌉",
+    "&lceil;": "⌈",
+    "&rfloor;": "⌋",
+    "&lfloor;": "⌊",
+    "&alefsym;": "ℵ",
+    "&le;": "≤",  # available at the bottom of the wikitext edit window
+    "&ge;": "≥",  # available at the bottom of the wikitext edit window
+    "&weierp;": "℘",
+    "&hArr;": "⇔",
+    "&rArr;": "⇒",
+    "&rarr;": "→",
+    "&larr;": "←",
+    "&lArr;": "⇐",
+    "&harr;": "↔",
+    "&uarr;": "↑",
+    "&uArr;": "⇑",
+    "&crarr;": "↵",
 
     "㎆": "MB",
     "㎅": "KB",
