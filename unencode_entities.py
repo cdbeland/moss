@@ -226,7 +226,7 @@ keep = [
 ]
 
 controversial = {
-    # Possibly controversial (but Deacon Vorbis might be the only objector, and they have retired)
+    # Possibly controversial. Objectors: Headbomb, Deacon Vorbis (retired)
     "&asymp;": "≈",
     "&empty;": "∅",
     "&part;": "∂",
@@ -248,6 +248,12 @@ controversial = {
     "&int;": "∫",
     "&real;": "ℜ",
     "&sdot;": "⋅",  # Multiplication dot, not to be confused with middot
+    "&alefsym;": "ℵ",
+    "&weierp;": "℘",
+    "&nabla;": "∇",
+    "&cong;": "≅",
+    "&perp;": "⊥",
+    "&notin;": "∉",
 }
 
 # keep.extend(controversial.keys())
@@ -881,10 +887,8 @@ transform = {
     "&lceil;": "⌈",
     "&rfloor;": "⌋",
     "&lfloor;": "⌊",
-    "&alefsym;": "ℵ",
     "&le;": "≤",  # available at the bottom of the wikitext edit window
     "&ge;": "≥",  # available at the bottom of the wikitext edit window
-    "&weierp;": "℘",
     "&hArr;": "⇔",
     "&rArr;": "⇒",
     "&rarr;": "→",
@@ -894,10 +898,6 @@ transform = {
     "&uarr;": "↑",
     "&uArr;": "⇑",
     "&crarr;": "↵",
-    "&nabla;": "∇",
-    "&cong;": "≅",
-    "&perp;": "⊥",
-    "&notin;": "∉",
 
     "㎆": "MB",
     "㎅": "KB",
