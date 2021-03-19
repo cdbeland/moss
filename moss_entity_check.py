@@ -203,6 +203,7 @@ article_blocklist = [
     "Xerox Character Code Standard",
     "YUSCII",
     "Zero-width space",
+    "Œ",
 
     # Note: Characters like &Ohm; and &#x2F802; are changed by
     # Normalization Form Canonical Composition and appear as different
@@ -345,6 +346,7 @@ suppression_patterns = [
     re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{PIE.*?}}", flags=re.I+re.S),
+    re.compile(r"{{7seg.*?}}", flags=re.I+re.S),  # Uses superscript = as a parameter value
 
     # It's unclear if these and if text outside of templates should be
     # converted to Unicode or HTML superscripts/subscripts.  Produce a
@@ -402,14 +404,21 @@ def entity_check(article_title, article_text):
                 # Legitimate use to prevent interpretation as wikitext list syntax
                 continue
 
-        if entity in controversial:
-            add_safely(article_title, entity, controversial_found)
-            add_safely(entity, article_title, worst_articles)
-            continue
-        if entity in greek_letters:
-            add_safely(article_title, entity, greek_letters_found)
-            add_safely(entity, article_title, worst_articles)
-            continue
+        if entity in controversial or entity in greek_letters:
+            if "<math>" in article_text:
+                # Editors in these types of articles prefer the HTML
+                # entity so that special characters can be found by
+                # name in both TeX and HTML markup.
+                continue
+
+            if entity in controversial:
+                add_safely(article_title, entity, controversial_found)
+                add_safely(entity, article_title, worst_articles)
+                continue
+            if entity in greek_letters:
+                add_safely(article_title, entity, greek_letters_found)
+                add_safely(entity, article_title, worst_articles)
+                continue
 
         add_safely(entity, article_title, worst_articles)
 
@@ -441,9 +450,9 @@ def dump_dict(section_title, dictionary):
     elif section_title == "Uncontroversial entities":
         output += f"Fix automatically with jwb-articles-low.txt\n\n"
     elif section_title == "Greek letters":
-        output += f"Fix automatically with jwb-articles-greek.txt (avoiding STEM articles)\n\n"
+        output += f"Fix automatically with jwb-articles-greek.txt (avoiding STEM articles with TeX markup)\n\n"
     elif section_title == "Controversial entities":
-        output += f"Fix automatically with jwb-articles-controversial.txt (avoiding STEM articles)\n\n"
+        output += f"Fix automatically with jwb-articles-controversial.txt (avoiding STEM articles with TeX markup)\n\n"
     elif section_title == "Unknown numerical: Latin range":
         output += f"Fix automatically with jwb-articles-low.txt\n\n"
     elif section_title == "Unknown high numerical":
@@ -494,10 +503,13 @@ def extract_entities(dictionary):
 
 
 def extract_articles(dictionary):
-    # Returns a list sorted by frequency of least-frequent entity occurrance, low to high
+    # Returns a list sorted by:
+    # 1.) Frequency of least-frequent entity occurrence, low to high
+    # 2.) Alphabetically by entity
+    # 3.) Alphabetically by article title
     articles = list()
-    for (entity, article_list) in sorted(dictionary.items(),
-                                         key=lambda ent: len(dictionary[ent])):
+    for (entity, article_list) in sorted(sorted(dictionary.items()),
+                                         key=lambda tup: len(tup[1])):
 
         # For doing special runs:
         """
@@ -592,12 +604,12 @@ def dump_results():
         dump_for_jwb("combo", bad_entities, file=combof)
 
     with open("jwb-articles-controversial.txt", "w") as contro:
-        articles = extract_articles(controversial_found, limit=False)
-        print("\n".join(sorted(articles)), file=contro)
+        articles = extract_articles(controversial_found)
+        print("\n".join(articles), file=contro)
 
     with open("jwb-articles-greek.txt", "w") as greek:
-        articles = extract_articles(greek_letters_found, limit=False)
-        print("\n".join(sorted(articles)), file=greek)
+        articles = extract_articles(greek_letters_found)
+        print("\n".join(articles), file=greek)
 
     with open("jwb-articles-low.txt", "w") as lowa:
         articles = list()
@@ -607,7 +619,7 @@ def dump_results():
         print("\n".join(articles[0:500]), file=lowa)
 
     with open("jwb-articles-high.txt", "w") as higha:
-        print("\n".join(sorted(extract_articles(unknown_numerical_high, limit=False))), file=higha)
+        print("\n".join(sorted(extract_articles(unknown_numerical_high))), file=higha)
 
 
 read_en_article_text(entity_check)
