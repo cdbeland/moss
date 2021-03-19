@@ -21,7 +21,9 @@ echo `date`
 
 # Run time for this segment: ~2h
 
-../venv/bin/python3 ../moss_entity_check.py | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
+# ../venv/bin/python3 ../moss_entity_check.py | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
+../venv/bin/python3 ../moss_entity_check.py > tmp-entities
+cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
 # "Worst" report disabled because it's mostly [[MOS:STRAIGHT]]
 # violations, which are not a priority.
 # ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
