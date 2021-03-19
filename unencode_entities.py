@@ -254,6 +254,7 @@ controversial = {
     "&cong;": "≅",
     "&perp;": "⊥",
     "&notin;": "∉",
+    "&sube;": "⊆",
 }
 
 # keep.extend(controversial.keys())
@@ -263,10 +264,12 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
-    "&ast;": "*",  # * causes problems sometimes because it's used to mark a list in wiki syntax
+    # Uncomment after all &#42; are changed
+    # "&ast;": "*",  # * causes problems sometimes because it's used to mark a list in wiki syntax
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
 
+    "&#x20;": "%20",  # Usually, but not always. Sometimes this should just be a regular space.
     "&#8239;": "&nbsp;",    # narrow no-break space
 
     # Probably convert to regular space or no space
@@ -881,7 +884,6 @@ transform = {
     "&compfn;": "∘",
     "&rightleftharpoons;": "⇌",
     "&darr;": "↓",
-    "&sube;": "⊆",
     "&subseteq;": "⊆",
     "&rceil;": "⌉",
     "&lceil;": "⌈",
