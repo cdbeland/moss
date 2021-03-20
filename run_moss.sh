@@ -262,5 +262,10 @@ echo `date`
 sort -k2 -nr tmp-readability.txt > post-readability.txt
 rm tmp-readability.txt
 
+# --- SUPERSCRIPTS AND SUBSCRIPTS ---
+
+echo "Beginning superscript/subscript audit"
+../superscripts.sh
+
 echo "Done"
 echo `date`
