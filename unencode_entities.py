@@ -130,7 +130,6 @@ keep = [
     "&#x2069;",
 
     # Definitely confusing, probably keep forever
-    "&times;",  # ×
     "&and;",    # ∧
     "&or;",     # ∨
     "&lang;",   # 〈
@@ -255,6 +254,7 @@ controversial = {
     "&perp;": "⊥",
     "&notin;": "∉",
     "&sube;": "⊆",
+    "&times;",  # × - not hard to distinguish from "x"
 }
 
 # keep.extend(controversial.keys())
@@ -268,6 +268,24 @@ transform_unsafe = {
     # "&ast;": "*",  # * causes problems sometimes because it's used to mark a list in wiki syntax
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
+
+    # Non-compliant and incorrect uses of superscript o
+    "n<sup>o<sup>": "no.",
+    "N<sup>o<sup>": "No.",
+    "<sup>o<sup>C": "°C",
+    "<sup>o<sup> C": "° C",
+    # Some of the below might be ordinal indicators for Romance
+    # languages, in which case they should use "º" per [[MOS:ORDINAL]]
+    "0<sup>o<sup>C": "0°",
+    "1<sup>o<sup>C": "1°",
+    "2<sup>o<sup>C": "2°",
+    "3<sup>o<sup>C": "3°",
+    "4<sup>o<sup>C": "4°",
+    "5<sup>o<sup>C": "5°",
+    "6<sup>o<sup>C": "6°",
+    "7<sup>o<sup>C": "7°",
+    "8<sup>o<sup>C": "8°",
+    "9<sup>o<sup>C": "9°",
 
     "&#x20;": "%20",  # Usually, but not always. Sometimes this should just be a regular space.
     "&#8239;": "&nbsp;",    # narrow no-break space
