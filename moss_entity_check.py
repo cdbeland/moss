@@ -318,6 +318,9 @@ article_blocklist = [
 
     # Blackboard bold characters used as anchors
     "Glossary of mathematical symbols",
+
+    # Objection from Headbomb
+    "Xi baryon",
 ]
 
 
