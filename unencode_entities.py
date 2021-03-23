@@ -254,7 +254,7 @@ controversial = {
     "&perp;": "⊥",
     "&notin;": "∉",
     "&sube;": "⊆",
-    "&times;",  # × - not hard to distinguish from "x"
+    "&times;": "×",  # not hard to distinguish from "x"
 }
 
 # keep.extend(controversial.keys())
