@@ -38,10 +38,12 @@ import re
 # Quotation marks | U+201F || {{smallcaps|{{lc:Double high-reversed-9 quotation mark}}}} || &amp;amp;#8223;
 
 
-def read_en_article_text(callback_function):
+def read_en_article_text(callback_function, filename=""):
     working_string = ""
 
-    with open("/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml", "r") as article_xml_file:
+    if not filename:
+        filename = "/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml"
+    with open(filename, "r") as article_xml_file:
         for line in article_xml_file:
             working_string += line
             if line == "  </page>\n":
