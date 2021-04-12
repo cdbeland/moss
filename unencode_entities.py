@@ -88,9 +88,17 @@ alert = [
 
 # Ignore these if seen in articles
 keep = [
-    "&amp;",  # dangerous for e.g. &amp;126;
-    "&num;",  # hash symbol, needed in rare cases for section link in template call
-    "&c;",    # Almost all are in archaic quotations and titles, and "&c" is in Wiktionary (as archaic)
+
+    "&lbrack;",  # [] needed when adding a link in a quote, rarely
+    "&rbrack;",
+    "&comma;",  # Template weirdness on [[Nuremburg]]
+    "&excl;",   # !! is problematic in some tables
+    "&ast;",    # * causes problems sometimes because it's used to mark
+                # a list in wiki syntax; usually <nowiki>*</nowiki> works but not always
+    "&amp;",    # dangerous for e.g. &amp;126;
+    "&num;",    # hash symbol, needed in rare cases for section link in template call
+    "&c;",      # Almost all are in archaic quotations and titles, and
+                # "&c" is in Wiktionary (as archaic)
     "&period;",  # When needed to stop template from dropping "." from abbreviations
 
     "&#x0261;",  # g for gravity distinguished from g for gram
@@ -225,7 +233,11 @@ keep = [
 ]
 
 controversial = {
-    # Possibly controversial. Objectors: Headbomb, Deacon Vorbis (retired)
+    # Following objections from User:Headbomb, User:Deacon Vorbis
+    # (retired), keep these in articles with <math> markup. In these
+    # articles, some editors prefer to be able to search by the TeX
+    # name (usually the same as the HTML entity) rather than by the
+    # Unicode character.
     "&asymp;": "≈",
     "&empty;": "∅",
     "&part;": "∂",
@@ -235,7 +247,6 @@ controversial = {
     "&oplus;": "⊕",
     "&ne;": "≠",
     "&not;": "¬",
-    "&radic;": "√",
     "&forall;": "∀",
     "&sup;": "⊃",
     "&supe;": "⊇",
@@ -243,7 +254,7 @@ controversial = {
     "&isin;": "∈",
     "&fnof;": "ƒ",
     "&infin;": "∞",
-    "&lowast;": "∗",
+    "&lowast;": "∗",  # When used in math, otherwise use ASCII *
     "&int;": "∫",
     "&real;": "ℜ",
     "&sdot;": "⋅",  # Multiplication dot, not to be confused with middot
@@ -255,6 +266,12 @@ controversial = {
     "&notin;": "∉",
     "&sube;": "⊆",
     "&times;": "×",  # not hard to distinguish from "x"
+    "&geq;": "≥",
+    "&leq;": "≤",
+    "&plusmn;": "±",
+    "&vellip;": "⋮",
+    "&ctdot;": "⋯",
+    "&dtdot;": "⋱",
 }
 
 # keep.extend(controversial.keys())
@@ -264,10 +281,11 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
-    # Uncomment after all &#42; are changed
-    # "&ast;": "*",  # * causes problems sometimes because it's used to mark a list in wiki syntax
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
+
+    # [[MOS:RADICAL]]
+    "&radic;": "√",  # May need to use <math>\sqrt{}</math>
 
     # Non-compliant and incorrect uses of superscript o
     "n<sup>o<sup>": "no.",
@@ -671,8 +689,8 @@ transform = {
     "&gtdot;": "⋗",
     "&ltdot;": "⋖",
     "&esdot;": "⋖",
-    "&geq;": "≥",
     "&bullet;": "•",
+    "&hyphen;": "-",
 
     "&#160;": "&nbsp;",
     "&#xA0;": "&nbsp;",
@@ -869,7 +887,6 @@ transform = {
     "&spades;": "♠",
     "&deg;": "°",
     "&oline;": "‾",
-    "&plusmn;": "±",
     "&pm;": "±",
     "&plus;": "+",
     "&mp;": "∓",
@@ -883,7 +900,6 @@ transform = {
     "&divide;": "÷",
 
     # More math symbols to clean up
-    "&leq;": "≤",
     "&rationals;": "ℚ",
     "&integers;": "ℤ",
     "&reals;": "ℝ",
@@ -948,6 +964,7 @@ transform = {
     "&ecirc;": "ê",
     "&Egrave;": "È",
     "&egrave;": "è",
+    "&Euml;": "Ë",
     "&euml;": "ë",
     "&#X1E24;": "Ḥ",
     "&iacute;": "í",
@@ -1088,6 +1105,10 @@ transform = {
     "&nsp;": "&nbsp;",
     "&124;": "&#124;",
     "&tbsp;": "&nbsp;",
+    "&nbdp;": "&nbsp;",
+    "&nbsps;": "&nbsp;",
+    "&nbstp;": "&nbsp;",
+    "&mdaash;": "&mdash;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
@@ -1228,15 +1249,25 @@ def should_keep_as_is(entity):
             "000FFFFF",
             "0010FFFF"]:
         return True
+
+    if num_value < 1:
+        print(f"Low character value '{num_value}' for '{entity}'",
+              file=sys.stderr)
+        return True
+
+    if num_value > 0x110000:
+        print(f"Excessively high character value {num_value} for '{entity}'",
+              file=sys.stderr)
+        return True
+
     if unicodedata.combining(chr(num_value)):
         # Combining characters are too difficult to edit as themselves
         return True
     if variant_selectors_re.match(entity):
         return True
 
-    # Avoid changing entities into characters that would normalized
-    # into a different
-    # character.
+    # Avoid changing entities into characters that would normalize
+    # into a different character.
     # https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization
     transformed = unicodedata.normalize("NFC", entity)
     if entity != transformed:
