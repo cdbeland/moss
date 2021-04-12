@@ -4,12 +4,18 @@ import sys
 from xml.sax.saxutils import escape
 
 
-if len(sys.argv) != 2:
-    print("Please specify exactly one search term on the command line")
+if len(sys.argv) < 2:
+    print("Please specify regex search term on the command line")
+    exit(1)
+if len(sys.argv) > 3:
+    print("Too many arguments!")
     exit(1)
 
 
 search_regex = re.compile(sys.argv[1])
+filename = ""
+if len(sys.argv) == 3:
+    filename = sys.argv[2]
 
 
 def grep_callback(article_title, article_text):
@@ -25,4 +31,4 @@ def grep_callback(article_title, article_text):
         print("  </page>\n")  # Whitespace is needed to fake real dump output exactly
 
 
-read_en_article_text(grep_callback)
+read_en_article_text(grep_callback, filename=filename)
