@@ -32,6 +32,7 @@ article_blocklist = [
     "AltGr key",
     "Apostrophe",
     "Ayin",
+    "Baudot code",
     "Basic Latin (Unicode block)",
     "Big5",
     "Bitstream International Character Set",
@@ -147,6 +148,7 @@ article_blocklist = [
     "Registered trademark symbol",
     "RISC OS character set",
     "Roman numerals",
+    "Romanization of Arabic",
     "Rough breathing",
     "Quotation mark",
     "Schwarzian derivative",
@@ -218,7 +220,7 @@ article_blocklist = [
     "Eastern Arabic numerals",
     "List of XML and HTML character entity references",
     "Bengali–Assamese script",
-
+    "Modern Arabic mathematical notation",  # LTR/RTL characters
     "List of jōyō kanji",  # Breaks display of certain characters
 
     # &zwj; apparently needed
@@ -419,6 +421,12 @@ def entity_check(article_title, article_text):
                 add_safely(entity, article_title, worst_articles)
                 continue
             if entity in greek_letters:
+
+                # eta, pi, phi, rho, omega, upsilon
+                if any(meson in article_text for meson in ["ta meson", "i meson", "ho meson", "mega meson", "psilon meson"]):
+                    # Per User:Headbomb
+                    continue
+
                 add_safely(article_title, entity, greek_letters_found)
                 add_safely(entity, article_title, worst_articles)
                 continue
