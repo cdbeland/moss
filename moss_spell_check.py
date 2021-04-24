@@ -70,7 +70,7 @@ def dump_results():
         print(output_string)
 
 
-ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove) to \w+"
+ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove|[Cc]opy section) to \w+"
                             r"|[Nn]ot English"
                             r"|[Cc]leanup HTML"
                             r"|[Cc]leanup"
