@@ -89,6 +89,9 @@ alert = [
 # Ignore these if seen in articles
 keep = [
 
+
+    "&lbrace;",  # {} sometimes needed due to template syntax
+    "&rbrace;",  # Or can use Template:( and Template ) which make {}
     "&lbrack;",  # [] needed when adding a link in a quote, rarely
     "&rbrack;",
     "&comma;",  # Template weirdness on [[Nuremburg]]
@@ -340,6 +343,7 @@ transform_unsafe = {
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
     "&#x2116;": "No.",
     "&#8470;": "No.",
+    "&numero;": "No.",
 
     # &#x2011; should be kept if it is at the beginning or end of a
     # word, so the hyphen doesn't break onto a new line (due to bug in
@@ -997,6 +1001,7 @@ transform = {
     "&Uuml;": "Ü",
     "&uuml;": "ü",
     "&yacute;": "ý",
+    "&thorn;": "þ",
 
     "&#214;": "Ö",
     "&#225;": "á",
@@ -1275,7 +1280,9 @@ def should_keep_as_is(entity):
     if entity != transformed:
         return True
 
-    return False
+    # This makes a difference; not sure why.
+    if num_value == 0xFA1e:
+        return True
 
 
 def make_character_or_ignore(entity):
