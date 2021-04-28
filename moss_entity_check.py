@@ -12,12 +12,10 @@ controversial_found = {}
 uncontroversial_found = {}
 greek_letters_found = {}
 unknown_found = {}
-unknown_numerical_latin = {}
-unknown_numerical_high = {}
+unknown_numerical = {}
 non_entity_transform = [string for string
                         in list(transform.keys()) + list(controversial.keys())
                         if not string.startswith("&")]
-worst_articles = {}
 
 article_blocklist = [
     # Characters themselves are discussed or listed as part of a mapping
@@ -323,6 +321,9 @@ article_blocklist = [
 
     # Objection from Headbomb
     "Xi baryon",
+
+    # Capital Alpha not in Greek word, exactly
+    "Kamen Rider Agito",
 ]
 
 
@@ -379,7 +380,6 @@ def entity_check(article_title, article_text):
 
         for instance in re.findall(string, article_text):
             add_safely(article_title, string, alerts_found)
-            add_safely(string, article_title, worst_articles)
             # This intentionally adds the article title as many times
             # as the string appears
 
@@ -391,7 +391,6 @@ def entity_check(article_title, article_text):
         if string in article_text:
             for instance in re.findall(re.escape(string), article_text):
                 add_safely(article_title, string, uncontroversial_found)
-                add_safely(string, article_title, worst_articles)
                 # This intentionally adds the article title as many
                 # times as the string appears
 
@@ -418,32 +417,25 @@ def entity_check(article_title, article_text):
 
             if entity in controversial:
                 add_safely(article_title, entity, controversial_found)
-                add_safely(entity, article_title, worst_articles)
                 continue
             if entity in greek_letters:
 
                 # eta, pi, phi, rho, omega, upsilon
-                if any(meson in article_text for meson in ["ta meson", "i meson", "ho meson", "mega meson", "psilon meson"]):
+                if any(meson in article_text for meson in ["ta meson", "i meson", "ho meson", "mega meson", "psilon meson", "scalar meson"]):
                     # Per User:Headbomb
                     continue
 
                 add_safely(article_title, entity, greek_letters_found)
-                add_safely(entity, article_title, worst_articles)
                 continue
-
-        add_safely(entity, article_title, worst_articles)
 
         if entity in transform:
             add_safely(article_title, entity, uncontroversial_found)
         else:
             if should_keep_as_is(entity):
                 continue
-            value = find_char_num(entity)
-            if value:
-                if int(value) < 0x0250:
-                    add_safely(article_title, entity, unknown_numerical_latin)
-                else:
-                    add_safely(article_title, entity, unknown_numerical_high)
+            if find_char_num(entity):
+                add_safely(article_title, entity, unknown_numerical)
+                continue
             else:
                 if entity == entity.upper() and re.search("[A-Z]+%s" % entity, article_text):
                     # Ignore things like "R&B;" and "PB&J;" which is common in railroad names.
@@ -459,35 +451,15 @@ def dump_dict(section_title, dictionary):
     elif section_title == "Unknown":
         output += f"Not included in JWB scripts; fix manually or update moss code.\n\n"
     elif section_title == "Uncontroversial entities":
-        output += f"Fix automatically with jwb-articles-low.txt\n\n"
+        output += f"Fix automatically with jwb-articles.txt\n\n"
     elif section_title == "Greek letters":
-        output += f"Fix automatically with jwb-articles-greek.txt (avoiding STEM articles with TeX markup)\n\n"
+        output += f"Fix automatically with jwb-articles.txt (articles with {{tag|math}} markup excluded)\n\n"
     elif section_title == "Controversial entities":
-        output += f"Fix automatically with jwb-articles-controversial.txt (avoiding STEM articles with TeX markup)\n\n"
-    elif section_title == "Unknown numerical: Latin range":
-        output += f"Fix automatically with jwb-articles-low.txt\n\n"
-    elif section_title == "Unknown high numerical":
-        output += f"Fix automatically with jwb-articles-high.txt\n\n"
+        output += f"Fix automatically with jwb-articles.txt (articles with {{tag|math}} markup excluded)\n\n"
+    elif section_title == "Unknown numerical":
+        output += f"Fix automatically with jwb-articles.txt\n\n"
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
-
-    if section_title == "Worst articles":
-        # Disabled - mostly low-priority MOS:STRAIGHT violations
-        return
-    """
-        output += "Fix automatically with jwb-articles-worst.txt\n"
-        for (article_title, entities) in sorted_items[0:50]:
-            distinct_entities = set(entities)
-            output += f"* {len(entities)}/{len(distinct_entities)} - [[{article_title}]] - "
-            output += ", ".join([entity for entity in sorted(distinct_entities)])
-            output += "\n"
-        with open("jwb-articles-worst.txt", "w") as worsta:
-            print("\n".join([article_title
-                             for (article_title, entities)
-                             in sorted_items[0:50]]),
-                  file=worsta)
-        return output
-    """
 
     for (key, article_list) in sorted_items[0:100]:
         if section_title == "To avoid":
@@ -576,61 +548,33 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
 
 def dump_results():
     sections = {
-        "Worst articles": worst_articles,
-        "Controversial entities": controversial_found,
-        "Greek letters": greek_letters_found,
+        "Unknown": unknown_found,
         "To avoid": alerts_found,
         "Uncontroversial entities": uncontroversial_found,
-        "Unknown": unknown_found,
-        "Unknown numerical: Latin range": unknown_numerical_latin,
-        "Unknown high numerical": unknown_numerical_high,
+        "Unknown numerical": unknown_numerical,
+        "Greek letters": greek_letters_found,
+        "Controversial entities": controversial_found,
     }
     for (section_title, dictionary) in sections.items():
         output = dump_dict(section_title, dictionary)
         print(output)
-        """
-        # Disabled - mostly low-priority MOS:STRAIGHT violations
-        if section_title == "Worst articles":
-            with open("tmp-worst.txt", "w") as worst:
-                print(output, file=worst)
-        else:
-            print(output)
-        """
 
-    with open("jwb-combo-no-greek-no-controversial.json", "w") as combojng:
+    with open("jwb-combo.json", "w") as combof:
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
-                           unknown_found, unknown_numerical_latin,
-                           unknown_numerical_high]:
-            bad_entities.update(extract_entities(dictionary))
-        dump_for_jwb("combo", bad_entities, file=combojng)
-
-    with open("jwb-combo-full.json", "w") as combof:
-        bad_entities = set()
-        for dictionary in [alerts_found, uncontroversial_found,
-                           unknown_found, unknown_numerical_latin,
-                           unknown_numerical_high,
+                           unknown_found, unknown_numerical,
                            controversial_found, greek_letters_found]:
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=combof)
 
-    with open("jwb-articles-controversial.txt", "w") as contro:
-        articles = extract_articles(controversial_found)
-        print("\n".join(articles), file=contro)
-
-    with open("jwb-articles-greek.txt", "w") as greek:
-        articles = extract_articles(greek_letters_found)
-        print("\n".join(articles), file=greek)
-
-    with open("jwb-articles-low.txt", "w") as lowa:
+    with open("jwb-articles.txt", "w") as articlesf:
         articles = list()
-        for dictionary in [unknown_numerical_latin, uncontroversial_found]:
+        for dictionary in [
+                controversial_found, greek_letters_found,
+                unknown_numerical, uncontroversial_found]:
             articles.extend(extract_articles(dictionary))
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
-        print("\n".join(articles[0:500]), file=lowa)
-
-    with open("jwb-articles-high.txt", "w") as higha:
-        print("\n".join(sorted(extract_articles(unknown_numerical_high))), file=higha)
+        print("\n".join(articles[0:500]), file=articlesf)
 
 
 read_en_article_text(entity_check)
