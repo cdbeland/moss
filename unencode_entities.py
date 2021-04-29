@@ -42,10 +42,6 @@ alert = [
     # needed
     "&zwj;", "&zwnj;"
 
-    # Might want to be wiki-list syntax
-    "•",
-    "&bull;",
-
     # CONFLICTING SUBSTITUTIONS FOR ARABIC VS. HEBREW:
     # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
     # -> Or maybe make separate templates for these
@@ -286,6 +282,9 @@ transform_unsafe = {
 
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
+
+    # Might want to be wiki-list syntax
+    "&bull;": "•",
 
     # [[MOS:RADICAL]]
     "&radic;": "√",  # May need to use <math>\sqrt{}</math>
