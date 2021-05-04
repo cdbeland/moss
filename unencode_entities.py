@@ -24,10 +24,6 @@ alert = [
 
     "₤",  # per [[MOS:CURRENCY]] should be £ for GBP, but this is used for Italian Lira
 
-    # Probably would be controversial to change these
-    "∑", "&sum;",
-    "∏",
-
     # Convert to straight quotes per [[MOS:CONFORM]]
     # but LEAVE when internal to non-English text per [[MOS:STRAIGHT]]
     # Also seen in URL titles (used as stylized field separators)
@@ -46,16 +42,6 @@ alert = [
     # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
     # -> Or maybe make separate templates for these
 
-    # Probably a miscoding of a Hebrew or Arabic letter
-    "&#700;",  # U+02BC
-    "ʼ",  # U+02BC
-    "&#x02BC;",
-
-    "&#701;",
-    "&#x02BD;",
-
-    "&#x02BE;",  # : "'",
-    "&#702;",  # : "'",
     "ʾ",       #: "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
     # ASCII apostrophe is used in transliterations by default, per
     # [[Wikipedia:Naming conventions (Hebrew)]] which uses the Hebrew Academy scheme at
@@ -68,24 +54,11 @@ alert = [
     "&#x0374;",  # : "{{keraia}}",
 
     # For transliterated Arabic ayin
-    "&#703;",  # : "{{ayin}}",
     "ʿ",  # : "{{ayin}}",
-
-    # MISUSE OF OKINA FOR CHINESE
-    # ʻOkina is U+02BB.
-    "ʻ",         # : "{{okina}}",
-    "&#x02BB;",  # : "{{okina}}",
-    "&#x2bb;",   # : "{{asper}}",
-    # Okina is wrong if used as an apostrophe but OK in Hawaiian and
-    # maybe other languages.  Per [[Talk:Wade-Giles]], [[spiritus
-    # asper]] is preferred (strongly over okina and weakly over
-    # apostrophes) for Chinese romanizations using that system.
 ]
 
 # Ignore these if seen in articles
 keep = [
-
-
     "&lbrace;",  # {} sometimes needed due to template syntax
     "&rbrace;",  # Or can use Template:( and Template ) which make {}
     "&lbrack;",  # [] needed when adding a link in a quote, rarely
@@ -271,6 +244,7 @@ controversial = {
     "&vellip;": "⋮",
     "&ctdot;": "⋯",
     "&dtdot;": "⋱",
+    "&sum;": "Σ",  # U+03A3 Greek Capital Letter Sigma
 }
 
 # keep.extend(controversial.keys())
@@ -324,6 +298,9 @@ transform_unsafe = {
     # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
     "µ": "μ",  # micro to mu
     "&micro;": "μ",  # micro to mu
+
+    "∑": "Σ",  # U+2211 N-Ary Summation to Sigma
+    "∏": "Π",  # U+220F N-Ary Product to Pi
 
     "&#x202F;": "",  # Narrow non-breaking space, usually not needed
     "&#x202f;": "",
@@ -454,6 +431,20 @@ transform_unsafe = {
     "&#x2019;": "'",   # ’ -> '
     "&#x201C;": '"',
     "&#x201D;": '"',
+
+    # These are OK to transform, but must be in a {{lang}} or {{transl}} tag
+    "&#700;": "ʼ",
+    "&#702;": "ʾ",
+    "&#703;": "ʿ",
+    "&#x02BD;": "ʽ",
+    "&#x2bb;": "ʻ",
+
+    # ʻOkina is U+02BB, and should be used in Polynesian languages
+    # only, not as an apostrophe.
+    "ʻ" : "{{okina}}",
+    # Use {{asper}} not {{okina}} for Wade-Giles transliteration of
+    # Chinese, per:
+    # https://en.wikipedia.org/wiki/Talk:Wade%E2%80%93Giles#%CA%BB_or_%60_???
 
     # NOT SURE THIS IS A GOOD IDEA.
     # Per [[MOS:CONFORM]]

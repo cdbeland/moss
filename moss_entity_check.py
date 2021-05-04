@@ -29,6 +29,7 @@ article_blocklist = [
     "AZERTY",
     "AltGr key",
     "Apostrophe",
+    "Arabic alphabet",
     "Ayin",
     "Baudot code",
     "Basic Latin (Unicode block)",
@@ -353,6 +354,14 @@ suppression_patterns = [
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{PIE.*?}}", flags=re.I+re.S),
     re.compile(r"{{7seg.*?}}", flags=re.I+re.S),  # Uses superscript = as a parameter value
+
+    # Used in various non-English orthographies and transliterations,
+    # but must be tagged with the language.
+    re.compile(r"{{(lang|Lang|transl|Transl)[^}]+[ʿʾʻʼ][^}]}}", flags=re.S),
+    # ʿ U+02BF Modifier letter left half ring,
+    # ʾ U+02BE Modifier letter right half ring
+    # ʻ U+02BB 'Okina
+    # ʼ U+02BC Modifier letter apostrophe
 
     # It's unclear if these and if text outside of templates should be
     # converted to Unicode or HTML superscripts/subscripts.  Produce a
