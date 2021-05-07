@@ -136,6 +136,7 @@ article_blocklist = [
     "Mathematical operators and symbols in Unicode",
     "Mojibake",
     "Multinational Character Set",
+    "NEC APC character set",
     "Number Forms",
     "Numerals in Unicode",
     "Numero sign",
@@ -247,7 +248,9 @@ article_blocklist = [
     # African language needs slash in link
     "2011 South African municipal elections",
 
-    # Unwanted character in file name (which could theoretically be fixed)
+    """
+    # Unwanted character in file name - should be fixed by code
+    # changes
     "2019 in India",
     "Charles Francis Adams III",
     "Graham Sutton (musician)",
@@ -285,6 +288,17 @@ article_blocklist = [
     "Tokyo Skytree",
     "Tree of life",
     "Tricable gondola lift",
+    "1964 in architecture",
+    "AGC Inc.",
+    "Daihatsu Charade",
+    "Daihatsu Move Canbus",
+    "DeNA",
+    "Doppelmayr/Garaventa Group",
+    "Isawa Shūji",
+    "List of Viceroys of New France",
+    "On the Road to Timbuktu: Explorers in Africa",
+    "Republic of China Air Force",
+    """
 
     # Chess with ½
     "World Chess960 Championship",
@@ -313,6 +327,9 @@ article_blocklist = [
 
     # Unicode superscript in URL in bidirectional text
     "Almah",
+
+    # Roman numeral in URL
+    "Cray XC50",
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
@@ -347,8 +364,8 @@ suppression_patterns = [
     re.compile(r"<code.*?</code>", flags=re.I+re.S),
     re.compile(r"{{code\s*\|.*?}}", flags=re.I+re.S),
 
-    re.compile(r"[[File:.*?]]", flags=re.I+re.S),
-    re.compile(r"[[Image:.*?]]", flags=re.I+re.S),
+    re.compile(r"\[\[File:.*?(\||\])", flags=re.I+re.S),
+    re.compile(r"\[\[Image:.*?(\||\])", flags=re.I+re.S),
 
     re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
@@ -363,11 +380,10 @@ suppression_patterns = [
     # ʻ U+02BB 'Okina
     # ʼ U+02BC Modifier letter apostrophe
 
-    # It's unclear if these and if text outside of templates should be
-    # converted to Unicode or HTML superscripts/subscripts.  Produce a
-    # report after IPA revert is complete.
-    # re.compile(r"{{lang.*?}}", flags=re.I+re.S),
-    #
+    # It's unclear if these should be using Unicode or HTML
+    # superscripts/subscripts; ignoring for now.
+    re.compile(r"{{lang.*?}}", flags=re.I+re.S),
+
     # It's unclear if tones like <sup>H</sup> in IPA templates should
     # be converted to Unicode.
 ]
