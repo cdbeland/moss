@@ -245,6 +245,8 @@ controversial = {
     "&ctdot;": "⋯",
     "&dtdot;": "⋱",
     "&sum;": "Σ",  # U+03A3 Greek Capital Letter Sigma
+    "&rarr;": "→",
+    "&larr;": "←",
 }
 
 # keep.extend(controversial.keys())
@@ -921,8 +923,6 @@ transform = {
     "&ge;": "≥",  # available at the bottom of the wikitext edit window
     "&hArr;": "⇔",
     "&rArr;": "⇒",
-    "&rarr;": "→",
-    "&larr;": "←",
     "&lArr;": "⇐",
     "&harr;": "↔",
     "&uarr;": "↑",
