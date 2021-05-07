@@ -21,13 +21,13 @@ ORIG_DIR=`pwd`
 cd /bulk-wikipedia/
 gunzip all-wiktionaries/*
 sort --unique all-wiktionaries/* > titles_all_wiktionaries_uniq.txt
-# This sort takes about 1 hour
+# This sort takes about 2 min
 
 cd $ORIG_DIR
 echo `date`
 echo "Transliterating..."
 venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
-# Takes about a minute, as of commit 58e9e2
+# Takes about 10 sec
 cd /bulk-wikipedia/
 
 rm -f Wikispecies:Requested_articles
@@ -62,24 +62,31 @@ bunzip2 enwiki-latest-pages-articles-multistream.xml.bz2
 
 # FIRST TIME SETUP
 
+# Change "beland" to the Unix user you want to set up for
+
 # su
+# apt-get install mariadb-server
 # service mariadb restart
 # mysql
 #  CREATE DATABASE enwiktionary;
+#  USE enwiktionary;
+#  CREATE USER 'beland'@'localhost';
 #  GRANT ALL PRIVILEGES ON enwiktionary TO 'beland'@'localhost' WITH GRANT OPTION;
+#  GRANT ALL PRIVILEGES ON enwiktionary.* TO 'beland'@'localhost' WITH GRANT OPTION;
 
 echo `date`
 echo "Loading enwiktionary-latest-categorylinks.sql..."
 cat enwiktionary-latest-categorylinks.sql | mysql -D enwiktionary
-# Load time: About 1 hour 10 minutes
+# Load time: About 23 minutes
 
 echo `date`
 echo "Loading enwiktionary-latest-page.sql..."
 cat enwiktionary-latest-page.sql | mysql -D enwiktionary
-# Load time: About 25 minutes
+# Load time: About 4 minutes
 
 echo `date`
 echo "Building page_categories table..."
+# Run time for this section: About 8 minuts
 
 echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiktionary
 echo "CREATE TABLE page_categories (
@@ -87,28 +94,24 @@ echo "CREATE TABLE page_categories (
   category_name varbinary(255) NOT NULL DEFAULT '',
   PRIMARY KEY (title, category_name)
 );" | mysql -D enwiktionary
-# Load time: About 2.5 hours
 
 echo "DELETE FROM page WHERE page_namespace != 0;" | mysql -D enwiktionary
-# Query OK, 569828 rows affected (2 min 30.10 sec)
 
 echo "INSERT INTO page_categories (title, category_name)
  SELECT page_title, cl_to
  FROM page, categorylinks
  WHERE page.page_id = categorylinks.cl_from;" | mysql -D enwiktionary
-# Query OK, 22540237 rows affected (16 min 3.32 sec)
 
 echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mysql -D enwiktionary
-# Query OK, 0 rows affected (5 min 27.56 sec)         
 echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D enwiktionary
-# Query OK, 0 rows affected (5 min 49.56 sec)         
 
 cd $ORIG_DIR
 echo `date`
 venv/bin/python3 extract_english.py > /bulk-wikipedia/english_words_only.txt
-# extract_english.py takes about 40 minutes
+# extract_english.py takes about 26 minutes
+echo `date`
 
-
+# TODO:
 # 1. From this script, run pywikibot in a Python script and get all
 # the names of articles in
 # https://en.wikipedia.org/w/index.php?title=Category:Redirects_from_misspellings
