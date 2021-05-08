@@ -1,1 +1,27 @@
 See https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
+
+UBUNTU DEPENDENCIES
+sudo apt-get install git pyflakes pylint python3-pep8 python3-env python3-dev
+
+FEDORA DEPENDENCIES
+sudo yum install git pyflakes pylint python3-pep8
+
+GIT SETUP (optional)
+git config --global color.ui true
+git config --global push.default simple
+
+CLONE AND SET UP:
+cd ~
+# Or wherever you'd like the clone to be parented
+git clone https://github.com/cdbeland/moss.git
+cd moss/
+./reset_environment.sh
+sudo mkdir /bulk-wikipedia/
+sudo chown $USER /bulk-wikipedia/
+Run "FIRST TIME SETUP" steps in ./update_downloads.sh
+
+DOWNLOAD DATA:
+./update_downloads.sh
+
+RUN SPELL CHECK AND FRIENDS:
+./run_moss.sh
