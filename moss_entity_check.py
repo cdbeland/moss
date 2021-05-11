@@ -472,9 +472,9 @@ def dump_dict(section_title, dictionary):
     output = f"=== {section_title} ===\n"
 
     if section_title == "To avoid":
-        output += f"Not included in JWB scripts; fix manually or update moss code.\n\n"
+        output += "Not included in JWB scripts; fix manually or update moss code.\n\n"
     elif section_title == "Unknown":
-        output += f"Not included in JWB scripts; fix manually or update moss code.\n\n"
+        output += "Not included in JWB scripts; fix manually or update moss code.\n\n"
     elif section_title == "Uncontroversial entities":
         output += "Fix automatically with jwb-articles.txt\n\n"
     elif section_title == "Greek letters":

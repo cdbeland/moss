@@ -443,7 +443,7 @@ transform_unsafe = {
 
     # ʻOkina is U+02BB, and should be used in Polynesian languages
     # only, not as an apostrophe.
-    "ʻ" : "{{okina}}",
+    "ʻ": "{{okina}}",
     # Use {{asper}} not {{okina}} for Wade-Giles transliteration of
     # Chinese, per:
     # https://en.wikipedia.org/wiki/Talk:Wade%E2%80%93Giles#%CA%BB_or_%60_???
