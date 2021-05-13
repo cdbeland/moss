@@ -5,6 +5,20 @@ import re
 
 html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
 blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>)", flags=re.I+re.S)
+ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove|[Cc]opy section) to \w+"
+                            r"|[Nn]ot English"
+                            r"|[Cc]leanup HTML"
+                            r"|[Cc]leanup"
+                            r"|[Ww]hich lang(uage)?"
+                            r"|[Tt]ypo help inline"
+                            r"|[Yy]ou"
+                            r"|[Tt]one"
+                            r"|[Cc]opy ?edit"
+                            r"|[Gg]rammar"
+                            r"|[Mm]anual"
+                            r"|[Tt]ravel guide"
+                            r"|[Ll]like resume"
+                            r"|[Hh]ow\-?to).*?}}")
 
 
 def remove_structure_nested(string, open_string, close_string):

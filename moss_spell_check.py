@@ -3,7 +3,7 @@
 import nltk
 import re
 from moss_dump_analyzer import read_en_article_text
-from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
+from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_tags_re
 from spell import is_word_spelled_correctly, bad_words
 from word_categorizer import is_chemistry_word
 
@@ -47,13 +47,10 @@ from word_categorizer import is_chemistry_word
 #   them they may have made a spelling error.  The algorithm needs to
 #   be pretty solid.
 
-global article_count
 global misspelled_words
 
 misspelled_words = {}
 # {'misspellling': (2, ['article1', 'article2'])}
-
-article_count = 0
 
 
 def dump_results():
@@ -70,20 +67,6 @@ def dump_results():
         print(output_string)
 
 
-ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove|[Cc]opy section) to \w+"
-                            r"|[Nn]ot English"
-                            r"|[Cc]leanup HTML"
-                            r"|[Cc]leanup"
-                            r"|[Ww]hich lang(uage)?"
-                            r"|[Tt]ypo help inline"
-                            r"|[Yy]ou"
-                            r"|[Tt]one"
-                            r"|[Cc]opy ?edit"
-                            r"|[Gg]rammar"
-                            r"|[Mm]anual"
-                            r"|[Tt]ravel guide"
-                            r"|[Ll]like resume"
-                            r"|[Hh]ow\-?to).*?}}")
 start_template_re = re.compile(r"{{")
 end_template_re = re.compile(r"}}")
 unicode_letters_plus_dashes_re = re.compile(r"^([^\W\d_]|-)+$")
@@ -160,8 +143,6 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
 
 
 def spellcheck_all_langs(article_title, article_text):
-    global article_count
-
     # -- Skip article entirely if appropriate --
 
     # if article_title[0] != "X":
@@ -229,7 +210,6 @@ def spellcheck_all_langs(article_title, article_text):
 
     # -- Initialization for main spell check --
 
-    article_count += 1
     article_oops_list = []
     article_text = article_text.replace("✂", " ")
 
