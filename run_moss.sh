@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+# Run time for commit 6206fa6: ~24h to end of dash report, readability check took days (big-bucks)
 # Run time for commit c6ce3ab: ~26h (whata)
 # Run time for commit 5e6b2ce: 21h 18m (whata)
 # Run time for commit 10512ac: 23h 19m (whata)
@@ -19,7 +20,7 @@ cd $RUN_NAME
 echo "Beginning HTML entity check"
 echo `date`
 
-# Run time for this segment: ~2h
+# Run time for this segment: ~2h 20 min
 
 # ../venv/bin/python3 ../moss_entity_check.py | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities
@@ -32,7 +33,7 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 
 # --- MAIN SPELL CHECK ---
 
-# Run time for this segment: ~26h 07m
+# Run time for this segment: ~18h
 
 echo "Beginning main spell check"
 echo `date`
@@ -44,7 +45,7 @@ echo `date`
 echo "Beginning word categorization run 1"
 echo `date`
 
-# Run time for this segment: ~3h 25m
+# Run time for this segment: ~3h
 grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
 cat /tmp/sorted_by_article.txt | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 rm -rf /tmp/sorted_by_article.txt
@@ -58,7 +59,7 @@ grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2
 echo "Beginning word categorization run 2"
 echo `date`
 
-# Run time for this line: ~3h
+# Run time for this line: ~2h 20m
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---
@@ -66,7 +67,7 @@ tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tm
 echo "Beginning by-article post-processing"
 echo `date`
 
-# Run time for here to beginning of readability report: ~2 minutes
+# Run time for here to beginning of readability report: ~1 minute
 
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py > post-main-listings.txt
 
