@@ -366,9 +366,11 @@ ignore_sections_re = re.compile(
     r").*$",
     flags=re.I + re.S)
 ignore_headers_re = re.compile("=[^\n]+=\n")
-line_starts_with_space_re = re.compile(r"\n [^\n]*\n")
-line_starts_with_colon_re = re.compile(r"\n:[^\n]*\n")
 ignore_lists_re = re.compile(r"\n[\*\#;][^\n]*")
+line_starts_with_re = re.compile(r"\n[ :†][^\n]*")
+# Starts with space - often computer programming code snippets
+# Starts with colon - generally quotes or technical content
+# † - footnotes
 
 
 def get_main_body_wikitext(wikitext_input, strong=False):
@@ -380,12 +382,7 @@ def get_main_body_wikitext(wikitext_input, strong=False):
 
     wikitext_working = prose_quote_re.sub("✂", wikitext_working)
     wikitext_working = ignore_headers_re.sub("", wikitext_working)
-
-    # Many of these are computer programming code snippets
-    wikitext_working = line_starts_with_space_re.sub("\n", wikitext_working)
-
-    # These are generally quotes or technical content
-    wikitext_working = line_starts_with_colon_re.sub("\n", wikitext_working)
+    wikitext_working = line_starts_with_re.sub("", wikitext_working)
 
     if strong:
         wikitext_working = parenthetical_re.sub("", wikitext_working)
