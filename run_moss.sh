@@ -257,10 +257,10 @@ grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ..
 echo "Beginning readability check"
 echo `date`
 
-# Run time for this segment: ~10.5h
+# Run time for this segment: 1h 45m (8-core parallel)
 
 ../venv/bin/python3 ../moss_readability_check.py > tmp-readability.txt
-sort -k2 -nr tmp-readability.txt > post-readability.txt
+sort -k2 -n tmp-readability.txt > post-readability.txt
 rm tmp-readability.txt
 
 # --- SUPERSCRIPTS AND SUBSCRIPTS ---
