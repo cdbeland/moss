@@ -11,10 +11,13 @@ from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_
 list_cleanup_re = re.compile(r"(^|\n)[ :#\*].*")
 year_in_re = re.compile(r"^(\d+s?$|\d+s? BC$|\d\d+s? in )")
 article_skip_list = [
-    "Globotriaosylceramide 3-beta-N-acetylgalactosaminyltransferase",
-    "Princely houses of Poland and Lithuania",
     "Alfonso de Borbón y Borbón",
 ]
+ignore_tags_more_re = re.compile("|".join([
+    r"{{[Ll]ike resume",
+    r"{{[Aa]dvert",
+    r"{{[Ll]ong plot",
+    ]))
 
 
 def is_prose_paragraph(paragraph_text):
@@ -48,6 +51,7 @@ def check_reading_level(article_title, article_text):
         return
     if article_text.startswith("#REDIRECT") or article_text.startswith("# REDIRECT"):
         return
+    """
     if (article_title.endswith("season")
             or article_title.endswith("roster")
             or article_title.endswith("rosters")
@@ -64,11 +68,10 @@ def check_reading_level(article_title, article_text):
             return
     if article_title.endswith("Championships"):
         return
+    """
     if ignore_tags_re.search(article_text):
         return
-    if "{{like resume" in article_text:
-        return
-    if "{{Advert" in article_text:
+    if ignore_tags_more_re.search(article_text):
         return
     if article_title in article_skip_list:
         return
@@ -114,7 +117,7 @@ def check_reading_level(article_title, article_text):
     # articles that are excessively difficult to read, which probably
     # need to be marked for cleanup.
     # if article_difficulty_level < 17:  # For Coleman-Liau
-    if article_difficulty_level > 0:  # For Flesch Reading Ease
+    if article_difficulty_level > 5:  # For Flesch Reading Ease
         return
 
     return f"* {article_difficulty_level} - [[{article_title}]]"
