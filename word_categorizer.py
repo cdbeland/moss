@@ -35,6 +35,7 @@ from collections import defaultdict
 import difflib
 import enchant
 import fileinput
+from multiprocessing import Pool
 from nltk.metrics import distance
 import re
 import sys
@@ -361,22 +362,25 @@ def get_word_category(word):
     return category
 
 
+def process_line(line):
+    length = None
+    word = None
+
+    if "\t" in line:
+        (length, word) = line.split("\t")
+    else:
+        word = get_word(line)
+
+    category = get_word_category(word)
+
+    if length:
+        return f"{category}\t* {length} [https://en.wikipedia.org/w/index.php?search={word} {word}]"
+    else:
+        return f"{category}\t{line}"
+
+
 if __name__ == '__main__':
-    for line in fileinput.input("-"):
-        line = line.strip()
-
-        length = None
-        word = None
-
-        if "\t" in line:
-            (length, word) = line.split("\t")
-        else:
-            word = get_word(line)
-
-        category = get_word_category(word)
-
-        if length:
-            print("%s\t* %s [https://en.wikipedia.org/w/index.php?search=%s %s]"
-                  % (category, length, word, word))
-        else:
-            print("%s\t%s" % (category, line))
+    lines = [line.strip() for line in fileinput.input("-")]
+    with Pool(8) as pool:
+        for result in pool.map(process_line, lines):
+            print(result)

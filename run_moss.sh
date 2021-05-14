@@ -33,7 +33,7 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 
 # --- MAIN SPELL CHECK ---
 
-# Run time for this segment: ~18h
+# Run time for this segment: ~3h (8-core parallel)
 
 echo "Beginning main spell check"
 echo `date`
@@ -45,8 +45,9 @@ echo `date`
 echo "Beginning word categorization run 1"
 echo `date`
 
-# Run time for this segment: ~3h
+# Run time for this segment: ~26min (8-core parallel)
 grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
+# Sort takes ~37sec
 cat /tmp/sorted_by_article.txt | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 rm -rf /tmp/sorted_by_article.txt
 # TODO: Can this run as one line, or is that the source of the .py command not found error?
@@ -59,7 +60,7 @@ grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2
 echo "Beginning word categorization run 2"
 echo `date`
 
-# Run time for this line: ~2h 20m
+# Run time for this line: ~20m (8-core parallel)
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---
