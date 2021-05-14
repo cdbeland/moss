@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from multiprocessing import Pool
 import nltk
 import re
-from moss_dump_analyzer import read_en_article_text
+from moss_dump_analyzer import page_generator
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_tags_re
 from spell import is_word_spelled_correctly, bad_words
 from word_categorizer import is_chemistry_word
@@ -47,9 +48,9 @@ from word_categorizer import is_chemistry_word
 #   them they may have made a spelling error.  The algorithm needs to
 #   be pretty solid.
 
-global misspelled_words
 
 misspelled_words = {}
+# Indexes articles by typo.  For example:
 # {'misspellling': (2, ['article1', 'article2'])}
 
 
@@ -143,6 +144,9 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
 
 
 def spellcheck_all_langs(article_title, article_text):
+    # WARNING: This function runs in subprocesses, and cannot
+    # change global context variables. (It CAN print.)
+
     # -- Skip article entirely if appropriate --
 
     # if article_title[0] != "X":
@@ -154,16 +158,16 @@ def spellcheck_all_langs(article_title, article_text):
     #     return
 
     if article_title in article_skip_list:
-        print("S\tSKIPPING due to article skip list\t%s" % article_title)
+        print("S\tSKIPPING due to article skip list\t%s" % article_title, flush=True)
         return
 
     if ignore_tags_re.search(article_text):
-        print("S\tSKIPPING due to known cleanup tag\t%s" % article_title)
+        print("S\tSKIPPING due to known cleanup tag\t%s" % article_title, flush=True)
         return
 
     request_search_string = 'title="en:%s"' % article_title
     if request_search_string in requested_species_html:
-        print("S\tSKIPPING - list with requested species\t%s" % article_title)
+        print("S\tSKIPPING - list with requested species\t%s" % article_title, flush=True)
         return
 
     # -- Fatal problems --
@@ -177,7 +181,7 @@ def spellcheck_all_langs(article_title, article_text):
     starters = start_template_re.findall(article_text)
     enders = end_template_re.findall(article_text)
     if len(starters) != len(enders):
-        print("!\t* [[%s]] - Mismatched {{ }}" % article_title)
+        print("!\t* [[%s]] - Mismatched {{ }}" % article_title, flush=True)
         return
 
     # -- Dashes --
@@ -190,7 +194,8 @@ def spellcheck_all_langs(article_title, article_text):
         print("D\t* %s - [[%s]]: %s" % (
             len(bad_emdash_context_list),
             article_title,
-            " ... ".join(bad_emdash_context_list)))
+            " ... ".join(bad_emdash_context_list)),
+              flush=True)
 
     # -- More fatal problems --
 
@@ -199,9 +204,9 @@ def spellcheck_all_langs(article_title, article_text):
             matches = re.findall(r".{0,20}%s.{0,20}" % unmatched_item, article_text)
             excerpt = " ... ".join(matches)
             if unmatched_item == '"' and ("“" in article_text or "”" in article_text):
-                print("!Q\t* [[%s]] - Unmatched %s probably due to violation of [[MOS:STRAIGHT]] near: %s" % (article_title, unmatched_item, excerpt))
+                print("!Q\t* [[%s]] - Unmatched %s probably due to violation of [[MOS:STRAIGHT]] near: %s" % (article_title, unmatched_item, excerpt), flush=True)
             else:
-                print("!\t* [[%s]] - Unmatched %s near: %s" % (article_title, unmatched_item, excerpt))
+                print("!\t* [[%s]] - Unmatched %s near: %s" % (article_title, unmatched_item, excerpt), flush=True)
             # Often due to typo in wiki markup or mismatched English
             # punctuation, but might be due to moss misinterpreting
             # the markup.  (Either way, should be fixed because this
@@ -386,7 +391,7 @@ def spellcheck_all_langs(article_title, article_text):
         if is_spelling_correct is True:
             continue
         if is_spelling_correct == "uncertain":
-            print("G\t%s\t%s" % (word_mixedcase, article_title))
+            print("G\t%s\t%s" % (word_mixedcase, article_title), flush=True)
             # "G" for "iGnored but maybe shouldn't be"
             continue
         if ignore_typo_in_context(word_mixedcase, article_text_orig):
@@ -394,16 +399,21 @@ def spellcheck_all_langs(article_title, article_text):
 
         # - Word is misspelled -
 
-        # Normalize for report rollup purposes, even if this is incorrect capitalization
-        word_lower = word_mixedcase.lower()
-
         # Index typo by article
         article_oops_list.append(word_mixedcase)
 
     article_oops_string = u"𝆃".join(article_oops_list)
-    print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string))
+    print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string), flush=True)
+    return (article_title, article_oops_list)
 
-    # Index article by typo
+
+# Callback from completion of spellcheck_all_langs() that indexes
+# articles by typo in a global dictionary in the parent process
+def tally_misspelled_words(result):
+    if not result:
+        return
+    (article_title, article_oops_list) = result
+    global misspelled_words
     for word_mixedcase in article_oops_list:
         word_lower = word_mixedcase.lower()
         (freq, existing_list) = misspelled_words.get(word_lower, (0, []))
@@ -412,5 +422,7 @@ def spellcheck_all_langs(article_title, article_text):
 
 
 if __name__ == '__main__':
-    read_en_article_text(spellcheck_all_langs)
+    with Pool(8) as pool:
+        for (article_title, article_text) in page_generator():
+            pool.apply_async(spellcheck_all_langs, args=[article_title, article_text], callback=tally_misspelled_words)
     dump_results()
