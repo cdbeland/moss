@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
-# Run time for commit 6206fa6: ~24h to end of dash report, readability check took days (big-bucks)
+# Run time for commit 6206fa6: ~24h to end of dash report, readability
+#  check took days due to dependency changes (big-bucks)
 # Run time for commit c6ce3ab: ~26h (whata)
 # Run time for commit 5e6b2ce: 21h 18m (whata)
 # Run time for commit 10512ac: 23h 19m (whata)
@@ -265,6 +266,8 @@ sort -k2 -n tmp-readability.txt > post-readability.txt
 rm tmp-readability.txt
 
 # --- SUPERSCRIPTS AND SUBSCRIPTS ---
+
+# Run time for this segment: ~2h
 
 echo "Beginning superscript/subscript audit"
 ../superscripts.sh
