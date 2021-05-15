@@ -19,6 +19,9 @@ def print_result(result):
 
 
 def read_en_article_text(callback_function, filename=DEFAULT_XML_FILE, parallel=False):
+    if not filename:
+        # Necessary backstop for dump_grep_regex.py
+        filename = DEFAULT_XML_FILE
     if parallel:
         with Pool(8) as pool:
             for (article_title, article_text) in page_generator(filename):
