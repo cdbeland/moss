@@ -928,6 +928,8 @@ transform = {
     "&uarr;": "↑",
     "&uArr;": "⇑",
     "&crarr;": "↵",
+    "&Lt;": "≪",
+    "&Gt;": "≫",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -958,6 +960,7 @@ transform = {
     "&ecirc;": "ê",
     "&Egrave;": "È",
     "&egrave;": "è",
+    "&emacr;": "(ē)",
     "&Euml;": "Ë",
     "&euml;": "ë",
     "&#X1E24;": "Ḥ",
@@ -1106,6 +1109,8 @@ transform = {
     "&nbsps;": "&nbsp;",
     "&nbstp;": "&nbsp;",
     "&mdaash;": "&mdash;",
+    "&nsbsp;": "&nbsp;",
+    "&msdash;": "&mdash;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
