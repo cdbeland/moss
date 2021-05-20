@@ -31,6 +31,7 @@ def grep_callback(article_title, article_text):
         output += article_text
         output += "</text>\n"
         output += "  </page>\n"  # Whitespace is needed to fake real dump output exactly
+        return output
 
 
 read_en_article_text(grep_callback, filename=filename, parallel=True)
