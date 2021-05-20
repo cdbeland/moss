@@ -19,6 +19,7 @@ FIND_RE = re.compile(sys.argv[1])
 def process_article(article_title, article_text):
     for article_line in article_text.splitlines():
         if FIND_RE.search(article_line):
+            # Avoid print() due to possible race condition with newlines
             sys.stdout.write(f"{article_title}: {article_line}\n")
 
 

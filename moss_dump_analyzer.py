@@ -14,6 +14,7 @@ DEFAULT_XML_FILE = "/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml
 
 
 def print_result(result):
+    # Print from parent process to avoid race conditions
     if result:
         print(result)
 
@@ -26,6 +27,8 @@ def read_en_article_text(callback_function, filename=DEFAULT_XML_FILE, parallel=
         with Pool(8) as pool:
             for (article_title, article_text) in page_generator(filename):
                 pool.apply_async(callback_function, args=[article_title, article_text], callback=print_result)
+            pool.close()
+            pool.join()
     else:
         for (article_title, article_text) in page_generator(filename):
             callback_function(article_title, article_text)

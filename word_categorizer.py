@@ -382,5 +382,7 @@ def process_line(line):
 if __name__ == '__main__':
     lines = [line.strip() for line in fileinput.input("-")]
     with Pool(8) as pool:
-        for result in pool.map(process_line, lines):
+        for result in pool.imap(process_line, lines):
             print(result)
+        pool.close()
+        pool.join()

@@ -425,4 +425,6 @@ if __name__ == '__main__':
     with Pool(8) as pool:
         for (article_title, article_text) in page_generator():
             pool.apply_async(spellcheck_all_langs, args=[article_title, article_text], callback=tally_misspelled_words)
+        pool.close()
+        pool.join()            
     dump_results()

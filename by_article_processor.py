@@ -45,3 +45,5 @@ if __name__ == '__main__':
     with Pool(8) as pool:
         for result in pool.imap(process_line, lines, chunksize=100):
             print(result)
+        pool.close()
+        pool.join()
