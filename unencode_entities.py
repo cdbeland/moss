@@ -38,6 +38,12 @@ alert = [
     # needed
     "&zwj;", "&zwnj;"
 
+    # Disabled - these are probably fine as-is. TODO: Should use ʿ
+    # vs. ' more consistently, and in some cases {{transl}} tags are
+    # missing.
+    # # For transliterated Arabic ayin
+    # "ʿ",  # : "{{ayin}}",
+
     # CONFLICTING SUBSTITUTIONS FOR ARABIC VS. HEBREW:
     # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
     # -> Or maybe make separate templates for these
@@ -52,9 +58,6 @@ alert = [
 
     # For native [[Greek numerals]]
     "&#x0374;",  # : "{{keraia}}",
-
-    # For transliterated Arabic ayin
-    "ʿ",  # : "{{ayin}}",
 ]
 
 # Ignore these if seen in articles
