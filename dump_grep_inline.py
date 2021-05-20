@@ -33,7 +33,7 @@ def grep_dump_inline():
                 working_string = re.sub(r"^.*(<page.*?</page>).*$", r"\1", working_string, flags=re.MULTILINE+re.DOTALL)
                 root_element = lxml.etree.fromstring(working_string)
                 working_string = ""
-    
+
                 article_title = root_element.findtext('title')
                 article_text = root_element.findtext('.//text')
                 pool.apply_async(process_article,
