@@ -12,7 +12,7 @@ controversial_found = {}
 uncontroversial_found = {}
 greek_letters_found = {}
 unknown_found = {}
-unknown_numerical = {}
+numeric = {}
 non_entity_transform = [string for string
                         in list(transform.keys()) + list(controversial.keys())
                         if not string.startswith("&")]
@@ -453,19 +453,23 @@ def entity_check(article_title, article_text):
                 add_safely(article_title, entity, greek_letters_found)
                 continue
 
+        if should_keep_as_is(entity):
+            # Excludes numeric ranges that must remain untouched
+            continue
+        if find_char_num(entity):
+            # Intentionally mixing both known and unknown, all of
+            # which can usually be handled seamlessly, though not
+            # including numeric entities in the "alert" section,
+            # which by definition can't be handled automatically.
+            add_safely(article_title, entity, numeric)
+            continue
         if entity in transform:
             add_safely(article_title, entity, uncontroversial_found)
-        else:
-            if should_keep_as_is(entity):
-                continue
-            if find_char_num(entity):
-                add_safely(article_title, entity, unknown_numerical)
-                continue
-            else:
-                if entity == entity.upper() and re.search("[A-Z]+%s" % entity, article_text):
-                    # Ignore things like "R&B;" and "PB&J;" which is common in railroad names.
-                    continue
-                add_safely(article_title, entity, unknown_found)
+            continue
+        elif entity == entity.upper() and re.search("[A-Z]+%s" % entity, article_text):
+            # Ignore things like "R&B;" and "PB&J;" which is common in railroad names.
+            continue
+        add_safely(article_title, entity, unknown_found)
 
 
 def dump_dict(section_title, dictionary):
@@ -481,7 +485,7 @@ def dump_dict(section_title, dictionary):
         output += "Fix automatically with jwb-articles.txt (articles with {{tag|math}} markup excluded)\n\n"
     elif section_title == "Controversial entities":
         output += "Fix automatically with jwb-articles.txt (articles with {{tag|math}} markup excluded)\n\n"
-    elif section_title == "Unknown numerical":
+    elif section_title == "Numeric":
         output += "Fix automatically with jwb-articles.txt\n\n"
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
@@ -576,7 +580,7 @@ def dump_results():
         "Unknown": unknown_found,
         "To avoid": alerts_found,
         "Uncontroversial entities": uncontroversial_found,
-        "Unknown numerical": unknown_numerical,
+        "Numeric": numeric,
         "Greek letters": greek_letters_found,
         "Controversial entities": controversial_found,
     }
@@ -587,7 +591,7 @@ def dump_results():
     with open("jwb-combo.json", "w") as combof:
         bad_entities = set()
         for dictionary in [alerts_found, uncontroversial_found,
-                           unknown_found, unknown_numerical,
+                           unknown_found, numeric,
                            controversial_found, greek_letters_found]:
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=combof)
@@ -596,10 +600,10 @@ def dump_results():
         articles = list()
         for dictionary in [
                 controversial_found, greek_letters_found,
-                unknown_numerical, uncontroversial_found]:
+                numeric, uncontroversial_found]:
             articles.extend(extract_articles(dictionary))
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
-        print("\n".join(articles[0:500]), file=articlesf)
+        print("\n".join(articles[0:1000]), file=articlesf)
 
 
 read_en_article_text(entity_check)
