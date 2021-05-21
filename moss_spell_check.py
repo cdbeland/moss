@@ -3,7 +3,7 @@
 from multiprocessing import Pool
 import nltk
 import re
-from moss_dump_analyzer import page_generator
+from moss_dump_analyzer import page_generator_fast
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_tags_re
 from spell import is_word_spelled_correctly, bad_words
 from word_categorizer import is_chemistry_word
@@ -423,7 +423,7 @@ def tally_misspelled_words(result):
 
 if __name__ == '__main__':
     with Pool(8) as pool:
-        for (article_title, article_text) in page_generator():
+        for (article_title, article_text) in page_generator_fast():
             pool.apply_async(spellcheck_all_langs, args=[article_title, article_text], callback=tally_misspelled_words)
         pool.close()
         pool.join()
