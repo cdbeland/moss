@@ -11,6 +11,7 @@ import re
 # Runtime: ~1.5 hours (with a simple callback, whata, single-threaded)
 
 DEFAULT_XML_FILE = "/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml"
+PAGE_RE = re.compile(r"^.*(<page.*?</page>).*$", flags=re.MULTILINE+re.DOTALL)
 
 
 def print_result(result):
@@ -40,7 +41,7 @@ def page_generator(filename=DEFAULT_XML_FILE):
         for line in article_xml_file:
             working_string += line
             if line == "  </page>\n":
-                working_string = re.sub(r"^.*(<page.*?</page>).*$", r"\1", working_string, flags=re.MULTILINE+re.DOTALL)
+                working_string = PAGE_RE.sub(r"\1", working_string)
                 root_element = lxml.etree.fromstring(working_string)
                 working_string = ""
 
