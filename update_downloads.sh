@@ -86,7 +86,7 @@ cat enwiktionary-latest-page.sql | mysql -D enwiktionary
 
 echo `date`
 echo "Building page_categories table..."
-# Run time for this section: About 8 minuts
+# Run time for this section: About 8 minutes
 
 echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiktionary
 echo "CREATE TABLE page_categories (
@@ -117,3 +117,9 @@ echo `date`
 # https://en.wikipedia.org/w/index.php?title=Category:Redirects_from_misspellings
 # 2. At spell-check time load these into memory. Use them to mark
 # words as known misspellings.
+
+# Run time: ~1h 20min
+
+echo "Converting XML to CSV..."
+venv/bin/python3 xml_to_csv.py > /bulk-wikipedia/enwiki-articles-no-redir.csv
+echo `date`
