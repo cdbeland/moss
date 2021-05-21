@@ -11,6 +11,7 @@ import re
 # Runtime: ~1.5 hours (with a simple callback, whata, single-threaded)
 
 DEFAULT_XML_FILE = "/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml"
+DEFAULT_CSV_FILE = "/bulk-wikipedia/enwiki-articles-no-redir.csv"
 PAGE_RE = re.compile(r"^.*(<page.*?</page>).*$", flags=re.MULTILINE+re.DOTALL)
 
 
@@ -33,6 +34,14 @@ def read_en_article_text(callback_function, filename=DEFAULT_XML_FILE, parallel=
     else:
         for (article_title, article_text) in page_generator(filename):
             callback_function(article_title, article_text)
+
+
+def page_generator_fast(filename=DEFAULT_CSV_FILE):
+    # Using formfeed as line separator so article text can have newlines.
+    with open(filename, "r", newline="\r") as article_xml_file:
+        for line in article_xml_file:
+            (article_title, article_text) = line.split("\t", 1)
+            yield (article_title, article_text)
 
 
 def page_generator(filename=DEFAULT_XML_FILE):
