@@ -1,18 +1,14 @@
 # Run time: About 2 hours
 
-from moss_dump_analyzer import read_en_article_text
+from moss_dump_analyzer import page_generator_fast
+from multiprocessing import Pool
 import re
 import sys
 from unencode_entities import (
     alert, keep, controversial, transform, greek_letters, find_char_num,
     entities_re, fix_text, should_keep_as_is)
 
-alerts_found = {}
-controversial_found = {}
-uncontroversial_found = {}
-greek_letters_found = {}
-unknown_found = {}
-numeric = {}
+strings_found_by_type = {}
 non_entity_transform = [string for string
                         in list(transform.keys()) + list(controversial.keys())
                         if not string.startswith("&")]
@@ -351,11 +347,17 @@ def jwb_escape(text):
     return text
 
 
-def add_safely(value, key, dictionary):
-    existing_list = dictionary.get(key, [])
-    existing_list.append(value)
-    dictionary[key] = existing_list
-    return dictionary
+def add_tuples_to_results(tuple_list):
+    if not tuple_list:
+        return
+    for (result_type, article_title, string) in tuple_list:
+        if result_type not in strings_found_by_type:
+            strings_found_by_type[result_type] = {}
+        if string not in strings_found_by_type[result_type]:
+            strings_found_by_type[result_type][string] = []
+        articles_with_string = strings_found_by_type[result_type][string]
+        articles_with_string.append(article_title)
+        strings_found_by_type[result_type][string] = articles_with_string
 
 
 suppression_patterns = [
@@ -398,13 +400,15 @@ def entity_check(article_title, article_text):
 
     article_text_lower = article_text.lower()
 
+    result_tuples = []
+
     for string in alert:
         if string == "₤" and ("lira" in article_text_lower):
             # Per [[MOS:CURRENCY]]
             continue
 
         for instance in re.findall(string, article_text):
-            add_safely(article_title, string, alerts_found)
+            result_tuples.append(("ALERT", article_title, string))
             # This intentionally adds the article title as many times
             # as the string appears
 
@@ -415,7 +419,7 @@ def entity_check(article_title, article_text):
 
         if string in article_text:
             for instance in re.findall(re.escape(string), article_text):
-                add_safely(article_title, string, uncontroversial_found)
+                result_tuples.append(("UNCONTROVERSIAL", article_title, string))
                 # This intentionally adds the article title as many
                 # times as the string appears
 
@@ -441,7 +445,7 @@ def entity_check(article_title, article_text):
                 continue
 
             if entity in controversial:
-                add_safely(article_title, entity, controversial_found)
+                result_tuples.append(("CONTROVERSIAL", article_title, entity))
                 continue
             if entity in greek_letters:
 
@@ -450,7 +454,7 @@ def entity_check(article_title, article_text):
                     # Per User:Headbomb
                     continue
 
-                add_safely(article_title, entity, greek_letters_found)
+                result_tuples.append(("GREEK", article_title, entity))
                 continue
 
         if should_keep_as_is(entity):
@@ -461,15 +465,16 @@ def entity_check(article_title, article_text):
             # which can usually be handled seamlessly, though not
             # including numeric entities in the "alert" section,
             # which by definition can't be handled automatically.
-            add_safely(article_title, entity, numeric)
+            result_tuples.append(("NUMERIC", article_title, entity))
             continue
         if entity in transform:
-            add_safely(article_title, entity, uncontroversial_found)
+            result_tuples.append(("UNCONTROVERSIAL", article_title, entity))
             continue
         elif entity == entity.upper() and re.search("[A-Z]+%s" % entity, article_text):
             # Ignore things like "R&B;" and "PB&J;" which is common in railroad names.
             continue
-        add_safely(article_title, entity, unknown_found)
+            result_tuples.append(("UNKNOWN", article_title, entity))
+    return result_tuples
 
 
 def dump_dict(section_title, dictionary):
@@ -493,7 +498,7 @@ def dump_dict(section_title, dictionary):
     for (key, article_list) in sorted_items[0:100]:
         if section_title == "To avoid":
             # Exclude overlapping entities
-            if key in uncontroversial_found:
+            if key in strings_found_by_type["UNCONTROVERSIAL"]:
                 continue
 
         article_set = set(article_list)
@@ -577,12 +582,12 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
 
 def dump_results():
     sections = {
-        "Unknown": unknown_found,
-        "To avoid": alerts_found,
-        "Uncontroversial entities": uncontroversial_found,
-        "Numeric": numeric,
-        "Greek letters": greek_letters_found,
-        "Controversial entities": controversial_found,
+        "Unknown": strings_found_by_type.get("UNKNOWN", {}),
+        "To avoid": strings_found_by_type.get("ALERT", {}),
+        "Uncontroversial entities": strings_found_by_type.get("UNCONTROVERSIAL", {}),
+        "Numeric": strings_found_by_type.get("NUMERIC", {}),
+        "Greek letters": strings_found_by_type.get("GREEK", {}),
+        "Controversial entities": strings_found_by_type.get("CONTROVERSIAL", {})
     }
     for (section_title, dictionary) in sections.items():
         output = dump_dict(section_title, dictionary)
@@ -590,21 +595,24 @@ def dump_results():
 
     with open("jwb-combo.json", "w") as combof:
         bad_entities = set()
-        for dictionary in [alerts_found, uncontroversial_found,
-                           unknown_found, numeric,
-                           controversial_found, greek_letters_found]:
+        for dic_type in ["ALERT", "UNCONTROVERSIAL", "UNKNOWN", "NUMERIC", "CONTROVERSIAL", "GREEK"]:
+            dictionary = strings_found_by_type.get(dic_type, {})
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=combof)
 
     with open("jwb-articles.txt", "w") as articlesf:
         articles = list()
-        for dictionary in [
-                controversial_found, greek_letters_found,
-                numeric, uncontroversial_found]:
+        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL"]:
+            dictionary = strings_found_by_type.get(dic_type, {})
             articles.extend(extract_articles(dictionary))
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
         print("\n".join(articles[0:1000]), file=articlesf)
 
 
-read_en_article_text(entity_check)
-dump_results()
+if __name__ == '__main__':
+    with Pool(8) as pool:
+        for (article_title, article_text) in page_generator_fast():
+            pool.apply_async(entity_check, args=[article_title, article_text], callback=add_tuples_to_results)
+        pool.close()
+        pool.join()
+    dump_results()
