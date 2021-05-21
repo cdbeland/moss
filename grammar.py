@@ -441,7 +441,8 @@ def fetch_categories(word):
 
     # Account for SQL being case-insensitive
     # result = [cat.decode('utf-8') for (title, cat) in cursor if title.decode('utf-8') == word]
-    result = [cat for (title, cat) in cursor if title == word]
+
+    result = [cat.decode('utf8') for (title, cat) in cursor if title.decode('utf8') == word]
     cursor.close()
     return result
 
