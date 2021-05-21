@@ -1,4 +1,4 @@
-# Run time: About 2 hours
+# Run time: About 17 minutes
 
 from moss_dump_analyzer import page_generator_fast
 from multiprocessing import Pool
@@ -473,7 +473,7 @@ def entity_check(article_title, article_text):
         elif entity == entity.upper() and re.search("[A-Z]+%s" % entity, article_text):
             # Ignore things like "R&B;" and "PB&J;" which is common in railroad names.
             continue
-            result_tuples.append(("UNKNOWN", article_title, entity))
+        result_tuples.append(("UNKNOWN", article_title, entity))
     return result_tuples
 
 
