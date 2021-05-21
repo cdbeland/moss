@@ -611,8 +611,17 @@ def dump_results():
 
 if __name__ == '__main__':
     with Pool(8) as pool:
+        count = 0
         for (article_title, article_text) in page_generator_fast():
-            pool.apply_async(entity_check, args=[article_title, article_text], callback=add_tuples_to_results)
+            result = pool.apply_async(entity_check, args=[article_title, article_text], callback=add_tuples_to_results)
+            count += 1
+            if count % 100000 == 0:
+                # Prevent results from child processes from piling up
+                # waiting for the parent process to deal with
+                # callbacks.  (This can consume all available memory
+                # because article text isn't garbage collected until
+                # the callback is complete.)
+                result.wait()
         pool.close()
         pool.join()
     dump_results()
