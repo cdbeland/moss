@@ -1,7 +1,6 @@
 # Run time: About 17 minutes
 
-from moss_dump_analyzer import page_generator_fast
-from multiprocessing import Pool
+from moss_dump_analyzer import read_en_article_text
 import re
 import sys
 from unencode_entities import (
@@ -610,18 +609,5 @@ def dump_results():
 
 
 if __name__ == '__main__':
-    with Pool(8) as pool:
-        count = 0
-        for (article_title, article_text) in page_generator_fast():
-            result = pool.apply_async(entity_check, args=[article_title, article_text], callback=add_tuples_to_results)
-            count += 1
-            if count % 100000 == 0:
-                # Prevent results from child processes from piling up
-                # waiting for the parent process to deal with
-                # callbacks.  (This can consume all available memory
-                # because article text isn't garbage collected until
-                # the callback is complete.)
-                result.wait()
-        pool.close()
-        pool.join()
+    read_en_article_text(entity_check, process_result_callback=add_tuples_to_results)
     dump_results()

@@ -19,14 +19,23 @@ def print_result(result):
         print(result)
 
 
-def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=False):
+def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=False, process_result_callback=print_result):
     if not filename:
         # Necessary backstop for dump_grep_regex.py
         filename = DEFAULT_CSV_FILE
     if parallel:
         with Pool(8) as pool:
+            count = 0
             for (article_title, article_text) in page_generator_fast(filename):
-                pool.apply_async(callback_function, args=[article_title, article_text], callback=print_result)
+                result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback)
+                count += 1
+                if count % 100000 == 0:
+                    # Prevent results from child processes from piling up
+                    # waiting for the parent process to deal with
+                    # callbacks.  (This can consume all available memory
+                    # because article text isn't garbage collected until
+                    # the callback is complete.)
+                    result.wait()
             pool.close()
             pool.join()
     else:
