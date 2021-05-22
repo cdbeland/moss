@@ -609,5 +609,5 @@ def dump_results():
 
 
 if __name__ == '__main__':
-    read_en_article_text(entity_check, process_result_callback=add_tuples_to_results)
+    read_en_article_text(entity_check, process_result_callback=add_tuples_to_results, parallel=True)
     dump_results()

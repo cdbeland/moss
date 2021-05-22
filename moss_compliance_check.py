@@ -127,4 +127,4 @@ def process_article(article_title, article_text):
     loop_number += 1
 
 
-read_en_article_text(process_article)
+read_en_article_text(process_article, parallel=True)

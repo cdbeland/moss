@@ -421,5 +421,5 @@ def tally_misspelled_words(result):
 
 
 if __name__ == '__main__':
-    read_en_article_text(spellcheck_all_langs, process_result_callback=tally_misspelled_words)
+    read_en_article_text(spellcheck_all_langs, process_result_callback=tally_misspelled_words, parallel=True)
     dump_results()
