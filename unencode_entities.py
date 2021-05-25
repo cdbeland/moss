@@ -269,6 +269,7 @@ transform_unsafe = {
 
     # [[MOS:RADICAL]]
     "&radic;": "√",  # May need to use <math>\sqrt{}</math>
+    "∛": r"<math>\sqrt[3]{}</math>",
 
     # Non-compliant and incorrect uses of superscript o
     "n<sup>o<sup>": "no.",
@@ -712,6 +713,9 @@ transform = {
     "&sup2;": "<sup>2</sup>",
     "&sup3;": "<sup>3</sup>",
 
+    "⅟": "{{frac|1|",     # [[Number Forms]]
+    "↉": "{{frac|0|3}}",  # [[Number Forms]]
+
     "¹": "<sup>1</sup>",
     "²": "<sup>2</sup>",
     "³": "<sup>3</sup>",
@@ -963,7 +967,7 @@ transform = {
     "&ecirc;": "ê",
     "&Egrave;": "È",
     "&egrave;": "è",
-    "&emacr;": "(ē)",
+    "&emacr;": "ē",
     "&Euml;": "Ë",
     "&euml;": "ë",
     "&#X1E24;": "Ḥ",
