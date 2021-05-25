@@ -119,6 +119,7 @@ article_blocklist = [
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
     "List of Latin-script letters",
+    "List of mathematical symbols by subject",
     "List of precomposed Latin characters in Unicode",
     "List of Unicode characters",
     "Lotus Multi-Byte Character Set",
@@ -243,64 +244,13 @@ article_blocklist = [
     # African language needs slash in link
     "2011 South African municipal elections",
 
-    """
-    # Unwanted character in file name - should be fixed by code
-    # changes
-    "2019 in India",
-    "Charles Francis Adams III",
-    "Graham Sutton (musician)",
-    "Ichikawa Danjūrō IX",
-    "Kamakura Gongorō Kagemasa",
-    "OptiX",
-    "Aragoto",
-    "Collection (publishing)",
-    "Group A",
-    "Kobee",
-    "Luanping County",
-    "Radio masts and towers",
-    "Baden VI c",
-    "Découvertes Gallimard",
-    "Tokyo International Conference on African Development",
-    "Swallow-tailed Hems and Flying Ribbons clothing",
-    "China Railway DF5",
-    "H-IIB",
-    "Housing in Japan",
-    "KARI KSR-3",
-    "Keisei Narita Airport Line",
-    "List of Daihatsu vehicles",
-    "List of National Treasures of Japan (temples)",
-    "List of Places of Scenic Beauty of Japan (Kyōto)",
-    "Nanzen-ji",
-    "National Central University",
-    "National Chung-Shan Institute of Science and Technology",
-    "Nomura Securities",
-    "Norinchukin Bank",
-    "Palette Town",
-    "Piano Concerto (Khachaturian)",
-    "Sanxingdui",
-    "Shibuya Hikarie",
-    "Skyliner",
-    "Tokyo Skytree",
-    "Tree of life",
-    "Tricable gondola lift",
-    "1964 in architecture",
-    "AGC Inc.",
-    "Daihatsu Charade",
-    "Daihatsu Move Canbus",
-    "DeNA",
-    "Doppelmayr/Garaventa Group",
-    "Isawa Shūji",
-    "List of Viceroys of New France",
-    "On the Road to Timbuktu: Explorers in Africa",
-    "Republic of China Air Force",
-    """
-
     # Chess with ½
     "World Chess960 Championship",
     "Algebraic notation (chess)",
 
     # !! in table (&#33; or &#x21;)
     "Cledus T. Judd",
+    "Devin the Dude",
     "Frank Sinatra discography",
     "Kis-My-Ft2",
     "Kunio-kun",
@@ -310,6 +260,7 @@ article_blocklist = [
     "List of Enix games",
     "List of Iwata Asks interviews",
     "List of Sega Saturn games",
+    "List of songs recorded by Super Junior",
     "Rina Aiuchi discography",
     "Super Junior discography",
     "Super Junior-T",
@@ -326,6 +277,9 @@ article_blocklist = [
     # Roman numeral in URL
     "Cray XC50",
 
+    # Roman numeral in image name
+    "Collection (publishing)",
+
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
 
@@ -337,6 +291,9 @@ article_blocklist = [
 
     # Capital Alpha not in Greek word, exactly
     "Kamen Rider Agito",
+
+    # &lowbar; needed to retain underscore in proper name
+    "Double Fine",
 ]
 
 
@@ -494,13 +451,21 @@ def dump_dict(section_title, dictionary):
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
 
-    for (key, article_list) in sorted_items[0:100]:
+    for (key, article_list) in sorted_items:
+
         if section_title == "To avoid":
             # Exclude overlapping entities
             if key in strings_found_by_type["UNCONTROVERSIAL"]:
                 continue
 
         article_set = set(article_list)
+
+        if len(article_set) > 100000:
+            # These should probably be addressed by bot or policy
+            # change or more targeted cleanup; leave them off this
+            # todo list
+            continue
+
         output += "* %s/%s - %s - %s\n" % (
             len(article_list),
             len(article_set),
@@ -523,24 +488,15 @@ def extract_articles(dictionary):
     # 1.) Frequency of least-frequent entity occurrence, low to high
     # 2.) Alphabetically by entity
     # 3.) Alphabetically by article title
+    #
+    # Ignores entities with 100,000+ articles because these should be
+    # addressed by bot (or policy change)
+
     articles = list()
     for (entity, article_list) in sorted(sorted(dictionary.items()),
                                          key=lambda tup: len(tup[1])):
-
-        # For doing special runs:
-        """
-        if entity not in [
-                "&Xi;",
-                "&alpha;",
-                "&rarr;",
-                "&copy;",
-                "&#8212;",
-                "&apos;",
-                "&hellip;",
-        ]:
+        if len(article_list) >= 100000:
             continue
-        """
-
         articles.extend(sorted(article_list))
 
     articles = list(dict.fromkeys(articles))  # uniqify
@@ -600,10 +556,11 @@ def dump_results():
         dump_for_jwb("combo", bad_entities, file=combof)
 
     with open("jwb-articles.txt", "w") as articlesf:
-        articles = list()
+        # Sorted from least-frequent to most-frequent across all types
+        mega_dict = {}
         for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL"]:
-            dictionary = strings_found_by_type.get(dic_type, {})
-            articles.extend(extract_articles(dictionary))
+            mega_dict.update(strings_found_by_type.get(dic_type, {}))
+        articles = extract_articles(mega_dict)
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
         print("\n".join(articles[0:1000]), file=articlesf)
 
