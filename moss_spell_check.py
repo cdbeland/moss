@@ -160,6 +160,9 @@ def spellcheck_all_langs(article_title, article_text):
         print("S\tSKIPPING due to article skip list\t%s" % article_title, flush=True)
         return
 
+    if article_title.endswith("(data page)"):
+        print("S\tSKIPPING chemical data page\t%s" % article_title, flush=True)
+
     if ignore_tags_re.search(article_text):
         print("S\tSKIPPING due to known cleanup tag\t%s" % article_title, flush=True)
         return
