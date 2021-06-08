@@ -421,6 +421,9 @@ def entity_check(article_title, article_text):
             # which can usually be handled seamlessly, though not
             # including numeric entities in the "alert" section,
             # which by definition can't be handled automatically.
+            if entity == "&ensp;" and "lim=" in article_text:
+                # Needed for {{linktext |lim=;&ensp; |...}}
+                continue
             result_tuples.append(("NUMERIC", article_title, entity))
             continue
         if entity in transform:
