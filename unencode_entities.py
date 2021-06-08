@@ -220,6 +220,7 @@ controversial = {
     "&exist;": "∃",
     "&equiv;": "≡",
     "&oplus;": "⊕",
+    "&CirclePlus;": "⊕",
     "&ne;": "≠",
     "&not;": "¬",
     "&forall;": "∀",
@@ -252,6 +253,7 @@ controversial = {
     "&larr;": "←",
     "&le;": "≤",  # available at the bottom of the wikitext edit window
     "&ge;": "≥",  # available at the bottom of the wikitext edit window
+    "&setminus;": "∖",
 }
 
 # keep.extend(controversial.keys())
@@ -291,6 +293,7 @@ transform_unsafe = {
 
     "&#x20;": "%20",  # Usually, but not always. Sometimes this should just be a regular space.
     "&#8239;": "&nbsp;",    # narrow no-break space
+    "&#32;": "&ensp;",  # When used with {{linktext}} but otherwise should just be a regular space.
 
     # Probably convert to regular space or no space
     "&ensp;": " ",
@@ -662,8 +665,8 @@ transform = {
     "&#00093;": "&rbrack;",
     "&00091;": "&lbrack;",
     "&00093;": "&rbrack;",
-    "&#x5B;": "&lbrack;",
-    "&#x5D;": "&rbrack;",
+    "&#x5B;": "%5B",  # Usually in URLs; otherwise, "&lbrack;",
+    "&#x5D;": "%5D",  # Usually in URLs; otherwise, "&rbrack;",
     "&#x7C;": "{{!}}",  # |
     "&#x7c;": "{{!}}",  # |
     "&#x007C;": "{{!}}",  # |
@@ -1118,6 +1121,10 @@ transform = {
     "&mdaash;": "&mdash;",
     "&nsbsp;": "&nbsp;",
     "&msdash;": "&mdash;",
+    "&Nbsp;": "&nbsp;",
+    "&nbwsp;": "&nbsp;",
+    "&bnbsp;": "&nbsp;",
+    "&nbash;": "&ndash;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
