@@ -23,6 +23,7 @@ article_blocklist = [
     "ASMO 449",
     "AZERTY",
     "AltGr key",
+    "Americanist phonetic notation",
     "Apostrophe",
     "Arabic alphabet",
     "Ayin",
@@ -33,6 +34,7 @@ article_blocklist = [
     "Blackboard bold",
     "Bookshelf Symbol 7",
     "Bracket",
+    "C",
     "CEA-708",
     "CER-GS",
     "Casio calculator character sets",
@@ -78,6 +80,7 @@ article_blocklist = [
     "Grave accent",
     "Greek script in Unicode",
     "Hashtag",
+    "Hook (diacritic)",
     "HP Roman",
     "IBM 2741",
     "IBM 3270",
@@ -107,6 +110,7 @@ article_blocklist = [
     "Jeremy Burge",
     "JIS X 0201",
     "JIS X 0208",
+    "K",
     "KOI-8",
     "KOI8-B",
     "KOI8-F",
@@ -115,7 +119,9 @@ article_blocklist = [
     "KOI8-U",
     "KPS 9566",
     "KS X 1001",
+    "L",
     "Latin script in Unicode",
+    "Letterlike Symbols",
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
     "List of Latin-script letters",
@@ -139,7 +145,10 @@ article_blocklist = [
     "Palatal hook",
     "PETSCII",
     "Phags-pa (Unicode block)",
+    "Phi",
+    "Phonetic symbols in Unicode",
     "Prime (symbol)",
+    "Radical symbol",
     "Regional indicator symbol",
     "Registered trademark symbol",
     "RISC OS character set",
@@ -147,20 +156,25 @@ article_blocklist = [
     "Romanization of Arabic",
     "Rough breathing",
     "Quotation mark",
+    "S",
     "Schwarzian derivative",
     "Secondary articulation",
     "Service mark",
     "Sharp pocket computer character sets",
+    "Square sign",
     "SI 960",
     "Sinclair QL character set",
     "Six-bit character code",
     "Specials (Unicode block)",
     "Slash (punctuation)",
     "Slashed zero",
+    "Stokoe notation",
     "Superior letter",
     "Symbol (typeface)",
+    "T",
     "T.51/ISO/IEC 6937",
     "Tab key",
+    "Tab-separated values",
     "Teletext character set",
     "Thai Industrial Standard 620-2533",
     "TI calculator character sets",
@@ -173,12 +187,14 @@ article_blocklist = [
     "Unicode subscripts and superscripts",
     "UTF-8",
     "UTF-EBCDIC",
+    "V",
     "Ventura International",
     "Videotex character set",
     "VISCII",
     "VSCII",
     "VT100 encoding",
     "VT52",
+    "W",
     "Wade–Giles",
     "Wang International Standard Code for Information Interchange",
     "Warmian-Masurian Voivodeship",
@@ -198,9 +214,11 @@ article_blocklist = [
     "Windows Glyph List 4",
     "Windows Polytonic Greek",
     "World glyph set",
+    "X",
     "Xerox Character Code Standard",
     "YUSCII",
     "Zero-width space",
+    "Z",
     "Œ",
 
     # Note: Characters like &Ohm; and &#x2F802; are changed by
@@ -279,6 +297,7 @@ article_blocklist = [
 
     # Roman numeral in image name
     "Collection (publishing)",
+    "Hillman Minx",
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
@@ -294,6 +313,23 @@ article_blocklist = [
 
     # &lowbar; needed to retain underscore in proper name
     "Double Fine",
+
+    # Matching the actual unpronouncable album and song titles
+    "Four Tet discography",
+
+    # {{lang}} can't be used in {{cite}}
+    "Everett, Washington",
+
+    # Special character in file name
+    "Piano Concerto (Khachaturian)",
+    "Charles Francis Adams III",
+    "Daihatsu Boon",
+    "Daihatsu Wake",
+    "KARI KSR-3",
+    "Nanzen-ji",
+    "National Chung-Shan Institute of Science and Technology",
+    "Sumida, Tokyo",
+    "Tokyo Skytree",
 ]
 
 
@@ -326,9 +362,14 @@ suppression_patterns = [
     re.compile(r"\[\[Image:.*?(\||\])", flags=re.I+re.S),
 
     re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
+    re.compile(r"{{UPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
+    re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
+    re.compile(r"ipa symbol\d? *= *[^ ]+", flags=re.I+re.S),
     re.compile(r"{{PIE.*?}}", flags=re.I+re.S),
+    re.compile(r"<blockquote lang=.*?</blockquote>", flags=re.I+re.S),
     re.compile(r"{{7seg.*?}}", flags=re.I+re.S),  # Uses superscript = as a parameter value
+    re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.I+re.S),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
@@ -349,6 +390,12 @@ suppression_patterns = [
 
 def entity_check(article_title, article_text):
     if article_title in article_blocklist:
+        return
+
+    if "{{cleanup lang" in article_text or "{{Cleanup lang" in article_text:
+        return
+
+    if "{{which lang" in article_text:
         return
 
     for pattern in suppression_patterns:
