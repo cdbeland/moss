@@ -652,21 +652,22 @@ transform = {
     "&#65279;": "",
 
     "&#8206;": "&lrm;",
-
-    "&#x005B;": "&lbrack;",  # [
-    "&#x005D;": "&rbrack;",  # ]
-    "&#x5b;": "&lbrack;",
-    "&#x5d;": "&rbrack;",
-    "&#091;": "&lbrack;",
-    "&#093;": "&rbrack;",
-    "&#0091;": "&lbrack;",
-    "&#0093;": "&rbrack;",
-    "&#00091;": "&lbrack;",
-    "&#00093;": "&rbrack;",
-    "&00091;": "&lbrack;",
-    "&00093;": "&rbrack;",
-    "&#x5B;": "%5B",  # Usually in URLs; otherwise, "&lbrack;",
-    "&#x5D;": "%5D",  # Usually in URLs; otherwise, "&rbrack;",
+    "&lbrack;": "&lsqb;",  # [
+    "&rbrack;": "&rsqb;",  # ]
+    "&#x005B;": "&lsqb;",
+    "&#x005D;": "&rsqb;",
+    "&#x5b;": "&lsqb;",
+    "&#x5d;": "&rsqb;",
+    "&#091;": "&lsqb;",
+    "&#093;": "&rsqb;",
+    "&#0091;": "&lsqb;",
+    "&#0093;": "&rsqb;",
+    "&#00091;": "&lsqb;",
+    "&#00093;": "&rsqb;",
+    "&00091;": "&lsqb;",
+    "&00093;": "&rsqb;",
+    "&#x5B;": "%5B",  # Usually in URLs; otherwise, "&lsqb;",
+    "&#x5D;": "%5D",  # Usually in URLs; otherwise, "&rsqb;",
     "&#x7C;": "{{!}}",  # |
     "&#x7c;": "{{!}}",  # |
     "&#x007C;": "{{!}}",  # |
@@ -684,12 +685,10 @@ transform = {
     "&#62;": "&gt;",
     "&#062;": "&gt;",
     "&#0062;": "&gt;",
-    "&#093;": "&rbrack;",  # ]
-    "&#0093;": "&rbrack;",  # ]
-    "&#91;": "&lbrack;",
-    "&#93;": "&rbrack;",
-    "&lsqb;": "&lbrack;",
-    "&rsqb;": "&rbrack;",
+    "&#093;": "&rsqb;",  # ]
+    "&#0093;": "&rsqb;",  # ]
+    "&#91;": "&lsqb;",
+    "&#93;": "&rsqb;",
 
     "&gtdot;": "⋗",
     "&ltdot;": "⋖",
