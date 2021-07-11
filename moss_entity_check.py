@@ -22,6 +22,7 @@ article_blocklist = [
     "ALGOL 68",
     "ASMO 449",
     "AZERTY",
+    "Afrasianist phonetic notation",
     "AltGr key",
     "Americanist phonetic notation",
     "Apostrophe",
@@ -45,6 +46,7 @@ article_blocklist = [
     "Code page 351",
     "Code page 361",
     "Code page 897",
+    "Code page 899",
     "Code page 903",
     "Code page 904",
     "Code page 921",
@@ -62,6 +64,7 @@ article_blocklist = [
     "Code page 1288",
     "Colon (punctuation)",
     "Computer Braille Code",
+    "Dania transcription",
     "Dash",
     "Devanagari transliteration",
     "DEC Hebrew",
@@ -79,6 +82,7 @@ article_blocklist = [
     "GOST 10859",
     "Grave accent",
     "Greek script in Unicode",
+    "H",
     "Hashtag",
     "Hook (diacritic)",
     "HP Roman",
@@ -295,9 +299,11 @@ article_blocklist = [
     # Roman numeral in URL
     "Cray XC50",
 
-    # Roman numeral in image name
+    # Roman numeral in image name (<gallery> or parameter)
     "Collection (publishing)",
+    "Découvertes Gallimard",
     "Hillman Minx",
+    "Grammaire égyptienne",
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
@@ -330,6 +336,10 @@ article_blocklist = [
     "National Chung-Shan Institute of Science and Technology",
     "Sumida, Tokyo",
     "Tokyo Skytree",
+
+    # Special character in <timeline>
+    "Chip (magazine)",
+    "Cleo (group)",
 ]
 
 
@@ -361,15 +371,16 @@ suppression_patterns = [
     re.compile(r"\[\[File:.*?(\||\])", flags=re.I+re.S),
     re.compile(r"\[\[Image:.*?(\||\])", flags=re.I+re.S),
 
-    re.compile(r"{{IPA.*?}}", flags=re.I+re.S),
-    re.compile(r"{{UPA.*?}}", flags=re.I+re.S),
+    re.compile(r"{{IPA.*?}}", flags=re.S),
+    re.compile(r"{{UPA.*?}}", flags=re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
-    re.compile(r"ipa symbol\d? *= *[^ ]+", flags=re.I+re.S),
-    re.compile(r"{{PIE.*?}}", flags=re.I+re.S),
+    re.compile(r"ipa symbol\d? *= *[^ ]+"),
+    re.compile(r"{{PIE.*?}}", flags=re.S),
     re.compile(r"<blockquote lang=.*?</blockquote>", flags=re.I+re.S),
-    re.compile(r"{{7seg.*?}}", flags=re.I+re.S),  # Uses superscript = as a parameter value
-    re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.I+re.S),
+    re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
+    re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
+    re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
