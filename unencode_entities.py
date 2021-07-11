@@ -64,8 +64,8 @@ alert = [
 keep = [
     "&lbrace;",  # {} sometimes needed due to template syntax
     "&rbrace;",  # Or can use Template:( and Template ) which make {}
-    "&lbrack;",  # [] needed when adding a link in a quote, rarely
-    "&rbrack;",
+    "&lsqb;",  # [] needed when adding a link in a quote, rarely
+    "&rsqb;",
     "&comma;",  # Template weirdness on [[Nuremburg]]
     "&excl;",   # !! is problematic in some tables
     "&ast;",    # * causes problems sometimes because it's used to mark
@@ -856,6 +856,7 @@ transform = {
 
 
     "&#46;": "&period;",  # When needed to stop template from dropping "." from abbreviations
+    "&point;": "&period;",
 
     "&#0033;": "!",
     "&#0047;": "/",
@@ -872,6 +873,7 @@ transform = {
     "&#8217;": "'",
 
     "&quot;": '"',
+    "&QUOT;": '"',
     "&#8220;": '"',
     "&#8221;": '"',
 
@@ -939,6 +941,8 @@ transform = {
     "&crarr;": "↵",
     "&Lt;": "≪",
     "&Gt;": "≫",
+    "&vDash;": "⊨",
+    "&nvDash;": "⊭",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -1124,6 +1128,7 @@ transform = {
     "&nbwsp;": "&nbsp;",
     "&bnbsp;": "&nbsp;",
     "&nbash;": "&ndash;",
+    "&nbssp;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
@@ -1161,6 +1166,7 @@ greek_letters = {
     "&Phi;": "Φ",
     "&Psi;": "Ψ",
     "&Omega;": "Ω",
+    "&varphi;": "ϕ",
 
     # There are strong objections to changing these outside of
     # Greek words, because they look too much like Latin letters.
