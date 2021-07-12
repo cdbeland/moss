@@ -375,7 +375,7 @@ suppression_patterns = [
     re.compile(r"{{UPA.*?}}", flags=re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
-    re.compile(r"ipa symbol\d? *= *[^ ]+"),
+    re.compile(r"ipa symbol\d? *= *[^ \n]+"),
     re.compile(r"{{PIE.*?}}", flags=re.S),
     re.compile(r"<blockquote lang=.*?</blockquote>", flags=re.I+re.S),
     re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
