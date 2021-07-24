@@ -63,7 +63,9 @@ article_blocklist = [
     "Code page 1287",
     "Code page 1288",
     "Colon (punctuation)",
+    "Compose key",
     "Computer Braille Code",
+    "Cork encoding",
     "Dania transcription",
     "Dash",
     "Devanagari transliteration",
@@ -169,6 +171,7 @@ article_blocklist = [
     "SI 960",
     "Sinclair QL character set",
     "Six-bit character code",
+    "Spacing Modifier Letters",
     "Specials (Unicode block)",
     "Slash (punctuation)",
     "Slashed zero",
@@ -335,6 +338,7 @@ article_blocklist = [
     "Nanzen-ji",
     "National Chung-Shan Institute of Science and Technology",
     "Sumida, Tokyo",
+    "Tokyo",
     "Tokyo Skytree",
 
     # Special character in <timeline>
