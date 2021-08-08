@@ -397,7 +397,9 @@ transform_unsafe = {
     "&hellip;": "...",
 
     "&#123;": "&lbrace;",  # {
+    "&lcub;": "&lbrace;",  # {
     "&#125;": "&rbrace;",  # }
+    "&rcub;": "&rbrace;",  # }
 
     # This is a pipe, and usually happens in URL titles
     "&#124;": "{{pipe}}",
@@ -592,6 +594,10 @@ transform_unsafe = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+
+    "&star;": "☆",
+    "&digamma;": "ϝ",
+    "&varepsilon;": "ϵ",
 
     "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
