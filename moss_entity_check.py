@@ -478,6 +478,9 @@ def entity_check(article_title, article_text):
                 result_tuples.append(("GREEK", article_title, entity))
                 continue
 
+        if (entity == "&ensp;" or entity == "&semi;") and "lim=" in article_text:
+            # Needed for {{linktext |lim=&semi;&ensp; |...}}
+            continue
         if should_keep_as_is(entity):
             # Excludes numeric ranges that must remain untouched
             continue
@@ -486,9 +489,6 @@ def entity_check(article_title, article_text):
             # which can usually be handled seamlessly, though not
             # including numeric entities in the "alert" section,
             # which by definition can't be handled automatically.
-            if (entity == "&ensp;" or entity == "&semi;") and "lim=" in article_text:
-                # Needed for {{linktext |lim=&semi;&ensp; |...}}
-                continue
             result_tuples.append(("NUMERIC", article_title, entity))
             continue
         if entity in transform:
