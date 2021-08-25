@@ -4,8 +4,8 @@ import re
 # --- HELPER VARIABLES AND CONFIG ---
 
 # By-frequency lists swap which half of the alphabet they suppress
-alpha_half_inactive = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
-alpha_half_active = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 other_active = True
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
@@ -50,10 +50,10 @@ def restrict_misspellings(input_lines_str):
             raise Exception(f"Could not find number of instances from '{line}'")
         number = int(match.group(1))
 
-        # There will always be a low level of typos; 5 and fewer probably
+        # There will always be a low level of typos; 4 and fewer probably
         # not frequent enough to put on lists of frequent typos, and
         # at that point this report will probably be obsolete.
-        if number <= 5:
+        if number <= 4:
             continue
 
         # Skip words that only appear in one article
