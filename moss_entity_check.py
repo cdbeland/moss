@@ -296,11 +296,10 @@ article_blocklist = [
     # # in external link
     "WalangForever",
 
-    # Unicode superscript in URL in bidirectional text
+    # Special character in URL
     "Almah",
-
-    # Roman numeral in URL
     "Cray XC50",
+    "Rallying",
 
     # Roman numeral in image name (<gallery> or parameter)
     "Collection (publishing)",
@@ -375,6 +374,7 @@ suppression_patterns = [
     re.compile(r"\[\[File:.*?(\||\])", flags=re.I+re.S),
     re.compile(r"\[\[Image:.*?(\||\])", flags=re.I+re.S),
 
+    re.compile(r"{{proper name.*?}}", flags=re.S),
     re.compile(r"{{IPA.*?}}", flags=re.S),
     re.compile(r"{{UPA.*?}}", flags=re.S),
     re.compile(r"{{angle.*?}}", flags=re.I+re.S),
