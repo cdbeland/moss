@@ -32,8 +32,6 @@
 # N = Numbers or punctuation
 
 from collections import defaultdict
-import difflib
-import enchant
 import fileinput
 from multiprocessing import Pool
 from nltk.metrics import distance
@@ -50,7 +48,6 @@ except ImportError:
     from .spell import bad_words
     from .wikitext_util import html_tag_re
 
-enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
 az_re = re.compile(r"^[a-z]+$", flags=re.I)
 az_plus_re = re.compile(r"^[a-z|\d|\-|\.]+$", flags=re.I)
 az_dot_re = re.compile(r"^[a-z]+(\-[a-z]+)?\.[a-z]+(\-[a-z]+)?$", flags=re.I)
@@ -80,6 +77,57 @@ not_html = {"<a>", "<name>", "<r>", "<h>"}
 # <a> is not turned into a link by Mediawiki, so it's almost always
 # intentional like linguistics markup.
 
+
+# -- INITIALIZATION HELPERS --
+
+
+# Based on code from http://norvig.com/spell-correct.html
+def make_edits_with_anychar_unordered(word_list, edit_distance):
+    # Edited strings are produced with a low-fi matching
+    # representation. Instead of ordered strings, words are stored as
+    # a string of letters in alphabetical order (rather than the order
+    # present in the word), and the number of occurrances of each
+    # letter doesn't matter (each letter present is listed only
+    # once). "*" means "any letter". This means transposes are
+    # ignored; actual edit distance between two words must be
+    # calculated after generating match candidates. But it is
+    # guaranteed a given candidate may have a lower (closer) reported
+    # edit distance than actual, but never higher (more distant).
+
+    for word in word_list:
+        splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
+        deletes = [left + right[1:] for left, right in splits if right]
+        replaces = [left + "*" + right[1:] for left, right in splits if right]
+        inserts = [left + "*" + right for left, right in splits]
+
+    # De-dup strings
+    edited_strings = set(deletes + replaces + inserts)
+
+    # Low-fi the strings
+    edited_sets = ["".join(sorted(list(set(edited_string.lower())))) for edited_string in edited_strings]
+
+    # De-dup low-fi strings
+    edited_sets = set(edited_sets)
+
+    if edit_distance == 1:
+        return {1: edited_sets}
+    elif edit_distance > 1:
+        results = make_edits_with_anychar_unordered(edited_strings, edit_distance - 1)
+        results[edit_distance] = edited_sets
+        return results
+    raise ("Base case failure")
+
+
+def make_suggestions(edit_distance, input_list):
+    for word in input_list:
+        sets_for_word = make_edits_with_anychar_unordered([word], edit_distance)
+        for (ed, sets_for_word_this_ed) in sets_for_word.items():
+            for set_for_word_this_ed in sets_for_word_this_ed:
+                suggestions[ed][set_for_word_this_ed].add(word)
+
+
+# -- LOAD DATA --
+
 # Any words in multi-word phrases should also be listed as individual
 # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
 # (at list creation time?) since these won't be matched anyway.
@@ -100,7 +148,25 @@ print("Loading English words only...", file=sys.stderr)
 with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
     english_words = set([line.strip() for line in title_list])
 
+print("Indexing English spelling suggestions...", file=sys.stderr)
+# Edit distance 4 and greater gives a negligible true positive rate
+MAX_EDIT_DISTANCE = 3
+# Changing this would require some tweaking of the below init code
+
+# Keys are length, then low-fi match sets
+suggestions = {
+    1: defaultdict(set),
+    2: defaultdict(set),
+    3: defaultdict(set)
+}
+make_suggestions(MAX_EDIT_DISTANCE, [w for w in english_words if az_re.match(w)])
+from pprint import pformat
+print(pformat(suggestions))
 print("Done loading.", file=sys.stderr)
+
+
+# -- Chemistry ---
+
 
 element_symbols = [
     "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S",
@@ -158,6 +224,9 @@ def is_chemistry_word(word):
     if chem_formula_re.match(word):
         return True
     return False
+
+
+# --
 
 
 def is_url(word):
@@ -248,27 +317,6 @@ def is_rhyme_scheme(word):
     return False
 
 
-# Returns False if not near a common word, or integer edit distance to
-# closest word, or "S" for word split
-def near_common_word(word):
-    close_matches = difflib.get_close_matches(word, enchant_en.suggest(word))
-    if close_matches:
-        if " " in close_matches[0] or "-" in close_matches[0]:
-            return "S"
-        this_distance = distance.edit_distance(word, close_matches[0], transpositions=True)
-        if this_distance <= 3:
-            # 4 and greater is fairly useless
-            return this_distance
-    return False
-# Other spell check and spelling suggestion libraries:
-# https://textblob.readthedocs.io/en/dev/quickstart.html#spelling-correction
-#  -> based on NLTK and http://norvig.com/spell-correct.html
-# https://pypi.org/project/autocorrect/
-#  from autocorrect import spell
-#  print(spell('caaaar'))
-# https://github.com/wolfgarbe/SymSpell
-
-
 def is_compound(word):
     parts = word.split("-")
     if len(parts) > 1:
@@ -293,6 +341,48 @@ def is_compound(word):
 
     return False
 
+
+# -- Spelling suggestions and T_ code --
+
+# Process the input word into low-fi match strings
+def get_anychar_permutations(word):
+    word = word.lower()
+    permus = [word]
+    working_list = [word]
+    for num_any in range(1, MAX_EDIT_DISTANCE + 1):
+        new_permus = []
+        for wrd in working_list:
+            new_permus.extend([wrd[0:c] + "*" + wrd[c + 1:] for c in range(0, len(wrd))])
+        permus.extend(new_permus)
+        working_list = new_permus
+    return permus
+
+
+# Returns False if not near a known English word, or integer edit
+# distance to closest word (up to MAX_EDIT_DISTANCE)
+def near_common_word(word):
+    word = word.lower()
+    if word in english_words:
+        return 0
+
+    permus = get_anychar_permutations(word)
+    matches = []
+    matches_by_distance = defaultdict(set)
+    for edit_distance in range(1, MAX_EDIT_DISTANCE + 1):
+        for permu in permus:
+            if permu in suggestions[edit_distance]:
+                matches.extend(list(suggestions[edit_distance][permu]))
+        for match in matches:
+            matches_by_distance[distance.edit_distance(word, match, transpositions=True)].add(match)
+        if matches_by_distance[edit_distance]:
+            print(f"+{word}:{matches_by_distance[edit_distance]}")
+            return edit_distance
+        # Intentionally leaving matches_by_distance that may be of
+        # lower edit distance to kick around
+    return False
+
+
+# -- Main loop --
 
 def get_word_category(word):
     category = None
