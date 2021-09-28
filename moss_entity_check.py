@@ -27,6 +27,7 @@ article_blocklist = [
     "Americanist phonetic notation",
     "Apostrophe",
     "Arabic alphabet",
+    "Atari ST character set",
     "Ayin",
     "Baudot code",
     "Basic Latin (Unicode block)",
@@ -36,6 +37,7 @@ article_blocklist = [
     "Bookshelf Symbol 7",
     "Bracket",
     "C",
+    "(C)",
     "CEA-708",
     "CER-GS",
     "Casio calculator character sets",
@@ -95,6 +97,7 @@ article_blocklist = [
     "ISO/IEC 10367",
     "ISO 5426",
     "ISO 5428",
+    "ISO 6862",
     "ISO-IR-111",
     "ISO-IR-200",
     "ISO/IEC 8859-1",
@@ -161,6 +164,7 @@ article_blocklist = [
     "Roman numerals",
     "Romanization of Arabic",
     "Rough breathing",
+    "RPL character set",
     "Quotation mark",
     "S",
     "Schwarzian derivative",
@@ -205,6 +209,7 @@ article_blocklist = [
     "Wade–Giles",
     "Wang International Standard Code for Information Interchange",
     "Warmian-Masurian Voivodeship",
+    "Western Latin character sets (computing)",
     "Whitespace (programming language)",
     "Windows-1250",
     "Windows-1251",
@@ -300,6 +305,8 @@ article_blocklist = [
     "Almah",
     "Cray XC50",
     "Rallying",
+    "Pegeen Vail Guggenheim",
+    "Power electronic substrate",
 
     # Roman numeral in image name (<gallery> or parameter)
     "Collection (publishing)",
@@ -339,6 +346,7 @@ article_blocklist = [
     "Sumida, Tokyo",
     "Tokyo",
     "Tokyo Skytree",
+    "Patrice Bart-Williams",
 
     # Special character in <timeline>
     "Chip (magazine)",
@@ -383,6 +391,7 @@ suppression_patterns = [
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
     re.compile(r"ipa symbol\d? *= *[^\n]+"),
+    re.compile(r"poj *= *[^\n]+"),
     re.compile(r"{{PIE.*?}}", flags=re.S),
     re.compile(r"<blockquote lang=.*?</blockquote>", flags=re.I+re.S),
     re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
@@ -399,7 +408,10 @@ suppression_patterns = [
 
     # It's unclear if these should be using Unicode or HTML
     # superscripts/subscripts; ignoring for now.
-    re.compile(r"{{lang.*?}}", flags=re.I+re.S),
+    re.compile(r"{{[Ll]ang.*?}}", flags=re.S),
+    re.compile(r"{{[Zz]h.*?}}", flags=re.S),
+
+    re.compile(r".{0,100}{{[Nn]eeds IPA.*?}}", flags=re.S),
 
     # It's unclear if tones like <sup>H</sup> in IPA templates should
     # be converted to Unicode.
