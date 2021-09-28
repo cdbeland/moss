@@ -215,6 +215,7 @@ controversial = {
     # Unicode character.
     "&asymp;": "≈",
     "&empty;": "∅",
+    "&emptyset;": "∅",
     "&part;": "∂",
     "&otimes;": "⊗",
     "&exist;": "∃",
@@ -409,6 +410,9 @@ transform_unsafe = {
     "&vert;": "{{pipe}}",
     # {{!}} in tables?
     # https://www.mediawiki.org/wiki/Help:Magic_words#Other
+
+    "&Verbar;": "‖",
+    "&squ;": "□",
 
     # These are usually spurious, per [[MOS:TMRULES]]
     "&trade;": "",  # ™
@@ -1094,6 +1098,7 @@ transform = {
     "&endash;": "&ndash;",
     "&bdash;": "&ndash;",
     "&ndahs;": "&ndash;",
+    "&ndadh;": "&ndash;",
     "&ndas;": "&ndash;",
     "&dnash;": "&ndash;",
     "&ndasgh;": "&ndash;",
@@ -1103,6 +1108,7 @@ transform = {
     "&bnsp;": "&nbsp;",
     "&spnb;": "&nbsp;",
     "&ndsp;": "&nbsp;",
+    "&nbsap;": "&nbsp;",
     "&nbp;": "&nbsp;",
     "&nhsp;": "&nbsp;",
     "&ngsp;": "&nbsp;",
@@ -1140,6 +1146,7 @@ transform = {
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
+    # Replace with &sdot; in math expressions
 }
 
 greek_letters = {
