@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import re
 from string import punctuation
 import sys
@@ -10,12 +11,6 @@ try:
 except ImportError:
     from .wikitext_util import html_tag_re
     from .unencode_entities import entities_re
-
-print("Loading spellcheck dictionary...", file=sys.stderr)
-
-# TODO: Possibly move this to postgres or MySQL.  Load DB as part of
-# update_downloads.sh; startup time is very slow due to loading this
-# all into Python, even though accessing in-memory data is very fast.
 
 all_words = set()
 punctuation_tmp = punctuation
@@ -43,24 +38,37 @@ def add_tokens(line):
      if title_word]
 
 
-with open("/bulk-wikipedia/moss", "r") as moss_html_file:
-    moss_html = moss_html_file.read()
-    moss_html = re.sub(r'^.*?(<h3><span class="mw-headline" id="For_Wiktionary">For Wiktionary.*?)<h3>.*$', r'\1', moss_html, flags=re.S)
-    queued_matches = re.findall('"https://en.wiktionary.org/wiki/(.*?)"', moss_html)
-    if not queued_matches:
-        raise Exception("Empty Wikitionary queue; regex broken?")
-    for queued_match in queued_matches:
-        add_tokens(queued_match)
+def load_data():
+    print("Loading spellcheck dictionary...", file=sys.stderr)
 
-for filename in [
-    "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
-    "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
-    "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
-    "/bulk-wikipedia/Wikispecies:Requested_articles",
-]:
-    with open(filename, "r") as title_list:
-        for line in title_list:
-            add_tokens(line)
+    # TODO: Possibly move this to postgres or MySQL.  Load DB as part
+    # of update_downloads.sh; startup time is very slow due to loading
+    # this all into Python, even though accessing in-memory data is
+    # very fast.
+
+    with open("/bulk-wikipedia/moss", "r") as moss_html_file:
+        moss_html = moss_html_file.read()
+        moss_html = re.sub(r'^.*?(<h3><span class="mw-headline" id="For_Wiktionary">For Wiktionary.*?)<h3>.*$', r'\1', moss_html, flags=re.S)
+        queued_matches = re.findall('"https://en.wiktionary.org/wiki/(.*?)"', moss_html)
+        if not queued_matches:
+            raise Exception("Empty Wikitionary queue; regex broken?")
+        for queued_match in queued_matches:
+            add_tokens(queued_match)
+
+    for filename in [
+            "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
+            "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
+            "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
+            "/bulk-wikipedia/Wikispecies:Requested_articles",
+    ]:
+        with open(filename, "r") as title_list:
+            for line in title_list:
+                add_tokens(line)
+
+
+if not os.environ.get("NO_LOAD"):
+    load_data()
+
 
 abbr_re = re.compile(r"\.\w\.$")
 all_letters_re = re.compile(r"^[^\W\d_]+$", flags=re.UNICODE)
