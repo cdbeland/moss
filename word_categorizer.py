@@ -78,11 +78,21 @@ not_html = {"<a>", "<name>", "<r>", "<h>"}
 # intentional like linguistics markup.
 
 
-# -- INITIALIZATION HELPERS --
+# -- INITIALIZATION HELPERS AND GLOBAL VARIABLES --
+
+
+titles_all_wiktionaries = None
+transliterations = None
+english_wiktionary = None
+english_words = None
+suggestions = None  # Keys are length, then low-fi match sets
+
+# Edit distance 4 and greater gives a negligible true positive rate
+MAX_EDIT_DISTANCE = 3
 
 
 # Based on code from http://norvig.com/spell-correct.html
-def make_edits_with_anychar_unordered(word_list, edit_distance):
+def make_edits_with_anychar_unordered(word_list, edit_distance_target, this_edit_distance=1):
     # Edited strings are produced with a low-fi matching
     # representation. Instead of ordered strings, words are stored as
     # a string of letters in alphabetical order (rather than the order
@@ -93,76 +103,58 @@ def make_edits_with_anychar_unordered(word_list, edit_distance):
     # calculated after generating match candidates. But it is
     # guaranteed a given candidate may have a lower (closer) reported
     # edit distance than actual, but never higher (more distant).
+    #
+    # Matches at higher distances are suppressed to save space, since
+    # it's assumed lower distnaces will be searched first.
+
+    deletes = []
+    replaces = []
+    inserts = []
 
     for word in word_list:
         splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
-        deletes = [left + right[1:] for left, right in splits if right]
-        replaces = [left + "*" + right[1:] for left, right in splits if right]
-        inserts = [left + "*" + right for left, right in splits]
+        deletes += [left + right[1:] for left, right in splits if right]
+        replaces += [left + "*" + right[1:] for left, right in splits if right]
+        inserts += [left + "*" + right for left, right in splits]
 
     # De-dup strings
     edited_strings = set(deletes + replaces + inserts)
 
     # Low-fi the strings
-    edited_sets = ["".join(sorted(list(set(edited_string.lower())))) for edited_string in edited_strings]
+    lowfi_strings = ["".join(sorted(list(set(edited_string.lower())))) for edited_string in edited_strings]
 
     # De-dup low-fi strings
-    edited_sets = set(edited_sets)
+    lowfi_strings = set(lowfi_strings)
 
-    if edit_distance == 1:
-        return {1: edited_sets}
-    elif edit_distance > 1:
-        results = make_edits_with_anychar_unordered(edited_strings, edit_distance - 1)
-        results[edit_distance] = edited_sets
+    if edit_distance_target == this_edit_distance:
+        return {this_edit_distance: lowfi_strings}
+    else:
+        results = make_edits_with_anychar_unordered(edited_strings, edit_distance_target, this_edit_distance + 1)
+        results[this_edit_distance] = lowfi_strings
+
+        # Suppress duplicate matches at higher distances
+        strings_seen = set()
+        if len(word_list) == 1:
+            # Suppress the original word
+            strings_seen.add("".join(sorted(list(set(word_list[0].lower())))))
+        for dist in sorted(results.keys()):
+            results[dist] = results[dist] - strings_seen
+            strings_seen = strings_seen.union(results[dist])
+
         return results
-    raise ("Base case failure")
 
 
 def make_suggestions(edit_distance, input_list):
+    suggestion_dict = dict()
+    for d in range(1, MAX_EDIT_DISTANCE + 1):
+        suggestion_dict[d] = defaultdict(set)
+
     for word in input_list:
         sets_for_word = make_edits_with_anychar_unordered([word], edit_distance)
         for (ed, sets_for_word_this_ed) in sets_for_word.items():
             for set_for_word_this_ed in sets_for_word_this_ed:
-                suggestions[ed][set_for_word_this_ed].add(word)
-
-
-# -- LOAD DATA --
-
-# Any words in multi-word phrases should also be listed as individual
-# words, so don't bother tokenizing.  TODO: Drop multi-word phrases
-# (at list creation time?) since these won't be matched anyway.
-print("Loading all languages...", file=sys.stderr)
-with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
-    titles_all_wiktionaries = set([line.strip() for line in title_list])
-
-print("Loading transliterations...", file=sys.stderr)
-with open("/bulk-wikipedia/transliterations.txt", "r") as title_list:
-    transliterations = set([line.strip().split("\t")[1] for line in title_list
-                            if "\t" in line.strip() and "_" not in line])
-
-print("Loading English Wiktionary...", file=sys.stderr)
-with open("/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0", "r") as title_list:
-    english_wiktionary = set([line.strip() for line in title_list if "_" not in line])
-
-print("Loading English words only...", file=sys.stderr)
-with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
-    english_words = set([line.strip() for line in title_list])
-
-print("Indexing English spelling suggestions...", file=sys.stderr)
-# Edit distance 4 and greater gives a negligible true positive rate
-MAX_EDIT_DISTANCE = 3
-# Changing this would require some tweaking of the below init code
-
-# Keys are length, then low-fi match sets
-suggestions = {
-    1: defaultdict(set),
-    2: defaultdict(set),
-    3: defaultdict(set)
-}
-make_suggestions(MAX_EDIT_DISTANCE, [w for w in english_words if az_re.match(w)])
-from pprint import pformat
-print(pformat(suggestions))
-print("Done loading.", file=sys.stderr)
+                suggestion_dict[ed][set_for_word_this_ed].add(word)
+    return suggestion_dict
 
 
 # -- Chemistry ---
@@ -470,6 +462,34 @@ def process_line(line):
 
 
 if __name__ == '__main__':
+    # -- Load data --
+
+    # Any words in multi-word phrases should also be listed as individual
+    # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
+    # (at list creation time?) since these won't be matched anyway.
+    print("Loading all languages...", file=sys.stderr)
+    with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
+        titles_all_wiktionaries = set([line.strip() for line in title_list])
+
+    print("Loading transliterations...", file=sys.stderr)
+    with open("/bulk-wikipedia/transliterations.txt", "r") as title_list:
+        transliterations = set([line.strip().split("\t")[1] for line in title_list
+                                if "\t" in line.strip() and "_" not in line])
+
+    print("Loading English Wiktionary...", file=sys.stderr)
+    with open("/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0", "r") as title_list:
+        english_wiktionary = set([line.strip() for line in title_list if "_" not in line])
+
+    print("Loading English words only...", file=sys.stderr)
+    with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
+        english_words = set([line.strip() for line in title_list])
+
+    print("Indexing English spelling suggestions...", file=sys.stderr)
+    suggestions = make_suggestions(MAX_EDIT_DISTANCE, [w for w in english_words if az_re.match(w)])
+    print("Done loading.", file=sys.stderr)
+
+    # -- Process input --
+
     lines = [line.strip() for line in fileinput.input("-")]
     with Pool(8) as pool:
         for result in pool.imap(process_line, lines):
