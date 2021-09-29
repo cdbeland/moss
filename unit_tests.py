@@ -1,7 +1,14 @@
+from collections import defaultdict
+from pprint import pformat
 import unittest
 
-from .wikitext_util import remove_structure_nested, wikitext_to_plaintext
-from .word_categorizer import letters_introduced_alphabetically
+# Enabling this makes init fast but breaks spelling tests
+# import os
+# os.environ["NO_LOAD"] = "1"
+from .spell import is_word_spelled_correctly  # noqa: E402
+
+from .wikitext_util import remove_structure_nested, wikitext_to_plaintext  # noqa: E402
+from .word_categorizer import (letters_introduced_alphabetically, make_suggestions, make_edits_with_anychar_unordered)  # noqa: E402
 
 
 class WikitextUtilTest(unittest.TestCase):
@@ -74,12 +81,140 @@ class WordCategorizerTest(unittest.TestCase):
         self.assertFalse(letters_introduced_alphabetically("baa"))
         self.assertFalse(letters_introduced_alphabetically("abd"))
 
+    def test_make_lowfi_one(self):
+        actual = make_edits_with_anychar_unordered(["xyz"], 1)
+        correct = {
+            1: set(["*xyz", "*xy", "*yz", "*xz", "*yz", "*xz", "xy", "yz", "xz"]),
+        }
+        self.assertEqual(actual, correct)
+
+    def test_make_lowfi_two(self):
+        actual = make_edits_with_anychar_unordered(["xyz"], 2)
+        print(pformat(actual))
+        correct = {
+            1: set(["*xyz", "*xy", "*yz", "*xz", "*yz", "*xz", "xy", "yz", "xz"]),
+            2: set(["x", "y", "z", "*x", "*y", "*z"]),
+        }
+        self.assertEqual(actual, correct)
+
+    def test_make_suggestions(self):
+        actual = dict(make_suggestions(3, ["qwerty", "asd", "a"]))
+        print(pformat(actual))
+
+        correct = {
+            1: defaultdict(set, {
+                "*a": {"a"},
+                "": {"a"},
+                "*": {"a"},
+                "*ads": {"asd"},
+                "ds": {"asd"},
+                "ad": {"asd"},
+                "as": {"asd"},
+                "*ds": {"asd"},
+                "*ad": {"asd"},
+                "*as": {"asd"},
+                "*eqrtwy": {"qwerty"},
+                "qrtwy": {"qwerty"},
+                "ertwy": {"qwerty"},
+                "eqtwy": {"qwerty"},
+                "eqrwy": {"qwerty"},
+                "eqrty": {"qwerty"},
+                "eqrtw": {"qwerty"},
+                "*qrtwy": {"qwerty"},
+                "*ertwy": {"qwerty"},
+                "*eqtwy": {"qwerty"},
+                "*eqrwy": {"qwerty"},
+                "*eqrty": {"qwerty"},
+                "*eqrtw": {"qwerty"},
+            }),
+            2: defaultdict(set, {
+                '*a': {'asd'},
+                '*d': {'asd'},
+                '*eqrt': {'qwerty'},
+                '*eqrw': {'qwerty'},
+                '*eqry': {'qwerty'},
+                '*eqtw': {'qwerty'},
+                '*eqty': {'qwerty'},
+                '*eqwy': {'qwerty'},
+                '*ertw': {'qwerty'},
+                '*erty': {'qwerty'},
+                '*erwy': {'qwerty'},
+                '*etwy': {'qwerty'},
+                '*qrtw': {'qwerty'},
+                '*qrty': {'qwerty'},
+                '*qrwy': {'qwerty'},
+                '*qtwy': {'qwerty'},
+                '*rtwy': {'qwerty'},
+                '*s': {'asd'},
+                'a': {'asd'},
+                'd': {'asd'},
+                'eqrt': {'qwerty'},
+                'eqrw': {'qwerty'},
+                'eqry': {'qwerty'},
+                'eqtw': {'qwerty'},
+                'eqty': {'qwerty'},
+                'eqwy': {'qwerty'},
+                'ertw': {'qwerty'},
+                'erty': {'qwerty'},
+                'erwy': {'qwerty'},
+                'etwy': {'qwerty'},
+                'qrtw': {'qwerty'},
+                'qrty': {'qwerty'},
+                'qrwy': {'qwerty'},
+                'qtwy': {'qwerty'},
+                'rtwy': {'qwerty'},
+                's': {'asd'}}),
+            3: defaultdict(set, {
+                '': {'asd'},
+                '*': {'asd'},
+                '*eqr': {'qwerty'},
+                '*eqt': {'qwerty'},
+                '*eqw': {'qwerty'},
+                '*eqy': {'qwerty'},
+                '*ert': {'qwerty'},
+                '*erw': {'qwerty'},
+                '*ery': {'qwerty'},
+                '*etw': {'qwerty'},
+                '*ety': {'qwerty'},
+                '*ewy': {'qwerty'},
+                '*qrt': {'qwerty'},
+                '*qrw': {'qwerty'},
+                '*qry': {'qwerty'},
+                '*qtw': {'qwerty'},
+                '*qty': {'qwerty'},
+                '*qwy': {'qwerty'},
+                '*rtw': {'qwerty'},
+                '*rty': {'qwerty'},
+                '*rwy': {'qwerty'},
+                '*twy': {'qwerty'},
+                'eqr': {'qwerty'},
+                'eqt': {'qwerty'},
+                'eqw': {'qwerty'},
+                'eqy': {'qwerty'},
+                'ert': {'qwerty'},
+                'erw': {'qwerty'},
+                'ery': {'qwerty'},
+                'etw': {'qwerty'},
+                'ety': {'qwerty'},
+                'ewy': {'qwerty'},
+                'qrt': {'qwerty'},
+                'qrw': {'qwerty'},
+                'qry': {'qwerty'},
+                'qtw': {'qwerty'},
+                'qty': {'qwerty'},
+                'qwy': {'qwerty'},
+                'rtw': {'qwerty'},
+                'rty': {'qwerty'},
+                'rwy': {'qwerty'},
+                'twy': {'qwerty'}
+            }),
+        }
+        self.assertEqual(actual, correct)
+
 
 class SpellTest(unittest.TestCase):
 
     def test_dashes(self):
-        from .spell import is_word_spelled_correctly  # This takes a long time
-
         # May also return "uncertain", which is the wrong answer (but
         # evaluates to True)
         self.assertTrue(is_word_spelled_correctly("entirely-wet") is True)
@@ -88,11 +223,9 @@ class SpellTest(unittest.TestCase):
         self.assertTrue(is_word_spelled_correctly("Arabic-based") is True)
 
     def test_unknown_html_tag(self):
-        from .spell import is_word_spelled_correctly
         self.assertFalse(is_word_spelled_correctly("<nowiki/>"))
 
     def test_transliterations(self):
-        from .spell import is_word_spelled_correctly
         # Dashes in a proper noun
         self.assertTrue(is_word_spelled_correctly("Anbār-e"))
         # Single quote marks in a proper noun
@@ -101,7 +234,6 @@ class SpellTest(unittest.TestCase):
         self.assertTrue(is_word_spelled_correctly("Ḩasan"))
 
     def period_splices(self):
-        from .spell import is_word_spelled_correctly
         self.assertFalse(is_word_spelled_correctly("again.The"))
         self.assertFalse(is_word_spelled_correctly("Everest.Another"))
         self.assertTrue(is_word_spelled_correctly("Ph.B"))
