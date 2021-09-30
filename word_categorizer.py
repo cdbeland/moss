@@ -48,8 +48,8 @@ except ImportError:
     from .spell import bad_words
     from .wikitext_util import html_tag_re
 
-az_re = re.compile(r"^[a-z]+$", flags=re.I)
-az_plus_re = re.compile(r"^[a-z|\d|\-|\.]+$", flags=re.I)
+az_re = re.compile(r"^[a-z']+$", flags=re.I)
+az_plus_re = re.compile(r"^[a-z|\d|\-|\.']+$", flags=re.I)
 az_dot_re = re.compile(r"^[a-z]+(\-[a-z]+)?\.[a-z]+(\-[a-z]+)?$", flags=re.I)
 ag_re = re.compile(r"^[a-g]+$")
 mz_re = re.compile(r"[m-z]")
@@ -117,14 +117,8 @@ def make_edits_with_anychar_unordered(word_list, edit_distance_target, this_edit
         replaces += [left + "*" + right[1:] for left, right in splits if right]
         inserts += [left + "*" + right for left, right in splits]
 
-    # De-dup strings
-    edited_strings = set(deletes + replaces + inserts)
-
-    # Low-fi the strings
-    lowfi_strings = ["".join(sorted(list(set(edited_string.lower())))) for edited_string in edited_strings]
-
-    # De-dup low-fi strings
-    lowfi_strings = set(lowfi_strings)
+    edited_strings = set(deletes + replaces + inserts)  # De-dup
+    lowfi_strings = make_lowfi_strings(edited_strings)
 
     if edit_distance_target == this_edit_distance:
         return {this_edit_distance: lowfi_strings}
@@ -142,6 +136,19 @@ def make_edits_with_anychar_unordered(word_list, edit_distance_target, this_edit
             strings_seen = strings_seen.union(results[dist])
 
         return results
+
+
+def make_lowfi_strings(edited_strings):
+    # De-dup input strings (which are all the permutations at a given
+    # edit distance, including "*" for any character)
+    edited_strings = set(edited_strings)
+
+    # Low-fi the strings by ignoring case, order, and number of
+    # instances of the same letter
+    lowfi_strings = ["".join(sorted(list(set(edited_string.lower())))) for edited_string in edited_strings]
+
+    # De-dup low-fi strings
+    return set(lowfi_strings)
 
 
 def make_suggestions(edit_distance, input_list):
@@ -357,13 +364,13 @@ def near_common_word(word):
     if word in english_words:
         return 0
 
-    permus = get_anychar_permutations(word)
+    lowfi_strings = make_lowfi_strings(get_anychar_permutations(word))
     matches = []
     matches_by_distance = defaultdict(set)
     for edit_distance in range(1, MAX_EDIT_DISTANCE + 1):
-        for permu in permus:
-            if permu in suggestions[edit_distance]:
-                matches.extend(list(suggestions[edit_distance][permu]))
+        for lowfi_string in lowfi_strings:
+            if lowfi_string in suggestions[edit_distance]:
+                matches.extend(list(suggestions[edit_distance][lowfi_string]))
         for match in matches:
             matches_by_distance[distance.edit_distance(word, match, transpositions=True)].add(match)
         if matches_by_distance[edit_distance]:
@@ -408,7 +415,6 @@ def get_word_category(word):
         if az_re.match(word):
             edit_distance = near_common_word(word)
             if edit_distance:
-                # Possibly TS
                 category = "T" + str(edit_distance)
             elif word in transliterations:
                 category = "L"
