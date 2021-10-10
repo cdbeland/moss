@@ -32,6 +32,8 @@
 # N = Numbers or punctuation
 
 from collections import defaultdict
+import difflib
+import enchant
 import fileinput
 from multiprocessing import Pool
 from nltk.metrics import distance
@@ -48,8 +50,9 @@ except ImportError:
     from .spell import bad_words
     from .wikitext_util import html_tag_re
 
-az_re = re.compile(r"^[a-z']+$", flags=re.I)
-az_plus_re = re.compile(r"^[a-z|\d|\-|\.']+$", flags=re.I)
+enchant_en = enchant.Dict("en_US")  # en_GB seems to give US dictionary
+az_re = re.compile(r"^[a-z]+$", flags=re.I)
+az_plus_re = re.compile(r"^[a-z|\d|\-|\.]+$", flags=re.I)
 az_dot_re = re.compile(r"^[a-z]+(\-[a-z]+)?\.[a-z]+(\-[a-z]+)?$", flags=re.I)
 ag_re = re.compile(r"^[a-g]+$")
 mz_re = re.compile(r"[m-z]")
@@ -77,95 +80,27 @@ not_html = {"<a>", "<name>", "<r>", "<h>"}
 # <a> is not turned into a link by Mediawiki, so it's almost always
 # intentional like linguistics markup.
 
+# Any words in multi-word phrases should also be listed as individual
+# words, so don't bother tokenizing.  TODO: Drop multi-word phrases
+# (at list creation time?) since these won't be matched anyway.
+print("Loading all languages...", file=sys.stderr)
+with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
+    titles_all_wiktionaries = set([line.strip() for line in title_list])
 
-# -- INITIALIZATION HELPERS AND GLOBAL VARIABLES --
+print("Loading transliterations...", file=sys.stderr)
+with open("/bulk-wikipedia/transliterations.txt", "r") as title_list:
+    transliterations = set([line.strip().split("\t")[1] for line in title_list
+                            if "\t" in line.strip() and "_" not in line])
 
+print("Loading English Wiktionary...", file=sys.stderr)
+with open("/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0", "r") as title_list:
+    english_wiktionary = set([line.strip() for line in title_list if "_" not in line])
 
-titles_all_wiktionaries = None
-transliterations = None
-english_wiktionary = None
-english_words = None
-suggestions = None  # Keys are length, then low-fi match sets
+print("Loading English words only...", file=sys.stderr)
+with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
+    english_words = set([line.strip() for line in title_list])
 
-# Edit distance 4 and greater gives a negligible true positive rate
-MAX_EDIT_DISTANCE = 3
-
-
-# Based on code from http://norvig.com/spell-correct.html
-def make_edits_with_anychar_unordered(word_list, edit_distance_target, this_edit_distance=1):
-    # Edited strings are produced with a low-fi matching
-    # representation. Instead of ordered strings, words are stored as
-    # a string of letters in alphabetical order (rather than the order
-    # present in the word), and the number of occurrances of each
-    # letter doesn't matter (each letter present is listed only
-    # once). "*" means "any letter". This means transposes are
-    # ignored; actual edit distance between two words must be
-    # calculated after generating match candidates. But it is
-    # guaranteed a given candidate may have a lower (closer) reported
-    # edit distance than actual, but never higher (more distant).
-    #
-    # Matches at higher distances are suppressed to save space, since
-    # it's assumed lower distnaces will be searched first.
-
-    deletes = []
-    replaces = []
-    inserts = []
-
-    for word in word_list:
-        splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
-        deletes += [left + right[1:] for left, right in splits if right]
-        replaces += [left + "*" + right[1:] for left, right in splits if right]
-        inserts += [left + "*" + right for left, right in splits]
-
-    edited_strings = set(deletes + replaces + inserts)  # De-dup
-    lowfi_strings = make_lowfi_strings(edited_strings)
-
-    if edit_distance_target == this_edit_distance:
-        return {this_edit_distance: lowfi_strings}
-    else:
-        results = make_edits_with_anychar_unordered(edited_strings, edit_distance_target, this_edit_distance + 1)
-        results[this_edit_distance] = lowfi_strings
-
-        # Suppress duplicate matches at higher distances
-        strings_seen = set()
-        if len(word_list) == 1:
-            # Suppress the original word
-            strings_seen.add("".join(sorted(list(set(word_list[0].lower())))))
-        for dist in sorted(results.keys()):
-            results[dist] = results[dist] - strings_seen
-            strings_seen = strings_seen.union(results[dist])
-
-        return results
-
-
-def make_lowfi_strings(edited_strings):
-    # De-dup input strings (which are all the permutations at a given
-    # edit distance, including "*" for any character)
-    edited_strings = set(edited_strings)
-
-    # Low-fi the strings by ignoring case, order, and number of
-    # instances of the same letter
-    lowfi_strings = ["".join(sorted(list(set(edited_string.lower())))) for edited_string in edited_strings]
-
-    # De-dup low-fi strings
-    return set(lowfi_strings)
-
-
-def make_suggestions(edit_distance, input_list):
-    suggestion_dict = dict()
-    for d in range(1, MAX_EDIT_DISTANCE + 1):
-        suggestion_dict[d] = defaultdict(set)
-
-    for word in input_list:
-        sets_for_word = make_edits_with_anychar_unordered([word], edit_distance)
-        for (ed, sets_for_word_this_ed) in sets_for_word.items():
-            for set_for_word_this_ed in sets_for_word_this_ed:
-                suggestion_dict[ed][set_for_word_this_ed].add(word)
-    return suggestion_dict
-
-
-# -- Chemistry ---
-
+print("Done loading.", file=sys.stderr)
 
 element_symbols = [
     "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S",
@@ -223,9 +158,6 @@ def is_chemistry_word(word):
     if chem_formula_re.match(word):
         return True
     return False
-
-
-# --
 
 
 def is_url(word):
@@ -316,6 +248,27 @@ def is_rhyme_scheme(word):
     return False
 
 
+# Returns False if not near a common word, or integer edit distance to
+# closest word, or "S" for word split
+def near_common_word(word):
+    close_matches = difflib.get_close_matches(word, enchant_en.suggest(word))
+    if close_matches:
+        if " " in close_matches[0] or "-" in close_matches[0]:
+            return "S"
+        this_distance = distance.edit_distance(word, close_matches[0], transpositions=True)
+        if this_distance <= 3:
+            # 4 and greater is fairly useless
+            return this_distance
+    return False
+# Other spell check and spelling suggestion libraries:
+# https://textblob.readthedocs.io/en/dev/quickstart.html#spelling-correction
+#  -> based on NLTK and http://norvig.com/spell-correct.html
+# https://pypi.org/project/autocorrect/
+#  from autocorrect import spell
+#  print(spell('caaaar'))
+# https://github.com/wolfgarbe/SymSpell
+
+
 def is_compound(word):
     parts = word.split("-")
     if len(parts) > 1:
@@ -340,48 +293,6 @@ def is_compound(word):
 
     return False
 
-
-# -- Spelling suggestions and T_ code --
-
-# Process the input word into low-fi match strings
-def get_anychar_permutations(word):
-    word = word.lower()
-    permus = [word]
-    working_list = [word]
-    for num_any in range(1, MAX_EDIT_DISTANCE + 1):
-        new_permus = []
-        for wrd in working_list:
-            new_permus.extend([wrd[0:c] + "*" + wrd[c + 1:] for c in range(0, len(wrd))])
-        permus.extend(new_permus)
-        working_list = new_permus
-    return permus
-
-
-# Returns False if not near a known English word, or integer edit
-# distance to closest word (up to MAX_EDIT_DISTANCE)
-def near_common_word(word):
-    word = word.lower()
-    if word in english_words:
-        return 0
-
-    lowfi_strings = make_lowfi_strings(get_anychar_permutations(word))
-    matches = []
-    matches_by_distance = defaultdict(set)
-    for edit_distance in range(1, MAX_EDIT_DISTANCE + 1):
-        for lowfi_string in lowfi_strings:
-            if lowfi_string in suggestions[edit_distance]:
-                matches.extend(list(suggestions[edit_distance][lowfi_string]))
-        for match in matches:
-            matches_by_distance[distance.edit_distance(word, match, transpositions=True)].add(match)
-        if matches_by_distance[edit_distance]:
-            print(f"+{word}:{matches_by_distance[edit_distance]}")
-            return edit_distance
-        # Intentionally leaving matches_by_distance that may be of
-        # lower edit distance to kick around
-    return False
-
-
-# -- Main loop --
 
 def get_word_category(word):
     category = None
@@ -415,6 +326,7 @@ def get_word_category(word):
         if az_re.match(word):
             edit_distance = near_common_word(word)
             if edit_distance:
+                # Possibly TS
                 category = "T" + str(edit_distance)
             elif word in transliterations:
                 category = "L"
@@ -468,34 +380,6 @@ def process_line(line):
 
 
 if __name__ == '__main__':
-    # -- Load data --
-
-    # Any words in multi-word phrases should also be listed as individual
-    # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
-    # (at list creation time?) since these won't be matched anyway.
-    print("Loading all languages...", file=sys.stderr)
-    with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
-        titles_all_wiktionaries = set([line.strip() for line in title_list])
-
-    print("Loading transliterations...", file=sys.stderr)
-    with open("/bulk-wikipedia/transliterations.txt", "r") as title_list:
-        transliterations = set([line.strip().split("\t")[1] for line in title_list
-                                if "\t" in line.strip() and "_" not in line])
-
-    print("Loading English Wiktionary...", file=sys.stderr)
-    with open("/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0", "r") as title_list:
-        english_wiktionary = set([line.strip() for line in title_list if "_" not in line])
-
-    print("Loading English words only...", file=sys.stderr)
-    with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
-        english_words = set([line.strip() for line in title_list])
-
-    print("Indexing English spelling suggestions...", file=sys.stderr)
-    suggestions = make_suggestions(MAX_EDIT_DISTANCE, [w for w in english_words if az_re.match(w)])
-    print("Done loading.", file=sys.stderr)
-
-    # -- Process input --
-
     lines = [line.strip() for line in fileinput.input("-")]
     with Pool(8) as pool:
         for result in pool.imap(process_line, lines):
