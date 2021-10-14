@@ -31,7 +31,10 @@
 # I = International (non-ASCII characters)
 # N = Numbers or punctuation
 
+import cProfile
 from collections import defaultdict
+import datetime
+import difflib
 import fileinput
 from multiprocessing import Pool
 from nltk.metrics import distance
@@ -85,14 +88,41 @@ titles_all_wiktionaries = None
 transliterations = None
 english_wiktionary = None
 english_words = None
-suggestions = None  # Keys are length, then low-fi match sets
+suggestion_dict = None  # Keys are length, then low-fi match sets
 
 # Edit distance 4 and greater gives a negligible true positive rate
-MAX_EDIT_DISTANCE = 3
+MAX_EDIT_DISTANCE = 1
+
+
+# From http://norvig.com/spell-correct.html
+# All edits that are one edit away from "word".
+def edits1(word):
+    letters = "abcdefghijklmnopqrstuvwxyz"
+    splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
+    deletes = [left + right[1:] for left, right in splits if right]
+    transposes = [left + right[1] + right[0] + right[2:] for left, right in splits if len(right) > 1]
+    replaces = [left + center + right[1:] for left, right in splits if right for center in letters]
+    inserts = [left + center + right for left, right in splits for center in letters]
+    return set(deletes + transposes + replaces + inserts)
+
+
+def check_dictionary(word_list, edit_distance_target, this_edit_distance=1):
+    edited_string_sets = [edits1(word) for word in word_list]
+    edited_strings = set()
+    edited_strings.update(*edited_string_sets)
+    found_strings = [s for s in edited_strings if s in english_words]
+    if found_strings:
+        return (this_edit_distance, found_strings)
+    if this_edit_distance == edit_distance_target:
+        return None
+    return check_dictionary(edited_strings, edit_distance_target, this_edit_distance + 1)
 
 
 # Based on code from http://norvig.com/spell-correct.html
-def make_edits_with_anychar_unordered(word_list, edit_distance_target, this_edit_distance=1):
+def make_edits_lowfi(lowfi_strings, edit_distance_target, this_edit_distance=1, seen=None):
+    # Takes a "lowfi" string and produces a dictionary where the keys
+    # are the edit distance and the values are sets of lowfi strings.
+
     # Edited strings are produced with a low-fi matching
     # representation. Instead of ordered strings, words are stored as
     # a string of letters in alphabetical order (rather than the order
@@ -105,62 +135,68 @@ def make_edits_with_anychar_unordered(word_list, edit_distance_target, this_edit
     # edit distance than actual, but never higher (more distant).
     #
     # Matches at higher distances are suppressed to save space, since
-    # it's assumed lower distnaces will be searched first.
+    # it's assumed lower distances will be searched first.
 
     deletes = []
     replaces = []
     inserts = []
 
-    for word in word_list:
-        splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
-        deletes += [left + right[1:] for left, right in splits if right]
-        replaces += [left + "*" + right[1:] for left, right in splits if right]
-        inserts += [left + "*" + right for left, right in splits]
+    if not seen:
+        seen = set(lowfi_strings)
+    else:
+        seen.update(lowfi_strings)
 
-    edited_strings = set(deletes + replaces + inserts)  # De-dup
-    lowfi_strings = make_lowfi_strings(edited_strings)
+    for lfs in lowfi_strings:
+        splits = [(lfs[:i], lfs[i:]) for i in range(len(lfs) + 1)]
+        deletes += [left + right[1:] for left, right in splits if right]
+
+        if lfs.startswith("*"):
+            # No need to do inserts; this would just add a second "*"
+            # which is invisible in the lowfi representation
+
+            # No need to do replaces; this would duplicate a delete
+            # that has already been calculated.
+            pass
+        else:
+            inserts.append("*" + lfs)
+            replaces += ["*" + left + right[1:] for left, right in splits if right]
+
+    edited_strings_lowfi = set(deletes + replaces + inserts)  # De-dup
+    edited_strings_lowfi -= seen
 
     if edit_distance_target == this_edit_distance:
-        return {this_edit_distance: lowfi_strings}
+        return {this_edit_distance: edited_strings_lowfi}
     else:
-        results = make_edits_with_anychar_unordered(edited_strings, edit_distance_target, this_edit_distance + 1)
-        results[this_edit_distance] = lowfi_strings
-
-        # Suppress duplicate matches at higher distances
-        strings_seen = set()
-        if len(word_list) == 1:
-            # Suppress the original word
-            strings_seen.add("".join(sorted(list(set(word_list[0].lower())))))
-        for dist in sorted(results.keys()):
-            results[dist] = results[dist] - strings_seen
-            strings_seen = strings_seen.union(results[dist])
-
+        results = make_edits_lowfi(edited_strings_lowfi, edit_distance_target, this_edit_distance + 1, seen=seen)
+        results[this_edit_distance] = edited_strings_lowfi
         return results
 
 
-def make_lowfi_strings(edited_strings):
-    # De-dup input strings (which are all the permutations at a given
-    # edit distance, including "*" for any character)
-    edited_strings = set(edited_strings)
-
-    # Low-fi the strings by ignoring case, order, and number of
-    # instances of the same letter
-    lowfi_strings = ["".join(sorted(list(set(edited_string.lower())))) for edited_string in edited_strings]
-
-    # De-dup low-fi strings
-    return set(lowfi_strings)
+def make_lowfi_string(string_in):
+    # Low-fi by ignoring case, order, and number of instances of the
+    # same letter
+    return "".join(sorted(set(string_in.lower())))
 
 
-def make_suggestions(edit_distance, input_list):
+def make_suggestion_helper(word):
+    sets_for_word = make_edits_lowfi([make_lowfi_string(word)], MAX_EDIT_DISTANCE)
+    return (word, sets_for_word)
+
+
+def make_suggestion_dict(input_list):
+    # Takes about 4.5 min in parallel, 10 min serial
     suggestion_dict = dict()
     for d in range(1, MAX_EDIT_DISTANCE + 1):
         suggestion_dict[d] = defaultdict(set)
 
-    for word in input_list:
-        sets_for_word = make_edits_with_anychar_unordered([word], edit_distance)
-        for (ed, sets_for_word_this_ed) in sets_for_word.items():
-            for set_for_word_this_ed in sets_for_word_this_ed:
-                suggestion_dict[ed][set_for_word_this_ed].add(word)
+    with Pool(8) as pool:
+        for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list):
+            for (ed, sets_for_word_this_ed) in sets_for_word.items():
+                for set_for_word_this_ed in sets_for_word_this_ed:
+                    suggestion_dict[ed][set_for_word_this_ed].add(word)
+        pool.close()
+        pool.join()
+
     return suggestion_dict
 
 
@@ -357,6 +393,49 @@ def get_anychar_permutations(word):
     return permus
 
 
+# Gestalt helper
+def min_max_length(word, cutoff_ratio):
+    # cutoff = 2 * min(len1, len2) / (len1 + len2)
+    # cutoff = 2x / (len(word) + x)
+    # 2x = cutoff(len(word) + x)
+    # 2x = cutoff*len(word) + cutoff(x)
+    # (2-cutoff)x = cutoff*len(word)
+    # x = cutoff*len(word) / (2-cutoff)
+    min_len = round((cutoff_ratio * len(word)) / (2 - cutoff_ratio))
+    diff_len = len(word) - min_len
+    max_len = len(word) + diff_len
+    return (min_len, max_len)
+
+
+# https://en.wikipedia.org/wiki/Gestalt_Pattern_Matching
+def near_common_word_gestalt(word):
+    print(word)
+    cutoff_ratio = .85
+    (min_len, max_len) = min_max_length(word, cutoff_ratio)
+
+    suggestions = []
+
+    for length in range(min_len, max_len + 1):
+        # Looking only at words with the same first letter is a little
+        # lossy, but needed to make run time reasonable
+        candidate_suggestions = english_words_by_length_and_letter[length].get(word[0])
+        if candidate_suggestions:
+            suggestions.extend(difflib.get_close_matches(word, candidate_suggestions, cutoff=cutoff_ratio))
+
+    if not suggestions:
+        return False
+
+    scores = dict()
+    for sug in suggestions:
+        scores[sug] = difflib.SequenceMatcher(a=word, b=sug).ratio()
+    sorted_scores = sorted(scores.items(), key=lambda sug: sug[1], reverse=True)
+    if suggestions:
+        chosen = sorted_scores[0][0]
+        print(f"+{word}:{sorted_scores}")
+        return "G" + str(distance.edit_distance(word, chosen, transpositions=True))
+    return False
+
+
 # Returns False if not near a known English word, or integer edit
 # distance to closest word (up to MAX_EDIT_DISTANCE)
 def near_common_word(word):
@@ -364,24 +443,37 @@ def near_common_word(word):
     if word in english_words:
         return 0
 
-    lowfi_strings = make_lowfi_strings(get_anychar_permutations(word))
-    matches = []
+    lowfi_strings = {make_lowfi_string(permu) for permu in get_anychar_permutations(word)}
+    # PERFORMANCE NOTE: Can be made more efficient by doing equivalent
+    # of get_anychar_permutations() knowing we only care about lowfi
+    # strings
+
     matches_by_distance = defaultdict(set)
     for edit_distance in range(1, MAX_EDIT_DISTANCE + 1):
+        matches = []  # List to avoid excessive de-dup comparisons
+        print(datetime.datetime.now())
+        print(f"CHECKING LOWFI MATCHES FOR {word} AT DISTANCE {edit_distance}")
         for lowfi_string in lowfi_strings:
-            if lowfi_string in suggestions[edit_distance]:
-                matches.extend(list(suggestions[edit_distance][lowfi_string]))
+            if lowfi_string in suggestion_dict[edit_distance]:
+                matches.extend(list(suggestion_dict[edit_distance][lowfi_string]))
+        print(f"{len(matches)} FOUND")
+        matches = {match for match in matches if abs(len(match) - len(word)) <= MAX_EDIT_DISTANCE}
+        print(f"{len(matches)} PLAUSIBLE, DE-DUP FOUND")
+
         for match in matches:
             matches_by_distance[distance.edit_distance(word, match, transpositions=True)].add(match)
         if matches_by_distance[edit_distance]:
             print(f"+{word}:{matches_by_distance[edit_distance]}")
             return edit_distance
-        # Intentionally leaving matches_by_distance that may be of
-        # lower edit distance to kick around
+        # Intentionally leaving matches_by_distance of higher edit
+        # distance (if any) for the next loop, so all suggestions of
+        # equal distance will show up
+    print(datetime.datetime.now())
+    print("NO SUGGESTIONS")
     return False
 
 
-# -- Main loop --
+# -- Main loop functions --
 
 def get_word_category(word):
     category = None
@@ -416,6 +508,8 @@ def get_word_category(word):
             edit_distance = near_common_word(word)
             if edit_distance:
                 category = "T" + str(edit_distance)
+            elif near_common_word_gestalt(word):
+                category = "G"
             elif word in transliterations:
                 category = "L"
             elif compound_cat:
@@ -467,12 +561,27 @@ def process_line(line):
         return f"{category}\t{line}"
 
 
-if __name__ == '__main__':
-    # -- Load data --
+def process_input_debug():
+    lines = [line.strip() for line in fileinput.input("-")]
+    lines = lines[0:10000]
+    for line in lines:
+        print(process_line(line))
 
+
+def process_input_parallel():
+    lines = [line.strip() for line in fileinput.input("-")]
+    with Pool(8) as pool:
+        for result in pool.imap(process_line, lines):
+            print(result)
+        pool.close()
+        pool.join()
+
+
+if __name__ == '__main__':
     # Any words in multi-word phrases should also be listed as individual
     # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
     # (at list creation time?) since these won't be matched anyway.
+    print(datetime.datetime.now(), file=sys.stderr)
     print("Loading all languages...", file=sys.stderr)
     with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
         titles_all_wiktionaries = set([line.strip() for line in title_list])
@@ -490,15 +599,35 @@ if __name__ == '__main__':
     with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
         english_words = set([line.strip() for line in title_list])
 
+    print("Indexing English words by length...", file=sys.stderr)
+    english_words_by_length_and_letter = defaultdict(dict)
+    for word in [w.lower() for w in english_words if az_re.match(w)]:
+        existing_dict = english_words_by_length_and_letter[len(word)]
+        first_letter = word[0]
+        if first_letter not in existing_dict:
+            existing_dict[first_letter] = {word}
+        else:
+            existing_dict[first_letter].add(word)
+
+    print(datetime.datetime.now(), file=sys.stderr)
     print("Indexing English spelling suggestions...", file=sys.stderr)
-    suggestions = make_suggestions(MAX_EDIT_DISTANCE, [w for w in english_words if az_re.match(w)])
+    suggestion_dict = make_suggestion_dict([w for w in english_words if az_re.match(w)])
+
+    # DEBUG
+
+    for d in range(1, MAX_EDIT_DISTANCE + 1):
+        print(f"Suggestions for edit distance {d}")
+        lengths = [(lowfi_string, len(words)) for (lowfi_string, words) in suggestion_dict[d].items()]
+        lengths.sort(key=lambda tup: tup[1])
+        for (lowfi_string, wordlist_len) in lengths:
+            print(f"{wordlist_len}\t{lowfi_string}")
+
+    # --
+
     print("Done loading.", file=sys.stderr)
+    print(datetime.datetime.now(), file=sys.stderr)
 
-    # -- Process input --
-
-    lines = [line.strip() for line in fileinput.input("-")]
-    with Pool(8) as pool:
-        for result in pool.imap(process_line, lines):
-            print(result)
-        pool.close()
-        pool.join()
+    process_input_parallel()
+    # print(cProfile.run("process_input_debug()", sort="cumtime"))
+    print("Done categorizing.", file=sys.stderr)
+    print(datetime.datetime.now(), file=sys.stderr)
