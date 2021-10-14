@@ -91,7 +91,7 @@ english_words = None
 suggestion_dict = None  # Keys are length, then low-fi match sets
 
 # Edit distance 4 and greater gives a negligible true positive rate
-MAX_EDIT_DISTANCE = 1
+MAX_EDIT_DISTANCE = 2
 
 
 # From http://norvig.com/spell-correct.html
@@ -393,49 +393,6 @@ def get_anychar_permutations(word):
     return permus
 
 
-# Gestalt helper
-def min_max_length(word, cutoff_ratio):
-    # cutoff = 2 * min(len1, len2) / (len1 + len2)
-    # cutoff = 2x / (len(word) + x)
-    # 2x = cutoff(len(word) + x)
-    # 2x = cutoff*len(word) + cutoff(x)
-    # (2-cutoff)x = cutoff*len(word)
-    # x = cutoff*len(word) / (2-cutoff)
-    min_len = round((cutoff_ratio * len(word)) / (2 - cutoff_ratio))
-    diff_len = len(word) - min_len
-    max_len = len(word) + diff_len
-    return (min_len, max_len)
-
-
-# https://en.wikipedia.org/wiki/Gestalt_Pattern_Matching
-def near_common_word_gestalt(word):
-    print(word)
-    cutoff_ratio = .85
-    (min_len, max_len) = min_max_length(word, cutoff_ratio)
-
-    suggestions = []
-
-    for length in range(min_len, max_len + 1):
-        # Looking only at words with the same first letter is a little
-        # lossy, but needed to make run time reasonable
-        candidate_suggestions = english_words_by_length_and_letter[length].get(word[0])
-        if candidate_suggestions:
-            suggestions.extend(difflib.get_close_matches(word, candidate_suggestions, cutoff=cutoff_ratio))
-
-    if not suggestions:
-        return False
-
-    scores = dict()
-    for sug in suggestions:
-        scores[sug] = difflib.SequenceMatcher(a=word, b=sug).ratio()
-    sorted_scores = sorted(scores.items(), key=lambda sug: sug[1], reverse=True)
-    if suggestions:
-        chosen = sorted_scores[0][0]
-        print(f"+{word}:{sorted_scores}")
-        return "G" + str(distance.edit_distance(word, chosen, transpositions=True))
-    return False
-
-
 # Returns False if not near a known English word, or integer edit
 # distance to closest word (up to MAX_EDIT_DISTANCE)
 def near_common_word(word):
@@ -508,8 +465,6 @@ def get_word_category(word):
             edit_distance = near_common_word(word)
             if edit_distance:
                 category = "T" + str(edit_distance)
-            elif near_common_word_gestalt(word):
-                category = "G"
             elif word in transliterations:
                 category = "L"
             elif compound_cat:
