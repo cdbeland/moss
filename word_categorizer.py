@@ -434,9 +434,6 @@ def near_common_word(word):
 # -- Main loop functions --
 
 def get_word_category(word):
-    if not titles_all_wiktionaries:
-        load_data()
-
     category = None
     suggestion = None
 
@@ -526,6 +523,9 @@ def process_line(line):
 
 
 def process_input_parallel():
+    if not titles_all_wiktionaries:
+        load_data()
+
     lines = [line.strip() for line in fileinput.input("-")]
     with Pool(8) as pool:
         for result in pool.imap(process_line, lines):
