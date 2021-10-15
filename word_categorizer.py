@@ -24,6 +24,7 @@
 # MW = Probable coMpound, found in non-English Wiktionary
 # ML = Probable coMpound, transLiteration
 # U = URL or computer file name
+# A = mAth
 #
 # Relatively unsorted:
 #
@@ -228,6 +229,8 @@ chem_formula_regexes = [
 ]
 chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
 
+math_re = re.compile(r"^([a-z]\([a-z]\))|(log]([a-z0-9]]))$")
+
 
 # Note: This may malfunction slightly if there are commas inside the
 # chemical name.
@@ -421,7 +424,7 @@ def near_common_word(word):
         for match in matches:
             matches_by_distance[distance.edit_distance(word, match, transpositions=True)].add(match)
         if matches_by_distance[edit_distance]:
-            return (edit_distance, matches_by_distance[edit_distance][0])
+            return (edit_distance, list(matches_by_distance[edit_distance])[0])
         # Intentionally leaving matches_by_distance of higher edit
         # distance (if any) for the next loop, so all suggestions of
         # equal distance will show up
@@ -456,6 +459,8 @@ def get_word_category(word):
         category = "Z"
     elif is_chemistry_word(word):
         category = "C"
+    elif math_re.search(word):
+        category = "A"
     elif any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
         category = "TS"
@@ -464,14 +469,14 @@ def get_word_category(word):
             (edit_distance, suggestion) = near_common_word(word)
             if word in transliterations:
                 category = "L"
+            elif is_rhyme_scheme(word):
+                category = "P"
             elif compound_cat:
                 category = compound_cat
             elif edit_distance:
                 category = "T" + str(edit_distance)
             elif dna_re.match(word):
                 category = "D"
-            elif is_rhyme_scheme(word):
-                category = "P"
             else:
                 category = "R"
         elif az_dot_re.match(word):
