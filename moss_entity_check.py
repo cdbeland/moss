@@ -392,6 +392,7 @@ suppression_patterns = [
     re.compile(r"{{UPA.*?}}", flags=re.S),
     re.compile(r"{{angle.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr.*?}}", flags=re.I+re.S),
+    re.compile(r'{\|\s*class="wikitable IPA".*?\|}'),
     re.compile(r"{{transl.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
