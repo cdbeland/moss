@@ -31,10 +31,8 @@
 # I = International (non-ASCII characters)
 # N = Numbers or punctuation
 
-import cProfile
 from collections import defaultdict
 import datetime
-import difflib
 import fileinput
 from multiprocessing import Pool
 from nltk.metrics import distance
@@ -396,8 +394,9 @@ def get_anychar_permutations(word):
     return permus
 
 
-# Returns False if not near a known English word, or integer edit
-# distance to closest word (up to MAX_EDIT_DISTANCE)
+# Returns (False) if not near a known English word, or (integer edit
+# distance, spelling suggestion) to closest word up to
+# MAX_EDIT_DISTANCE
 def near_common_word(word):
     word = word.lower()
     if word in english_words:
@@ -411,14 +410,10 @@ def near_common_word(word):
     matches_by_distance = defaultdict(set)
     for edit_distance in range(1, MAX_EDIT_DISTANCE + 1):
         matches = []  # List to avoid excessive de-dup comparisons
-        print(datetime.datetime.now())
-        print(f"CHECKING LOWFI MATCHES FOR {word} AT DISTANCE {edit_distance}")
         for lowfi_string in lowfi_strings:
             if lowfi_string in suggestion_dict[edit_distance]:
                 matches.extend(list(suggestion_dict[edit_distance][lowfi_string]))
-        print(f"{len(matches)} FOUND")
         matches = {match for match in matches if abs(len(match) - len(word)) <= MAX_EDIT_DISTANCE}
-        print(f"{len(matches)} PLAUSIBLE, DE-DUP FOUND")
         if edit_distance > 1:
             # A little lossy, but greatly improves performance
             matches = {match for match in matches if match[0] == word[0]}
@@ -426,20 +421,18 @@ def near_common_word(word):
         for match in matches:
             matches_by_distance[distance.edit_distance(word, match, transpositions=True)].add(match)
         if matches_by_distance[edit_distance]:
-            print(f"+{word}:{matches_by_distance[edit_distance]}")
-            return edit_distance
+            return (edit_distance, matches_by_distance[edit_distance][0])
         # Intentionally leaving matches_by_distance of higher edit
         # distance (if any) for the next loop, so all suggestions of
         # equal distance will show up
-    print(datetime.datetime.now())
-    print("NO SUGGESTIONS")
-    return False
+    return (False, False)
 
 
 # -- Main loop functions --
 
 def get_word_category(word):
     category = None
+    suggestion = None
 
     if word.lower() in bad_words or word in bad_words:
         # "you", "I'm"
@@ -468,13 +461,13 @@ def get_word_category(word):
         category = "TS"
     elif az_plus_re.match(word):
         if az_re.match(word):
-            edit_distance = near_common_word(word)
-            if edit_distance:
-                category = "T" + str(edit_distance)
-            elif word in transliterations:
+            (edit_distance, suggestion) = near_common_word(word)
+            if word in transliterations:
                 category = "L"
             elif compound_cat:
                 category = compound_cat
+            elif edit_distance:
+                category = "T" + str(edit_distance)
             elif dna_re.match(word):
                 category = "D"
             elif is_rhyme_scheme(word):
@@ -502,6 +495,8 @@ def get_word_category(word):
     else:
         category = compound_cat or "I"
 
+    # Dropping suggestion for now. TODO: Put it in a JWB substitution
+    # file for speedy fixups.
     return category
 
 
@@ -520,13 +515,6 @@ def process_line(line):
         return f"{category}\t* {length} [https://en.wikipedia.org/w/index.php?search={word} {word}]"
     else:
         return f"{category}\t{line}"
-
-
-def process_input_debug():
-    lines = [line.strip() for line in fileinput.input("-")]
-    lines = lines[0:10000]
-    for line in lines:
-        print(process_line(line))
 
 
 def process_input_parallel():
@@ -574,21 +562,9 @@ if __name__ == '__main__':
     print("Indexing English spelling suggestions...", file=sys.stderr)
     suggestion_dict = make_suggestion_dict([w for w in english_words if az_re.match(w)])
 
-    # DEBUG
-
-    for d in range(1, MAX_EDIT_DISTANCE + 1):
-        print(f"Suggestions for edit distance {d}")
-        lengths = [(lowfi_string, len(words)) for (lowfi_string, words) in suggestion_dict[d].items()]
-        lengths.sort(key=lambda tup: tup[1])
-        for (lowfi_string, wordlist_len) in lengths:
-            print(f"{wordlist_len}\t{lowfi_string}")
-
-    # --
-
     print("Done loading.", file=sys.stderr)
     print(datetime.datetime.now(), file=sys.stderr)
 
     process_input_parallel()
-    # print(cProfile.run("process_input_debug()", sort="cumtime"))
     print("Done categorizing.", file=sys.stderr)
     print(datetime.datetime.now(), file=sys.stderr)
