@@ -8,7 +8,7 @@ import unittest
 from .spell import is_word_spelled_correctly  # noqa: E402
 
 from .wikitext_util import remove_structure_nested, wikitext_to_plaintext  # noqa: E402
-from .word_categorizer import (letters_introduced_alphabetically, make_suggestions, make_edits_with_anychar_unordered)  # noqa: E402
+from .word_categorizer import (letters_introduced_alphabetically, make_suggestion_dict, make_edits_lowfi)  # noqa: E402
 
 
 class WikitextUtilTest(unittest.TestCase):
@@ -82,14 +82,14 @@ class WordCategorizerTest(unittest.TestCase):
         self.assertFalse(letters_introduced_alphabetically("abd"))
 
     def test_make_lowfi_one(self):
-        actual = make_edits_with_anychar_unordered(["xyz"], 1)
+        actual = make_edits_lowfi(["xyz"], 1)
         correct = {
             1: set(["*xyz", "*xy", "*yz", "*xz", "*yz", "*xz", "xy", "yz", "xz"]),
         }
         self.assertEqual(actual, correct)
 
     def test_make_lowfi_two(self):
-        actual = make_edits_with_anychar_unordered(["xyz"], 2)
+        actual = make_edits_lowfi(["xyz"], 2)
         print(pformat(actual))
         correct = {
             1: set(["*xyz", "*xy", "*yz", "*xz", "*yz", "*xz", "xy", "yz", "xz"]),
@@ -97,8 +97,8 @@ class WordCategorizerTest(unittest.TestCase):
         }
         self.assertEqual(actual, correct)
 
-    def test_make_suggestions(self):
-        actual = dict(make_suggestions(3, ["qwerty", "asd", "a"]))
+    def test_make_suggestion_dict(self):
+        actual = dict(make_suggestion_dict(["qwerty", "asd", "a"]))
         print(pformat(actual))
 
         correct = {
@@ -126,7 +126,10 @@ class WordCategorizerTest(unittest.TestCase):
                 "*eqrwy": {"qwerty"},
                 "*eqrty": {"qwerty"},
                 "*eqrtw": {"qwerty"},
-            }),
+            })}
+
+        # If MAX_EDIT_DISTANCE is higher, these are needed:
+        """
             2: defaultdict(set, {
                 '*a': {'asd'},
                 '*d': {'asd'},
@@ -208,7 +211,7 @@ class WordCategorizerTest(unittest.TestCase):
                 'rwy': {'qwerty'},
                 'twy': {'qwerty'}
             }),
-        }
+        """
         self.assertEqual(actual, correct)
 
 

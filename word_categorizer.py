@@ -186,7 +186,7 @@ def make_suggestion_helper(word):
 
 
 def make_suggestion_dict(input_list):
-    # Takes about 4.5 min in parallel, 10 min serial
+    # Takes about 4.5 min in parallel, 10 min serial at MAX_EDIT_DISTANCE 3
     suggestion_dict = dict()
     for d in range(1, MAX_EDIT_DISTANCE + 1):
         suggestion_dict[d] = defaultdict(set)
@@ -434,6 +434,9 @@ def near_common_word(word):
 # -- Main loop functions --
 
 def get_word_category(word):
+    if not titles_all_wiktionaries:
+        load_data()
+
     category = None
     suggestion = None
 
@@ -531,7 +534,16 @@ def process_input_parallel():
         pool.join()
 
 
-if __name__ == '__main__':
+# Separate function so these don't have to be loaded for unit tests,
+# but can be loaded when importing functions that need all the data.
+def load_data():
+    global titles_all_wiktionaries
+    global transliterations
+    global english_wiktionary
+    global english_words
+    global suggestion_dict
+    global english_words_by_length_and_letter
+
     # Any words in multi-word phrases should also be listed as individual
     # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
     # (at list creation time?) since these won't be matched anyway.
@@ -569,6 +581,10 @@ if __name__ == '__main__':
 
     print("Done loading.", file=sys.stderr)
     print(datetime.datetime.now(), file=sys.stderr)
+
+
+if __name__ == '__main__':
+    load_data()
 
     process_input_parallel()
     print("Done categorizing.", file=sys.stderr)
