@@ -709,6 +709,10 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
         word_mixedcase = word_mixedcase.lstrip("†")
         search_again = True
 
+    if word_mixedcase.endswith("(s)"):
+        word_mixedcase = word_mixedcase[:-3] + "s"
+        search_again = True
+
     if search_again:
         if not word_mixedcase:
             return True
