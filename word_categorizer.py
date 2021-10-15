@@ -91,7 +91,10 @@ english_words = None
 suggestion_dict = None  # Keys are length, then low-fi match sets
 
 # Edit distance 4 and greater gives a negligible true positive rate
-MAX_EDIT_DISTANCE = 2
+# Though even 2 and 3 are more non-typos than typos, especially if
+# using a full dictionary.  Need to use other methods to classify
+# those.
+MAX_EDIT_DISTANCE = 1
 
 
 # From http://norvig.com/spell-correct.html
@@ -416,6 +419,9 @@ def near_common_word(word):
         print(f"{len(matches)} FOUND")
         matches = {match for match in matches if abs(len(match) - len(word)) <= MAX_EDIT_DISTANCE}
         print(f"{len(matches)} PLAUSIBLE, DE-DUP FOUND")
+        if edit_distance > 1:
+            # A little lossy, but greatly improves performance
+            matches = {match for match in matches if match[0] == word[0]}
 
         for match in matches:
             matches_by_distance[distance.edit_distance(word, match, transpositions=True)].add(match)
