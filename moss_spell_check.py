@@ -9,6 +9,7 @@ from word_categorizer import is_chemistry_word
 
 
 # TODO:
+# * Flag articles for topic (e.g. species, genus)
 # * Detect strings of three or more Greek letters ONLY for
 #   spell-checking purposes.
 # * tmp-output.txt:* 24 - [[wikt:ation]] - [[1772 in poetry]] ([[attest]]ation)
