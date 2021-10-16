@@ -596,6 +596,41 @@ transform_unsafe = {
     "𝕏": r"<math>\mathbb{X}</math>",
     "𝕐": r"<math>\mathbb{Y}</math>",
     "ℤ": r"<math>\mathbb{Z}</math>",
+
+    # [[MOS:LIGATURE]], list adapted from https://en.wikipedia.org/wiki/Ligature_(writing)
+    # To be ignored for non-English languages if the ligature is common.
+    "Ꜳ": "AA",
+    "ꜳ": "aa",
+    "Æ": "AE",
+    "æ": "ae",
+    "Ꜵ": "AO",
+    "ꜵ": "ao",
+    "Ꜷ": "AU",
+    "ꜷ": "au",
+    "Ꜹ": "AV",
+    "ꜹ": "av",
+    "🙰": "et",
+    "ﬀ": "ff",
+    "ﬃ": "ffi",
+    "ﬄ": "ffl",
+    "ﬁ": "fi",
+    "ﬂ": "fl",
+    "Ƕ": "Hv",
+    "ƕ": "hv",
+    "℔": "lb",
+    "Ỻ": "lL",
+    "ỻ": "ll",
+    "Œ": "OE",
+    "œ": "oe",
+    "Ꝏ": "OO",
+    "ꝏ": "oo",
+    "ﬆ": "st",
+    "Ꜩ": "Tz",
+    "ꜩ": "tz",
+    "ᵫ": "ue",
+    "ꭣ": "uo",
+    "Ꝡ": "VY",
+    "ꝡ": "vy",
 }
 
 # Automatically change, with the expectation there will be a
@@ -1038,11 +1073,7 @@ transform = {
     "&#287;": "ğ",
     "&#304;": "İ",
 
-    # Removed from "alert": "Æ", "æ", "Œ", "œ",
-    # Per [[MOS:LIGATURES]], allowed in proper names and text in
-    # languages in which they are standard. Usually not worth
-    # reviewing. Non-proper names will show up on spell check anyway
-    # if it's not a standard rendering.
+    # Ligatures in HTML entities
     "&aelig;": "æ",
     "&oelig;": "œ",
     "&AElig;": "Æ",

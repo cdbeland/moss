@@ -256,6 +256,41 @@ bad_words = {
 bad_characters = {
     # Also works for multi-character substrings
 
+    # [[MOS:LIGATURE]], list adapted from https://en.wikipedia.org/wiki/Ligature_(writing)
+    # To be ignored for non-English languages if the ligature is common.
+    "Ꜳ",
+    "ꜳ",
+    "Æ",
+    "æ",
+    "Ꜵ",
+    "ꜵ",
+    "Ꜷ",
+    "ꜷ",
+    "Ꜹ",
+    "ꜹ",
+    "🙰",
+    "ﬀ",
+    "ﬃ",
+    "ﬄ",
+    "ﬁ",
+    "ﬂ",
+    "Ƕ",
+    "ƕ",
+    "℔",
+    "Ỻ",
+    "ỻ",
+    "Œ",
+    "œ",
+    "Ꝏ",
+    "ꝏ",
+    "ﬆ",
+    "Ꜩ",
+    "ꜩ",
+    "ᵫ",
+    "ꭣ",
+    "Ꝡ",
+    "ꝡ",
+
     # Per [[MOS:BLOCKQUOTE]]
     "{{cquote",
     # This type of string must be protected from template removal (see
