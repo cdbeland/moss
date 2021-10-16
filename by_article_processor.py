@@ -1,7 +1,7 @@
 import fileinput
 from multiprocessing import Pool
 import sys
-from word_categorizer import get_word_category
+from word_categorizer import get_word_category, load_data
 
 
 def get_word_categories_uniq(word_list):
@@ -39,6 +39,7 @@ def process_line(line):
 
 
 if __name__ == '__main__':
+    load_data()
     print("Loading input...", file=sys.stderr)
     lines = [line.strip() for line in fileinput.input("-")]
     print("Processing...", file=sys.stderr)
