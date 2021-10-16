@@ -263,7 +263,8 @@ def spellcheck_all_langs(article_title, article_text):
 
     # -- Generate and fix tokenization of word_list --
 
-    word_list = nltk.word_tokenize(article_text)
+    word_list = nltk.word_tokenize(article_text.replace("—", " - "))
+    # NLTK tokenizer sometimes doesn't split on emdash
 
     # Old-fashioned loop to allow lookahead and cope with the fact
     # that the length of word_list may change as it is edited in
