@@ -20,9 +20,6 @@
 # W = Found in a non-English Wikitionary
 # L = Probable Romanization (transLiteration)
 # ME = Probable coMpound, English in English Wiktionary
-# MI = Probable coMpound, non-English (International) in English Wiktionary
-# MW = Probable coMpound, found in non-English Wiktionary
-# ML = Probable coMpound, transLiteration
 # U = URL or computer file name
 # A = mAth
 #
@@ -229,7 +226,7 @@ chem_formula_regexes = [
 ]
 chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
 
-math_re = re.compile(r"^([a-z]\([a-z]\))|(log]([a-z0-9]]))$")
+math_re = re.compile(r"^([a-z]\([a-z]\))|(log]([a-z0-9]])|([A-Za-zΑ-Ωα-ω0-9]{2,3})$")
 
 
 # Note: This may malfunction slightly if there are commas inside the
@@ -356,28 +353,16 @@ def is_rhyme_scheme(word):
     return False
 
 
-def is_compound(word):
+def is_english_compound(word):
     parts = word.split("-")
     if len(parts) > 1:
         if all(part in english_words for part in parts):
-            return "ME"
-        if all(part in english_wiktionary for part in parts):
-            return "MI"
-        if all(part in titles_all_wiktionaries for part in parts):
-            return "MW"
-        if all(part in transliterations for part in parts):
-            return "ML"
+            return True
         return False
-
     pairs = [(word[0:i], word[i:]) for i in range(1, len(word))]
-    for (cat_letter, dictionary) in [("E", english_words),
-                                     ("I", english_wiktionary),
-                                     ("W", titles_all_wiktionaries),
-                                     ("L", transliterations)]:
-        for pair in pairs:
-            if pair[0] in dictionary and pair[1] in dictionary:
-                return "M" + cat_letter
-
+    for pair in pairs:
+        if pair[0] in english_words and pair[1] in english_words:
+            return True
     return False
 
 
@@ -438,11 +423,17 @@ def get_word_category(word):
     suggestion = None
 
     if word.lower() in bad_words or word in bad_words:
-        # "you", "I'm"
+        # "you"
+        return "BW"
+    if word in bad_words or word in bad_words:
+        # "I'm"
         return "BW"
     if any([bad_char in word for bad_char in bad_characters]):
         # (bad character or substring)
         return "BC"
+
+    if is_english_compound(word):
+        return "ME"
 
     # Words in English Wiktionary (presumably including all known
     # English words) are ignored by the spell checker, so no need to
@@ -452,8 +443,6 @@ def get_word_category(word):
 
     if is_url(word):
         return "U"
-
-    compound_cat = is_compound(word)
 
     if missing_leading_zero_re.search(word):
         category = "Z"
@@ -471,8 +460,6 @@ def get_word_category(word):
                 category = "L"
             elif is_rhyme_scheme(word):
                 category = "P"
-            elif compound_cat:
-                category = compound_cat
             elif edit_distance:
                 category = "T" + str(edit_distance)
             elif dna_re.match(word):
@@ -498,7 +485,7 @@ def get_word_category(word):
             if word in known_html_bad:
                 category = "HB"
     else:
-        category = compound_cat or "I"
+        category = "I"
 
     # Dropping suggestion for now. TODO: Put it in a JWB substitution
     # file for speedy fixups.
@@ -539,7 +526,6 @@ def process_input_parallel():
 def load_data():
     global titles_all_wiktionaries
     global transliterations
-    global english_wiktionary
     global english_words
     global suggestion_dict
     global english_words_by_length_and_letter
@@ -556,10 +542,6 @@ def load_data():
     with open("/bulk-wikipedia/transliterations.txt", "r") as title_list:
         transliterations = set([line.strip().split("\t")[1] for line in title_list
                                 if "\t" in line.strip() and "_" not in line])
-
-    print("Loading English Wiktionary...", file=sys.stderr)
-    with open("/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0", "r") as title_list:
-        english_wiktionary = set([line.strip() for line in title_list if "_" not in line])
 
     print("Loading English words only...", file=sys.stderr)
     with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
