@@ -265,7 +265,13 @@ def is_chemistry_word(word):
 # --
 
 
-def is_url(word):
+def is_url_or_filename(word):
+    if "/" in word and "." in word:
+        return True
+    if word.endswith(".pdf"):
+        return True
+    if word.endswith(".html"):
+        return True
     if word.startswith("www."):
         return True
     if word.endswith(".org"):
@@ -441,7 +447,7 @@ def get_word_category(word):
     if word in titles_all_wiktionaries:
         return "W"
 
-    if is_url(word):
+    if is_url_or_filename(word):
         return "U"
 
     if missing_leading_zero_re.search(word):
