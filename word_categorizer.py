@@ -227,6 +227,17 @@ chem_formula_regexes = [
 chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
 
 math_re = re.compile(r"^([a-z]\([a-z]\))|(log]([a-z0-9]])|([A-Za-zΑ-Ωα-ω0-9]{2,3})$")
+greek_letter_present_re = re.compile(r"[Α-Ωα-ω]")
+
+
+def is_math(word):
+    if math_re.search(word):
+        return True
+    if greek_letter_present_re.search(word):
+        if "-" in word:
+            return True
+        if "/" in word:
+            return True
 
 
 # Note: This may malfunction slightly if there are commas inside the
@@ -454,8 +465,10 @@ def get_word_category(word):
         category = "Z"
     elif is_chemistry_word(word):
         category = "C"
-    elif math_re.search(word):
+    elif is_math(word):
         category = "A"
+    elif "=" in word:
+        category = "N"
     elif any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
         category = "TS"
