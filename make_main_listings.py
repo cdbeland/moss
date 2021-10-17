@@ -11,19 +11,6 @@ unsorted = [
     # TODO: BW needs to ignore italics and capital letters for "You"
     # in titles etc.  See [[1947]], [[1972 in film]]
 
-    "W",
-    # TODO: Contractions like "I'm" are mixed in, should be in BW
-    # Most of these need {{lang}}
-
-    "I",
-    # TODO: "/" and other punctuation needs to be sorted out
-
-    "MW",
-    "MI",
-    # TODO: Making compounds that combine English and non-English
-    # words lets a lot of misspellings in.  Non-English words need
-    # {{lang}} anyway.
-
     "Z",
     # TODO: Special report for batting averages and calibers, possibly
     # geared for JWB
@@ -32,8 +19,20 @@ unsorted = [
     # Processing these with JWB via moss_entity_check.py; there are
     # too many to do manually, and the benefit is usually small.
 
-    "R", "N", "P", "H", "U", "TS"]
-probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "TS+BRACKET", "T2", "T3", "HB", "HL"]
+    "TS+BRACKET",
+    # TODO: Fix quality issues discriminating whitespace oops vs. STEM
+    # notation
+
+    "TF",
+    # TODO: QA on language detection for more languages; code below
+    # truncates any unlisted languages to this.
+
+    "N", "P", "H", "U", "TS", "A"]
+probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "HB", "HL", "T/", "TE",
+
+                  # These need {{lang}} and also to be added to the
+                  # English Wiktionary; might be misspelled.
+                  "TF+el", "TF+de"]
 probably_right = ["L", "ME", "C", "D"]
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
@@ -78,6 +77,8 @@ for line in fileinput.input("-"):
             types[index] = "TS+EXTRA"
         elif types[index] == "TS" and bracket_missing_ws_re.search(typo_link):
             types[index] = "TS+BRACKET"
+        elif types[index].startswith("TF") and types[index] not in probably_wrong:
+            types[index] = "TF"
 
     best_type = None
     for type_ in probably_wrong:
