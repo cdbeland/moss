@@ -13,3 +13,5 @@ for filename in [
 
 # TODO: Compare e.g.
 # https://en.wikipedia.org/wiki/ISO_9
+# https://en.wikipedia.org/wiki/List_of_ISO_romanizations
+# https://en.wikipedia.org/wiki/Romanization
