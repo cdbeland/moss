@@ -74,41 +74,12 @@ echo `date`
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py > post-main-listings.txt
 
 # Dealing with the remaining pile of typos:
-# * Mark valid mechanistic transliterations as IT and TT; these would
-#   not be eligible for Wiktionary.  (Will reduce R and T4+.)
-#   Probably want to make a separate step that runs at download time
-#   that makes a file of transliterated forms for spell.py to load.
-#    https://en.wikipedia.org/wiki/List_of_ISO_romanizations
-#    https://en.wikipedia.org/wiki/Romanization
-# * Refine "N" category:
-#   * Valid word + hyphen + invalid word - probably a typo especially
-#     if the invalid one is T1.  Maybe classify both sides?
-#   * Chemistry words with hypens
-#   * Chemistry words with hypens and numbers
-#   * Other words with numbers (need to manually {{not a typo}})
-#   * Remainders (sounding outs, non-English words?)
+# * Improve transliterate.py
+#  * Valid word + hyphen + invalid word - probably a typo especially
+#    if the invalid one is T1.  Maybe classify both sides?
+# * Refine "A" category to require {{math}} be tagged but otherwise
+#   allow forms in compliance with the Manual of Style?
 
-# * Refine "I" category to distinguish between human-language words
-#   (IW) and scientific notation and other characters (IS).  spell.py
-#   should generally be enhanced to ignore IS that complies with the
-#   Manual of Style.
-# * Post lists of words in other Wiktionaries missing from the English
-#   Wiktionary (W)
-# * Look at IW words and see what's left
-#   * May need to separate IW into those that are and aren't 1 edit
-#     away from a non-English word, and post IWT1 probable
-#     misspellings, non-English
-#   * May need to replace ispell hack for English, anyway?
-#   * Post IW probable new words, non-English
-#   * R and T4+ mixed in article with IW or IT are probably
-#     non-English; include these in lists, and update stats.
-# * Some legit English T1s are marked as W or TT, recover those and
-#   post a list for people to sort them out.  Might help to have an
-#   English-only spell check list.
-# * Post lists of valid but untagged transliterations (IT) by script
-# * Post lists of in-Wiktionary but untagged words by language, so
-#   people interested in those languages can go tag the English
-#   articles (need to add language classifier)
 # Also helps stats a lot:
 # * Tagging articles for {{cleanup HTML}} from the appropriate report
 # * Tagging articles with the most misspelled words with:
@@ -133,27 +104,7 @@ echo `date`
 grep -P '^(TS|ME)' tmp-words-with-articles.txt | grep -vP 'wikt:[^\]]+[\(\[\),\.]' | grep -vP "\w\]\w" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
 grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
 
-grep -P '^(?!T1|TS|P|D|C|H|U|BC|BW|N|Z)' tmp-words-with-articles.txt | grep -vP "\[\[wikt:&" | grep -vP "\[\[wikt:<" | grep -P "wikt:[\p{L}]{3,}\]\]" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
-# No longer excluding I, W, MI, MW - most remaining words are no longer in English anyway.
-# Two characters or less gets a lot of math and IPA notation.
-#
-# TODO to speed processing of non-English words:
-# * Separate words into the scripts they use:
-#  -> See https://en.wikipedia.org/wiki/Wikipedia:Language_recognition_chart
-# * Start with an easy-to-identify language (like Hebrew, Arabic,
-#   Korean, Japanese, Chinese, German [with ß])
-# * Download all Wikipedias and Wiktionaries (titles only) for
-#   languages that use this script
-# * Produce a list of words from this language which might be typos or
-#   might need to be added to the English or non-English Wiktionary or
-#   Wikipedia.
-# * If there's no way to distinguish proper nouns in a language, we
-#   may just need to ignore all text from that language so we don't
-#   alert on non-notable proper names.  But do such entities deserve
-#   translation in the English Wikipedia?  If so, it would be nice to
-#   have editors manually check the spelling of such words and add
-#   {{proper name}} to those instances.  Though we don't do that for
-#   English proper names.
+grep -P '^(?!T1|TS|TE|P|D|C|H|U|BC|BW|N|Z|A|T/|L)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
 
 echo "===Known bad HTML tags (HB) ===" > post-html-by-freq.txt
 echo "These are also included in the main listings." >> post-html-by-freq.txt
@@ -194,7 +145,7 @@ echo `date`
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
-grep -v "I," tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z][\,\.][A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' | grep -vP '[a-zA-Z][\(\)\[\]][A-Za-z]' > post-copyedit.txt
+grep -v "TF+" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z][\,\.][A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' | grep -vP '[a-zA-Z][\(\)\[\]][A-Za-z]' > post-copyedit.txt
 
 # --- BY WORD LENGTH ---
 
