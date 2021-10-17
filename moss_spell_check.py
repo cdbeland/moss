@@ -9,7 +9,8 @@ from word_categorizer import is_chemistry_word
 
 
 # TODO:
-# * Flag articles for topic (e.g. species, genus)
+# * Flag articles for topic (e.g. species, genus) and language hints
+#   (country name, language name, {{lang}} and {{transl}})
 # * Detect strings of three or more Greek letters ONLY for
 #   spell-checking purposes.
 # * tmp-output.txt:* 24 - [[wikt:ation]] - [[1772 in poetry]] ([[attest]]ation)
@@ -31,8 +32,6 @@ from word_categorizer import is_chemistry_word
 #   "{{[\w]+(misspelling|incorrect)[\w* ]+}}" pages on enwiki and
 #   prepare batch edits for these
 # * Is there an equivalent for misspellings on wiktionary?
-
-# TODOs:
 # * Handle multi-word phrases properly, or slice up article titles?
 # * Be case-sensitive (need to recover from article text due to first
 #   word in article titles always being capitalized, and on the other
@@ -42,7 +41,6 @@ from word_categorizer import is_chemistry_word
 # * Support {{sic}}, reading and writing
 # * Only allow 's on nouns
 # * Handle final . properly for real, by detecting end-of-sentence
-
 # * Monitor recent changes (see [[Wikipedia:Recent changes
 #   patrol#Monitoring]]) and drop notes on editor talk pages notifying
 #   them they may have made a spelling error.  The algorithm needs to
