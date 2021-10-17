@@ -11,3 +11,5 @@ unidecode
 wikipedia
 git+https://github.com/wikimedia/pywikibot.git
 textstat
+gcld3
+pycountry
