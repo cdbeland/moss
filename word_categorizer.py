@@ -32,6 +32,7 @@
 from collections import defaultdict
 import datetime
 import fileinput
+import gcld3
 from multiprocessing import Pool
 from nltk.metrics import distance
 import re
@@ -75,6 +76,9 @@ known_bad_link = {"<http>", "<https>", "<http/>", "<https/>", "<www>"}
 not_html = {"<a>", "<name>", "<r>", "<h>"}
 # <a> is not turned into a link by Mediawiki, so it's almost always
 # intentional like linguistics markup.
+
+google_lang_detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
+                                                    max_num_bytes=1000)
 
 
 # -- INITIALIZATION HELPERS AND GLOBAL VARIABLES --
@@ -433,6 +437,17 @@ def near_common_word(word):
     return (False, False)
 
 
+def tag_by_lang(word):
+    lang_code = google_lang_detector.FindLanguage(word).language
+    if lang_code == "en":
+        return "TE"
+    else:
+        if lang_code == "iw":
+            lang_code = "he"
+            # ISO 639 code change for Hebrew
+        return f"TF+{lang_code}"
+
+
 # -- Main loop functions --
 
 def get_word_category(word):
@@ -455,8 +470,11 @@ def get_word_category(word):
     # Words in English Wiktionary (presumably including all known
     # English words) are ignored by the spell checker, so no need to
     # categorize words in english_words and english_wiktionary.
+    #
+    # TODO: Find the language of the word by Wikitionary lookup
+    # instead of fuzzy language identification.
     if word in titles_all_wiktionaries:
-        return "W"
+        return tag_by_lang(word)
 
     if is_url_or_filename(word):
         return "U"
@@ -484,7 +502,7 @@ def get_word_category(word):
             elif dna_re.match(word):
                 category = "D"
             else:
-                category = "R"
+                category = tag_by_lang(word)
         elif az_dot_re.match(word):
             # Usually missing whitespace after a period at the end of
             # a sentence
@@ -504,10 +522,10 @@ def get_word_category(word):
             if word in known_html_bad:
                 category = "HB"
     else:
-        category = "I"
+        category = tag_by_lang(word)
 
-    # Dropping suggestion for now. TODO: Put it in a JWB substitution
-    # file for speedy fixups.
+    # Dropping suggestion for now. TODO: Put suggestions in a JWB
+    # substitution file for speedy fixups.
     return category
 
 

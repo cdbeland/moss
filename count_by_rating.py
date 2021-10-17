@@ -9,6 +9,9 @@ ratings_instances = defaultdict(int)
 
 for line in fileinput.input("-"):
     (rating, remainder) = line.split("\t")
+    if rating.startswith("TF"):
+        # Collapse all non-English languages for statistical purposes
+        rating = "TF"
     instances = instance_re.match(remainder).group(1)
 
     ratings_uniques[rating] += 1
