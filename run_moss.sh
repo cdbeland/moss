@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# Run time for commit 2ec07e4: 4h30m to start of readability report,
+#  5h50m overall (8-core parallel, big-bucks)
 # Run time for commit 17ca7d3: ~4h to start of readability report,
 #  5.5h overall (8-core parallel, big-bucks)
 # Run time for commit c6ce3ab: ~26h (whata)
@@ -21,7 +23,7 @@ cd $RUN_NAME
 echo "Beginning HTML entity check"
 echo `date`
 
-# Run time for this segment: ~17 min (8-core parallel)
+# Run time for this segment: ~45 min (8-core parallel)
 
 # ../venv/bin/python3 ../moss_entity_check.py | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities
@@ -46,7 +48,7 @@ echo `date`
 echo "Beginning word categorization run 1"
 echo `date`
 
-# Run time for this segment: ~26 min (8-core parallel)
+# Run time for this segment: ~36 min (8-core parallel)
 grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
 # Sort takes ~37sec
 cat /tmp/sorted_by_article.txt | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
@@ -61,7 +63,7 @@ grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2
 echo "Beginning word categorization run 2"
 echo `date`
 
-# Run time for this line: ~20 min (8-core parallel)
+# Run time for this line: ~30 min (8-core parallel)
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---
