@@ -5,8 +5,13 @@
 # HL = Bad HTML-like linking, like <http://...>
 # T1, T2, etc. = Typo likely in regular word; number gives edit
 #                distance to nearest common dictionary word
+# TE = Typo likely English based on language recognition
+# TF = Typo likely Foreign (non-English) based on language recognition
+#      (followed by "+" then ISO 639 language code and possible ISO
+#      15924 script code)
 # TS = Typo likely in regular word; probably two words that need to be
 #      split by space or dash
+# T/ = Possible violation of [[MOS:SLASH]]
 # BW = Bad word
 # BC = Bad character
 # Z = Decimal fraction missing leading zero (includes calibers and
@@ -17,16 +22,10 @@
 # C = Chemistry
 # D = DNA sequence
 # P = Pattern of some kind (rhyme scheme, reduplication)
-# W = Found in a non-English Wikitionary
 # L = Probable Romanization (transLiteration)
 # ME = Probable coMpound, English in English Wiktionary
 # U = URL or computer file name
 # A = mAth
-#
-# Relatively unsorted:
-#
-# R = Regular word (a-z only)
-# I = International (non-ASCII characters)
 # N = Numbers or punctuation
 
 from collections import defaultdict
@@ -37,6 +36,8 @@ from multiprocessing import Pool
 from nltk.metrics import distance
 import re
 import sys
+import unicodedata
+
 try:
     from sectionalizer import get_word
     from spell import bad_characters
@@ -230,7 +231,7 @@ chem_formula_regexes = [
 ]
 chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
 
-math_re = re.compile(r"^([a-z]\([a-z]\))|(log\([a-z0-9]\))|([A-Za-zΑ-Ωα-ω0-9]{2,3})$")
+math_re = re.compile(r"^(^[a-z]\([a-z]\)|log\([a-z0-9]\)|[A-Za-zΑ-Ωα-ω0-9]{2,3})$")
 greek_letter_present_re = re.compile(r"[Α-Ωα-ω]")
 
 
@@ -242,6 +243,7 @@ def is_math(word):
             return True
         if "/" in word:
             return True
+    return False
 
 
 # Note: This may malfunction slightly if there are commas inside the
@@ -380,6 +382,7 @@ def is_english_compound(word):
         if all(part in english_words for part in parts):
             return True
         return False
+
     pairs = [(word[0:i], word[i:]) for i in range(1, len(word))]
     for pair in pairs:
         if pair[0] in english_words and pair[1] in english_words:
@@ -438,6 +441,9 @@ def near_common_word(word):
 
 
 def tag_by_lang(word):
+    # TODO: Very unreliable for Korean. Try using script detection?
+    # -> https://en.wikipedia.org/wiki/Wikipedia:Language_recognition_chart
+
     lang_code = google_lang_detector.FindLanguage(word).language
     if lang_code == "en":
         return "TE"
@@ -485,8 +491,6 @@ def get_word_category(word):
         category = "C"
     elif is_math(word):
         category = "A"
-    elif "=" in word:
-        category = "N"
     elif any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
         category = "TS"
@@ -507,9 +511,8 @@ def get_word_category(word):
             # Usually missing whitespace after a period at the end of
             # a sentence
             category = "TS"
-        else:
-            category = "N"
-    elif html_tag_re.match(word):
+
+    if not category and html_tag_re.match(word):
         category = "H"
         if word in known_bad_link:
             category = "HL"
@@ -521,8 +524,20 @@ def get_word_category(word):
             word = word.replace("/", "")
             if word in known_html_bad:
                 category = "HB"
-    else:
-        category = tag_by_lang(word)
+
+    if not category:
+        # Unicode category code meanings:
+        # https://www.unicode.org/reports/tr44/#Property_Values
+        unicode_classes = [unicodedata.category(char) for char in word]
+        odd_classes = [c for c in unicode_classes if not c.startswith("L")]
+        odd_classes = [c for c in odd_classes if c != "Pd"]
+        if odd_classes:
+            if odd_classes == ["Po"] and "/" in word:
+                category = "T/"
+            else:
+                category = "N"
+        else:
+            category = tag_by_lang(word)
 
     # Dropping suggestion for now. TODO: Put suggestions in a JWB
     # substitution file for speedy fixups.
