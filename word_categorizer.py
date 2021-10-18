@@ -377,6 +377,9 @@ def is_rhyme_scheme(word):
 
 
 def is_english_compound(word):
+    if "." in word:
+        return False
+
     parts = word.split("-")
     if len(parts) > 1:
         if all(part in english_words for part in parts):
