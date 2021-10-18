@@ -15,16 +15,19 @@ non_entity_transform = [string for string
 article_blocklist = [
     # Characters themselves are discussed or listed as part of a mapping
     "' (disambiguation)",
+    "AA",
     "ANSEL",
     "ARIB STD B24 character set",
     "ALCOR",
     "ALGOL",
     "ALGOL 68",
     "ASMO 449",
+    "AV",
     "AZERTY",
     "Afrasianist phonetic notation",
     "AltGr key",
     "Americanist phonetic notation",
+    "Ampersand",
     "Apostrophe",
     "Arabic alphabet",
     "Atari ST character set",
@@ -36,6 +39,7 @@ article_blocklist = [
     "Blackboard bold",
     "Bookshelf Symbol 7",
     "Bracket",
+    ".ca",
     "C",
     "(C)",
     "CEA-708",
@@ -81,6 +85,8 @@ article_blocklist = [
     "En (typography)",
     "Extended Latin-8",
     "Extensions to the International Phonetic Alphabet",
+    "Ezh",
+    "FFL",
     "FOCAL character set",
     "G",
     "GB 2312",
@@ -117,6 +123,7 @@ article_blocklist = [
     "ISO/IEC 8859-7",
     "ISO/IEC 8859-8",
     "ISO/IEC 8859-9",
+    "ISO basic Latin alphabet",
     "ITU T.61",
     "Jeremy Burge",
     "JIS X 0201",
@@ -131,8 +138,11 @@ article_blocklist = [
     "KPS 9566",
     "KS X 1001",
     "L",
+    "Latin Extended Additional",
+    "Latin Extended-B",
     "Latin script in Unicode",
     "Letterlike Symbols",
+    "Ligature (writing)",
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
     "List of Latin-script letters",
@@ -155,6 +165,8 @@ article_blocklist = [
     "Number Forms",
     "Numerals in Unicode",
     "Numero sign",
+    "Numismatics",
+    "OT1 encoding",
     "Palatal hook",
     "PETSCII",
     "Phags-pa (Unicode block)",
@@ -214,6 +226,7 @@ article_blocklist = [
     "Wade–Giles",
     "Wang International Standard Code for Information Interchange",
     "Warmian-Masurian Voivodeship",
+    "Welsh orthography",
     "Western Latin character sets (computing)",
     "Whitespace (programming language)",
     "Windows-1250",
@@ -230,9 +243,11 @@ article_blocklist = [
     "Windows Cyrillic + German",
     "Windows Glyph List 4",
     "Windows Polytonic Greek",
+    "Wingdings",
     "World glyph set",
     "X",
     "Xerox Character Code Standard",
+    "Yakut scripts",
     "YUSCII",
     "Zero-width space",
     "Z",
@@ -253,6 +268,18 @@ article_blocklist = [
     "Bengali–Assamese script",
     "Modern Arabic mathematical notation",  # LTR/RTL characters
     "List of jōyō kanji",  # Breaks display of certain characters
+
+    # Ligatures correctly used
+    "Massachusett dialects",
+    "Massachusett language",
+    "Massachusett writing systems",
+    "Wampum",
+    "Alchemical symbol",
+    "Mayan languages",
+    "Tezos",
+    "Hubert Déquier",
+    "Komi Nje",
+    "Flow process chart",
 
     # &zwj; apparently needed
     "Rasm",
@@ -403,6 +430,10 @@ suppression_patterns = [
     re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
     re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
     re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
+
+    # Proper nouns with ligatures, which are an exception to the
+    # general no-ligatures-in-English rule at [[MOS:LIGATURE]].
+    re.compile(r"Raunkiær|Encyclopædia Britannica|Encyclopædia Iranica|Ævar"),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.

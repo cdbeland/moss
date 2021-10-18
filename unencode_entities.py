@@ -599,9 +599,14 @@ transform_unsafe = {
 
     # [[MOS:LIGATURE]], list adapted from https://en.wikipedia.org/wiki/Ligature_(writing)
     # To be ignored for non-English languages if the ligature is common.
+
+    # Disabled (for now) because they are capital letters often seen
+    # in proper nouns, an [[MOS:LIGATURE]] exception.
+    # "Æ": "AE",
+    # "Œ": "OE",
+
     "Ꜳ": "AA",
     "ꜳ": "aa",
-    "Æ": "AE",
     "æ": "ae",
     "Ꜵ": "AO",
     "ꜵ": "ao",
@@ -620,7 +625,6 @@ transform_unsafe = {
     "℔": "lb",
     "Ỻ": "lL",
     "ỻ": "ll",
-    "Œ": "OE",
     "œ": "oe",
     "Ꝏ": "OO",
     "ꝏ": "oo",

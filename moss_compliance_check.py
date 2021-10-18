@@ -35,10 +35,6 @@ REGEX_SUBSTITUTIONS = [
     # multi-dimensional converts:
     # https://en.wikipedia.org/wiki/Terris_Nguyen_Temple
 
-    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Ligatures
-    # æ -> ae unless word is capitalized or not English or in IPA
-    # https://en.wikipedia.org/w/index.php?search=insource%3A%2F%C3%A6%2F&title=Special%3ASearch&profile=advanced&fulltext=1&advancedSearch-current=%7B%7D&ns0=1
-    #
     # insource:/coöperative/ -> cooperative, archaic?
     # (or should English have accents to help pronunciation?)
 
