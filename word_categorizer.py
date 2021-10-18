@@ -473,7 +473,11 @@ def get_word_category(word):
         # (bad character or substring)
         return "BC"
 
-    if is_english_compound(word):
+    if missing_leading_zero_re.search(word):
+        return "Z"
+    elif is_chemistry_word(word):
+        return "C"  # Should be before "ME"
+    elif is_english_compound(word):
         return "ME"
 
     # Words in English Wiktionary (presumably including all known
@@ -488,11 +492,7 @@ def get_word_category(word):
     if is_url_or_filename(word):
         return "U"
 
-    if missing_leading_zero_re.search(word):
-        category = "Z"
-    elif is_chemistry_word(word):
-        category = "C"
-    elif is_math(word):
+    if is_math(word):
         category = "A"
     elif any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
