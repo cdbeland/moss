@@ -1,7 +1,7 @@
 import fileinput
 import re
 
-match_re = re.compile(r"(\w+)\t\* \d+ - \[\[wikt:(.*?)\]\] - (.*)$")
+match_re = re.compile(r"([\w\+/\-]+)\t\* \d+ - \[\[wikt:(.*?)\]\] - (.*)$")
 
 for line in fileinput.input("-"):
     line = line.strip()
