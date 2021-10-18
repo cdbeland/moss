@@ -98,6 +98,8 @@ grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[
 # can be relaxed once "you" and contractions can be ignored inside
 # italics.
 
+grep TF+la tmp-articles-linked-words.txt | perl -pe 's/^.*?\t\*/*/' > beland-species.txt
+
 # --- BY FREQUENCY ---
 
 echo "Beginning by-frequency post-processing"
