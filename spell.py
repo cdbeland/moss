@@ -141,6 +141,13 @@ bad_words = {
     "I'm",
     "I've",
     "I'd",
+
+    # For code which does .lower() for everything
+    "i'll",
+    "i'm",
+    "i've",
+    "i'd",
+
     "isn't",
     "it'd",
     "it'll",

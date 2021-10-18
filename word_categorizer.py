@@ -466,7 +466,7 @@ def get_word_category(word):
     if word.lower() in bad_words or word in bad_words:
         # "you"
         return "BW"
-    if word in bad_words or word in bad_words:
+    if word in bad_words:
         # "I'm"
         return "BW"
     if any([bad_char in word for bad_char in bad_characters]):
