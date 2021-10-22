@@ -4,7 +4,7 @@ import re
 
 
 html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
-blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>)", flags=re.I+re.S)
+blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>|{{quote box.*?}})", flags=re.I+re.S)
 ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove|[Cc]opy section) to \w+"
                             r"|[Nn]ot English"
                             r"|[Cc]leanup HTML"
