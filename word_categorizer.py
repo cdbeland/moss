@@ -231,7 +231,7 @@ chem_formula_regexes = [
 ]
 chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
 
-math_re = re.compile(r"^(^[a-z]\([a-z]\)|log\([a-z0-9]\)|[A-Za-zΑ-Ωα-ω0-9]{2,3})$")
+math_re = re.compile(r"^([A-Za-z]{1,2}\([A-Za-z]{1,2}\)|log\([a-z0-9]\)|[A-Za-zΑ-Ωα-ω0-9]{2,3})$")
 greek_letter_present_re = re.compile(r"[Α-Ωα-ω]")
 
 
