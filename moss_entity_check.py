@@ -281,6 +281,9 @@ article_blocklist = [
     "Komi Nje",
     "Flow process chart",
 
+    # Legitimate use of <h2> due to complex layout
+    "Main Page",
+
     # &zwj; apparently needed
     "Rasm",
     "The Partisan",
