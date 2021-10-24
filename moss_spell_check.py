@@ -92,6 +92,9 @@ article_skip_list = [
     "Unicode subscripts and superscripts",  # Really only need to suppress BC for this article
 ]
 
+bad_words_apos = sorted([w for w in bad_words if "'" in w], key=lambda w: 100 - len(w))
+bad_words_apos_re = re.compile(r"[^a-z](" + "|".join(bad_words_apos) + r")[^a-z]", re.I)
+
 
 def ignore_typo_in_context(word_mixedcase, article_text_orig):
 
@@ -252,9 +255,9 @@ def spellcheck_all_langs(article_title, article_text):
             article_oops_list.append(typo)
 
     # The NLTK tokenizer splits contractions in two
-    for bad_word in bad_words:
-        if "'" in bad_word and bad_word in article_text:
-            article_oops_list.append(bad_word)
+    found_bad_words = bad_words_apos_re.findall(article_text)
+    for bad_word in found_bad_words:
+        article_oops_list.append(bad_word)
 
     article_oops_list = [oops for oops in article_oops_list
                          if not ignore_typo_in_context(oops, article_text_orig)]
