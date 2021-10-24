@@ -436,7 +436,7 @@ suppression_patterns = [
 
     # Proper nouns with ligatures, which are an exception to the
     # general no-ligatures-in-English rule at [[MOS:LIGATURE]].
-    re.compile(r"Raunkiær|Encyclopædia Britannica|Encyclopædia Iranica|Ævar"),
+    re.compile(r"\W[A-Z][a-z]*[æœ][a-z]*\W|\W[ÆŒ][a-z]+\W"),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
