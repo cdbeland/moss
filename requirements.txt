@@ -9,7 +9,10 @@ pyenchant
 stopit
 unidecode
 wikipedia
-git+https://github.com/wikimedia/pywikibot.git
 textstat
 gcld3
 pycountry
+
+git+https://github.com/wikimedia/pywikibot.git
+wikitextparser
+# Alternate parser: mwparserfromhell
