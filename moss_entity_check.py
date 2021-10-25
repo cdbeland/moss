@@ -208,6 +208,7 @@ article_blocklist = [
     "TI calculator character sets",
     "Tibetan (Unicode block)",
     "Tilde",
+    "Trademark symbol",
     "TRON (encoding)",
     "Unicode compatibility characters",
     "Unicode equivalence",
@@ -408,6 +409,22 @@ def add_tuples_to_results(tuple_list):
         strings_found_by_type[result_type][string] = articles_with_string
 
 
+# Lowercase letters for French and Scandanavian languages that use
+# ligatures as standard characters
+#  lc_lig = "a-zøðþęáéóúýǫ́àèòùâêîôûëïöüÿçå"
+# Proper nouns with ligatures, which are an exception to the general
+# no-ligatures-in-English rule at [[MOS:LIGATURE]].
+#  ligature_suppression_pattern = rf"\W[[:upper:]]{lg_lig}*[æœ]{lg_lig}*\W|\W[ÆŒ]{lg_lig}+\W"
+#
+# The below is omitted from suppression_patterns because æ and œ are
+# disabled in unencode_entities.transform_unsafe; detection of
+# inappropriate uses of these is now handled by spell check, because
+# they are very common standard spelling in French and Scandanavian
+# languages.
+#  import regex
+#  regex.compile(ligature_suppression_pattern),
+
+
 suppression_patterns = [
     re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I+re.S),
     re.compile(r"<source.*?</source>", flags=re.I+re.S),
@@ -433,10 +450,6 @@ suppression_patterns = [
     re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
     re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
     re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
-
-    # Proper nouns with ligatures, which are an exception to the
-    # general no-ligatures-in-English rule at [[MOS:LIGATURE]].
-    re.compile(r"\W[A-Z][a-z]*[æœ][a-z]*\W|\W[ÆŒ][a-z]+\W"),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
@@ -466,6 +479,9 @@ def entity_check(article_title, article_text):
         return
 
     if "{{which lang" in article_text:
+        return
+
+    if "{{move to Wiki" in article_text or "{{Move to Wiki" in article_text:
         return
 
     for pattern in suppression_patterns:

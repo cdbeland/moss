@@ -597,17 +597,12 @@ transform_unsafe = {
     "𝕐": r"<math>\mathbb{Y}</math>",
     "ℤ": r"<math>\mathbb{Z}</math>",
 
-    # [[MOS:LIGATURE]], list adapted from https://en.wikipedia.org/wiki/Ligature_(writing)
-    # To be ignored for non-English languages if the ligature is common.
 
-    # Disabled (for now) because they are capital letters often seen
-    # in proper nouns, an [[MOS:LIGATURE]] exception.
-    # "Æ": "AE",
-    # "Œ": "OE",
-
+    # See similar list in spell.py!
+    # [[MOS:LIGATURE]], list adapted from
+    # https://en.wikipedia.org/wiki/Ligature_(writing)
     "Ꜳ": "AA",
     "ꜳ": "aa",
-    "æ": "ae",
     "Ꜵ": "AO",
     "ꜵ": "ao",
     "Ꜷ": "AU",
@@ -625,7 +620,6 @@ transform_unsafe = {
     "℔": "lb",
     "Ỻ": "lL",
     "ỻ": "ll",
-    "œ": "oe",
     "Ꝏ": "OO",
     "ꝏ": "oo",
     "ﬆ": "st",
@@ -635,6 +629,14 @@ transform_unsafe = {
     "ꭣ": "uo",
     "Ꝡ": "VY",
     "ꝡ": "vy",
+
+    # These are extremely common in standard French and Scandanavian
+    # languages, where they are allowed by [[MOS:LIGATURE]] because
+    # they are considered standard spellings.
+    # "Æ": "AE",
+    # "Œ": "OE",
+    # "æ": "ae",
+    # "œ": "oe",
 }
 
 # Automatically change, with the expectation there will be a

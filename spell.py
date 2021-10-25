@@ -263,12 +263,13 @@ bad_words = {
 bad_characters = {
     # Also works for multi-character substrings
 
-    # [[MOS:LIGATURE]], list adapted from https://en.wikipedia.org/wiki/Ligature_(writing)
-    # To be ignored for non-English languages if the ligature is common.
+    # See similar list in unencode_entities.py!
+    # [[MOS:LIGATURE]], list adapted from:
+    #  https://en.wikipedia.org/wiki/Ligature_(writing)
+    # To be ignored for non-English languages if the spelling with the
+    # ligature is considered standard, using {{lang}}.
     "Ꜳ",
     "ꜳ",
-    "Æ",
-    "æ",
     "Ꜵ",
     "ꜵ",
     "Ꜷ",
@@ -286,8 +287,6 @@ bad_characters = {
     "℔",
     "Ỻ",
     "ỻ",
-    "Œ",
-    "œ",
     "Ꝏ",
     "ꝏ",
     "ﬆ",
@@ -297,6 +296,17 @@ bad_characters = {
     "ꭣ",
     "Ꝡ",
     "ꝡ",
+
+    # These are extremely common in standard French and Scandanavian
+    # languages, where they are allowed by [[MOS:LIGATURE]] because
+    # they are considered standard spellings. De-listed here so that
+    # any inappropriate uses in English are detected by dictionary
+    # lookup failure (except for archaic/non-standard dictionary
+    # entries, which are a TODO to suppress).
+    # "æ",
+    # "Æ",
+    # "œ",
+    # "Œ",
 
     # Per [[MOS:BLOCKQUOTE]]
     "{{cquote",
