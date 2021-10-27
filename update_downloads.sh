@@ -123,3 +123,8 @@ echo `date`
 echo "Converting XML to CSV..."
 venv/bin/python3 xml_to_csv.py > /bulk-wikipedia/enwiki-articles-no-redir.csv
 echo `date`
+
+./load_enwiki_categories.sh
+
+echo `date`
+echo "Done"

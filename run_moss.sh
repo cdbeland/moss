@@ -228,3 +228,13 @@ echo "Beginning superscript/subscript audit"
 
 echo "Done"
 echo `date`
+
+# --- CHEMICAL FORMULAS ---
+
+echo "Starting chemical formulas report"
+echo `date`
+
+../venv/bin/python3 ../chemical_formula_report.py > beland-chemical-formulas.txt
+
+echo "Done"
+echo `date`
