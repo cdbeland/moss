@@ -42,6 +42,7 @@ article_blocklist = [
     ".ca",
     "C",
     "(C)",
+    "C (disambiguation)",
     "CEA-708",
     "CER-GS",
     "Casio calculator character sets",
@@ -383,6 +384,7 @@ article_blocklist = [
     "Tokyo",
     "Tokyo Skytree",
     "Patrice Bart-Williams",
+    "Nomura Securities",
 
     # Special character in <timeline>
     "Chip (magazine)",
@@ -439,7 +441,7 @@ suppression_patterns = [
     re.compile(r"{{UPA.*?}}", flags=re.S),
     re.compile(r"{{angle.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr.*?}}", flags=re.I+re.S),
-    re.compile(r'{\|\s*class="wikitable IPA".*?\|}'),
+    re.compile(r'{\|\s*class="wikitable IPA".*?\|}', flags=re.S),
     re.compile(r"{{transl.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
@@ -450,6 +452,7 @@ suppression_patterns = [
     re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
     re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
     re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
+    re.compile(r"{{([Ii]nfobox )?[Cc]hinese*?}}", flags=re.I+re.S),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
