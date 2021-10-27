@@ -440,8 +440,6 @@ def fetch_categories(word):
     cursor.execute("SELECT title, category_name FROM page_categories WHERE title=%s", (word, ))
 
     # Account for SQL being case-insensitive
-    # result = [cat.decode('utf-8') for (title, cat) in cursor if title.decode('utf-8') == word]
-
     result = [cat.decode('utf8') for (title, cat) in cursor if title.decode('utf8') == word]
     cursor.close()
     return result
