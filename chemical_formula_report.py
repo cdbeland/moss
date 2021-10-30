@@ -34,7 +34,7 @@ articles_by_formula = defaultdict(list)
 
 
 def chem_formula_check(article_title, article_text):
-    article_text = wikitext_to_plaintext(article_text)
+    article_text = wikitext_to_plaintext(article_text, flatten_sup_sub=False)
     article_text = get_main_body_wikitext(article_text)
 
     # Fast but over-matches
@@ -54,9 +54,11 @@ def add_tuples_to_results(tuple_list):
 
 
 def dump_results():
+    for (formula, article_list) in articles_by_formula.items():
+        articles_by_formula[formula] = sorted(set(article_list))
     tuples = list(articles_by_formula.items())
     tuples.sort(key=lambda t: (len(t[1]) * -1, t[0]))
-    for length_cap in [5, 5000]:
+    for length_cap in [25, 5000]:
         for (formula, article_list) in tuples:
             short_list = sorted(article_list)[0:length_cap]
             length = len(article_list)
