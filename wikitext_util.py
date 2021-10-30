@@ -259,10 +259,6 @@ substitutions = [
     (re.compile(r"</big>", flags=re.I), ""),
     (re.compile(r"<center>", flags=re.I), ""),
     (re.compile(r"</center>", flags=re.I), ""),
-    (re.compile(r"<sub>", flags=re.I), ""),  # e.g. PreQ<sub>1</sub>, H<sub>2</sub>O
-    (re.compile(r"</sub>", flags=re.I), ""),
-    (re.compile(r"<sup>", flags=re.I), ""),
-    (re.compile(r"</sup>", flags=re.I), ""),
     (re.compile(r"<s>", flags=re.I), ""),
     (re.compile(r"</s>", flags=re.I), ""),
     (re.compile(r"<u>", flags=re.I), ""),
@@ -320,13 +316,22 @@ substitutions = [
 ]
 
 
+substitutions_sub_sup = [
+    # Incorporate inline into surrounding text
+    (re.compile(r"<sub>", flags=re.I), ""),  # e.g. PreQ<sub>1</sub>, H<sub>2</sub>O
+    (re.compile(r"</sub>", flags=re.I), ""),
+    (re.compile(r"<sup>", flags=re.I), ""),
+    (re.compile(r"</sup>", flags=re.I), ""),
+]
+
+
 # This function does not preserve all elements in the wikitext where
 # non-linear rendering or template substitution would be required, so
 # some information on the page is lost.  It is intended for use with
 # verification algorithms that are mostly expecting prose, and will
 # leave complicated markup (including math-in-prose) unverified.  Some
 # wikitext features, like section headers, are left intact.
-def wikitext_to_plaintext(string):
+def wikitext_to_plaintext(string, flatten_sup_sub=True):
     for (regex, replacement) in early_substitutions:
         string = regex.sub(replacement, string)
 
@@ -340,6 +345,10 @@ def wikitext_to_plaintext(string):
 
     for (regex, replacement) in substitutions:
         string = regex.sub(replacement, string)
+
+    if flatten_sup_sub:
+        for (regex, replacement) in substitutions_sub_sup:
+            string = regex.sub(replacement, string)
 
     return string
 
