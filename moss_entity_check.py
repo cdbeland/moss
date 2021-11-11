@@ -24,6 +24,7 @@ article_blocklist = [
     "ASMO 449",
     "AV",
     "AZERTY",
+    "Adobe Glyph List",
     "Afrasianist phonetic notation",
     "AltGr key",
     "Americanist phonetic notation",
@@ -385,6 +386,8 @@ article_blocklist = [
     "Tokyo Skytree",
     "Patrice Bart-Williams",
     "Nomura Securities",
+    "Rui En vol. 01",
+    "Jan de Herdt",
 
     # Special character in <timeline>
     "Chip (magazine)",
@@ -442,6 +445,7 @@ suppression_patterns = [
     re.compile(r"{{angle.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr.*?}}", flags=re.I+re.S),
     re.compile(r'{\|\s*class="wikitable IPA".*?\|}', flags=re.S),
+    re.compile(r'{\|\s*class="IPA wikitable".*?\|}', flags=re.S),
     re.compile(r"{{transl.*?}}", flags=re.I+re.S),
     re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
     re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
@@ -453,6 +457,7 @@ suppression_patterns = [
     re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
     re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
     re.compile(r"{{([Ii]nfobox )?[Cc]hinese*?}}", flags=re.I+re.S),
+    re.compile(r"{{char.*?}}", flags=re.S),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
