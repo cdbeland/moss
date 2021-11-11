@@ -169,8 +169,9 @@ def spellcheck_all_langs(article_title, article_text):
         print("S\tSKIPPING due to known cleanup tag\t%s" % article_title, flush=True)
         return
 
-    request_search_string = 'title="en:%s"' % article_title
-    if request_search_string in requested_species_html:
+    request_search_string_en = 'title="en:%s"' % article_title
+    request_search_string_w = 'title="w:%s"' % article_title
+    if request_search_string_en in requested_species_html or request_search_string_w in requested_species_html:
         print("S\tSKIPPING - list with requested species\t%s" % article_title, flush=True)
         return
 
