@@ -98,7 +98,8 @@ grep BW,BW,BW,BW,BW tmp-articles-linked-words.txt | grep wikt:you | grep -vP "\[
 # can be relaxed once "you" and contractions can be ignored inside
 # italics.
 
-grep TF+la tmp-articles-linked-words.txt | perl -pe 's/^.*?\t\*/*/' > beland-species.txt
+grep TF+la tmp-articles-linked-words.txt | grep species | perl -pe 's/^.*?\t\*/*/' | perl -pe 's/ - \[\[/ - \[\[w:/' | perl -pe 's/\[\[wikt:/\[\[/g' > beland-species1.txt
+grep TF+la,TF+la tmp-articles-linked-words.txt | grep -v species | perl -pe 's/^.*?\t\*/*/' | grep -P "^[A-Za-z0-9,\[\]\*:\- \']+$" | perl -pe 's/ - \[\[/ - \[\[w:/' | perl -pe 's/\[\[wikt:/\[\[/g' > beland-species2.txt
 
 # --- BY FREQUENCY ---
 
