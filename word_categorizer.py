@@ -480,6 +480,9 @@ def get_word_category(word):
     elif is_english_compound(word):
         return "ME"
 
+    if is_math(word):
+        return "A"
+
     # Words in English Wiktionary (presumably including all known
     # English words) are ignored by the spell checker, so no need to
     # categorize words in english_words and english_wiktionary.
@@ -492,9 +495,7 @@ def get_word_category(word):
     if is_url_or_filename(word):
         return "U"
 
-    if is_math(word):
-        category = "A"
-    elif any(char in word for char in [",", "(", ")", "[", "]", " "]):
+    if any(char in word for char in [",", "(", ")", "[", "]", " "]):
         # Extra or missing whitespace
         category = "TS"
     elif az_plus_re.match(word):
