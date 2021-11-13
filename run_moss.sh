@@ -106,10 +106,12 @@ grep TF+la,TF+la tmp-articles-linked-words.txt | grep -v species | perl -pe 's/^
 echo "Beginning by-frequency post-processing"
 echo `date`
 
-grep -P '^(TS|ME)' tmp-words-with-articles.txt | grep -vP 'wikt:[^\]]+[\(\[\),\.]' | grep -vP "\w\]\w" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
-grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
-
-grep -P '^(?!T1|TS|TE|P|D|C|H|U|BC|BW|N|Z|A|T/|L)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
+# Lots of correctly-classified typos have been fixed, so the below algorithms now are unreliable classifiers.
+# grep -P '^(TS|ME)' tmp-words-with-articles.txt | grep -vP 'wikt:[^\]]+[\(\[\),\.]' | grep -vP "\w\]\w" | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-compound.txt
+# grep ^T1 tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-edit1.txt
+# grep -P '^(?!T1|TS|TE|P|D|C|H|U|BC|BW|N|Z|A|T/|L)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-new-words.txt
+# So, just make one big pile...
+grep -P '^(?!BC|BW|H|TS|A|Z|L|U|N|T/)' tmp-words-with-articles.txt | head -200 | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-most-common-all-words.txt
 
 echo "===Known bad HTML tags (HB) ===" > post-html-by-freq.txt
 echo "These are also included in the main listings." >> post-html-by-freq.txt

@@ -4,8 +4,8 @@ import re
 # --- HELPER VARIABLES AND CONFIG ---
 
 # By-frequency lists swap which half of the alphabet they suppress
-alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
-alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+alpha_half_inactive = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+alpha_half_active = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 other_active = True
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
@@ -66,51 +66,26 @@ def restrict_misspellings(input_lines_str):
 
 # --- MAIN PRINTOUT ---
 
-print("=== Likely misspellings by frequency (%s) ===" % active_range_str)
-print("")
-print("""The best list to work on if you want to eliminate all instances of
-a specific typo.  Only typos that are very close to known words are
-shown. The algorithm is not perfect, so some of these may still be
-words that need to be added to Wiktionary. For each run, only words
-from half of the alphabet are shown, to avoid duplicate work from when
-new dumps are being processed.
-
-Legitimate misspellings are candidates for [[Wikipedia:Lists of common misspellings]].
-If there is an obvious correction, adding that to
-[[Wikipedia:Lists of common misspellings/For machines]] will help
-editors who use automated tools to fix cases faster.""")
-print("")
-print(restrict_misspellings(get_active_lines_from_file("tmp-most-common-edit1.txt", alpha_half_active, alpha_half_inactive)))
-print("")
-
-
-print("=== Likely new English compounds by frequency (%s) ===" % active_range_str)
-print("")
-print("""The best list to work on if you want to add variations of known
-words to Wiktionary, mostly compound words.  The algorithm is not
-perfect, so some of these might be common mistakes that need to
-corrected. For each run, only words from half of the alphabet are
-shown, to avoid duplicate work from when new dumps are being
-processed.""")
-print("")
-print(get_active_lines_from_file("tmp-most-common-compound.txt", alpha_half_active, alpha_half_inactive, exclude_dot=True))
-print("")
-
-print("=== Likely new words by frequency, all languages (%s) ===" % active_range_str)
-print("")
+print("=== Most common possible typos (%s) ===" % active_range_str)
 
 print("""Good candidates for words to add to the English Wiktionary (which
-provides English definitions for words in all languages), as it seems
-English Wikipedia readers will frequently encounter them.  For each
-run, only words from half of the alphabet are shown, to avoid
-duplicate work from when new dumps are being processed.
+provides English definitions for words in all languages, including all
+compound words), as it seems English Wikipedia readers will frequently
+encounter them.  For each run, only words from half of the alphabet
+are shown, to avoid duplicate work from when new dumps are being
+processed.
 
 Most of the words are not from English.  To get them off this list,
 you can either add an entry to the English Wiktionary (which provides
 English definitions for words in all languages) or tag all instances
 of the word on the English Wikipedia with {{tl|lang}}.  Wiktionary
 does not accept Romanizations for some languages, so those cases must
-be tagged as {{tl|transl}} or {{tl|lang}}.""")
+be tagged as {{tl|transl}} or {{tl|lang}}.
+
+Legitimate misspellings are candidates for [[Wikipedia:Lists of common misspellings]].
+If there is an obvious correction, adding that to
+[[Wikipedia:Lists of common misspellings/For machines]] will help
+editors who use automated tools to fix cases faster.""")
 print("")
-print(get_active_lines_from_file("tmp-most-common-new-words.txt", alpha_half_active, alpha_half_inactive))
+print(get_active_lines_from_file("tmp-most-common-all-words.txt", alpha_half_active, alpha_half_inactive))
 print("")
