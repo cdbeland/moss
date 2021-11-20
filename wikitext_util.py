@@ -391,6 +391,7 @@ def get_main_body_wikitext(wikitext_input, strong=False):
     wikitext_working = ignore_sections_re.sub("", wikitext_input)
 
     wikitext_working = prose_quote_re.sub("✂", wikitext_working)
+    wikitext_working = blockquote_re.sub("✂", wikitext_working)
     wikitext_working = ignore_headers_re.sub("", wikitext_working)
     wikitext_working = line_starts_with_re.sub("", wikitext_working)
 
