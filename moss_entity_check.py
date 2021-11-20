@@ -500,7 +500,7 @@ def entity_check(article_title, article_text):
     result_tuples = []
 
     for string in alert:
-        if string == "₤" and ("lira" in article_text_lower):
+        if string == "₤" and ("lira" in article_text_lower or "lire" in article_text_lower):
             # Per [[MOS:CURRENCY]]
             continue
 
