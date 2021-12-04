@@ -58,6 +58,28 @@ alert = [
 
     # For native [[Greek numerals]]
     "&#x0374;",  # : "{{keraia}}",
+
+    # Per https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Abbreviations#Unicode_abbreviation_ligatures
+
+    # https://en.wikipedia.org/wiki/CJK_Compatibility
+    "㍘", "㍙", "㍚", "㍛", "㍜", "㍝", "㍞", "㍟", "㍠", "㍡", "㍢", "㍣", "㍤", "㍥", "㍦", "㍧", "㍨", "㍩", "㍪", "㍫", "㍬", "㍭", "㍮", "㍯", "㍰",
+    "㏠", "㏡", "㏢", "㏣", "㏤", "㏥", "㏦", "㏧", "㏨", "㏩", "㏪", "㏫", "㏬", "㏭", "㏮", "㏯", "㏰", "㏱", "㏲", "㏳", "㏴", "㏵", "㏶", "㏷", "㏸", "㏹", "㏺", "㏻", "㏼", "㏽", "㏾",
+
+    # https://en.wikipedia.org/wiki/Enclosed_CJK_Letters_and_Months
+    "㋀", "㋁", "㋂", "㋃", "㋄", "㋅", "㋆", "㋇", "㋈", "㋉", "㋊", "㋋",
+
+    # https://en.wikipedia.org/wiki/Enclosed_Alphanumeric_Supplement
+    "🄋", "🄌",
+    "🄐", "🄑", "🄒", "🄓", "🄔", "🄕", "🄖", "🄗", "🄘", "🄙", "🄚", "🄛", "🄜", "🄝", "🄞", "🄟",
+    "🄠", "🄡", "🄢", "🄣", "🄤", "🄥", "🄦", "🄧", "🄨", "🄩", "🄪", "🄫", "🄬", "🄭", "🄮", "🄯",
+    "🄰", "🄱", "🄲", "🄳", "🄴", "🄵", "🄶", "🄷", "🄸", "🄹", "🄺", "🄻", "🄼", "🄽", "🄾", "🄿",
+    "🅀", "🅁", "🅂", "🅃", "🅄", "🅅", "🅆", "🅇", "🅈", "🅉", "🅊", "🅋", "🅌", "🅍", "🅎", "🅏",
+    "🅐", "🅑", "🅒", "🅓", "🅔", "🅕", "🅖", "🅗", "🅘", "🅙", "🅚", "🅛", "🅜", "🅝", "🅞", "🅟",
+    "🅠", "🅡", "🅢", "🅣", "🅤", "🅥", "🅦", "🅧", "🅨", "🅩",
+    "🅰", "🅱", "🅲", "🅳", "🅴", "🅵", "🅶", "🅷", "🅸", "🅹", "🅺", "🅻", "🅼", "🅽", "🅾", "🅿",
+    "🆀", "🆁", "🆂", "🆃", "🆄", "🆅", "🆆", "🆇", "🆈", "🆉", "🆊", "🆋", "🆌", "🆍", "🆎", "🆏",
+    "🆐", "🆑", "🆒", "🆓", "🆔", "🆕", "🆖", "🆗", "🆘", "🆙", "🆚", "🆛", "🆜", "🆝", "🆞", "🆟",
+    "🆠", "🆡", "🆢", "🆣", "🆤", "🆥", "🆦", "🆧", "🆨", "🆩", "🆪", "🆫", "🆬",
 ]
 
 # Ignore these if seen in articles
@@ -72,11 +94,7 @@ keep = [
                 # a list in wiki syntax; usually <nowiki>*</nowiki> works but not always
     "&amp;",    # dangerous for e.g. &amp;126;
     "&num;",    # hash symbol, needed in rare cases for section link in template call
-    "&c;",      # Almost all are in archaic quotations and titles, and
-                # "&c" is in Wiktionary (as archaic)
     "&period;",  # When needed to stop template from dropping "." from abbreviations
-
-    "&#x0261;",  # g for gravity distinguished from g for gram
 
     # Should be excluded by <source> etc.
     # "&a;",    # Used in computer articles as example of a pointer
@@ -419,6 +437,7 @@ transform_unsafe = {
     "&reg;": "",  # ®
     "&copy;": "",  # ©
     "™": "",
+    "℠": "",
     "®": "",
     "©": "",
     "&8482;": "",   # ™
@@ -597,6 +616,159 @@ transform_unsafe = {
     "𝕐": r"<math>\mathbb{Y}</math>",
     "ℤ": r"<math>\mathbb{Z}</math>",
 
+    "&#x0261;": "g",  # g for gravity distinguished from g for gram
+
+    # Per https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Abbreviations#Unicode_abbreviation_ligatures
+    # https://en.wikipedia.org/wiki/CJK_Compatibility
+    "㍱": "hPa",
+    "㍲": "da",
+    "㍳": "AU",
+    "㍴": "bar",
+    "㍵": "oV",
+    "㍶": "pc",
+    "㍷": "dm",
+    "㍸": "dm<sup>2</sup>",
+    "㍹": "dm<sup>3</sup>",
+    "㍺": "IU",
+    "㎀": "pA",
+    "㎁": "nA",
+    "㎂": "μA",
+    "㎃": "mA",
+    "㎄": "kA",
+    "㎅": "KB",
+    "㎆": "MB",
+    "㎇": "GB",
+    "㎈": "cal",
+    "㎉": "kcal",
+    "㎊": "pF",
+    "㎋": "nF",
+    "㎌": "μF",
+    "㎍": "μg",
+    "㎎": "mg",
+    "㎏": "kg",
+    "㎐": "Hz",
+    "㎑": "kHz",
+    "㎒": "MHz",
+    "㎓": "GHz",
+    "㎔": "THz",
+    "㎕": "uL",
+    "㎖": "mL",
+    "㎗": "dL",
+    "㎘": "kL",
+    "㎙": "fm",
+    "㎚": "nm",
+    "㎛": "μm",
+    "㎜": "mm",
+    "㎝": "cm",
+    "㎞": "km",
+    "㎟": "mm<sup>2</sup>",
+    "㎠": "cm<sup>2</sup>",
+    "㎡": "m<sup>2</sup>",
+    "㎢": "km<sup>2</sup>",
+    "㎣": "mm<sup>3</sup>",
+    "㎤": "cm<sup>3</sup>",
+    "㎥": "m<sup>3</sup>",
+    "㎦": "km<sup>3</sup>",
+    "㎧": "m/s",
+    "㎨": "{{frac|m|s<sup>2</sup>}}",
+    "㎩": "Pa",
+    "㎪": "kPa",
+    "㎫": "MPa",
+    "㎬": "GPa",
+    "㎭": "rad",
+    "㎮": "rad/s",
+    "㎯": "{{frac|rad|s<sup>2</sup>}}",
+    "㎰": "ps",
+    "㎱": "ns",
+    "㎲": "μs",
+    "㎳": "ms",
+    "㎴": "pV",
+    "㎵": "nV",
+    "㎶": "μV",
+    "㎷": "mV",
+    "㎸": "kV",
+    "㎹": "MV",
+    "㎺": "pW",
+    "㎻": "nW",
+    "㎼": "μW",
+    "㎽": "mW",
+    "㎾": "kW",
+    "㎿": "MW",
+    "㏀": "kΩ",
+    "㏁": "MΩ",
+    "㏂": "am",
+    "㏃": "Bq",
+    "㏄": "cc",
+    "㏅": "cd",
+    "㏆": "C/kg",
+    "㏇": "Co.",
+    "㏈": "dB",
+    "㏉": "Gy",
+    "㏊": "ha",
+    "㏋": "HP",
+    "㏌": "in",
+    "㏍": "KK",
+    "㏎": "KM",
+    "㏏": "kt",
+    "㏐": "lm",
+    "㏑": "ln",
+    "㏒": "log",
+    "㏓": "lx",
+    "㏔": "mb",
+    "㏕": "mil",
+    "㏖": "mol",
+    "㏗": "pH",
+    "㏘": "pm",
+    "㏙": "ppm",
+    "㏚": "PR",
+    "㏛": "sr",
+    "㏜": "Sv",
+    "㏝": "Wb",
+    "㏞": "V/m",
+    "㏟": "A/m",
+    "㏿": "gal",
+
+    # https://en.wikipedia.org/wiki/Enclosed_CJK_Letters_and_Months
+    "㋌": "Hg",
+    "㋍": "erg",
+    "㋎": "eV",
+    "㋏": "LTD",
+
+    # https://en.wikipedia.org/wiki/Enclosed_Alphanumeric_Supplement
+    "🄀": "0.",
+    "🄁": "0,",
+    "🄂": "1,",
+    "🄃": "2,",
+    "🄄": "3,",
+    "🄅": "4,",
+    "🄆": "5,",
+    "🄇": "6,",
+    "🄈": "7,",
+    "🄉": "8,",
+    "🄊": "9,",
+    "🅪": "MC",
+    "🅫": "MD",
+    "🅬": "MR",
+
+    # https://en.wikipedia.org/wiki/Letterlike_Symbols
+    "℀": "a/c",
+    "℁": "a/s",
+    "℃": "°C",
+    "℅": "c/o",
+    "℆": "c/u",
+    "℉": "°F",
+    "№": "No.",
+    "℞": "Rx",
+    "℡": "Tel",
+    "Ω": "Ω",
+    "K": "K",
+    "Å": "Å",
+    "℻": "Fax",
+    "⅍": "A/S",
+
+    # Per [[MOS:LATINABBR]]
+    "&c.": "etc.",
+    "&c;": "etc.;",
 
     # See similar list in spell.py!
     # [[MOS:LIGATURE]], list adapted from
@@ -752,6 +924,7 @@ transform = {
 
     "&#160;": "&nbsp;",
     "&#xA0;": "&nbsp;",
+    "&#xa0;": "&nbsp;",
     "&#x0A0;": "&nbsp;",
     "&#x00A0;": "&nbsp;",
 
