@@ -18,6 +18,7 @@ ignore_tags_re = re.compile(r"{{\s*(([Cc]opy|[Mm]ove|[Cc]opy section) to \w+"
                             r"|[Mm]anual"
                             r"|[Tt]ravel guide"
                             r"|[Ll]like resume"
+                            r"|MOS"
                             r"|[Hh]ow\-?to).*?}}")
 
 
