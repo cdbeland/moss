@@ -439,6 +439,7 @@ suppression_patterns = [
     re.compile(r"\[\[File:.*?(\||\])", flags=re.I+re.S),
     re.compile(r"\[\[Image:.*?(\||\])", flags=re.I+re.S),
 
+    re.compile(r"{{[Ss]hort description.*?}}", flags=re.S),
     re.compile(r"{{proper name.*?}}", flags=re.S),
     re.compile(r"{{IPA.*?}}", flags=re.S),
     re.compile(r"{{UPA.*?}}", flags=re.S),
