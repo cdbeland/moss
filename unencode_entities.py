@@ -618,7 +618,34 @@ transform_unsafe = {
 
     "&#x0261;": "g",  # g for gravity distinguished from g for gram
 
-    # Per https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Abbreviations#Unicode_abbreviation_ligatures
+    # Below sections per:
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Abbreviations#Unicode_abbreviation_ligatures
+
+    # https://en.wikipedia.org/wiki/Unicode_compatibility_characters#Semantically_distinct_characters
+    "ℵ": "א",  # From U+2135
+    "ℶ": "ב",  # From U+2136
+    "ℷ": "ג",  # From U+2137
+    "ℸ": "ד‎",  # From U+2138
+    "ϐ": "β",  # From U+03D0
+    "ϑ": "θ",  # From U+03D1
+    "ϕ": "Φ",  # From U+03D5
+    "ϖ": "Π",  # From U+03D6
+    "ϰ": "κ",  # From U+03F0
+    "ϱ": "ρ",  # From U+03F1
+    "ϴ": "Θ",  # From U+03F4
+    "ℇ": "ε",  # From U+2107 Euler constant
+    "₨": "Rs",
+    "․": ".",  # From U+2024
+    "ℹ": "i",  # From U+2139
+
+    # Unclear these are substitutable directly:
+    #  lunate epsilon (ϵ U+03F5)
+    #  lunate sigma (ϲ U+03F2)
+    #  capital lunate sigma (Ϲ U+03F9)
+    #  upsilon with hook (ϒ U+03D2)
+    #  Planck constant (ℎ U+210E)
+    #  reduced Planck constant (ℏ U+210F)
+
     # https://en.wikipedia.org/wiki/CJK_Compatibility
     "㍱": "hPa",
     "㍲": "da",
@@ -751,11 +778,11 @@ transform_unsafe = {
     "🅬": "MR",
 
     # https://en.wikipedia.org/wiki/Letterlike_Symbols
-    "℀": "a/c",
-    "℁": "a/s",
+    "℀": "a/c",  # Account of
+    "℁": "a/s",  # Addressed to the subject
     "℃": "°C",
-    "℅": "c/o",
-    "℆": "c/u",
+    "℅": "c/o",  # Care of
+    "℆": "c/u",  # Cada una ("each")
     "℉": "°F",
     "№": "No.",
     "℞": "Rx",
@@ -814,7 +841,8 @@ transform_unsafe = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
-
+    "&ell;": "ℓ",
+    "&Rarr;": "↠",
     "&star;": "☆",
     "&digamma;": "ϝ",
     "&varepsilon;": "ϵ",
@@ -1355,6 +1383,7 @@ transform = {
     "&bnbsp;": "&nbsp;",
     "&nbash;": "&ndash;",
     "&nbssp;": "&nbsp;",
+    "&mndash;": "&mdash;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
