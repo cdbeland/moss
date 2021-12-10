@@ -21,6 +21,7 @@ article_blocklist = [
     "ALCOR",
     "ALGOL",
     "ALGOL 68",
+    "ASCII",
     "ASMO 449",
     "AV",
     "AZERTY",
@@ -555,8 +556,9 @@ def entity_check(article_title, article_text):
                 result_tuples.append(("GREEK", article_title, entity))
                 continue
 
-        if (entity == "&ensp;" or entity == "&semi;") and "lim=" in article_text:
-            # Needed for {{linktext |lim=&semi;&ensp; |...}}
+        if (entity == "&semi;") and "lim=" in article_text:
+            # Needed for {{linktext |lim=&semi;{{sp}} |...}}
+            # Use {{sp}} instead of &ensp;
             continue
         if should_keep_as_is(entity):
             # Excludes numeric ranges that must remain untouched
