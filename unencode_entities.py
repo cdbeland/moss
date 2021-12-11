@@ -142,9 +142,6 @@ keep = [
     # Would otherwise break markup
     "&lt;",    # <
     "&gt;",    # >
-    "&#91;",   # [  {{!(}} will also work
-    "&#93;",   # ]  {{)!}} will also work
-    # TODO: Maybe these should be converted to <nowiki>[</nowiki> etc.?
 
     # https://en.wikipedia.org/wiki/Zero-width_non-joiner Used in
     # German, Arabic, Hebrew, etc.  Sometimes abused to fix wikitext
@@ -182,47 +179,6 @@ keep = [
     "&#x20e3;",
     "&#x20e4;",  # Combining triangle
     "&#x20E0;",  # Combining prohibition sign
-    "𝕒",
-    "𝕓",
-    "𝕔",
-    "𝕕",
-    "𝕖",
-    "𝕗",
-    "𝕘",
-    "𝕙",
-    "𝕚",
-    "𝕛",
-    "𝕜",
-    "𝕝",
-    "𝕞",
-    "𝕟",
-    "𝕠",
-    "𝕡",
-    "𝕢",
-    "𝕣",
-    "𝕤",
-    "𝕥",
-    "𝕦",
-    "𝕧",
-    "𝕨",
-    "𝕩",
-    "𝕪",
-    "𝕫",
-    "ℾ",
-    "ℽ",
-    "ℿ",
-    "ℼ",
-    "⅀",
-    "𝟘",
-    "𝟙",
-    "𝟚",
-    "𝟛",
-    "𝟜",
-    "𝟝",
-    "𝟞",
-    "𝟟",
-    "𝟠",
-    "𝟡",
 ]
 
 controversial = {
@@ -615,6 +571,47 @@ transform_unsafe = {
     "𝕏": r"<math>\mathbb{X}</math>",
     "𝕐": r"<math>\mathbb{Y}</math>",
     "ℤ": r"<math>\mathbb{Z}</math>",
+    "𝕒": r"<math>\mathbb{a}</math>",
+    "𝕓": r"<math>\mathbb{b}</math>",
+    "𝕔": r"<math>\mathbb{c}</math>",
+    "𝕕": r"<math>\mathbb{d}</math>",
+    "𝕖": r"<math>\mathbb{e}</math>",
+    "𝕗": r"<math>\mathbb{f}</math>",
+    "𝕘": r"<math>\mathbb{g}</math>",
+    "𝕙": r"<math>\mathbb{h}</math>",
+    "𝕚": r"<math>\mathbb{i}</math>",
+    "𝕛": r"<math>\mathbb{j}</math>",
+    "𝕜": r"<math>\mathbb{k}</math>",
+    "𝕝": r"<math>\mathbb{l}</math>",
+    "𝕞": r"<math>\mathbb{m}</math>",
+    "𝕟": r"<math>\mathbb{n}</math>",
+    "𝕠": r"<math>\mathbb{o}</math>",
+    "𝕡": r"<math>\mathbb{p}</math>",
+    "𝕢": r"<math>\mathbb{q}</math>",
+    "𝕣": r"<math>\mathbb{r}</math>",
+    "𝕤": r"<math>\mathbb{s}</math>",
+    "𝕥": r"<math>\mathbb{t}</math>",
+    "𝕦": r"<math>\mathbb{u}</math>",
+    "𝕧": r"<math>\mathbb{v}</math>",
+    "𝕨": r"<math>\mathbb{w}</math>",
+    "𝕩": r"<math>\mathbb{x}</math>",
+    "𝕪": r"<math>\mathbb{y}</math>",
+    "𝕫": r"<math>\mathbb{z}</math>",
+    "ℾ": r"<math>\mathbb{\Gamma}</math>",
+    "ℽ": r"<math>\mathbb{\gamma}</math>",
+    "ℿ": r"<math>\mathbb{\Pi}</math>",
+    "ℼ": r"<math>\mathbb{\pi}</math>",
+    "⅀": r"<math>\mathbb{\Sigma}</math>",
+    "𝟘": r"<math>\mathbb{0}</math>",
+    "𝟙": r"<math>\mathbb{1}</math>",
+    "𝟚": r"<math>\mathbb{2}</math>",
+    "𝟛": r"<math>\mathbb{3}</math>",
+    "𝟜": r"<math>\mathbb{4}</math>",
+    "𝟝": r"<math>\mathbb{5}</math>",
+    "𝟞": r"<math>\mathbb{6}</math>",
+    "𝟟": r"<math>\mathbb{7}</math>",
+    "𝟠": r"<math>\mathbb{8}</math>",
+    "𝟡": r"<math>\mathbb{9}</math>",
 
     "&#x0261;": "g",  # g for gravity distinguished from g for gram
 
@@ -906,12 +903,9 @@ transform = {
     "&#65279;": "",
 
     "&#8206;": "&lrm;",
-    "&lbrack;": "&lsqb;",  # [
-    "&rbrack;": "&rsqb;",  # ]
-    "&#x005B;": "&lsqb;",
-    "&#x005D;": "&rsqb;",
-    "&#x5b;": "&lsqb;",
-    "&#x5d;": "&rsqb;",
+
+    "&#91;": "&lsqb;",   # [  {{!(}} will also work
+    "&#93;": "&rsqb;",   # ]  {{)!}} will also work
     "&#091;": "&lsqb;",
     "&#093;": "&rsqb;",
     "&#0091;": "&lsqb;",
@@ -920,8 +914,14 @@ transform = {
     "&#00093;": "&rsqb;",
     "&00091;": "&lsqb;",
     "&00093;": "&rsqb;",
+    "&lbrack;": "&lsqb;",  # [
+    "&rbrack;": "&rsqb;",  # ]
     "&#x5B;": "%5B",  # Usually in URLs; otherwise, "&lsqb;",
     "&#x5D;": "%5D",  # Usually in URLs; otherwise, "&rsqb;",
+    "&#x005B;": "&lsqb;",
+    "&#x005D;": "&rsqb;",
+    "&#x5b;": "&lsqb;",
+    "&#x5d;": "&rsqb;",
     "&#x7C;": "{{!}}",  # |
     "&#x7c;": "{{!}}",  # |
     "&#x007C;": "{{!}}",  # |
