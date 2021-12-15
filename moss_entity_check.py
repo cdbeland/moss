@@ -442,6 +442,7 @@ suppression_patterns = [
 
     re.compile(r"{{[Ss]hort description.*?}}", flags=re.S),
     re.compile(r"{{proper name.*?}}", flags=re.S),
+    re.compile(r"{{DISPLAYTITLE.*?}}", flags=re.S),
     re.compile(r"{{IPA.*?}}", flags=re.S),
     re.compile(r"{{UPA.*?}}", flags=re.S),
     re.compile(r"{{angle.*?}}", flags=re.I+re.S),
