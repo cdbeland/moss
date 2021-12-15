@@ -101,7 +101,9 @@ keep = [
     # "&x;",    # Used in computer articles as example of a pointer
 
     # Allowed for math notation only
-    "&prime;", "′", "&Prime;", "″", "&x2034", "‴",
+    # "&prime;", "′",  Using {{prime}} instead
+    "&Prime;", "″",
+    "&x2034", "‴",
 
     "ʼ",  # U+02BC, used in IPA and a letter in some languages, including Klingon
 
@@ -274,8 +276,8 @@ transform_unsafe = {
     # Probably convert to regular space or no space
     "&ensp;": " ",
     "&emsp;": " ",
-    "&thinsp;": "{{thin space}}",
-    "&hairsp;": "{{hair space}}",
+    "&thinsp;": " ",  # Use "{{thin space}}" if retained
+    "&hairsp;": "",   # Use "{{hair space}}" if retained
     "&emsp13;": " ",
     "&emsp14;": " ",
     "&numsp;": "{{figure space}}",
@@ -626,7 +628,9 @@ transform_unsafe = {
     "ϐ": "β",  # From U+03D0
     "ϑ": "θ",  # From U+03D1
     "ϕ": "Φ",  # From U+03D5
-    "ϖ": "Π",  # From U+03D6
+    # "ϖ": "π", # U+03D6 seems to be used legitimately, visually
+    #           distinct, this looks like a combined omega + pi,
+    #           and matches the presentation in some TeX used in articles.
     "ϰ": "κ",  # From U+03F0
     "ϱ": "ρ",  # From U+03F1
     "ϴ": "Θ",  # From U+03F4
@@ -860,8 +864,10 @@ transform = {
     "&#x200F;": "&rlm;",
     "&#x02C6;": "&circ;",
     "&#x710;": "&circ;",
-    "&#8242;": "&prime;",
-    "&#x2032;": "&prime;",
+    "&#8242;": "{{prime}}",
+    "&#x2032;": "{{prime}}",
+    "&prime;": "{{prime}}",
+    "′": "{{prime}}",
     "&#8243;": "&Prime;",  # Double prime
     "&#x2033;": "&Prime;",  # Double prime
 
