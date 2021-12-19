@@ -939,9 +939,9 @@ transform = {
     "&#60;": "&lt;",
     "&#060;": "&lt;",
     "&#0060;": "&lt;",
-    "&#61;": "{{=}}",  # Will break markup inside templates
-    "&#061;": "{{=}}",  # Will break markup inside templates
-    "&#0061;": "{{=}}",  # Will break markup inside templates
+    "&#61;": "<nowiki>=</nowiki>",  # Will break markup inside templates
+    "&#061;": "<nowiki>=</nowiki>",  # Will break markup inside templates
+    "&#0061;": "<nowiki>=</nowiki>",  # Will break markup inside templates
     "&#62;": "&gt;",
     "&#062;": "&gt;",
     "&#0062;": "&gt;",
