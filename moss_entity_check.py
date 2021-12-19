@@ -153,6 +153,7 @@ article_blocklist = [
     "List of precomposed Latin characters in Unicode",
     "List of Unicode characters",
     "Lotus Multi-Byte Character Set",
+    "LY1 encoding",
     "M",
     "Mac OS Celtic",
     "Mac OS Central European encoding",
