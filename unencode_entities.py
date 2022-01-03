@@ -34,9 +34,8 @@ alert = [
     # "»",  # rsaquo
     # "„",  # bdquo
 
-    # &zwj; usually wants to be &zwnj; and probably that usually isn't
-    # needed
-    "&zwj;", "&zwnj;"
+    "&zwj;",  # Needed for Malaysian-language citations, makes a difference
+    "&zwnj;"
 
     # Disabled - these are probably fine as-is. TODO: Should use ʿ
     # vs. ' more consistently, and in some cases {{transl}} tags are
@@ -76,10 +75,12 @@ alert = [
     "🅀", "🅁", "🅂", "🅃", "🅄", "🅅", "🅆", "🅇", "🅈", "🅉", "🅊", "🅋", "🅌", "🅍", "🅎", "🅏",
     "🅐", "🅑", "🅒", "🅓", "🅔", "🅕", "🅖", "🅗", "🅘", "🅙", "🅚", "🅛", "🅜", "🅝", "🅞", "🅟",
     "🅠", "🅡", "🅢", "🅣", "🅤", "🅥", "🅦", "🅧", "🅨", "🅩",
-    "🅰", "🅱", "🅲", "🅳", "🅴", "🅵", "🅶", "🅷", "🅸", "🅹", "🅺", "🅻", "🅼", "🅽", "🅾", "🅿",
+    "🅰", "🅲", "🅳", "🅴", "🅵", "🅶", "🅷", "🅸", "🅹", "🅺", "🅻", "🅼", "🅽", "🅾", "🅿",
     "🆀", "🆁", "🆂", "🆃", "🆄", "🆅", "🆆", "🆇", "🆈", "🆉", "🆊", "🆋", "🆌", "🆍", "🆎", "🆏",
-    "🆐", "🆑", "🆒", "🆓", "🆔", "🆕", "🆖", "🆗", "🆘", "🆙", "🆚", "🆛", "🆜", "🆝", "🆞", "🆟",
+    "🆐", "🆑", "🆓", "🆔", "🆕", "🆖", "🆗", "🆘", "🆚", "🆛", "🆜", "🆝", "🆞", "🆟",
     "🆠", "🆡", "🆢", "🆣", "🆤", "🆥", "🆦", "🆧", "🆨", "🆩", "🆪", "🆫", "🆬",
+    # "🆙", "🆒",  # Used in titles from Twitter and Facebook only
+    # "🅱", Used in [[satirical misspelling]]
 ]
 
 # Ignore these if seen in articles
@@ -795,8 +796,10 @@ transform_unsafe = {
     "⅍": "A/S",
 
     # Per [[MOS:LATINABBR]]
-    "&c.": "etc.",
-    "&c;": "etc.;",
+    # Disabled because these are almost always in quotations; handle
+    # with spell-checker instead.
+    # "&c.": "etc.",
+    # "&c;": "etc.;",
 
     # See similar list in spell.py!
     # [[MOS:LIGATURE]], list adapted from
@@ -847,6 +850,8 @@ transform = {
     "&star;": "☆",
     "&digamma;": "ϝ",
     "&varepsilon;": "ϵ",
+    "&bigcup;": "⋃",
+    "&models;": "⊧",
 
     "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
@@ -1390,10 +1395,129 @@ transform = {
     "&nbash;": "&ndash;",
     "&nbssp;": "&nbsp;",
     "&mndash;": "&mdash;",
+    "&bsnp;": "&nbsp;",
+    "&nbsp4;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
     # Replace with &sdot; in math expressions
+
+    # ---
+
+    # https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)
+    "０": "0",
+    "１": "1",
+    "２": "2",
+    "３": "3",
+    "４": "4",
+    "５": "5",
+    "６": "6",
+    "７": "7",
+    "８": "8",
+    "９": "9",
+    "Ａ": "A",
+    "Ｂ": "B",
+    "Ｃ": "C",
+    "Ｄ": "D",
+    "Ｅ": "E",
+    "Ｆ": "F",
+    "Ｇ": "G",
+    "Ｈ": "H",
+    "Ｉ": "I",
+    "Ｊ": "J",
+    "Ｋ": "K",
+    "Ｌ": "L",
+    "Ｍ": "M",
+    "Ｎ": "N",
+    "Ｏ": "O",
+    "Ｐ": "P",
+    "Ｑ": "Q",
+    "Ｒ": "R",
+    "Ｓ": "S",
+    "Ｔ": "T",
+    "Ｕ": "U",
+    "Ｖ": "V",
+    "Ｗ": "W",
+    "Ｘ": "X",
+    "Ｙ": "Y",
+    "Ｚ": "Z",
+    "ａ": "a",
+    "ｂ": "b",
+    "ｃ": "c",
+    "ｄ": "d",
+    "ｅ": "e",
+    "ｆ": "f",
+    "ｇ": "g",
+    "ｈ": "h",
+    "ｉ": "i",
+    "ｊ": "j",
+    "ｋ": "k",
+    "ｌ": "l",
+    "ｍ": "m",
+    "ｎ": "n",
+    "ｏ": "o",
+    "ｐ": "p",
+    "ｑ": "q",
+    "ｒ": "r",
+    "ｓ": "s",
+    "ｔ": "t",
+    "ｕ": "u",
+    "ｖ": "v",
+    "ｗ": "w",
+    "ｘ": "x",
+    "ｙ": "y",
+    "ｚ": "z",
+
+    # Need to consult CJK language Wikiprojects
+    # "＂": '"',
+    # "＃": "#",
+    # "＄": "$",
+    # "％": "%",
+    # "＆": "&",
+    # "＇": "'",
+    # "＊": "*",
+    # "＋": "+",
+    # "－": "-",
+    # "／": "/",
+    # "＠": "@",
+    # "＼": "\\",
+    # "＾": "^",
+    # "＿": "_",
+    # "｀": "`",
+    # "￠": "¢",
+    # "￡": "£",
+    # "￥": "¥",
+    # "￦": "₩",
+
+    # TODO: Trickier fullwidth forms:
+    # ＜ ＝ ＞［ ］｛ ｜ ｝￣ ￤ ￨ ￩ ￪ ￫ ￬ ￭ ￮
+    # "｟": "⸨",
+    # "｠": "⸩",
+    # Vertical writing:
+    # ￢
+    # Half-width:
+    # "｡": "。",
+    # "｢": "「",
+    # "｣": "」",
+    # ､ ･ ｦ ｧ ｨ ｩ ｪ ｫ ｬ ｭ ｮ ｯ
+    # ｰ ｱ ｲ ｳ ｴ ｵ ｶ ｷ ｸ ｹ ｺ ｻ ｼ ｽ ｾ ｿ
+    # ﾀ ﾁ ﾂ ﾃ ﾄ ﾅ ﾆ ﾇ ﾈ ﾉ ﾊ ﾋ ﾌ ﾍ ﾎ ﾏ
+    # ﾐ ﾑ ﾒ ﾓ ﾔ ﾕ ﾖ ﾗ ﾘ ﾙ ﾚ ﾛ ﾜ ﾝ ﾞ ﾟ
+    # https://en.wikipedia.org/wiki/Half-width_kana
+}
+
+transform_conditional = {
+    # Need to be retained in e.g. Chinese text per https://en.wikipedia.org/wiki/Chinese_punctuation#Marks_similar_to_European_punctuation
+    # but should be transformed in e.g. English text
+    "！": "!",
+    "（": "(",
+    "）": ")",
+    "，": ",",
+    "．": ".",
+    "：": ":",
+    "；": ";",
+    "？": "?",
+    "～": "~",  # ASCII preferred in Korean per https://en.wikipedia.org/wiki/Korean_punctuation
 }
 
 greek_letters = {
