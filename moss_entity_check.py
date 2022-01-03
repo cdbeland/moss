@@ -86,6 +86,7 @@ article_blocklist = [
     "Ellipsis",
     "ELOT 927",
     "En (typography)",
+    "Enclosed Alphanumeric Supplement",
     "Extended Latin-8",
     "Extensions to the International Phonetic Alphabet",
     "Ezh",
@@ -151,6 +152,7 @@ article_blocklist = [
     "List of Latin-script letters",
     "List of mathematical symbols by subject",
     "List of precomposed Latin characters in Unicode",
+    "List of typographical symbols and punctuation marks",
     "List of Unicode characters",
     "Lotus Multi-Byte Character Set",
     "LY1 encoding",
@@ -159,13 +161,16 @@ article_blocklist = [
     "Mac OS Central European encoding",
     "Mac OS Devanagari encoding",
     "Mac OS Gaelic",
+    "Mac OS Icelandic encoding",
     "Mac OS Roman",
+    "Mac OS Turkish encoding",
     "Mathematical Alphanumeric Symbols",
     "Mathematical operators and symbols in Unicode",
     "MIK (character set)",
     "Mojibake",
     "Multinational Character Set",
     "NEC APC character set",
+    "NeXT character set",
     "Number Forms",
     "Numerals in Unicode",
     "Numero sign",
@@ -176,6 +181,7 @@ article_blocklist = [
     "Phags-pa (Unicode block)",
     "Phi",
     "Phonetic symbols in Unicode",
+    "PostScript Standard Encoding",
     "Prime (symbol)",
     "Radical symbol",
     "Regional indicator symbol",
@@ -390,10 +396,17 @@ article_blocklist = [
     "Nomura Securities",
     "Rui En vol. 01",
     "Jan de Herdt",
-
-    # Special character in <timeline>
-    "Chip (magazine)",
-    "Cleo (group)",
+    "H-IIB",
+    "AGC Inc.",
+    "Daihatsu Charade",
+    "Daihatsu Move Canbus",
+    "DeNA",
+    "Doppelmayr/Garaventa Group",
+    "Norinchukin Bank",
+    "On the Road to Timbuktu: Explorers in Africa",
+    "Palette Town",
+    "Shibuya Hikarie",
+    "Skyliner",
 ]
 
 
@@ -436,6 +449,7 @@ suppression_patterns = [
     re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I+re.S),
     re.compile(r"<source.*?</source>", flags=re.I+re.S),
     re.compile(r"<code.*?</code>", flags=re.I+re.S),
+    re.compile(r"<timeline.*?</timeline>", flags=re.I+re.S),
     re.compile(r"{{code\s*\|.*?}}", flags=re.I+re.S),
 
     re.compile(r"\[\[File:.*?(\||\])", flags=re.I+re.S),
@@ -460,8 +474,8 @@ suppression_patterns = [
     re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
     re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
     re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
-    re.compile(r"{{([Ii]nfobox )?[Cc]hinese*?}}", flags=re.I+re.S),
-    re.compile(r"{{char.*?}}", flags=re.S),
+    re.compile(r"{{([Ii]nfobox )?[Cc]hinese.*?}}", flags=re.I+re.S),
+    re.compile(r"{{[Cc]har.*?}}", flags=re.S),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
