@@ -986,6 +986,9 @@ transform = {
     "&bullet;": "•",
     "&hyphen;": "-",
 
+    # Raw non-breaking space
+    "\xA0": "&nbsp;",
+
     "&#160;": "&nbsp;",
     "&#xA0;": "&nbsp;",
     "&#xa0;": "&nbsp;",
