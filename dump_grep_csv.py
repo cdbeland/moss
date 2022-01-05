@@ -4,13 +4,12 @@ import re
 import sys
 from moss_dump_analyzer import read_en_article_text
 
-# Used to turn the XML output of dump_grep.py (which takes a long time
-# to run) into output more typical of Unix grep (one line per
-# instance, with the article name instead of file name)
+# Faster alternative to dump_grep.py + dump_grep_inline.py, which
+# greps the CSV version of the database dump directly.
+
 
 # For example:
-# venv/bin/python3 dump_grep.py ₤ > /tmp/pound-grep.xml
-# cat /tmp/pound-grep.xml | venv/bin/python3 dump_grep_inline.py ₤ | grep -v lira | perl -pe "s/:.*//" | sort | uniq
+# venv/bin/python3 dump_grep_csv.py ₤ > /tmp/pound-grep.txt | grep -v lira | perl -pe "s/:.*//" | sort | uniq
 
 FIND_RE = re.compile(sys.argv[1])
 
