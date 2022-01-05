@@ -242,6 +242,53 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
+    # "&#91;": "&lsqb;",   # [  {{!(}} will also work
+    # "&#93;": "&rsqb;",   # ]  {{)!}} will also work
+    # "&#091;": "&lsqb;",
+    # "&#093;": "&rsqb;",
+    # "&#0091;": "&lsqb;",
+    # "&#0093;": "&rsqb;",
+    # "&#00091;": "&lsqb;",
+    # "&#00093;": "&rsqb;",
+    # "&00091;": "&lsqb;",
+    # "&00093;": "&rsqb;",
+    # "&lbrack;": "&lsqb;",  # [
+    # "&rbrack;": "&rsqb;",  # ]
+    # "&#093;": "&rsqb;",  # ]
+    # "&#0093;": "&rsqb;",  # ]
+    # "&#91;": "&lsqb;",
+    # "&#93;": "&rsqb;",
+    # "&#x005B;": "&lsqb;",
+    # "&#x005D;": "&rsqb;",
+    # "&#x5b;": "&lsqb;",
+    # "&#x5d;": "&rsqb;",
+    "&#x5B;": "%5B",  # Usually in URLs; otherwise, "&lsqb;",
+    "&#x5D;": "%5D",  # Usually in URLs; otherwise, "&rsqb;",
+
+    # Usually not needed; especially after converting [] links to
+    # {{cite web}}, but substitute &lsqb; and &rsqb; if absolutely
+    # necessary.
+    "&#91;": "[",
+    "&#93;": "]",
+    "&#091;": "[",
+    "&#093;": "]",
+    "&#0091;": "[",
+    "&#0093;": "]",
+    "&#00091;": "[",
+    "&#00093;": "]",
+    "&00091;": "[",
+    "&00093;": "]",
+    "&lbrack;": "[",
+    "&rbrack;": "]",
+    "&#093;": "]",
+    "&#0093;": "]",
+    "&#91;": "[",
+    "&#93;": "]",
+    "&#x005B;": "[",
+    "&#x005D;": "]",
+    "&#x5b;": "[",
+    "&#x5d;": "]",
+
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
 
@@ -915,28 +962,10 @@ transform = {
 
     "&#8206;": "&lrm;",
 
-    "&#91;": "&lsqb;",   # [  {{!(}} will also work
-    "&#93;": "&rsqb;",   # ]  {{)!}} will also work
-    "&#091;": "&lsqb;",
-    "&#093;": "&rsqb;",
-    "&#0091;": "&lsqb;",
-    "&#0093;": "&rsqb;",
-    "&#00091;": "&lsqb;",
-    "&#00093;": "&rsqb;",
-    "&00091;": "&lsqb;",
-    "&00093;": "&rsqb;",
-    "&lbrack;": "&lsqb;",  # [
-    "&rbrack;": "&rsqb;",  # ]
-    "&#x5B;": "%5B",  # Usually in URLs; otherwise, "&lsqb;",
-    "&#x5D;": "%5D",  # Usually in URLs; otherwise, "&rsqb;",
-    "&#x005B;": "&lsqb;",
-    "&#x005D;": "&rsqb;",
-    "&#x5b;": "&lsqb;",
-    "&#x5d;": "&rsqb;",
-    "&#x7C;": "{{!}}",  # |
-    "&#x7c;": "{{!}}",  # |
-    "&#x007C;": "{{!}}",  # |
-    "&#0124;": "{{!}}",  # |
+    "&#x7C;": "{{pipe}}",  # |
+    "&#x7c;": "{{pipe}}",  # |
+    "&#x007C;": "{{pipe}}",  # |
+    "&#0124;": "{{pipe}}",  # |
     "&#x3C;": "&lt;",
     "&#x003C;": "&lt;",
     "&#x3E;": "&gt;",
@@ -950,10 +979,6 @@ transform = {
     "&#62;": "&gt;",
     "&#062;": "&gt;",
     "&#0062;": "&gt;",
-    "&#093;": "&rsqb;",  # ]
-    "&#0093;": "&rsqb;",  # ]
-    "&#91;": "&lsqb;",
-    "&#93;": "&rsqb;",
 
     "&gtdot;": "⋗",
     "&ltdot;": "⋖",
