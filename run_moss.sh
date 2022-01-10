@@ -257,11 +257,12 @@ cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\. b\. [^d-z]" > rhyme-a.b.space.txt
 
 # These may need to be relaxed in the future
-cat rhyme-AB-comma.txt > beland-rhyme.txt
-grep -iP "rhym|form|poem" rhyme-a-b.txt rhyme-a.b.txt rhyme-a.b.space.txt >> beland-rhyme.txt
-grep -iP "rhym" rhyme-masked-words.txt >> beland-rhyme.txt
+cat rhyme-AB-comma.txt > tmp-rhyme.txt
+grep --no-filename -iP "rhym|form|poem" rhyme-a-b.txt rhyme-a.b.txt rhyme-a.b.space.txt >> tmp-rhyme.txt
+grep -iP "rhym" rhyme-masked-words.txt >> tmp-rhyme.txt
+cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/[[$1]] - <nowiki>$2<\/nowiki>/' > beland-rhyme.txt
 
-rm tmp-rhyme-dump.xml
+rm -f tmp-rhyme-dump.xml
 
 
 echo "Done"
