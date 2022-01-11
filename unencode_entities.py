@@ -182,6 +182,14 @@ keep = [
     "&#x20e3;",
     "&#x20e4;",  # Combining triangle
     "&#x20E0;",  # Combining prohibition sign
+
+    # Per [[MOS:LATINABBR]]
+    # These are not allowed, but they show up mostly in quotations
+    # where they ARE allowed. So declaring "keep" for the entity
+    # report, but let the spell-checker deal with them since it only
+    # looks outside quotations.
+    "&c.",  # Archaic "etc."
+    "&c;",  # Archaic "etc."
 ]
 
 controversial = {
@@ -842,12 +850,6 @@ transform_unsafe = {
     "℻": "Fax",
     "⅍": "A/S",
 
-    # Per [[MOS:LATINABBR]]
-    # Disabled because these are almost always in quotations; handle
-    # with spell-checker instead.
-    # "&c.": "etc.",
-    # "&c;": "etc.;",
-
     # See similar list in spell.py!
     # [[MOS:LIGATURE]], list adapted from
     # https://en.wikipedia.org/wiki/Ligature_(writing)
@@ -887,7 +889,136 @@ transform_unsafe = {
     # "Œ": "OE",
     # "æ": "ae",
     # "œ": "oe",
+
+    # ---
+
+    # https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)
+    "０": "0",
+    "１": "1",
+    "２": "2",
+    "３": "3",
+    "４": "4",
+    "５": "5",
+    "６": "6",
+    "７": "7",
+    "８": "8",
+    "９": "9",
+    "Ａ": "A",
+    "Ｂ": "B",
+    "Ｃ": "C",
+    "Ｄ": "D",
+    "Ｅ": "E",
+    "Ｆ": "F",
+    "Ｇ": "G",
+    "Ｈ": "H",
+    "Ｉ": "I",
+    "Ｊ": "J",
+    "Ｋ": "K",
+    "Ｌ": "L",
+    "Ｍ": "M",
+    "Ｎ": "N",
+    "Ｏ": "O",
+    "Ｐ": "P",
+    "Ｑ": "Q",
+    "Ｒ": "R",
+    "Ｓ": "S",
+    "Ｔ": "T",
+    "Ｕ": "U",
+    "Ｖ": "V",
+    "Ｗ": "W",
+    "Ｘ": "X",
+    "Ｙ": "Y",
+    "Ｚ": "Z",
+    "ａ": "a",
+    "ｂ": "b",
+    "ｃ": "c",
+    "ｄ": "d",
+    "ｅ": "e",
+    "ｆ": "f",
+    "ｇ": "g",
+    "ｈ": "h",
+    "ｉ": "i",
+    "ｊ": "j",
+    "ｋ": "k",
+    "ｌ": "l",
+    "ｍ": "m",
+    "ｎ": "n",
+    "ｏ": "o",
+    "ｐ": "p",
+    "ｑ": "q",
+    "ｒ": "r",
+    "ｓ": "s",
+    "ｔ": "t",
+    "ｕ": "u",
+    "ｖ": "v",
+    "ｗ": "w",
+    "ｘ": "x",
+    "ｙ": "y",
+    "ｚ": "z",
+
+    # Need to consult CJK language Wikiprojects
+    # "＂": '"',
+    # "＃": "#",
+    # "＄": "$",
+    # "％": "%",
+    # "＆": "&",
+    # "＇": "'",
+    # "＊": "*",
+    # "＋": "+",
+    # "－": "-",
+    # "／": "/",
+    # "＠": "@",
+    # "＼": "\\",
+    # "＾": "^",
+    # "＿": "_",
+    # "｀": "`",
+    # "￠": "¢",
+    # "￡": "£",
+    # "￥": "¥",
+    # "￦": "₩",
+    # "＜": "<",
+    # "＝": "=",
+    # "＞": ">",
+    # "｛": "{",
+    # "｜": "{{pipe}}",
+    # "｝": "}",
+    # "￤": "¦",
+    # "｟": "⸨",
+    # "｠": "⸩",
+
+    # Ignoring for now:
+    # ￣
+    # Vertical writing:
+    # ￢
+    # Half-width:
+    # "｡": "。",
+    # "｢": "「",
+    # "｣": "」",
+    # "￨": "{{pipe}}",
+    # ￩ ￪ ￫ ￬ ￭ ￮
+    # ､ ･ ｦ ｧ ｨ ｩ ｪ ｫ ｬ ｭ ｮ ｯ
+    # ｰ ｱ ｲ ｳ ｴ ｵ ｶ ｷ ｸ ｹ ｺ ｻ ｼ ｽ ｾ ｿ
+    # ﾀ ﾁ ﾂ ﾃ ﾄ ﾅ ﾆ ﾇ ﾈ ﾉ ﾊ ﾋ ﾌ ﾍ ﾎ ﾏ
+    # ﾐ ﾑ ﾒ ﾓ ﾔ ﾕ ﾖ ﾗ ﾘ ﾙ ﾚ ﾛ ﾜ ﾝ ﾞ ﾟ
+    # https://en.wikipedia.org/wiki/Half-width_kana
 }
+
+transform_conditional = {
+    # Need to be retained in e.g. Chinese text per https://en.wikipedia.org/wiki/Chinese_punctuation#Marks_similar_to_European_punctuation
+    # but should be transformed in e.g. English text
+    "！": "!",
+    "（": "(",
+    "）": ")",
+    "，": ",",
+    "．": ".",
+    "：": ":",
+    "；": ";",
+    "？": "?",
+    "［ ": "[",
+    "］": "]",
+    "～": "~",  # ASCII preferred in Korean per https://en.wikipedia.org/wiki/Korean_punctuation
+}
+
 
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
@@ -1429,124 +1560,8 @@ transform = {
     # Used in tables, horizontal list formatting
     "&middot;": "·",
     # Replace with &sdot; in math expressions
-
-    # ---
-
-    # https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)
-    "０": "0",
-    "１": "1",
-    "２": "2",
-    "３": "3",
-    "４": "4",
-    "５": "5",
-    "６": "6",
-    "７": "7",
-    "８": "8",
-    "９": "9",
-    "Ａ": "A",
-    "Ｂ": "B",
-    "Ｃ": "C",
-    "Ｄ": "D",
-    "Ｅ": "E",
-    "Ｆ": "F",
-    "Ｇ": "G",
-    "Ｈ": "H",
-    "Ｉ": "I",
-    "Ｊ": "J",
-    "Ｋ": "K",
-    "Ｌ": "L",
-    "Ｍ": "M",
-    "Ｎ": "N",
-    "Ｏ": "O",
-    "Ｐ": "P",
-    "Ｑ": "Q",
-    "Ｒ": "R",
-    "Ｓ": "S",
-    "Ｔ": "T",
-    "Ｕ": "U",
-    "Ｖ": "V",
-    "Ｗ": "W",
-    "Ｘ": "X",
-    "Ｙ": "Y",
-    "Ｚ": "Z",
-    "ａ": "a",
-    "ｂ": "b",
-    "ｃ": "c",
-    "ｄ": "d",
-    "ｅ": "e",
-    "ｆ": "f",
-    "ｇ": "g",
-    "ｈ": "h",
-    "ｉ": "i",
-    "ｊ": "j",
-    "ｋ": "k",
-    "ｌ": "l",
-    "ｍ": "m",
-    "ｎ": "n",
-    "ｏ": "o",
-    "ｐ": "p",
-    "ｑ": "q",
-    "ｒ": "r",
-    "ｓ": "s",
-    "ｔ": "t",
-    "ｕ": "u",
-    "ｖ": "v",
-    "ｗ": "w",
-    "ｘ": "x",
-    "ｙ": "y",
-    "ｚ": "z",
-
-    # Need to consult CJK language Wikiprojects
-    # "＂": '"',
-    # "＃": "#",
-    # "＄": "$",
-    # "％": "%",
-    # "＆": "&",
-    # "＇": "'",
-    # "＊": "*",
-    # "＋": "+",
-    # "－": "-",
-    # "／": "/",
-    # "＠": "@",
-    # "＼": "\\",
-    # "＾": "^",
-    # "＿": "_",
-    # "｀": "`",
-    # "￠": "¢",
-    # "￡": "£",
-    # "￥": "¥",
-    # "￦": "₩",
-
-    # TODO: Trickier fullwidth forms:
-    # ＜ ＝ ＞［ ］｛ ｜ ｝￣ ￤ ￨ ￩ ￪ ￫ ￬ ￭ ￮
-    # "｟": "⸨",
-    # "｠": "⸩",
-    # Vertical writing:
-    # ￢
-    # Half-width:
-    # "｡": "。",
-    # "｢": "「",
-    # "｣": "」",
-    # ､ ･ ｦ ｧ ｨ ｩ ｪ ｫ ｬ ｭ ｮ ｯ
-    # ｰ ｱ ｲ ｳ ｴ ｵ ｶ ｷ ｸ ｹ ｺ ｻ ｼ ｽ ｾ ｿ
-    # ﾀ ﾁ ﾂ ﾃ ﾄ ﾅ ﾆ ﾇ ﾈ ﾉ ﾊ ﾋ ﾌ ﾍ ﾎ ﾏ
-    # ﾐ ﾑ ﾒ ﾓ ﾔ ﾕ ﾖ ﾗ ﾘ ﾙ ﾚ ﾛ ﾜ ﾝ ﾞ ﾟ
-    # https://en.wikipedia.org/wiki/Half-width_kana
 }
 
-transform_conditional = {
-    # Need to be retained in e.g. Chinese text per https://en.wikipedia.org/wiki/Chinese_punctuation#Marks_similar_to_European_punctuation
-    # but should be transformed in e.g. English text
-    "！": "!",
-    "（": "(",
-    "）": ")",
-    "，": ",",
-    "．": ".",
-    "：": ":",
-    "；": ";",
-    "？": "?",
-    "～": "~",  # ASCII preferred in Korean per https://en.wikipedia.org/wiki/Korean_punctuation
-}
 
 greek_letters = {
     "&alpha;": "α",
