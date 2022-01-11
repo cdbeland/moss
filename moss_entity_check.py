@@ -80,11 +80,13 @@ article_blocklist = [
     "Dash",
     "Devanagari transliteration",
     "DEC Hebrew",
+    "Digital encoding of APL symbols",
     "DKOI",
     "DIN 66303",
     "Duplicate characters in Unicode",
     "Ellipsis",
     "ELOT 927",
+    "Emoji",
     "En (typography)",
     "Enclosed Alphanumeric Supplement",
     "Extended Latin-8",
@@ -157,12 +159,16 @@ article_blocklist = [
     "Lotus Multi-Byte Character Set",
     "LY1 encoding",
     "M",
+    "Mac OS Armenian",
     "Mac OS Celtic",
     "Mac OS Central European encoding",
+    "Mac OS Croatian encoding",
     "Mac OS Devanagari encoding",
     "Mac OS Gaelic",
+    "Mac OS Georgian",
     "Mac OS Icelandic encoding",
     "Mac OS Roman",
+    "Mac OS Romanian encoding",
     "Mac OS Turkish encoding",
     "Mathematical Alphanumeric Symbols",
     "Mathematical operators and symbols in Unicode",
@@ -359,6 +365,7 @@ article_blocklist = [
     "Découvertes Gallimard",
     "Hillman Minx",
     "Grammaire égyptienne",
+    "Ōtaguro Park",
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
@@ -407,6 +414,9 @@ article_blocklist = [
     "Palette Town",
     "Shibuya Hikarie",
     "Skyliner",
+
+    # {{lang}} and {{IPA}} interwoven with other templates
+    "State Anthem of the Soviet Union",
 ]
 
 
