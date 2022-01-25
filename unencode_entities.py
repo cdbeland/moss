@@ -34,7 +34,7 @@ alert = [
     # "»",  # rsaquo
     # "„",  # bdquo
 
-    "&zwj;",  # Needed for Malaysian-language citations, makes a difference
+    # "&zwj;",  # Needed for Malaysian-language citations, makes a difference
     "&zwnj;"
 
     # Disabled - these are probably fine as-is. TODO: Should use ʿ
@@ -77,9 +77,9 @@ alert = [
     "🅠", "🅡", "🅢", "🅣", "🅤", "🅥", "🅦", "🅧", "🅨", "🅩",
     "🅰", "🅲", "🅳", "🅴", "🅵", "🅶", "🅷", "🅸", "🅹", "🅺", "🅻", "🅼", "🅽", "🅾", "🅿",
     "🆀", "🆁", "🆂", "🆃", "🆄", "🆅", "🆆", "🆇", "🆈", "🆉", "🆊", "🆋", "🆌", "🆍", "🆎", "🆏",
-    "🆐", "🆑", "🆓", "🆔", "🆕", "🆖", "🆗", "🆘", "🆚", "🆛", "🆜", "🆝", "🆞", "🆟",
+    "🆐", "🆑", "🆓", "🆔", "🆖", "🆗", "🆘", "🆛", "🆜", "🆝", "🆞", "🆟",
     "🆠", "🆡", "🆢", "🆣", "🆤", "🆥", "🆦", "🆧", "🆨", "🆩", "🆪", "🆫", "🆬",
-    # "🆙", "🆒",  # Used in titles from Twitter and Facebook only
+    # "🆙", "🆒", "🆚", "🆕",  # Used in titles from Twitter and Facebook only
     # "🅱", Used in [[satirical misspelling]]
 ]
 
@@ -430,10 +430,14 @@ transform_unsafe = {
     "&#8230;": "...",
     "&hellip;": "...",
 
-    "&#123;": "&lbrace;",  # {
-    "&lcub;": "&lbrace;",  # {
-    "&#125;": "&rbrace;",  # }
-    "&rcub;": "&rbrace;",  # }
+    # "&#123;": "&lbrace;",  # {
+    # "&lcub;": "&lbrace;",  # {
+    # "&#125;": "&rbrace;",  # }
+    # "&rcub;": "&rbrace;",  # }
+    "&#123;": "{",
+    "&lcub;": "{",
+    "&#125;": "}",
+    "&rcub;": "}",
 
     # This is a pipe, and usually happens in URL titles
     "&#124;": "{{pipe}}",
