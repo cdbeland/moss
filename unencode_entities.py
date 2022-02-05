@@ -340,12 +340,23 @@ transform_unsafe = {
     "&puncsp;": " ",
     "&MediumSpace;": " ",
 
+    # --- MATH STANDARDIZATION
+    # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Mathematics#Special_symbols
+
     # (should be μ (&mu;) per [[MOS:NUM#Specific units]]
     "µ": "μ",  # micro to mu
     "&micro;": "μ",  # micro to mu
 
     "∑": "Σ",  # U+2211 N-Ary Summation to Sigma
     "∏": "Π",  # U+220F N-Ary Product to Pi
+
+    "ϑ": "θ",  # U+03D1 Greek Theta Symbol to U+03B8 Green Small Letter Theta
+    "∼": "~",  # U+223C Tilde Operator to ASCII U+007E Tilde
+    "∕": "/",  # U+2215 Division Slash to ASCII U+002F Solidus
+    "∖": "\\",  # U+2216 Set Minus
+    "∶": ":",   # U+2236 Ratio to ASCII U+003A Colon
+
+    # ---
 
     "&#x202F;": "",  # Narrow non-breaking space, usually not needed
     "&#x202f;": "",
@@ -686,7 +697,6 @@ transform_unsafe = {
     "ℷ": "ג",  # From U+2137
     "ℸ": "ד‎",  # From U+2138
     "ϐ": "β",  # From U+03D0
-    "ϑ": "θ",  # From U+03D1
     "ϕ": "Φ",  # From U+03D5
     # "ϖ": "π", # U+03D6 seems to be used legitimately, visually
     #           distinct, this looks like a combined omega + pi,
