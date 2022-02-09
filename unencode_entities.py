@@ -327,11 +327,11 @@ transform_unsafe = {
 
     "&#x20;": "%20",  # Usually, but not always. Sometimes this should just be a regular space.
     "&#8239;": "&nbsp;",    # narrow no-break space
-    "&#32;": "&ensp;",  # When used with {{linktext}} but otherwise should just be a regular space.
+    "&#32;": "{{sp}}",  # When used with {{linktext}} but otherwise should just be a regular space.
 
     # Probably convert to regular space or no space
-    "&ensp;": " ",
-    "&emsp;": " ",
+    "&ensp;": " ",  # Or {{sp}} if a regular space is needed
+    "&emsp;": " ",  # Or {{sp}} if a regular space is needed
     "&thinsp;": " ",  # Use "{{thin space}}" if retained
     "&hairsp;": "",   # Use "{{hair space}}" if retained
     "&emsp13;": " ",
