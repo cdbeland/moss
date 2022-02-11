@@ -250,7 +250,7 @@ echo `date`
 ../venv/bin/python3 ../dump_grep_regex.py "[Rr]hym|[Pp]oem|[Ss]tanza|[Vv]erse|[Ll]yric" > tmp-rhyme-dump.xml
 
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z0-9\-A-Z][Aa]-[Bb][^a-zA-Z]"  > rhyme-a-b.txt
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^,]AB,[ABC]|AA,AB|AA,B|AB,[ABC]" | grep -v "<math" rhyme-AB-comma.txt | grep -vP "^(Rhyme scheme:|The Raven:)" > rhyme-AB-comma.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^,]AB,[ABC]|AA,AB|AA,B|AB,[ABC]" | grep -v "<math" | grep -vP "^(Rhyme scheme:|The Raven:)" > rhyme-AB-comma.txt
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]" > rhyme-masked-words.txt
 
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\.b\.[^d-z]" > rhyme-a.b.txt
