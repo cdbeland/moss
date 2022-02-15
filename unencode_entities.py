@@ -907,6 +907,10 @@ transform_unsafe = {
     # ---
 
     # https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)
+    # No objections from:
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China/Archive_31#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
     "０": "0",
     "１": "1",
     "２": "2",
@@ -970,6 +974,11 @@ transform_unsafe = {
     "ｙ": "y",
     "ｚ": "z",
 
+    # May need to update:
+    #  Wikipedia:Manual of Style/China- and Chinese-related articles
+    #  Wikipedia:Manual of Style/Korea-related articles
+    #  Wikipedia:Manual of Style/Japan-related articles
+
     # Need to consult CJK language Wikiprojects
     # "＂": '"',
     # "＃": "#",
@@ -993,12 +1002,8 @@ transform_unsafe = {
     # "＜": "<",
     # "＝": "=",
     # "＞": ">",
-    # "｛": "{",
     # "｜": "{{pipe}}",
-    # "｝": "}",
     # "￤": "¦",
-    # "｟": "⸨",
-    # "｠": "⸩",
 
     # Ignoring for now:
     # ￣
@@ -1031,6 +1036,13 @@ transform_conditional = {
     "［ ": "[",
     "］": "]",
     "～": "~",  # ASCII preferred in Korean per https://en.wikipedia.org/wiki/Korean_punctuation
+
+    # Per https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China/Archive_31#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
+    "｛": "{",
+    "｝": "}",
+    "｟": "⸨",
+    "｠": "⸩",
+
 }
 
 
