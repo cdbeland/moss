@@ -249,17 +249,17 @@ echo `date`
 
 ../venv/bin/python3 ../dump_grep_regex.py "[Rr]hym|[Pp]oem|[Ss]tanza|[Vv]erse|[Ll]yric" > tmp-rhyme-dump.xml
 
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z0-9\-A-Z][Aa]-[Bb][^a-zA-Z]"  > rhyme-a-b.txt
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^,]AB,[ABC]|AA,AB|AA,B|AB,[ABC]" | grep -v "<math" | grep -vP "^(Rhyme scheme:|The Raven:)" > rhyme-AB-comma.txt
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]" > rhyme-masked-words.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z0-9\-A-Z][Aa]-[Bb][^a-zA-Z]"  > tmp-rhyme-a-b.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^,]AB,[ABC]|AA,AB|AA,B|AB,[ABC]" | grep -v "<math" | grep -vP "^(Rhyme scheme:|The Raven:)" > tmp-rhyme-AB-comma.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]" > tmp-rhyme-masked-words.txt
 
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\.b\.[^d-z]" > rhyme-a.b.txt
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\. b\. [^d-z]" > rhyme-a.b.space.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\.b\.[^d-z]" > tmp-rhyme-a.b.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\. b\. [^d-z]" > tmp-rhyme-a.b.space.txt
 
 # These may need to be relaxed in the future
-cat rhyme-AB-comma.txt > tmp-rhyme.txt
-grep --no-filename -iP "rhym|form|poem" rhyme-a-b.txt rhyme-a.b.txt rhyme-a.b.space.txt >> tmp-rhyme.txt
-grep -iP "rhym" rhyme-masked-words.txt >> tmp-rhyme.txt
+cat tmp-rhyme-AB-comma.txt > tmp-rhyme.txt
+grep --no-filename -iP "rhym|form|poem" tmp-rhyme-a-b.txt tmp-rhyme-a.b.txt tmp-rhyme-a.b.space.txt >> tmp-rhyme.txt
+grep -iP "rhym" tmp-rhyme-masked-words.txt >> tmp-rhyme.txt
 cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/[[$1]] - <nowiki>$2<\/nowiki>/' > beland-rhyme.txt
 
 rm -f tmp-rhyme-dump.xml
