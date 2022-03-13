@@ -548,6 +548,15 @@ def entity_check(article_title, article_text):
                 # This intentionally adds the article title as many
                 # times as the string appears
 
+        if string == "ϑ" and "θ" not in article_text:
+            # Probably not appropriate for basic geometry articles,
+            # and some branches of mathematics may prefer it.
+            # ([[Wikipedia talk:Manual of Style/Mathematics#‎Can cursive
+            # theta be substituted?]], Mar 2022) So this check makes it
+            # so the only articles that are flagged are those that use
+            # both, which might be accidental inconsistency.
+            continue
+
     for entity in entities_re.findall(article_text):
         if entity in keep:
             continue
@@ -670,7 +679,8 @@ def extract_articles(dictionary):
                                          key=lambda tup: len(tup[1])):
         if len(article_list) >= 100000:
             continue
-        articles.extend(sorted(article_list))
+        articles.extend(sorted(article_list)[0:50])
+        # Limit 50 to avoid getting stuck on one common entity and getting bored
 
     articles = list(dict.fromkeys(articles))  # uniqify
     return articles
@@ -729,11 +739,20 @@ def dump_results():
         dump_for_jwb("combo", bad_entities, file=combof)
 
     with open("jwb-articles.txt", "w") as articlesf:
+        """
         # Sorted from least-frequent to most-frequent across all types
         mega_dict = {}
         for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL"]:
             mega_dict.update(strings_found_by_type.get(dic_type, {}))
         articles = extract_articles(mega_dict)
+        articles = list(dict.fromkeys(articles))  # uniqify across sublists
+        print("\n".join(articles[0:1000]), file=articlesf)
+        """
+
+        # By section, from least-frequent to most-frequent with each section
+        articles = []
+        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL"]:
+            articles += extract_articles(strings_found_by_type.get(dic_type, {}))
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
         print("\n".join(articles[0:1000]), file=articlesf)
 
