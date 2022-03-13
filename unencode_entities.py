@@ -1581,7 +1581,7 @@ transform = {
     "&nbssp;": "&nbsp;",
     "&mndash;": "&mdash;",
     "&bsnp;": "&nbsp;",
-    "&nbsp4;": "&nbsp;",
+    "&nbsp4;": "&nbsp;4",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
