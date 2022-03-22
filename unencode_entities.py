@@ -644,6 +644,7 @@ transform_unsafe = {
     "𝕏": r"<math>\mathbb{X}</math>",
     "𝕐": r"<math>\mathbb{Y}</math>",
     "ℤ": r"<math>\mathbb{Z}</math>",
+    "&Zopf;": r"<math>\mathbb{Z}</math>",
     "𝕒": r"<math>\mathbb{a}</math>",
     "𝕓": r"<math>\mathbb{b}</math>",
     "𝕔": r"<math>\mathbb{c}</math>",
@@ -1056,6 +1057,8 @@ transform = {
     "&varepsilon;": "ϵ",
     "&bigcup;": "⋃",
     "&models;": "⊧",
+    "&iexcl;": "¡",
+    "&DoubleLongRightArrow;": "⟹",
 
     "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
@@ -1581,7 +1584,7 @@ transform = {
     "&nbssp;": "&nbsp;",
     "&mndash;": "&mdash;",
     "&bsnp;": "&nbsp;",
-    "&nbsp4;": "&nbsp;4",
+    "&nbasp;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
