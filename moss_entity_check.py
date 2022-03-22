@@ -465,6 +465,7 @@ suppression_patterns = [
     re.compile(r"\[\[File:.*?(\||\])", flags=re.I+re.S),
     re.compile(r"\[\[Image:.*?(\||\])", flags=re.I+re.S),
 
+    re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
     re.compile(r"{{[Ss]hort description.*?}}", flags=re.S),
     re.compile(r"{{proper name.*?}}", flags=re.S),
     re.compile(r"{{DISPLAYTITLE.*?}}", flags=re.S),
@@ -483,7 +484,6 @@ suppression_patterns = [
     re.compile(r"<blockquote lang=.*?</blockquote>", flags=re.I+re.S),
     re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
     re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
-    re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
     re.compile(r"{{([Ii]nfobox )?[Cc]hinese.*?}}", flags=re.I+re.S),
     re.compile(r"{{[Cc]har.*?}}", flags=re.S),
 
@@ -550,11 +550,16 @@ def entity_check(article_title, article_text):
 
         if string == "ϑ" and "θ" not in article_text:
             # Probably not appropriate for basic geometry articles,
-            # and some branches of mathematics may prefer it.
-            # ([[Wikipedia talk:Manual of Style/Mathematics#‎Can cursive
-            # theta be substituted?]], Mar 2022) So this check makes it
-            # so the only articles that are flagged are those that use
-            # both, which might be accidental inconsistency.
+            # but some branches of mathematics may prefer it
+            # (e.g. [[Chebyshev function]] and [[Lovász number]] - see
+            # ([[Wikipedia talk:Manual of Style/Mathematics#‎Can
+            # cursive theta be substituted?]], Mar 2022). So this
+            # check makes it so the only articles that are flagged are
+            # those that use both, which might be accidental
+            # inconsistency.
+            #
+            # This will miss some articles that use cursive theta in
+            # Greek words and for simple high school geometry angles.
             continue
 
     for entity in entities_re.findall(article_text):
