@@ -240,7 +240,6 @@ article_blocklist = [
     "VT100 encoding",
     "VT52",
     "W",
-    "Wade–Giles",
     "Wang International Standard Code for Information Interchange",
     "Warmian-Masurian Voivodeship",
     "Welsh orthography",

@@ -1059,6 +1059,8 @@ transform = {
     "&models;": "⊧",
     "&iexcl;": "¡",
     "&DoubleLongRightArrow;": "⟹",
+    "&rightarrow;": "→",
+    "&mapsto;": "↦",
 
     "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
@@ -1422,6 +1424,7 @@ transform = {
     "&#X101;": "ā",
     "&Ccedil;": "Ç",
     "&ccedil;": "ç",
+    "&Ccirc;": "Ĉ",
     "&eth;": "ð",
     "&Eacute;": "É",
     "&eacute;": "é",
@@ -1585,6 +1588,9 @@ transform = {
     "&mndash;": "&mdash;",
     "&bsnp;": "&nbsp;",
     "&nbasp;": "&nbsp;",
+    "&nadash;": "&ndash;",
+    "&ngash;": "&ndash;",
+    "&nsb;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
