@@ -1,7 +1,7 @@
 See https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
 
 UBUNTU DEPENDENCIES
-sudo apt-get install git pyflakes pylint python3-pep8 python3-env python3-dev
+sudo apt-get install git pyflakes3 pylint python3-pep8 python3-env python3-dev protobuf-compiler g++
 
 FEDORA DEPENDENCIES
 sudo yum install git pyflakes pylint python3-pep8
