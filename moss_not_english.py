@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# USAGE: run_not_english.sh
+
 from collections import defaultdict
 import gcld3
 import re
@@ -67,9 +69,15 @@ def find_non_english(article_title, article_text):
         if is_english_word(word_mixedcase):
             article_words_by_lang["en"].append(word_mixedcase)
         elif is_correct_word(word_mixedcase):
-            if word_mixedcase == word_mixedcase.title():
-                # Capitalized words are usually proper nouns; not
-                # helpful for categorization
+            if len(word_mixedcase) <= 3:
+                # Not long enough for the language classifier to
+                # really work on. This also excludes the use of a lot
+                # of Greek variables in STEM articles.
+                continue
+            if word_mixedcase != word_mixedcase.lower():
+                # Capitalized words and words with internal
+                # capitalization are usually proper nouns; not helpful
+                # for categorization
                 continue
             lang_code = GOOGLE_LANG_DETECTOR.FindLanguage(word_mixedcase).language
             article_words_by_lang[lang_code].append(word_mixedcase)
@@ -96,7 +104,7 @@ def find_non_english(article_title, article_text):
         # output_line += str(100 * len(article_words_by_lang[lang]) / recognized_word_count)
         # output_line += f"%\t{len(article_words_by_lang[lang])}"
         output_line += f"\t{lang}"
-        output_line += "\t" + str(article_words_by_lang[lang][0:20])
+        output_line += "\t" + str(article_words_by_lang[lang][0:10])
         break  # Only report the most commonly detected non-English language
     print(output_line, flush=True)
 
