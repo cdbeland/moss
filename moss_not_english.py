@@ -44,14 +44,17 @@ def is_english_word(word):
 
 
 WORD_RE = re.compile(r"[\w']+")
+ACRONYM_RE = re.compile(r"^[A-Z]+$")
 ROMAN_NUM_RE = re.compile(r"^[IVXLCM]+$")
 GOOGLE_LANG_DETECTOR = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
                                                     max_num_bytes=1000)
 
+# Set this to false if you want to find individual words that need {{lang}}
+ONLY_LONG_SEGMENTS = True
+
 
 def find_non_english(article_title, article_text):
     if ignore_tags_re.search(article_text):
-        # print("S\tSKIPPING due to known cleanup tag\t%s" % article_title, flush=True)
         return
 
     article_text = wikitext_to_plaintext(article_text)
@@ -61,51 +64,76 @@ def find_non_english(article_title, article_text):
     article_text = article_text.replace("✂", " ")
     article_words_by_lang = defaultdict(list)
 
-    word_list = [word.strip("'\n0123456789") for word in WORD_RE.findall(article_text)]
-    word_list = [word for word in word_list if word]
-    word_list = [word for word in word_list if not ROMAN_NUM_RE.match(word)]
+    paragraphs = article_text.split("\n")
+    for paragraph_text in paragraphs:
+        paragraph_words_by_lang = defaultdict(list)
+        word_list = [word.strip("'\n0123456789") for word in WORD_RE.findall(paragraph_text)]
+        word_list = [word for word in word_list if word]
+        word_list = [word for word in word_list if not ROMAN_NUM_RE.match(word)]
+        if len(word_list) < 20:
+            if ONLY_LONG_SEGMENTS:
+                continue
 
-    for word_mixedcase in word_list:
-        if is_english_word(word_mixedcase):
-            article_words_by_lang["en"].append(word_mixedcase)
-        elif is_correct_word(word_mixedcase):
+        non_english_count = 0
+        for word_mixedcase in word_list:
             if len(word_mixedcase) <= 3:
                 # Not long enough for the language classifier to
                 # really work on. This also excludes the use of a lot
                 # of Greek variables in STEM articles.
                 continue
-            if word_mixedcase != word_mixedcase.lower():
-                # Capitalized words and words with internal
-                # capitalization are usually proper nouns; not helpful
+
+            if is_english_word(word_mixedcase):
+                paragraph_words_by_lang["en"].append(word_mixedcase)
+                continue
+
+            if word_mixedcase == word_mixedcase.title():
+                # Capitalized words are usually proper nouns; not helpful
                 # for categorization
                 continue
+            if ACRONYM_RE.match(word_mixedcase):
+                continue
+
             lang_code = GOOGLE_LANG_DETECTOR.FindLanguage(word_mixedcase).language
-            article_words_by_lang[lang_code].append(word_mixedcase)
+            if not is_correct_word(word_mixedcase):
+                lang_code = "ERR:" + lang_code
+            non_english_count += 1
+            paragraph_words_by_lang[lang_code].append(word_mixedcase)
+
+        if non_english_count == 0:
+            continue
+        if ONLY_LONG_SEGMENTS:
+            english_word_count = len(paragraph_words_by_lang["en"])
+            if english_word_count > len(word_list) / 3:
+                continue
+            if non_english_count < english_word_count / 2:
+                continue
+
+        for lang in paragraph_words_by_lang:
+            article_words_by_lang[lang].extend(paragraph_words_by_lang[lang])
 
     output_line = article_title
     recognized_word_count = 0
     for lang in article_words_by_lang:
         recognized_word_count += len(article_words_by_lang[lang])
     if recognized_word_count == 0:
-        print(f"{article_title}\t0%\t0", flush=True)
         return
 
-    # % non-English
-    output_line += "\t" + str(100 * (recognized_word_count - len(article_words_by_lang["en"])) / recognized_word_count) + "%"
-    # # non-English
-    output_line += "\t" + str(recognized_word_count - len(article_words_by_lang["en"]))
+    non_english_count = recognized_word_count - len(article_words_by_lang["en"])
+    if non_english_count == 0:
+        return
+    output_line += f"\t{non_english_count}"
+
+    article_word_count = len(article_text.split(" "))
+    non_english_percent = 100 * non_english_count / article_word_count
+    output_line += f"\t{non_english_percent}%"
 
     for lang in sorted(article_words_by_lang, key=lambda lang: len(article_words_by_lang[lang]), reverse=True):
         if lang == "en":
             continue
-        output_line += "\t"
-        # Stats for this language are too similar to overall
-        # non-English stats, which are probably more accurate anyway
-        # output_line += str(100 * len(article_words_by_lang[lang]) / recognized_word_count)
-        # output_line += f"%\t{len(article_words_by_lang[lang])}"
         output_line += f"\t{lang}"
-        output_line += "\t" + str(article_words_by_lang[lang][0:10])
-        break  # Only report the most commonly detected non-English language
+        output_line += "\t" + ", ".join(article_words_by_lang[lang][0:10])
+        break  # Only report examples from the most commonly detected non-English language
+
     print(output_line, flush=True)
 
 
