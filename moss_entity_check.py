@@ -416,6 +416,10 @@ article_blocklist = [
 
     # {{lang}} and {{IPA}} interwoven with other templates
     "State Anthem of the Soviet Union",
+
+    # {{not a typo}} not working well due to intersecting templates
+    "Beta",
+    "Kappa",
 ]
 
 
