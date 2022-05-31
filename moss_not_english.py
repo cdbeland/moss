@@ -10,6 +10,16 @@ from moss_dump_analyzer import read_en_article_text
 from moss_entity_check import suppression_patterns
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_tags_re
 
+# Set this to false if you want to find individual words that need {{lang}}
+ONLY_LONG_SEGMENTS = True
+
+# ---
+
+WORD_RE = re.compile(r"[\w']+")
+ACRONYM_RE = re.compile(r"^[A-Z]+$")
+ROMAN_NUM_RE = re.compile(r"^[IVXLCM]+$")
+GOOGLE_LANG_DETECTOR = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
+                                                    max_num_bytes=1000)
 
 print("Loading dictionaries...", file=sys.stderr)
 
@@ -17,6 +27,19 @@ with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list
     ALL_WORDS = set(word.strip() for word in title_list)
 with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
     ENGLISH_WORDS = set(word.strip() for word in title_list)
+
+SPECIES_WORDS = list()
+for filename in [
+        "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
+        "/bulk-wikipedia/Wikispecies:Requested_articles",
+]:
+    with open(filename, "r") as title_list:
+        for line in title_list:
+            line = line.replace("_", " ").strip()
+            SPECIES_WORDS.extend(list(WORD_RE.findall(line)))
+SPECIES_WORDS = set(SPECIES_WORDS)
+with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
+    REQUESTED_SPECIES_HTML = requested_species_file.read()
 
 print("Done loading.", file=sys.stderr)
 
@@ -43,18 +66,13 @@ def is_english_word(word):
     return False
 
 
-WORD_RE = re.compile(r"[\w']+")
-ACRONYM_RE = re.compile(r"^[A-Z]+$")
-ROMAN_NUM_RE = re.compile(r"^[IVXLCM]+$")
-GOOGLE_LANG_DETECTOR = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
-                                                    max_num_bytes=1000)
-
-# Set this to false if you want to find individual words that need {{lang}}
-ONLY_LONG_SEGMENTS = True
-
-
 def find_non_english(article_title, article_text):
     if ignore_tags_re.search(article_text):
+        return
+
+    request_search_string_en = 'title="en:%s"' % article_title
+    request_search_string_w = 'title="w:%s"' % article_title
+    if request_search_string_en in REQUESTED_SPECIES_HTML or request_search_string_w in REQUESTED_SPECIES_HTML:
         return
 
     article_text = wikitext_to_plaintext(article_text)
@@ -82,7 +100,7 @@ def find_non_english(article_title, article_text):
                 # of Greek variables in STEM articles.
                 continue
 
-            if is_english_word(word_mixedcase):
+            if is_english_word(word_mixedcase) or word_mixedcase in SPECIES_WORDS:
                 paragraph_words_by_lang["en"].append(word_mixedcase)
                 continue
 
@@ -95,7 +113,7 @@ def find_non_english(article_title, article_text):
 
             lang_code = GOOGLE_LANG_DETECTOR.FindLanguage(word_mixedcase).language
             if not is_correct_word(word_mixedcase):
-                lang_code = "ERR:" + lang_code
+                lang_code = lang_code + "?"
             non_english_count += 1
             paragraph_words_by_lang[lang_code].append(word_mixedcase)
 
@@ -124,7 +142,7 @@ def find_non_english(article_title, article_text):
     output_line += f"\t{non_english_count}"
 
     article_word_count = len(article_text.split(" "))
-    non_english_percent = 100 * non_english_count / article_word_count
+    non_english_percent = round(100 * non_english_count / article_word_count, 2)
     output_line += f"\t{non_english_percent}%"
 
     for lang in sorted(article_words_by_lang, key=lambda lang: len(article_words_by_lang[lang]), reverse=True):
