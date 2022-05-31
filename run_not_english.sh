@@ -7,6 +7,7 @@ cd $RUN_NAME
 ../venv/bin/python3 ../moss_not_english.py > not-english-output.csv
 sort not-english-output.csv -k3 -nr -t$'\t' | head -500 > tmp-not-english.csv
 echo '{|class="wikitable sortable"' > post-not-english.txt
+echo '! Article !! # non-Eng !! % non-Eng !! [[Language code|Lang code]] !! Sample words' >> post-not-english.txt
 cat tmp-not-english.csv | perl -pe 's/(.*?)\t/|-\n| [[$1]]\t/' | perl -pe 's/\t/ || /g' >> post-not-english.txt
 echo "|}" >> post-not-english.txt
 
