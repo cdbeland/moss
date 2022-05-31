@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # USAGE: run_not_english.sh
+# Run time: About 60-70 minutes
 
 from collections import defaultdict
 import gcld3
