@@ -355,6 +355,7 @@ transform_unsafe = {
     "∕": "/",  # U+2215 Division Slash to ASCII U+002F Solidus
     "∖": "\\",  # U+2216 Set Minus
     "∶": ":",   # U+2236 Ratio to ASCII U+003A Colon
+    "&ratio;": ":",
 
     # ---
 
@@ -1591,6 +1592,9 @@ transform = {
     "&nadash;": "&ndash;",
     "&ngash;": "&ndash;",
     "&nsb;": "&nbsp;",
+    "&ndah;": "&ndash;",
+    "&ndaah;": "&ndash;",
+    "&nbsssp;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
