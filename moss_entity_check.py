@@ -94,6 +94,7 @@ article_blocklist = [
     "Ezh",
     "FFL",
     "FOCAL character set",
+    "FR",
     "G",
     "GB 2312",
     "German keyboard layout",
@@ -420,6 +421,12 @@ article_blocklist = [
     # {{not a typo}} not working well due to intersecting templates
     "Beta",
     "Kappa",
+
+    # Mixed thetas are intentional
+    "Chebyshev function",
+    "Eisenstein series",
+    "J-invariant",
+    "Kamassian language",
 ]
 
 
@@ -762,7 +769,7 @@ def dump_results():
         for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL"]:
             articles += extract_articles(strings_found_by_type.get(dic_type, {}))
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
-        print("\n".join(articles[0:1000]), file=articlesf)
+        print("\n".join(articles), file=articlesf)
 
 
 if __name__ == '__main__':
