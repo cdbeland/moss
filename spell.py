@@ -46,9 +46,8 @@ def load_data():
     # this all into Python, even though accessing in-memory data is
     # very fast.
 
-    with open("/bulk-wikipedia/moss", "r") as moss_html_file:
+    with open("/bulk-wikipedia/moss/For_Wiktionary", "r") as moss_html_file:
         moss_html = moss_html_file.read()
-        moss_html = re.sub(r'^.*?(<h3><span class="mw-headline" id="For_Wiktionary">For Wiktionary.*?)<h3>.*$', r'\1', moss_html, flags=re.S)
         queued_matches = re.findall('"https://en.wiktionary.org/wiki/(.*?)"', moss_html)
         if not queued_matches:
             raise Exception("Empty Wikitionary queue; regex broken?")
