@@ -4,8 +4,8 @@ import re
 # --- HELPER VARIABLES AND CONFIG ---
 
 # By-frequency lists swap which half of the alphabet they suppress
-alpha_half_inactive = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
-alpha_half_active = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+alpha_half_active = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]
+alpha_half_inactive = ["n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 other_active = True
 active_range_str = "%s-%s" % (alpha_half_active[0], alpha_half_active[-1])
 
@@ -66,7 +66,7 @@ def restrict_misspellings(input_lines_str):
 
 # --- MAIN PRINTOUT ---
 
-print("=== Most common possible typos (%s) ===" % active_range_str)
+print("=== Highest-frequency words missing from dictionary (%s) ===" % active_range_str)
 
 print("""Good candidates for words to add to the English Wiktionary (which
 provides English definitions for words in all languages, including all
