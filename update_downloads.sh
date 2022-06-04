@@ -124,10 +124,20 @@ echo `date`
 # Run time: ~1h 20min
 
 echo "Converting XML to CSV..."
-venv/bin/python3 xml_to_csv.py > /bulk-wikipedia/enwiki-articles-no-redir.csv
+venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml > /bulk-wikipedia/enwiki-articles-no-redir.csv
 echo `date`
 
 ./load_enwiki_categories.sh
+
+echo "Preparing for enwiktionary spell check"
+cd /bulk-wikipedia/
+rm -f enwiktionary-latest-pages-articles-multistream.xml.bz2
+wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles-multistream.xml.bz2
+bunzip2 enwiktionary-latest-pages-articles-multistream.xml.bz2
+
+echo `date`
+cd $ORIG_DIR
+venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml > /bulk-wikipedia/enwiktionary-articles-no-redir.csv
 
 echo `date`
 echo "Done"

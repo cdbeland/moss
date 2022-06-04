@@ -10,13 +10,13 @@ import sys
 
 # Runtime: ~1.5 hours (with a simple callback, whata, single-threaded)
 
-DEFAULT_XML_FILE = "/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml"
+XML_FILE = sys.argv[1]
 PAGE_RE = re.compile(r"^.*(<page.*?</page>).*$", flags=re.MULTILINE+re.DOTALL)
 NEWLINE_RE = re.compile(r"\n")
 
 if __name__ == '__main__':
     working_string = ""
-    with open(DEFAULT_XML_FILE, "r") as article_xml_file:
+    with open(XML_FILE, "r") as article_xml_file:
         for line in article_xml_file:
             working_string += line
             if line == "  </page>\n":

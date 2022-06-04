@@ -46,7 +46,7 @@ def load_data():
     # this all into Python, even though accessing in-memory data is
     # very fast.
 
-    with open("/bulk-wikipedia/moss/For_Wiktionary", "r") as moss_html_file:
+    with open("/bulk-wikipedia/For_Wiktionary", "r") as moss_html_file:
         moss_html = moss_html_file.read()
         queued_matches = re.findall('"https://en.wiktionary.org/wiki/(.*?)"', moss_html)
         if not queued_matches:
