@@ -264,11 +264,7 @@ cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/[[$1]] - <nowiki>$2<\/nowiki>/' > b
 
 rm -f tmp-rhyme-dump.xml
 
-
-echo "Running Wiktionary spell check"
-echo `date`
-
-../venv/bin/python3 ../moss_spell_check_wiktionary.py > tmp-wiktionary-spell.txt
+../run_wiktionary_spell_check.sh
 
 echo "Done"
 echo `date`
