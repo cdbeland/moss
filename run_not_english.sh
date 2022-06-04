@@ -1,3 +1,4 @@
+echo "Starting not-English report"
 echo `date`
 
 RUN_NAME=run-not-english-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T"`

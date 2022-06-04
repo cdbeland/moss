@@ -264,6 +264,10 @@ cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/[[$1]] - <nowiki>$2<\/nowiki>/' > b
 
 rm -f tmp-rhyme-dump.xml
 
+# OTHER PROJECTS
+
+../run_not_english.sh
+
 ../run_wiktionary_spell_check.sh
 
 echo "Done"
