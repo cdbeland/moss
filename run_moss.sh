@@ -234,6 +234,8 @@ echo `date`
 
 # --- CHEMICAL FORMULAS ---
 
+# Run time: About 3 h 50 min
+
 echo "Starting chemical formulas report"
 echo `date`
 echo "====Possible chemical formulas that don't use subscripts====" > beland-chemical-formulas.txt
@@ -243,6 +245,10 @@ grep -P ' ((H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|
 echo "" >> beland-chemical-formulas.txt
 echo "====Known chemical formulas that don't use subscripts====" >> beland-chemical-formulas.txt
 ../venv/bin/python3 ../chemical_formula_report.py >> beland-chemical-formulas.txt
+
+# ---
+
+# Run time: About 2 h
 
 echo "Starting rhyme scheme report"
 echo `date`
@@ -266,8 +272,10 @@ rm -f tmp-rhyme-dump.xml
 
 # OTHER PROJECTS
 
+cd ..
 ../run_not_english.sh
 
+cd $RUN_NAME
 ../run_wiktionary_spell_check.sh
 
 echo "Done"

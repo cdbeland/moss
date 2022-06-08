@@ -14,5 +14,6 @@ echo '! Article !! # non-Eng !! % non-Eng !! [[Language code|Lang code]] !! Samp
 sort tmp-not-english.csv -k3 -nr -t$'\t' | uniq | perl -pe 's/(.*?)\t/|-\n| [[$1]]\t/' | perl -pe 's/\t/ || /g' >> post-not-english.txt
 echo "|}" >> post-not-english.txt
 
+cd ..
 echo "Finished"
 echo `date`
