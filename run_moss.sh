@@ -273,7 +273,7 @@ rm -f tmp-rhyme-dump.xml
 # OTHER PROJECTS
 
 cd ..
-run_not_english.sh
+./run_not_english.sh
 
 cd $RUN_NAME
 ../run_wiktionary_spell_check.sh
