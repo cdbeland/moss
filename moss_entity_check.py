@@ -414,9 +414,17 @@ article_blocklist = [
     "Palette Town",
     "Shibuya Hikarie",
     "Skyliner",
+    "Halanaerobium praevalens",
+    "Leonardo da Vinci: The Mind of the Renaissance",
+    "Cirsium toyoshimae",
+    "Cultural impact of Madonna",
+    "Akita Northern Happinets",
+    "Kyoto Hannaryz",
+    "Isuzu 810",
 
     # {{lang}} and {{IPA}} interwoven with other templates
     "State Anthem of the Soviet Union",
+    "National anthem of Bolivia",
 
     # {{not a typo}} not working well due to intersecting templates
     "Beta",
