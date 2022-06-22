@@ -162,7 +162,7 @@ echo `date`
 cat tmp-words-with-articles.txt | ../venv/bin/python3 ../charlen_extractor.py | sort -k3 -nr > tmp-misspelled-words-charlen-cat.txt
 
 echo "=== Possible typos by length ==="  > collected_by_length.txt
-echo "Longest or shortest in certain categories are shown, sometimes just for fun and sometimes because they form a useful group. Please use strikethrough (or leave a note) for this section rather than removing lines, to avoid repeating work done while the dumps were being processed. Thanks!" >> collected_by_length.txt
+echo "Longest or shortest in certain categories are shown, sometimes just for fun and sometimes because they form a useful group. Feel free to delete articles that are fixed or tagged." >> collected_by_length.txt
 echo "" >> collected_by_length.txt
 
 echo "==== Likely chemistry words ====" >> collected_by_length.txt
