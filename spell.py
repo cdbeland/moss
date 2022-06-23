@@ -255,6 +255,8 @@ bad_words = {
     "your",
     "you're",
 
+    "and/or",  # [[MOS:AND/OR]]
+    
     # Bad syntax, requires argument
     "{{formatnum:}}",
 }
