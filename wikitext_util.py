@@ -363,6 +363,7 @@ ignore_sections_re = re.compile(
     r"==\s*External links\s*==|"
     r"==\s*References\s*==|"
     r"==\s*Bibliography\s*==|"
+    r"==\s*Selected bibliography\s*==|"
     r"==\s*Further reading\s*==|"
     r"==\s*Sources\s*==|"
     r"==\s*Publications\s*==|"
