@@ -308,6 +308,10 @@ article_blocklist = [
     "Sumana Amarasinghe",
     "Gopi Sundar",
     "SASM/GNC romanization",
+    "List of Malayalam films of 2021",
+    "Memoirs of the Actor in a Supporting Role",
+    "Muslim Youth League",
+    "N. F. Varghese",
 
     # Correctly uses U+2011 Non-Breaking Hypens
     "Börje",
@@ -359,6 +363,8 @@ article_blocklist = [
     "Rallying",
     "Pegeen Vail Guggenheim",
     "Power electronic substrate",
+    ".450 No 2 Nitro Express",
+    "Armengol de Aspa",
 
     # Roman numeral in image name (<gallery> or parameter)
     "Collection (publishing)",
@@ -421,6 +427,9 @@ article_blocklist = [
     "Akita Northern Happinets",
     "Kyoto Hannaryz",
     "Isuzu 810",
+    "'01 (Richard Müller album)",
+    "'s Gravenmoer",
+    ".հայ",
 
     # {{lang}} and {{IPA}} interwoven with other templates
     "State Anthem of the Soviet Union",
@@ -476,6 +485,7 @@ def add_tuples_to_results(tuple_list):
 suppression_patterns = [
     re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I+re.S),
     re.compile(r"<source.*?</source>", flags=re.I+re.S),
+    re.compile(r"{{Rust\|.*?}}", flags=re.I+re.S),
     re.compile(r"<code.*?</code>", flags=re.I+re.S),
     re.compile(r"<timeline.*?</timeline>", flags=re.I+re.S),
     re.compile(r"{{code\s*\|.*?}}", flags=re.I+re.S),
@@ -587,7 +597,7 @@ def entity_check(article_title, article_text):
             # Handled above
             continue
 
-        if entity == "&ast;":
+        if entity in ["&ast;", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"]:
             if ("{{Infobox Chinese" in article_text
                     or "{{infobox Chinese" in article_text
                     or "{{Chinese" in article_text):
