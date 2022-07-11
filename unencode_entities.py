@@ -34,9 +34,6 @@ alert = [
     # "»",  # rsaquo
     # "„",  # bdquo
 
-    # "&zwj;",  # Needed for Malaysian-language citations, makes a difference
-    "&zwnj;"
-
     # Disabled - these are probably fine as-is. TODO: Should use ʿ
     # vs. ' more consistently, and in some cases {{transl}} tags are
     # missing.
@@ -529,7 +526,7 @@ transform_unsafe = {
     "&laquo;": "«",
     "&raquo;": "»",
 
-    "&zwj;": "",
+    "&zwj;": "", # Needed for Malaysian-language citations, makes a difference
     "&zwnj;": "",
 
     # https://en.wikipedia.org/wiki/Numerals_in_Unicode#Roman_numerals
@@ -1136,7 +1133,8 @@ transform = {
     "&#60;": "&lt;",
     "&#060;": "&lt;",
     "&#0060;": "&lt;",
-    "&#61;": "<nowiki>=</nowiki>",  # Will break markup inside templates
+    "&#61;": "=",  # OK for URLs, but in other places use the below:
+    # "&#61;": "<nowiki>=</nowiki>",  # Will break markup inside templates
     "&#061;": "<nowiki>=</nowiki>",  # Will break markup inside templates
     "&#0061;": "<nowiki>=</nowiki>",  # Will break markup inside templates
     "&#62;": "&gt;",
