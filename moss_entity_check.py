@@ -566,9 +566,13 @@ def entity_check(article_title, article_text):
             # as the string appears
 
     for string in non_entity_transform:
-        if string == "½" and ("chess" in article_text_lower):
+        if string in ["¼", "½", "¾"] and "{{frac" not in article_text_lower and "{{sfrac" not in article_text_lower:
             # Per [[MOS:FRAC]]
-            continue
+            if string == "½" and ("chess" in article_text_lower):
+                continue
+            if string in article_title:
+                # e.g. Ranma ½, Bentley 4½ Litre, in future Category:4 ft 6½ in gauge railways, 1980 Massachusetts Proposition 2½
+                continue
 
         if string in article_text:
             for instance in re.findall(re.escape(string), article_text):
