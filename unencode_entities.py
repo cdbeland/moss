@@ -98,11 +98,6 @@ keep = [
     # "&a;",    # Used in computer articles as example of a pointer
     # "&x;",    # Used in computer articles as example of a pointer
 
-    # Allowed for math notation only
-    # "&prime;", "′",  Using {{prime}} instead
-    "&Prime;", "″",
-    "&x2034", "‴",
-
     "ʼ",  # U+02BC, used in IPA and a letter in some languages, including Klingon
 
     # Definitely confusing, keep forever
@@ -1076,12 +1071,15 @@ transform = {
     "&#x200F;": "&rlm;",
     "&#x02C6;": "&circ;",
     "&#x710;": "&circ;",
+    "′": "{{prime}}",
     "&#8242;": "{{prime}}",
     "&#x2032;": "{{prime}}",
     "&prime;": "{{prime}}",
-    "′": "{{prime}}",
-    "&#8243;": "&Prime;",  # Double prime
-    "&#x2033;": "&Prime;",  # Double prime
+    "″": "{{pprime}}",
+    "&#8243;": "{{pprime}}",
+    "&#x2033;": "{{pprime}}",
+    "&Prime;": "{{pprime}}",
+    "&x2034": "{{pprime}}",
 
     "&#x2000;": "&ensp;",
     "&#8192;": "&ensp;",
@@ -1401,6 +1399,7 @@ transform = {
     "&odot;": "⊙",
     "&ll;": "≪",
     "&gg;": "≫",
+    "&marker;": "▮",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -1595,6 +1594,7 @@ transform = {
     "&ndah;": "&ndash;",
     "&ndaah;": "&ndash;",
     "&nbsssp;": "&nbsp;",
+    "&ndashc;": "&ndash",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
