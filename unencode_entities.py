@@ -382,9 +382,9 @@ transform_unsafe = {
     "&#8209;": "-",   # U+2011 Non-breaking hyphen to ASCII
     "&#x2011;": "-",   # U+2011 Non-breaking hyphen to ASCII
 
-    # Per [[MOS:FRAC]]
+    # Per [[MOS:FRAC]]; note important exceptions there!
     "¼": "{{frac|1|4}}",
-    "½": "{{frac|1|2}}",  # Except ½ is allowed in chess articles
+    "½": "{{frac|1|2}}",
     "¾": "{{frac|3|4}}",
     "⅓": "{{frac|1|3}}",
     "⅔": "{{frac|2|3}}",
@@ -526,7 +526,7 @@ transform_unsafe = {
     "&laquo;": "«",
     "&raquo;": "»",
 
-    "&zwj;": "", # Needed for Malaysian-language citations, makes a difference
+    "&zwj;": "",  # Needed for Malaysian-language citations, makes a difference
     "&zwnj;": "",
 
     # https://en.wikipedia.org/wiki/Numerals_in_Unicode#Roman_numerals
