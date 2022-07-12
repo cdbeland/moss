@@ -365,6 +365,8 @@ article_blocklist = [
     "Power electronic substrate",
     ".450 No 2 Nitro Express",
     "Armengol de Aspa",
+    "Naoya Uchida",
+    "Yoshito Yasuhara",
 
     # Roman numeral in image name (<gallery> or parameter)
     "Collection (publishing)",
@@ -435,9 +437,11 @@ article_blocklist = [
     "State Anthem of the Soviet Union",
     "National anthem of Bolivia",
 
-    # {{not a typo}} not working well due to intersecting templates
+    # {{not a typo}} not working well due to intersecting/nested templates
     "Beta",
     "Kappa",
+    # {{Rust}} not working well due to intersecting/nested templates
+    "Rust (programming language)",
 
     # Mixed thetas are intentional
     "Chebyshev function",
