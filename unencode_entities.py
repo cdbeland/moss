@@ -1348,6 +1348,7 @@ transform = {
     "&diams;": "♦",
     "&spades;": "♠",
     "&deg;": "°",
+    "&degree;": "°",
     "&oline;": "‾",
     "&pm;": "±",
     "&plus;": "+",
@@ -1360,6 +1361,8 @@ transform = {
     "&Scedil;": "Ş",
     "&scedil;": "ş",
     "&divide;": "÷",
+    "&male;": "♂",
+    "&female;": "♀",
 
     # More math symbols to clean up
     "&rationals;": "ℚ",
@@ -1400,6 +1403,10 @@ transform = {
     "&ll;": "≪",
     "&gg;": "≫",
     "&marker;": "▮",
+    "&langle;": "⟨",
+    "&rangle;": "⟩",
+    "&pre;": "⪯",
+    "&mid;": "{{pipe}}",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -1595,6 +1602,10 @@ transform = {
     "&ndaah;": "&ndash;",
     "&nbsssp;": "&nbsp;",
     "&ndashc;": "&ndash",
+    "&emdash;": "&mdash;",
+    "&nbsbp;": "&nbsp;",
+    "&bbsp;": "&nbsp;",
+    "&nbsbp;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
