@@ -34,6 +34,15 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 # mv tmp-worst.txt post-entities.txt
 # cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all >> post-entities.txt
 
+# --- FRAC REPAIR ---
+
+# Run time for this segment: ~12 min (8-core parallel)
+
+echo "Beginning {{frac}} repair scan"
+echo `date`
+
+../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-frac-repair.txt
+
 # --- MAIN SPELL CHECK ---
 
 # Run time for this segment: ~3h (8-core parallel)
