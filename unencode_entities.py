@@ -1353,8 +1353,8 @@ transform = {
     "&brvbar;": "¦",
     "&euro;": "€",
     "&curren;": "¤",
-    "&dagger;": "†",
-    "&Dagger;": "‡",
+    "&dagger;": "†",  # {{dagger}} is also available
+    "&Dagger;": "‡",  # {{double-dagger}} is also available
     "&clubs;": "♣",
     "&diams;": "♦",
     "&spades;": "♠",
@@ -1393,7 +1393,7 @@ transform = {
     "&cir;": "○",
     "&compfn;": "∘",
     "&rightleftharpoons;": "⇌",
-    "&darr;": "↓",
+    "&darr;": "↓",  # {{down-arrow}} is also available
     "&subseteq;": "⊆",
     "&rceil;": "⌉",
     "&lceil;": "⌈",
@@ -1403,7 +1403,7 @@ transform = {
     "&rArr;": "⇒",
     "&lArr;": "⇐",
     "&harr;": "↔",
-    "&uarr;": "↑",
+    "&uarr;": "↑",  # {{up-arrow}} is also available
     "&uArr;": "⇑",
     "&crarr;": "↵",
     "&Lt;": "≪",
