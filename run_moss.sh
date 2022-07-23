@@ -52,6 +52,15 @@ echo `date`
 
 ../venv/bin/python3 ../dump_grep_csv.py '[^C]{30}°F[^\|\}][^C]{15}' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-temperature-convert.txt
 
+# --- BROKEN NBSP ---
+
+# Run time for this segment: ?
+
+echo "Beginning broken nbsp scan"
+echo `date`
+
+../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-broken-nbsp.txt
+
 # --- MAIN SPELL CHECK ---
 
 # Run time for this segment: ~3h (8-core parallel)
