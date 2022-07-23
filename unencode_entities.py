@@ -299,11 +299,22 @@ transform_unsafe = {
     "&radic;": "√",  # May need to use <math>\sqrt{}</math>
     "∛": r"<math>\sqrt[3]{}</math>",
 
-    # Non-compliant and incorrect uses of superscript o
+    # Non-compliant and incorrect uses of superscript o and similar characters
     "n<sup>o<sup>": "no.",
     "N<sup>o<sup>": "No.",
+    "⁰ C": "°C",
+    "⁰C": "°C",
     "<sup>o<sup>C": "°C",
-    "<sup>o<sup> C": "° C",
+    "<sup>o<sup> C": "°C",
+    "⁰ F": "°F",
+    "⁰F": "°F",
+    "<sup>o<sup>F": "°F",
+    "<sup>o<sup> F": "°F",
+
+    # Per [[MOS:UNITSYMBOLS]]
+    "° C": "°C",
+    "° F": "°F",
+
     # Some of the below might be ordinal indicators for Romance
     # languages, in which case they should use "º" per [[MOS:ORDINAL]]
     "0<sup>o<sup>C": "0°",
