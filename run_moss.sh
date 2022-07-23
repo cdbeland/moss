@@ -43,6 +43,15 @@ echo `date`
 
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-frac-repair.txt
 
+# --- TEMPERATURE CONVERSION ---
+
+# Run time for this segment: ?
+
+echo "Beginning temperature conversion scan"
+echo `date`
+
+../venv/bin/python3 ../dump_grep_csv.py '[^C]{30}°F[^\|\}][^C]{15}' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-temperature-convert.txt
+
 # --- MAIN SPELL CHECK ---
 
 # Run time for this segment: ~3h (8-core parallel)
