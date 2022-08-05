@@ -41,11 +41,11 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 echo "Beginning {{frac}} repair scan"
 echo `date`
 
-../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-frac-repair.txt
+../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > jwb-frac-repair.txt
 
 # --- TEMPERATURE CONVERSION ---
 
-# Run time for this segment: ?
+# Run time for this segment: ~12 min (8-core parallel)
 
 echo "Beginning temperature conversion scan"
 echo `date`
@@ -54,12 +54,28 @@ echo `date`
 
 # --- BROKEN NBSP ---
 
-# Run time for this segment: ?
+# Run time for this segment: ~21 min (8-core parallel)
 
 echo "Beginning broken nbsp scan"
 echo `date`
 
 ../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-broken-nbsp.txt
+
+# --- MOS:LOGICAL ---
+
+# Run time for this segment: ~22 min (8-core parallel)
+
+echo "Beginning MOS:LOGICAL scan"
+echo `date`
+../venv/bin/python3 ../dump_grep_csv.py '"[a-z ,:\-;]+[,\.]"' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > beland-MOS-LOGICAL.txt
+
+# --- MOS:DOUBLE ---
+
+# Run time for this segment: ?
+
+echo "Beginning MOS:DOUBLE scan"
+echo `date`
+../venv/bin/python3 ../dump_grep_csv.py " '[A-Za-z ,:\-;]+'[,\. \}\)]" | grep -v '"' | grep -vP "{{([Ll]ang|[Tt]ransl|IPA)" | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > beland-MOS-DOUBLE.txt
 
 # --- MAIN SPELL CHECK ---
 

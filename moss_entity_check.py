@@ -756,11 +756,20 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
             output_string += '{"replaceText":"%s","replaceWith":"%s","useRegex":true,"regexFlags":"g","ignoreNowiki":true},\n' % (
                 entity,
                 fixed_entity)
-    # Won't be found automatically, but prevents the system from
-    # splitting the integer from the rest of the fraction.
+
+    # {{frac}} repair
     output_string += r'{"replaceText":"([0-9,]+){{frac\\|([0-9]+)}}","replaceWith":"{{frac|$1|1|$2}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
     output_string += "\n"
-    output_string += r'{"replaceText":"([0-9,]+){{frac\\|([0-9]+)\\|([0-9]+)}}","replaceWith":"{{frac|$1|$2|$3}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true}'
+    output_string += r'{"replaceText":"([0-9,]+){{frac\\|([0-9]+)\\|([0-9]+)}}","replaceWith":"{{frac|$1|$2|$3}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
+    output_string += "\n"
+
+    # MOS:LOGICAL
+    output_string += r'{"replaceText":"\"([a-z ,:\\-;]+)([,\\.])\"","replaceWith":"\"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
+    output_string += "\n"
+
+    # MOS:DOUBLE
+    r'{"replaceText":" \'([A-Za-z ,:\\-;]+)\'([,\\. \\}\)])", "replaceWith":" \"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true}'
+
     output_string += "\n]}}"
     print(output_string, file=file)
 
