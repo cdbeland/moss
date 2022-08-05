@@ -1612,7 +1612,7 @@ transform = {
     "&ndah;": "&ndash;",
     "&ndaah;": "&ndash;",
     "&nbsssp;": "&nbsp;",
-    "&ndashc;": "&ndash",
+    "&ndashc;": "&ndash;",
     "&emdash;": "&mdash;",
     "&nbsbp;": "&nbsp;",
     "&bbsp;": "&nbsp;",
