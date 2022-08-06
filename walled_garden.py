@@ -69,60 +69,50 @@ def update_list_of_chains(list_of_chains):
     return dedup_list_of_chains(new_list_of_chains)
 
 
-def convert_chain_to_loop(old_chain, new_loop_name, old_loop_name=None):
+def convert_chain_to_loop(old_chain, new_loop_name):
     # The chain might contain pages and one or more existing loops.
 
-    print(f"OLD CHAIN: {old_chain}")
-    print(f"NEW: {new_loop_name}  OLD: {old_loop_name}")
-    print("LOOPS")
-    pprint(loops)
-    print("LM:")
-    pprint(loop_map)
-
-    new_loop = set()
+    new_loop = list()
+    sub_loops_to_process = list()
     for link in old_chain:
-        print(link)
         if link.startswith("#LOOP#"):
             sub_loop_name = link.replace("#LOOP#", "")
-
-            if sub_loop_name == old_loop_name and sub_loop_name not in loops:
-                # Probably a repeated link
-                continue
-            
-            new_loop.update(convert_chain_to_loop(list(loops[sub_loop_name]), new_loop_name, old_loop_name=sub_loop_name))
-            del loops[sub_loop_name]
-            continue
-        
-        # Check to see if this page is already a member of a loop
-        # (and this chain hasn't been updated with that info)
-
-        sub_loop_name = loop_map.get(link)
-        if sub_loop_name and (sub_loop_name != old_loop_name):
-            # Consolidate with an existing loop
-            print(f"CONSOLIDATE #LOOP#{sub_loop_name} INTO new #LOOP#{new_loop_name}")
-            print("LOOPS")
-            pprint(loops)
-            print("LM:")
-            pprint(loop_map)
-            if sub_loop_name not in loops:
-                # Has already been consolidated with a different
-                # loop. Recover by lookup up the current loop of
-                # the titular article
-                sub_loop_name = loop_map[sub_loop_name]
-
-            if sub_loop_name == new_loop_name and new_loop_name not in loops:
-                # Probably a repeated link
-                continue
-                
-            sub_loop_members = list(loops[sub_loop_name])
-            new_loop.update(convert_chain_to_loop(sub_loop_members, new_loop_name, old_loop_name=sub_loop_name))
-            del loops[sub_loop_name]                
+            sub_loops_to_process.append(sub_loop_name)
         else:
-            loop_map[link] = new_loop_name
-            new_loop.add(link)
+            new_loop.append(link)
 
+            # Check to see if this page is already a member of a loop
+            # (and this chain hasn't been updated with that info)
+            sub_loop_name = loop_map.get(link)
+            if sub_loop_name:
+                sub_loops_to_process.append(sub_loop_name)
+
+    loops_to_delete = list()
+    for sub_loop_name in set(sub_loops_to_process):
+        # Loops are not allowed to contain other loops, so we don't
+        # need recursion.  Processing each loop only once saves a lot
+        # of work because there should be at least one enormous loop.
+
+        if sub_loop_name not in loops:
+            # Has already been consolidated with a different loop, so
+            # recover by lookup up the current loop of the titular
+            # article.
+            sub_loop_name = loop_map[sub_loop_name]
+
+        # Add pages from the other loop
+        new_loop.extend(loops[sub_loop_name])
+        loops_to_delete.append(sub_loop_name)
+
+    # Saving for the end to avoid lookup failures in case of
+    # overlapping membership
+    for loop_name in set(loops_to_delete):
+        if loop_name in loops:
+            del loops[loop_name]
+
+    new_loop = set(new_loop)
     loops[new_loop_name] = new_loop
-    return new_loop  # For recursion only
+    for loop_member in new_loop:
+        loop_map[loop_member] = new_loop_name
 
 
 # This constructs chains of articles, from left to right, and detects
