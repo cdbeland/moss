@@ -17,16 +17,18 @@ def load_sql_data():
                                                host='127.0.0.1',
                                                database='enwiki')
     cursor = mysql_connection.cursor()
-    cursor.execute("SELECT page_title FROM page")
-    page_titles = list(cursor)
+    cursor.execute("SELECT page_title FROM page LIMIT 100")  ###
+    page_titles = [page[0].decode("utf8") for page in cursor]
     cursor.close()
 
     for page in page_titles:
         cursor = mysql_connection.cursor()
-        # "WHERE BINARY" for case-sensitive match
+        # "WHERE BINARY" would do a case-sensitive match, but ignores
+        # the indexes, so that's way too slow.
 
-        cursor.execute("SELECT to FROM named_page_links WHERE BINARY from=%s", [page])
+        cursor.execute('SELECT pl_from, pl_to FROM named_page_links WHERE pl_from=%s', [page])
         links_out = list(cursor)
+        links_out = [result[1].decode("utf8") for result in links_out if result[0].decode("utf8") == page]
         cursor.close()
         if not links_out:
             dead_end_pages.append(page)
@@ -67,16 +69,68 @@ def update_list_of_chains(list_of_chains):
     return dedup_list_of_chains(new_list_of_chains)
 
 
+def convert_chain_to_loop(old_chain, new_loop_name, old_loop_name=None):
+    # The chain might contain pages and one or more existing loops.
+
+    print(f"OLD CHAIN: {old_chain}")
+    print(f"NEW: {new_loop_name}  OLD: {old_loop_name}")
+    print("LOOPS")
+    pprint(loops)
+    print("LM:")
+    pprint(loop_map)
+
+    new_loop = set()
+    for link in old_chain:
+        print(link)
+        if link.startswith("#LOOP#"):
+            sub_loop_name = link.replace("#LOOP#", "")
+
+            if sub_loop_name == old_loop_name and sub_loop_name not in loops:
+                # Probably a repeated link
+                continue
+            
+            new_loop.update(convert_chain_to_loop(list(loops[sub_loop_name]), new_loop_name, old_loop_name=sub_loop_name))
+            del loops[sub_loop_name]
+            continue
+        
+        # Check to see if this page is already a member of a loop
+        # (and this chain hasn't been updated with that info)
+
+        sub_loop_name = loop_map.get(link)
+        if sub_loop_name and (sub_loop_name != old_loop_name):
+            # Consolidate with an existing loop
+            print(f"CONSOLIDATE #LOOP#{sub_loop_name} INTO new #LOOP#{new_loop_name}")
+            print("LOOPS")
+            pprint(loops)
+            print("LM:")
+            pprint(loop_map)
+            if sub_loop_name not in loops:
+                # Has already been consolidated with a different
+                # loop. Recover by lookup up the current loop of
+                # the titular article
+                sub_loop_name = loop_map[sub_loop_name]
+
+            if sub_loop_name == new_loop_name and new_loop_name not in loops:
+                # Probably a repeated link
+                continue
+                
+            sub_loop_members = list(loops[sub_loop_name])
+            new_loop.update(convert_chain_to_loop(sub_loop_members, new_loop_name, old_loop_name=sub_loop_name))
+            del loops[sub_loop_name]                
+        else:
+            loop_map[link] = new_loop_name
+            new_loop.add(link)
+
+    loops[new_loop_name] = new_loop
+    return new_loop  # For recursion only
+
+
 # This constructs chains of articles, from left to right, and detects
 # and streamlines loops along the way.
 def iterate_stitching(chains_by_head):
     new_chains_by_head = defaultdict(list)
     for (chain_head, chains) in chains_by_head.items():
-        print("PROCESSING HEAD:")
-        print(chain_head)
         for chain in chains:
-            print("ATTACHING TO")
-            print(chain[-1])
             extension_chains = chains_by_head.get(chain[-1], [])
             if extension_chains:
                 for extension_chain in extension_chains:
@@ -84,25 +138,11 @@ def iterate_stitching(chains_by_head):
                     for i in range(1, len(extension_chain)):
                         if extension_chain[i] == chain[0]:
                             loop_detected = True
-                            new_loop = set()
                             new_loop_name = chain[0]
                             if new_loop_name.startswith("#LOOP#"):
                                 new_loop_name = new_loop_name.replace("#LOOP#", "")
-                                new_loop = loops[new_loop_name]  # Retain existing members
-                            for loop_member in chain + extension_chain[0:i]:
-                                if loop_member.startswith("#LOOP#"):
-                                    continue
-                                new_loop.add(loop_member)
-                                old_loop_name = loop_map.get(loop_member)
-                                if old_loop_name and old_loop_name != new_loop_name:
-                                    # Consolidate with an existing loop
-                                    for old_loop_member in loops[old_loop_name]:
-                                        new_loop.add(old_loop_member)
-                                        loop_map[old_loop_member] = new_loop_name
-                                    del loops[old_loop_name]
-                                else:
-                                    loop_map[loop_member] = new_loop_name
-                            loops[new_loop_name] = new_loop
+                            old_chain = chain + extension_chain[0:i]
+                            _ = convert_chain_to_loop(old_chain, new_loop_name)
                             new_chain = [f"#LOOP#{new_loop_name}"] + extension_chain[i + 1:]
                             break
                     if not loop_detected:
@@ -118,13 +158,16 @@ def iterate_stitching(chains_by_head):
 def run_walled_garden_check(chains_by_head):
     global dead_end_chains
 
-    for loop_number in [1, 2]:
+    load_sql_data()
+
+    for loop_number in range(0, 10):
         new_chains_by_head = iterate_stitching(chains_by_head)
         chains_by_head = defaultdict(list)
         for head in new_chains_by_head.keys():
             chains_by_head[head] = update_list_of_chains(new_chains_by_head[head])
         dead_end_chains = update_list_of_chains(dead_end_chains)
 
+        """
         print("LM:")
         pprint(loop_map)
         print("LOOPS:")
@@ -133,6 +176,7 @@ def run_walled_garden_check(chains_by_head):
         pprint(chains_by_head)
         print("DEC")
         pprint(dead_end_chains)
+        """
 
     all_looped_chains = []
     for list_of_chains in chains_by_head.values():
@@ -141,16 +185,24 @@ def run_walled_garden_check(chains_by_head):
 
     print()
     print("*****")
+    """
     print()
     print("DEAD-END CHAINS")
     pprint(dead_end_chains)
     print()
     print("DEAD-END PAGES")
     pprint(dead_end_pages)
+    """
     print()
     print("ALL LOOP-ENDED CHAINS")
     pprint(all_looped_chains)
     print()
+    print("--")
+    print()
+    print(f"DEAD-END CHAINS: {len(dead_end_chains)}")
+    print(f"DEAD-END PAGES: {len(dead_end_pages)}")
+    print(f"LOOP-ENDED CHAINS: {len(all_looped_chains)}")
+
     print("LOOPS:")
     for (loop_name, loop_members) in loops.items():
         print(f"{loop_name}: {len(loop_members)} articles - {list(loop_members)[:5]}")
@@ -158,18 +210,21 @@ def run_walled_garden_check(chains_by_head):
     # TODO: Prune chains that begin with redirects or disambiguation pages
 
 
-# run_walled_garden_check(chains_by_head)
+def test_walled_garden_check():
+    test_chains_by_head = defaultdict(list)
+    test_chains_by_head["ginger"] = [
+        ["ginger", "spice"],
+        ["ginger", "coconut"],
+        ["ginger", "pepper"],
+        ["ginger", "redhead"],
+    ]
+    test_chains_by_head["spice"] = [["spice", "ginger"]]
+    test_chains_by_head["pepper"] = [["pepper", "spice"]]
+    test_chains_by_head["bellpepper"] = [["bellpepper", "pepper"]]  # THIS SHOULD NOT BE IN THE COCONUT LOOP
+    test_chains_by_head["coconut"] = [["coconut", "ginger"]]
+    test_chains_by_head["Jupiter"] = [["Jupiter", "Solar system"]]
+    run_walled_garden_check(test_chains_by_head)
 
-test_chains_by_head = defaultdict(list)
-test_chains_by_head["ginger"] = [
-    ["ginger", "spice"],
-    ["ginger", "coconut"],
-    ["ginger", "pepper"],
-    ["ginger", "redhead"],
-]
-test_chains_by_head["spice"] = [["spice", "ginger"]]
-test_chains_by_head["pepper"] = [["pepper", "spice"]]
-test_chains_by_head["bellpepper"] = [["bellpepper", "pepper"]]  # THIS SHOULD NOT BE IN THE COCONUT LOOP
-test_chains_by_head["coconut"] = [["coconut", "ginger"]]
-test_chains_by_head["Jupiter"] = [["Jupiter", "Solar system"]]
-run_walled_garden_check(test_chains_by_head)
+
+# test_walled_garden_check()
+run_walled_garden_check(chains_by_head)
