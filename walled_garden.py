@@ -20,7 +20,7 @@ def load_sql_data():
                                                host='127.0.0.1',
                                                database='enwiki')
     cursor = mysql_connection.cursor()
-    cursor.execute("SELECT page_title FROM page LIMIT 1000")  ###
+    cursor.execute("SELECT page_title FROM page LIMIT 100000")  ###
     page_titles = [page[0].decode("utf8") for page in cursor]
     cursor.close()
 
@@ -124,10 +124,16 @@ def convert_chain_to_loop(old_chain, new_loop_name):
 # and streamlines loops along the way.
 def iterate_stitching(chains_by_head, dead_end_chains):
     live_chains = []
+    breadth_limit = 1000
+    chain_count = 0
     for (chain_head, chains) in chains_by_head.items():
         for chain in chains:
+            if chain_count >= breadth_limit:
+                live_chains.append(chain)
+                continue
             extension_chains = chains_by_head.get(chain[-1], [])
             if extension_chains:
+                chain_count += 1
                 for extension_chain in extension_chains:
                     loop_detected = False
                     for i in range(1, len(extension_chain)):
@@ -180,8 +186,9 @@ def print_stats(chains_by_head, dead_end_chains, and_results=False):
         print(f"DEAD-END PAGES: {len(dead_end_pages)}")
         print()
         print("CBH SAMPLE")
-        first_chains = itertools.islice(chains_by_head.values(), 5)
-        for chain in first_chains:
+        first_heads_and_chains = itertools.islice(chains_by_head.items(), 5)
+        for (head, chain) in first_heads_and_chains:
+            print(head)
             pprint(chain[0:5])
         print()
 
@@ -193,7 +200,7 @@ def print_stats(chains_by_head, dead_end_chains, and_results=False):
 def run_walled_garden_check(chains_by_head):
     # Unclear how many iterations are needed here
     dead_end_chains = []
-    for loop_number in range(0, 10):
+    for loop_number in range(0, 100):
         print("Lengthening chains...")
         (live_chains, dead_end_chains) = iterate_stitching(chains_by_head, dead_end_chains)
 
