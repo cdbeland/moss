@@ -20,10 +20,12 @@ def load_sql_data():
                                                host='127.0.0.1',
                                                database='enwiki')
     cursor = mysql_connection.cursor()
-    cursor.execute("SELECT page_title FROM page LIMIT 100000")  ###
+    cursor.execute("SELECT page_title FROM page")
     page_titles = [page[0].decode("utf8") for page in cursor]
+    print(f"Got {len(page_titles)} page titles")
     cursor.close()
 
+    i = 0
     for page in page_titles:
         cursor = mysql_connection.cursor()
         # "WHERE BINARY" would do a case-sensitive match, but ignores
@@ -37,8 +39,12 @@ def load_sql_data():
             dead_end_pages.append(page)
         for link_out in links_out:
             chains_by_head[page].append([page, link_out])
+        i += 1
+        if i % 10000 == 0:
+            print_stats(chains_by_head, [], and_results=True)
     mysql_connection.close()
     print("Done loading.")
+    print_stats(chains_by_head, [], and_results=True)
     return chains_by_head
 
 
@@ -124,16 +130,10 @@ def convert_chain_to_loop(old_chain, new_loop_name):
 # and streamlines loops along the way.
 def iterate_stitching(chains_by_head, dead_end_chains):
     live_chains = []
-    breadth_limit = 1000
-    chain_count = 0
     for (chain_head, chains) in chains_by_head.items():
         for chain in chains:
-            if chain_count >= breadth_limit:
-                live_chains.append(chain)
-                continue
             extension_chains = chains_by_head.get(chain[-1], [])
             if extension_chains:
-                chain_count += 1
                 for extension_chain in extension_chains:
                     loop_detected = False
                     for i in range(1, len(extension_chain)):
@@ -171,7 +171,10 @@ def print_stats(chains_by_head, dead_end_chains, and_results=False):
     pprint(loop_map)
     """
 
-    max_len = max([max([len(chain) for chain in chain_list]) for chain_list in chains_by_head.values()])
+    try:
+        max_len = max([max([len(chain) for chain in chain_list]) for chain_list in chains_by_head.values()])
+    except ValueError:
+        max_len = "ERR"
     print(f"MAX LENGTH OF CHAINS: {max_len}")
     print(f"HEADS: {len(chains_by_head)}")
     print(f"DEAD-END CHAINS AFTER DEDUP: {len(dead_end_chains)}")
@@ -202,6 +205,7 @@ def run_walled_garden_check(chains_by_head):
     dead_end_chains = []
     for loop_number in range(0, 100):
         print("Lengthening chains...")
+
         (live_chains, dead_end_chains) = iterate_stitching(chains_by_head, dead_end_chains)
 
         print("Consolidating and de-duping...")
@@ -230,7 +234,7 @@ def test_walled_garden_check():
     ]
     test_chains_by_head["spice"] = [["spice", "ginger"]]
     test_chains_by_head["pepper"] = [["pepper", "spice"]]
-    test_chains_by_head["bellpepper"] = [["bellpepper", "pepper"]]  # THIS SHOULD NOT BE IN THE COCONUT LOOP
+    test_chains_by_head["bellpepper"] = [["bellpepper", "pepper"]]  # This should not be in the coconut loop.
     test_chains_by_head["coconut"] = [["coconut", "ginger"]]
     test_chains_by_head["Jupiter"] = [["Jupiter", "Solar system"]]
     run_walled_garden_check(test_chains_by_head)
