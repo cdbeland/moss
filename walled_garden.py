@@ -1,9 +1,12 @@
 from collections import defaultdict
+import datetime
 import itertools
 import mysql.connector
 from pprint import pprint
 
-
+mysql_connection = mysql.connector.connect(user='beland',
+                                           host='127.0.0.1',
+                                           database='enwiki')
 dead_end_pages = []
 loop_map = dict()
 loops = dict()
@@ -11,14 +14,124 @@ loops = dict()
 # loops["ginger"] = set("ginger", "spice")
 
 
+# -- SEEDING IMPLEMENTATION --
+
+
+def find_reachable(start_node, direction):
+    reachable_set = set()
+    search_queue = [start_node]
+    count = 0
+    neighbor_count = 0
+    while search_queue:
+        debug_string = f"{datetime.datetime.now().isoformat()} "
+        debug_string += f" queue: {len(search_queue)}"
+        debug_string += f" reachable: {len(reachable_set)}"
+        if count:
+            debug_string += f" avg_branching_factor: {int(neighbor_count / count)}"
+        print(debug_string)
+
+        # All these are not in reachable_set or they would not have
+        # been added to search_queue.
+        reachable_set.update(search_queue)
+
+        # Do DB lookup all at once so we minimize de-duping; all these
+        # lookups are necessary because they have not been looked up
+        # before.
+        neighbor_list = []
+        for page in search_queue:
+            neighbor_pages = get_neighbors(page, direction)
+            neighbor_count += len(neighbor_pages)
+            neighbor_list.extend(neighbor_pages)
+
+            count += 1
+            if count % 10000 == 0:
+                print(f"{datetime.datetime.now().isoformat()}  checked: {count}")
+
+        print(f"{datetime.datetime.now().isoformat()}  Deduping...")
+        neighbors_dedup = set(neighbor_list)
+        search_queue = neighbors_dedup - reachable_set
+
+    return reachable_set
+
+
+def find_reachable_slow(start_node, direction):
+    reachable_set = {start_node}
+    search_queue = [start_node]
+    count = 0
+    neighbor_count = 0
+    while search_queue:
+        page = search_queue.pop(0)
+
+        count += 1
+        if count % 100 == 0:
+            print(f"{datetime.datetime.now().isoformat()}  search_queue: {len(search_queue)}  "
+                  f"reachable_set: {len(reachable_set)}  checked: {count}  average branching factor: {int(neighbor_count / count)}")
+            if count == 1000:
+                return reachable_set
+
+        neighbor_pages = get_neighbors(page, direction)
+        neighbor_count += len(neighbor_pages)
+
+        for neighbor_page in neighbor_pages:
+            if neighbor_page in search_queue:
+                # Also already in reachable_set
+                continue
+            if neighbor_page not in reachable_set:
+                search_queue.append(neighbor_page)
+                reachable_set.add(neighbor_page)
+    return reachable_set
+
+
+def get_neighbors(page_title, direction):
+    cursor = mysql_connection.cursor()
+    if direction == "forward":
+        cursor.execute('SELECT pl_to, pl_from FROM named_page_links WHERE pl_from=%s AND pl_from != pl_to', [page_title])
+    elif direction == "backward":
+        cursor.execute('SELECT pl_from, pl_to FROM named_page_links WHERE pl_to=%s AND pl_from != pl_to', [page_title])
+    else:
+        raise Exception(f"Invalid direction {direction}")
+
+    # Decoding and force case-sensitive (WHERE BINARY doesn't use index)
+    links = [result[0].decode("utf8") for result in cursor if result[1].decode("utf8") == page_title]
+    cursor.close()
+    return links
+
+
+# -- SEEDING MAIN --
+
+
+# "SELECT pl_from, COUNT(pl_to) FROM named_page_links GROUP BY pl_from HAVING COUNT(pl_to) > 1000 ORDER BY COUNT(pl_to);"
+# (takes ~1h to run)
+# points to "Index_", "List_", and "YEAR_in_X" articles as having the
+# highest branching factor
+START_NODE = "List_of_lists_of_lists"
+
+print("Finding articles via inbound links...")
+articles_inbound = find_reachable(START_NODE, "backward")
+
+print("Finding articles via outbound links...")
+articles_outbound = find_reachable(START_NODE, "forward")
+
+print("Calculating loop boundaries...")
+loops[START_NODE] = articles_outbound.intersection(articles_inbound)
+for page in loops[START_NODE]:
+    loop_map[page] = START_NODE
+
+print(loops[START_NODE])
+
+# To free memory
+articles_inbound = None
+articles_outbound = None
+
+
+# -- BIRDIRECTIONAL MAIN HELPERS --
+
+
 def load_sql_data():
     print("Loading data...")
     global dead_end_pages
     chains_by_head = defaultdict(list)
 
-    mysql_connection = mysql.connector.connect(user='beland',
-                                               host='127.0.0.1',
-                                               database='enwiki')
     cursor = mysql_connection.cursor()
     cursor.execute("SELECT page_title FROM page")
     page_titles = [page[0].decode("utf8") for page in cursor]
@@ -32,52 +145,97 @@ def load_sql_data():
         # the indexes, so that's way too slow.
 
         cursor.execute('SELECT pl_from, pl_to FROM named_page_links WHERE pl_from=%s AND pl_from != pl_to', [page])
-        links_out = list(cursor)
-        links_out = [result[1].decode("utf8") for result in links_out if result[0].decode("utf8") == page]
+        links_out = [result[1].decode("utf8") for result in cursor if result[0].decode("utf8") == page]
         cursor.close()
         if not links_out:
             dead_end_pages.append(page)
+        home_loop = loop_map.get(page)
         for link_out in links_out:
+            if home_loop and loop_map.get(link_out) == home_loop:
+                # Save a lot of space not storing many chains, and
+                # also separate redirects into the main loop from dead
+                # end links out.
+                continue
             chains_by_head[page].append([page, link_out])
         i += 1
         if i % 10000 == 0:
             print_stats(chains_by_head, [], and_results=True)
-    mysql_connection.close()
     print("Done loading.")
     print_stats(chains_by_head, [], and_results=True)
     return chains_by_head
 
 
-def dedup_list_of_chains(list_of_chains):
-    chain_strings = [">".join(chain) for chain in list_of_chains]
-    chain_strings = set(chain_strings)
-    return [chain_string.split(">") for chain_string in chain_strings]
+def run_walled_garden_check(chains_by_head):
+    # Unclear how many iterations are needed here
+    dead_end_chains = []
+    for loop_number in range(0, 100):
+        print("Lengthening chains...")
+
+        (live_chains, dead_end_chains) = iterate_stitching(chains_by_head, dead_end_chains)
+
+        print("Consolidating and de-duping...")
+        live_chains = update_list_of_chains(live_chains)
+        dead_end_chains = update_list_of_chains(dead_end_chains)
+
+        print("Re-indexing...")
+        chains_by_head = defaultdict(list)
+        for chain in live_chains:
+            chains_by_head[chain[0]].append(chain)
+
+        print_stats(chains_by_head, dead_end_chains, and_results=True)
+
+    # TODO: Prune chains that begin with redirects or disambiguation pages
+
+    print_stats(chains_by_head, dead_end_chains, and_results=True)
 
 
-def update_list_of_chains(list_of_chains):
-    new_list_of_chains = []
-    for chain in list_of_chains:
-        new_chain = []
-        last_title = None
-        for title in chain:
-            if title.startswith("#LOOP#"):
-                loop_name = title.replace("#LOOP#", "")
-                if loop_name not in loops:
-                    # Obsolete loop name
-                    new_loop_title = loop_map[loop_name]
-                    title = f"#LOOP#{new_loop_title}"
-            elif title in loop_map:
-                # Title is part of a loop
-                loop_name = loop_map[title]
-                title = f"#LOOP#{loop_name}"
-            if title == last_title:
-                continue
+def test_walled_garden_check():
+    test_chains_by_head = defaultdict(list)
+    test_chains_by_head["ginger"] = [
+        ["ginger", "spice"],
+        ["ginger", "coconut"],
+        ["ginger", "pepper"],
+        ["ginger", "redhead"],
+    ]
+    test_chains_by_head["spice"] = [["spice", "ginger"]]
+    test_chains_by_head["pepper"] = [["pepper", "spice"]]
+    test_chains_by_head["bellpepper"] = [["bellpepper", "pepper"]]  # This should not be in the coconut loop.
+    test_chains_by_head["coconut"] = [["coconut", "ginger"]]
+    test_chains_by_head["Jupiter"] = [["Jupiter", "Solar system"]]
+    run_walled_garden_check(test_chains_by_head)
+
+
+# -- BIDIRECTIONAL EXPANSION --
+
+
+# This constructs chains of articles, from left to right, and detects
+# and streamlines loops along the way.
+def iterate_stitching(chains_by_head, dead_end_chains):
+    live_chains = []
+    for (chain_head, chains) in chains_by_head.items():
+        for chain in chains:
+            extension_chains = chains_by_head.get(chain[-1], [])
+            if extension_chains:
+                for extension_chain in extension_chains:
+                    loop_detected = False
+                    for i in range(1, len(extension_chain)):
+                        if extension_chain[i] == chain[0]:
+                            loop_detected = True
+                            new_loop_name = chain[0]
+                            if new_loop_name.startswith("#LOOP#"):
+                                new_loop_name = new_loop_name.replace("#LOOP#", "")
+                            old_chain = chain + extension_chain[0:i]
+                            convert_chain_to_loop(old_chain, new_loop_name)
+                            new_chain = [f"#LOOP#{new_loop_name}"] + extension_chain[i + 1:]
+                            break
+                    if not loop_detected:
+                        new_chain = chain + extension_chain[1:]
+                    live_chains.append(new_chain)
+            elif chain[-1].startswith("#LOOP#"):
+                live_chains.append(chain)
             else:
-                new_chain.append(title)
-                last_title = title
-        new_list_of_chains.append(new_chain)
-
-    return dedup_list_of_chains(new_list_of_chains)
+                dead_end_chains.append(chain)
+    return (live_chains, dead_end_chains)
 
 
 def convert_chain_to_loop(old_chain, new_loop_name):
@@ -126,35 +284,42 @@ def convert_chain_to_loop(old_chain, new_loop_name):
         loop_map[loop_member] = new_loop_name
 
 
-# This constructs chains of articles, from left to right, and detects
-# and streamlines loops along the way.
-def iterate_stitching(chains_by_head, dead_end_chains):
-    live_chains = []
-    for (chain_head, chains) in chains_by_head.items():
-        for chain in chains:
-            extension_chains = chains_by_head.get(chain[-1], [])
-            if extension_chains:
-                for extension_chain in extension_chains:
-                    loop_detected = False
-                    for i in range(1, len(extension_chain)):
-                        if extension_chain[i] == chain[0]:
-                            loop_detected = True
-                            new_loop_name = chain[0]
-                            if new_loop_name.startswith("#LOOP#"):
-                                new_loop_name = new_loop_name.replace("#LOOP#", "")
-                            old_chain = chain + extension_chain[0:i]
-                            convert_chain_to_loop(old_chain, new_loop_name)
-                            new_chain = [f"#LOOP#{new_loop_name}"] + extension_chain[i + 1:]
-                            break
-                    if not loop_detected:
-                        new_chain = chain + extension_chain[1:]
-                    live_chains.append(new_chain)
-            elif chain[-1].startswith("#LOOP#"):
-                live_chains.append(chain)
-            else:
-                dead_end_chains.append(chain)
-    return (live_chains, dead_end_chains)
+# -- BIDIRECTIONAL REDUCING --
 
+
+def update_list_of_chains(list_of_chains):
+    new_list_of_chains = []
+    for chain in list_of_chains:
+        new_chain = []
+        last_title = None
+        for title in chain:
+            if title.startswith("#LOOP#"):
+                loop_name = title.replace("#LOOP#", "")
+                if loop_name not in loops:
+                    # Obsolete loop name
+                    new_loop_title = loop_map[loop_name]
+                    title = f"#LOOP#{new_loop_title}"
+            elif title in loop_map:
+                # Title is part of a loop
+                loop_name = loop_map[title]
+                title = f"#LOOP#{loop_name}"
+            if title == last_title:
+                continue
+            else:
+                new_chain.append(title)
+                last_title = title
+        new_list_of_chains.append(new_chain)
+
+    return dedup_list_of_chains(new_list_of_chains)
+
+
+def dedup_list_of_chains(list_of_chains):
+    chain_strings = [">".join(chain) for chain in list_of_chains]
+    chain_strings = set(chain_strings)
+    return [chain_string.split(">") for chain_string in chain_strings]
+
+
+# -- BIDIRECTIONAL REPORTING --
 
 def print_stats(chains_by_head, dead_end_chains, and_results=False):
     print()
@@ -200,45 +365,9 @@ def print_stats(chains_by_head, dead_end_chains, and_results=False):
     print()
 
 
-def run_walled_garden_check(chains_by_head):
-    # Unclear how many iterations are needed here
-    dead_end_chains = []
-    for loop_number in range(0, 100):
-        print("Lengthening chains...")
-
-        (live_chains, dead_end_chains) = iterate_stitching(chains_by_head, dead_end_chains)
-
-        print("Consolidating and de-duping...")
-        live_chains = update_list_of_chains(live_chains)
-        dead_end_chains = update_list_of_chains(dead_end_chains)
-
-        print("Re-indexing...")
-        chains_by_head = defaultdict(list)
-        for chain in live_chains:
-            chains_by_head[chain[0]].append(chain)
-
-        print_stats(chains_by_head, dead_end_chains, and_results=True)
-
-    # TODO: Prune chains that begin with redirects or disambiguation pages
-
-    print_stats(chains_by_head, dead_end_chains, and_results=True)
-
-
-def test_walled_garden_check():
-    test_chains_by_head = defaultdict(list)
-    test_chains_by_head["ginger"] = [
-        ["ginger", "spice"],
-        ["ginger", "coconut"],
-        ["ginger", "pepper"],
-        ["ginger", "redhead"],
-    ]
-    test_chains_by_head["spice"] = [["spice", "ginger"]]
-    test_chains_by_head["pepper"] = [["pepper", "spice"]]
-    test_chains_by_head["bellpepper"] = [["bellpepper", "pepper"]]  # This should not be in the coconut loop.
-    test_chains_by_head["coconut"] = [["coconut", "ginger"]]
-    test_chains_by_head["Jupiter"] = [["Jupiter", "Solar system"]]
-    run_walled_garden_check(test_chains_by_head)
-
+# -- MAIN --
 
 # test_walled_garden_check(test_chains_by_head)
 run_walled_garden_check(load_sql_data())
+
+mysql_connection.close()
