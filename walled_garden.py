@@ -17,6 +17,7 @@ loops = dict()
 # -- SEEDING IMPLEMENTATION --
 
 
+# Run time:
 def find_reachable(start_node, direction):
     reachable_set = set()
     search_queue = [start_node]
@@ -46,39 +47,19 @@ def find_reachable(start_node, direction):
             count += 1
             if count % 10000 == 0:
                 print(f"{datetime.datetime.now().isoformat()}  checked: {count}")
+            if count % 1000000 == 0:
+                # Letting neighbor_list grow too long can easily cause
+                # an out-of-memory error, so we have to occasionally
+                # eat the cost of an otherwise unnecessary de-duping.
+                # This will probably take 1-2 min, at least the first
+                # time it's run.
+                print(f"{datetime.datetime.now().isoformat()}  Intermediate deduping...")
+                neighbor_list = list(set(neighbor_list))
 
         print(f"{datetime.datetime.now().isoformat()}  Deduping...")
         neighbors_dedup = set(neighbor_list)
         search_queue = neighbors_dedup - reachable_set
 
-    return reachable_set
-
-
-def find_reachable_slow(start_node, direction):
-    reachable_set = {start_node}
-    search_queue = [start_node]
-    count = 0
-    neighbor_count = 0
-    while search_queue:
-        page = search_queue.pop(0)
-
-        count += 1
-        if count % 100 == 0:
-            print(f"{datetime.datetime.now().isoformat()}  search_queue: {len(search_queue)}  "
-                  f"reachable_set: {len(reachable_set)}  checked: {count}  average branching factor: {int(neighbor_count / count)}")
-            if count == 1000:
-                return reachable_set
-
-        neighbor_pages = get_neighbors(page, direction)
-        neighbor_count += len(neighbor_pages)
-
-        for neighbor_page in neighbor_pages:
-            if neighbor_page in search_queue:
-                # Also already in reachable_set
-                continue
-            if neighbor_page not in reachable_set:
-                search_queue.append(neighbor_page)
-                reachable_set.add(neighbor_page)
     return reachable_set
 
 
@@ -153,8 +134,9 @@ def load_sql_data():
         for link_out in links_out:
             if home_loop and loop_map.get(link_out) == home_loop:
                 # Save a lot of space not storing many chains, and
-                # also separate redirects into the main loop from dead
-                # end links out.
+                # also after chains start getting combined, this will
+                # separate redirects into the main loop from dead
+                # end links out of the main loop.
                 continue
             chains_by_head[page].append([page, link_out])
         i += 1
