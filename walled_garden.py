@@ -100,22 +100,25 @@ START_NODE = "List_of_lists_of_lists"
 if not articles_inbound:
     print("Finding articles via inbound links...")
     articles_inbound = find_reachable(START_NODE, "backward")
-    with open(TMP_FILENAME, "w") as tmp_file:
-        print("articles_inbound = " + articles_inbound)
+    with open(TMP_FILENAME, "a") as tmp_file:
+        print("articles_inbound = ", end="", file=tmp_file)
+        print(articles_inbound, file=tmp_file)
 
 if not articles_outbound:
     print("Finding articles via outbound links...")
     articles_outbound = find_reachable(START_NODE, "forward")
-    with open(TMP_FILENAME, "w") as tmp_file:
-        print("articles_outbound = " + articles_outbound)
+    with open(TMP_FILENAME, "a") as tmp_file:
+        print("articles_outbound = ", end="", file=tmp_file)
+        print(articles_outbound, file=tmp_file)
 
 if not loops.get(START_NODE):
     print("Calculating loop boundaries...")
     loops[START_NODE] = articles_outbound.intersection(articles_inbound)
     for page in loops[START_NODE]:
         loop_map[page] = START_NODE
-    with open(TMP_FILENAME, "w") as tmp_file:
-        print(f'loops["{START_NODE}"] = ' + loops[START_NODE])
+    with open(TMP_FILENAME, "a") as tmp_file:
+        print(f'loops["{START_NODE}"] = ', end="", file=tmp_file)
+        print(loops[START_NODE], file=tmp_file)
 
 # To free memory
 articles_inbound = None
@@ -126,7 +129,8 @@ articles_outbound = None
 
 
 def load_sql_data():
-    print("Loading data...")
+    print(datetime.datetime.now().isoformat())
+    print("Loading all page titles...")
     global dead_end_pages
     chains_by_head = defaultdict(list)
 
@@ -135,6 +139,9 @@ def load_sql_data():
     page_titles = [page[0].decode("utf8") for page in cursor]
     print(f"Got {len(page_titles)} page titles")
     cursor.close()
+
+    print(datetime.datetime.now().isoformat())
+    print("Loading all chains...")
 
     i = 0
     for page in page_titles:
@@ -159,6 +166,8 @@ def load_sql_data():
         i += 1
         if i % 10000 == 0:
             print_stats(chains_by_head, [], and_results=True)
+
+    print(datetime.datetime.now().isoformat())
     print("Done loading.")
     print_stats(chains_by_head, [], and_results=True)
     return chains_by_head
@@ -323,8 +332,9 @@ def dedup_list_of_chains(list_of_chains):
 def print_stats(chains_by_head, dead_end_chains, and_results=False):
     print()
     print("*****")
-    """
     print()
+    print(datetime.datetime.now().isoformat())
+    """
     print("DEAD-END CHAINS")
     pprint(dead_end_chains)
     print()
