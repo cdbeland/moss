@@ -31,5 +31,6 @@ echo "ALTER TABLE named_page_links ADD INDEX (pl_from);" | mysql -D enwiki
 echo "ALTER TABLE named_page_links ADD INDEX (pl_to);" | mysql -D enwiki
 # 2 hours
 
+rm -f /tmp/walled_garden_checkpoint.py
 cd /home/beland/moss/
 venv/bin/python3 walled_garden.py

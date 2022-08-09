@@ -2,11 +2,14 @@ from collections import defaultdict
 import datetime
 import itertools
 import mysql.connector
+from os.path import exists
 from pprint import pprint
+
 
 mysql_connection = mysql.connector.connect(user='beland',
                                            host='127.0.0.1',
                                            database='enwiki')
+TMP_FILENAME = "/tmp/walled_garden_checkpoint.py"
 dead_end_pages = []
 loop_map = dict()
 loops = dict()
@@ -80,6 +83,13 @@ def get_neighbors(page_title, direction):
 
 # -- SEEDING MAIN --
 
+articles_inbound = None
+articles_outbound = None
+if exists(TMP_FILENAME):
+    with open(TMP_FILENAME, "r") as tmp_file:
+        print("Reading checkpoint data...")
+        exec(tmp_file.read())
+
 
 # "SELECT pl_from, COUNT(pl_to) FROM named_page_links GROUP BY pl_from HAVING COUNT(pl_to) > 1000 ORDER BY COUNT(pl_to);"
 # (takes ~1h to run)
@@ -87,18 +97,25 @@ def get_neighbors(page_title, direction):
 # highest branching factor
 START_NODE = "List_of_lists_of_lists"
 
-print("Finding articles via inbound links...")
-articles_inbound = find_reachable(START_NODE, "backward")
+if not articles_inbound:
+    print("Finding articles via inbound links...")
+    articles_inbound = find_reachable(START_NODE, "backward")
+    with open(TMP_FILENAME, "w") as tmp_file:
+        print("articles_inbound = " + articles_inbound)
 
-print("Finding articles via outbound links...")
-articles_outbound = find_reachable(START_NODE, "forward")
+if not articles_outbound:
+    print("Finding articles via outbound links...")
+    articles_outbound = find_reachable(START_NODE, "forward")
+    with open(TMP_FILENAME, "w") as tmp_file:
+        print("articles_outbound = " + articles_outbound)
 
-print("Calculating loop boundaries...")
-loops[START_NODE] = articles_outbound.intersection(articles_inbound)
-for page in loops[START_NODE]:
-    loop_map[page] = START_NODE
-
-print(loops[START_NODE])
+if not loops.get(START_NODE):
+    print("Calculating loop boundaries...")
+    loops[START_NODE] = articles_outbound.intersection(articles_inbound)
+    for page in loops[START_NODE]:
+        loop_map[page] = START_NODE
+    with open(TMP_FILENAME, "w") as tmp_file:
+        print(f'loops["{START_NODE}"] = ' + loops[START_NODE])
 
 # To free memory
 articles_inbound = None
