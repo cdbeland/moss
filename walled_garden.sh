@@ -22,9 +22,11 @@ cat enwiki-20220801-pagelinks.sql | grep ^INSERT | mysql -D enwiki
 echo "DELETE FROM pagelinks WHERE pl_namespace != 0 OR pl_from_namespace != 0;" | mysql -D enwiki
 # 1,492,380,988 -> 641,503,901 rows in 2022-08-01 dump in about 1 hour
 
+echo `date`
+echo "Creating named_page_links.sql"
 cat /home/beland/moss/named_page_links.sql | mysql -D enwiki
 
-echo "INSERT INTO named_page_links SELECT page.page_title AS pl_from, pl_title AS pl_to FROM page, pagelinks WHERE pl_from = page.page_id;" | mysql -D enwiki
+echo "INSERT INTO named_page_links SELECT page.page_title AS pl_from, pl_title AS pl_to, page_is_redirect as from_redirect FROM page, pagelinks WHERE pl_from = page.page_id;" | mysql -D enwiki
 # 5 hours
 echo "ALTER TABLE named_page_links ADD INDEX (pl_from);" | mysql -D enwiki
 # 1 hour
@@ -33,4 +35,6 @@ echo "ALTER TABLE named_page_links ADD INDEX (pl_to);" | mysql -D enwiki
 
 rm -f /tmp/walled_garden_checkpoint.py
 cd /home/beland/moss/
+echo `date`
+echo "Done!"
 venv/bin/python3 walled_garden.py
