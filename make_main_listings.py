@@ -28,12 +28,13 @@ unsorted = [
     # truncates any unlisted languages to this.
 
     "N", "P", "H", "U", "TS", "A"]
-probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "HB", "HL", "T/", "TE",
+probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "HB", "HL", "T/", "TE", "ME",
 
                   # These need {{lang}} and also to be added to the
                   # English Wiktionary; might be misspelled.
                   "TF+el", "TF+de"]
-probably_right = ["L", "ME", "C", "D"]
+probably_right = ["L", "C", "D"]
+
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")
 first_letters = ["BEFORE A"] + [letter for letter in string.ascii_uppercase] + ["AFTER Z"]
