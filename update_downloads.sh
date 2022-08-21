@@ -2,9 +2,18 @@
 
 set -e
 
-# Download, extract, sort, and uncompress time: About 5 hours
+echo `date`
+echo "Dropping walled garden data..."
+
+# Both can't fit at the same time
+
+echo "DROP TABLE IF EXISTS page;" | mysql -D enwiki
+echo "DROP TABLE IF EXISTS pagelinks;" | mysql -D enwiki
+echo "DROP TABLE IF EXISTS named_page_links;" | mysql -D enwiki
 
 echo `date`
+
+# Download, extract, sort, and uncompress time: About 5 hours
 
 rm -rf /bulk-wikipedia/all-wiktionaries
 mkdir /bulk-wikipedia/all-wiktionaries
