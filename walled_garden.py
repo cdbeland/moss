@@ -11,6 +11,7 @@ mysql_connection = mysql.connector.connect(user='beland',
                                            database='enwiki')
 TMP_FILENAME = "/tmp/walled_garden_checkpoint.py"
 dead_end_pages = []
+redirect_to_main_loop = []
 loop_map = dict()
 loops = dict()
 # loop_map["ginger"] = "ginger"
@@ -20,7 +21,7 @@ loops = dict()
 # -- SEEDING IMPLEMENTATION --
 
 
-# Run time:
+# Run time: About 6h
 def find_reachable(start_node, direction):
     reachable_set = set()
     search_queue = [start_node]
@@ -97,14 +98,14 @@ if exists(TMP_FILENAME):
 # highest branching factor
 START_NODE = "List_of_lists_of_lists"
 
-if not articles_inbound:
+if not articles_inbound and not loops.get(START_NODE):
     print("Finding articles via inbound links...")
     articles_inbound = find_reachable(START_NODE, "backward")
     with open(TMP_FILENAME, "a") as tmp_file:
         print("articles_inbound = ", end="", file=tmp_file)
         print(articles_inbound, file=tmp_file)
 
-if not articles_outbound:
+if not articles_outbound and not loops.get(START_NODE):
     print("Finding articles via outbound links...")
     articles_outbound = find_reachable(START_NODE, "forward")
     with open(TMP_FILENAME, "a") as tmp_file:
@@ -116,7 +117,7 @@ if not loops.get(START_NODE):
     loops[START_NODE] = articles_outbound.intersection(articles_inbound)
     for page in loops[START_NODE]:
         loop_map[page] = START_NODE
-    with open(TMP_FILENAME, "a") as tmp_file:
+    with open(TMP_FILENAME, "w") as tmp_file:  # Intentionally overwriting, to save time and space
         print(f'loops["{START_NODE}"] = ', end="", file=tmp_file)
         print(loops[START_NODE], file=tmp_file)
 
@@ -132,6 +133,7 @@ def load_sql_data():
     print(datetime.datetime.now().isoformat())
     print("Loading all page titles...")
     global dead_end_pages
+    global redirect_to_main_loop
     chains_by_head = defaultdict(list)
 
     cursor = mysql_connection.cursor()
@@ -144,42 +146,100 @@ def load_sql_data():
     print("Loading all chains...")
 
     i = 0
+    all_chains = []
+    all_chains_tmp = []
     for page in page_titles:
         cursor = mysql_connection.cursor()
         # "WHERE BINARY" would do a case-sensitive match, but ignores
         # the indexes, so that's way too slow.
 
-        cursor.execute('SELECT pl_from, pl_to FROM named_page_links WHERE pl_from=%s AND pl_from != pl_to', [page])
-        links_out = [result[1].decode("utf8") for result in cursor if result[0].decode("utf8") == page]
+        cursor.execute('SELECT pl_from, pl_to, from_redirect FROM named_page_links WHERE pl_from=%s AND pl_from != pl_to', [page])
+        results = list(cursor)
         cursor.close()
+        from_redirect = False
+        if results:
+            from_redirect = results[0][2]
+        links_out = [result[1].decode("utf8") for result in results if result[0].decode("utf8") == page]
+
+        if loop_map.get(page):
+            page = "#LOOP#{loop_map[page]}"
         if not links_out:
             dead_end_pages.append(page)
-        home_loop = loop_map.get(page)
+
         for link_out in links_out:
-            if home_loop and loop_map.get(link_out) == home_loop:
+            if loop_map.get(link_out):
+                if from_redirect:
+                    # Assume there's only one loop loaded, and it's the main one
+                    redirect_to_main_loop.append(page)
+                link_out = "#LOOP#{loop_map[link_out]}"
+            if page == link_out:
                 # Save a lot of space not storing many chains, and
                 # also after chains start getting combined, this will
                 # separate redirects into the main loop from dead
                 # end links out of the main loop.
                 continue
-            chains_by_head[page].append([page, link_out])
+            all_chains_tmp.append([page, link_out])
         i += 1
         if i % 10000 == 0:
-            print_stats(chains_by_head, [], and_results=True)
+            print(f"{datetime.datetime.now().isoformat()} Deduping...")
+            all_chains = dedup_list_of_chains(all_chains + all_chains_tmp)
+            print(f"{datetime.datetime.now().isoformat()} {i} ALL CHAINS AFTER DEDUP: {len(all_chains)}")
 
+    all_chains = dedup_list_of_chains(all_chains + all_chains_tmp)
+    print(f"{datetime.datetime.now().isoformat()} {i} FINAL ALL CHAINS AFTER DEDUP: {len(all_chains)}")
+    for chain in all_chains:
+        chains_by_head[chain[0]].append(chain)
+
+    redirect_to_main_loop = set(redirect_to_main_loop)
     print(datetime.datetime.now().isoformat())
     print("Done loading.")
-    print_stats(chains_by_head, [], and_results=True)
+    print_stats(chains_by_head, [], full=True)
     return chains_by_head
 
 
 def run_walled_garden_check(chains_by_head):
+    # May need to rewrite
+    #
+    # dead_end_chains must be kept live because they may be needed to complete other chains
+    #
+    # Treat chains_by_head as add-only, accumulate a new list of working chains.
+
+    #  Expand chains_by_head by caching all the way down to terminal
+    #  nodes, without deleting the intermediate heads, in case they
+    #  have something else also pointed at them. Cache recursively,
+    #  watch out for loops. You'll know a cached answer is complete if
+    #  it's more than 1 link in the chain or it ends in a dead end (or
+    #  the main loop).
+
+    # Phase one: Links out of main loop
+    #  Complete all chains headed out of the main loop, depth-first, without deleting anything
+    #    Need some way to detect loops - use the existing loop_map
+    #      mechanism or something modified to work depth-first
+    #    Need some way to detect subset chains, maybe at the end
+    #  We only need to start with the main loop head; we know we are done when we've finished this.
+    #  Sort by length then alphabetical, and print e.g ">A>B>C"
+
+    # Phase two: All other chains
+    #  del chains_by_head["loops[START_NODE]"]  # To save space and time, not needed for incoming links
+    #  All chains now end in a dead end, because the main loop has become a dead end
+    #  Do the same thing as phase one, but for all starting points
+    #    (some chains may start before the main loop and end after it,
+    #    but never go through it)
+    #  We only have to make one pass through the head list, then
+    #    harvest the cached results, assuming loops have been taken care
+    #    of along the way.
+    #  Sort and report as "MAIN<C<B<A" to facilitate dropping redundant subchains and seeing patterns
+
+
+    # First pass:
+    # Find all the links out from the main loop to dead-en
+
     # Unclear how many iterations are needed here
     dead_end_chains = []
     for loop_number in range(0, 100):
-        print("Lengthening chains...")
-
-        (live_chains, dead_end_chains) = iterate_stitching(chains_by_head, dead_end_chains)
+        if loop_number > 0:
+            print("Lengthening chains...")
+            (live_chains, dead_end_chains) = iterate_stitching(chains_by_head, dead_end_chains)
 
         print("Consolidating and de-duping...")
         live_chains = update_list_of_chains(live_chains)
@@ -190,11 +250,9 @@ def run_walled_garden_check(chains_by_head):
         for chain in live_chains:
             chains_by_head[chain[0]].append(chain)
 
-        print_stats(chains_by_head, dead_end_chains, and_results=True)
+        print_stats(chains_by_head, dead_end_chains, full=True)
 
-    # TODO: Prune chains that begin with redirects or disambiguation pages
-
-    print_stats(chains_by_head, dead_end_chains, and_results=True)
+    print_stats(chains_by_head, dead_end_chains, full=True)
 
 
 def test_walled_garden_check():
@@ -329,7 +387,7 @@ def dedup_list_of_chains(list_of_chains):
 
 # -- BIDIRECTIONAL REPORTING --
 
-def print_stats(chains_by_head, dead_end_chains, and_results=False):
+def print_stats(chains_by_head, dead_end_chains, full=False):
     print()
     print("*****")
     print()
@@ -351,14 +409,15 @@ def print_stats(chains_by_head, dead_end_chains, and_results=False):
         max_len = "ERR"
     print(f"MAX LENGTH OF CHAINS: {max_len}")
     print(f"HEADS: {len(chains_by_head)}")
-    print(f"DEAD-END CHAINS AFTER DEDUP: {len(dead_end_chains)}")
+    print(f"REDIRECTS TO MAIN LOOP: {len(redirect_to_main_loop)}")
+    print(f"DEAD-END CHAINS: {len(dead_end_chains)}")
     chain_count = sum(len(chain) for chain in chains_by_head.values())
-    print(f"LIVE CHAINS AFTER DEDUP: {chain_count}")
+    print(f"LIVE CHAINS: {chain_count}")
     print()
     print("LOOPS:")
     for (loop_name, loop_members) in loops.items():
         print(f"{loop_name}: {len(loop_members)} articles - {list(loop_members)[:5]}")
-    if and_results:
+    if full:
         print()
         print(f"DEAD-END PAGES: {len(dead_end_pages)}")
         print()
@@ -367,11 +426,9 @@ def print_stats(chains_by_head, dead_end_chains, and_results=False):
         for (head, chain) in first_heads_and_chains:
             print(head)
             pprint(chain[0:5])
-        print()
 
-    print()
-    print("*****")
-    print()
+        # TODO: Prune chains that are ONLY redirects pointed to the main loop
+        # TODO: Prune chains that are ONLY disambiguation pages pointed to the main loop
 
 
 # -- MAIN --
