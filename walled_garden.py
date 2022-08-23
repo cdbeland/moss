@@ -230,7 +230,6 @@ def run_walled_garden_check(chains_by_head):
     #    of along the way.
     #  Sort and report as "MAIN<C<B<A" to facilitate dropping redundant subchains and seeing patterns
 
-
     # First pass:
     # Find all the links out from the main loop to dead-en
 
