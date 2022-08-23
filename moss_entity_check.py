@@ -768,7 +768,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += "\n"
 
     # MOS:DOUBLE
-    r'{"replaceText":" \'([A-Za-z ,:\\-;]+)\'([,\\. \\}\)])", "replaceWith":" \"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true}'
+    output_string += r'{"replaceText":" \'([A-Za-z ,:\\-;]+)\'([,\\. \\}\)])", "replaceWith":" \"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true}'
 
     output_string += "\n]}}"
     print(output_string, file=file)
