@@ -280,10 +280,6 @@ substitutions = [
     (re.compile(r"\[\s*(http|https|ftp):.*?\]", flags=re.I), ""),  # External links
     (re.compile(r"(http|https|ftp):.*?[ $]", flags=re.I), ""),  # Bare URLs
 
-    (re.compile(r"'''''"), ""),
-    (re.compile(r"''''"), ""),  # For when ''xxx'' has xxx removed
-    (re.compile(r"'''"), ""),
-    (re.compile(r"''"), ""),
     (re.compile(r"\{.{1,200}?\{.{1,200}?\}\}"), ""),  # Happens in mathematical expressions
 
     # TODO: Might need to actually respect this and protect segments
@@ -326,6 +322,14 @@ substitutions_sub_sup = [
 ]
 
 
+substitutions_bold_italics = [
+    (re.compile(r"'''''"), ""),
+    (re.compile(r"''''"), ""),  # For when ''xxx'' has xxx removed
+    (re.compile(r"'''"), ""),
+    (re.compile(r"''"), ""),
+]
+
+
 # This function does not preserve all elements in the wikitext where
 # non-linear rendering or template substitution would be required, so
 # some information on the page is lost.  It is intended for use with
@@ -354,8 +358,6 @@ def wikitext_to_plaintext(string, flatten_sup_sub=True):
     return string
 
 
-# TODO: Some day, we'll need to spell-check inside italics and
-# quotations, but for now these produce too many false alarms.
 italics_re = re.compile(r"([^'])(''[A-Za-z][^']{0,1000}'')([^'])")
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
 # "" because the contents may have been removed by a previous replacement
@@ -405,11 +407,17 @@ def get_main_body_wikitext(wikitext_input, strong=False):
     wikitext_working = ignore_headers_re.sub("", wikitext_working)
     wikitext_working = line_starts_with_re.sub("", wikitext_working)
 
+    # Must be done after italics_re
+    for (regex, replacement) in substitutions_bold_italics:
+        wikitext_working = regex.sub(replacement, wikitext_working)
+
     if strong:
         wikitext_working = parenthetical_re.sub("", wikitext_working)
         wikitext_working = ignore_lists_re.sub("", wikitext_working)
 
     """
+    # TODO: Do the same thing for italics
+
     quotation_list = blockquote_re.findall(article_text)
     quotation_list.extend(prose_quote_re.findall(article_text))
     quotation_list.extend(prose_quote_curly_re.findall(article_text))
