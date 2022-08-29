@@ -354,6 +354,9 @@ def wikitext_to_plaintext(string, flatten_sup_sub=True):
     return string
 
 
+# TODO: Some day, we'll need to spell-check inside italics and
+# quotations, but for now these produce too many false alarms.
+italics_re = re.compile(r"([^'])(''[A-Za-z][^']{0,1000}'')([^'])")
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
 # "" because the contents may have been removed by a previous replacement
 prose_quote_curly_re = re.compile(r'“\S[^”]{0,1000}?\S”|“\S”|“”')
@@ -397,6 +400,7 @@ def get_main_body_wikitext(wikitext_input, strong=False):
 
     wikitext_working = prose_quote_re.sub("✂", wikitext_working)
     wikitext_working = prose_quote_curly_re.sub("✂", wikitext_working)
+    wikitext_working = italics_re.sub(r"\1✂\3", wikitext_working)
     wikitext_working = blockquote_re.sub("✂", wikitext_working)
     wikitext_working = ignore_headers_re.sub("", wikitext_working)
     wikitext_working = line_starts_with_re.sub("", wikitext_working)
