@@ -363,6 +363,9 @@ prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
 # "" because the contents may have been removed by a previous replacement
 prose_quote_curly_re = re.compile(r'“\S[^”]{0,1000}?\S”|“\S”|“”')
 parenthetical_re = re.compile(r'\(\S[^\)]{0,1000}?\S\)|\(\S\)|\[\S[^\]]{0,1000}?\S\]|\[\S\]')
+single_quote_re = re.compile(r"(\s|^)('[A-Za-z][^']{0,1000}?')(\s|$)")
+# MOS:DOUBLE violations are captured in a separate report
+
 ignore_sections_re = re.compile(
     r"(==\s*See also\s*==|"
     r"==\s*External links\s*==|"
@@ -403,6 +406,7 @@ def get_main_body_wikitext(wikitext_input, strong=False):
     wikitext_working = prose_quote_re.sub("✂", wikitext_working)
     wikitext_working = prose_quote_curly_re.sub("✂", wikitext_working)
     wikitext_working = italics_re.sub(r"\1✂\3", wikitext_working)
+    wikitext_working = single_quote_re.sub(r"\1✂\3", wikitext_working)
     wikitext_working = blockquote_re.sub("✂", wikitext_working)
     wikitext_working = ignore_headers_re.sub("", wikitext_working)
     wikitext_working = line_starts_with_re.sub("", wikitext_working)
@@ -416,7 +420,7 @@ def get_main_body_wikitext(wikitext_input, strong=False):
         wikitext_working = ignore_lists_re.sub("", wikitext_working)
 
     """
-    # TODO: Do the same thing for italics
+    # TODO: Do the same thing for italics and single quote passages
 
     quotation_list = blockquote_re.findall(article_text)
     quotation_list.extend(prose_quote_re.findall(article_text))
