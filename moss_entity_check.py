@@ -7,6 +7,10 @@ from unencode_entities import (
     alert, keep, controversial, transform, greek_letters, find_char_num,
     entities_re, fix_text, should_keep_as_is)
 
+low_priority = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ" \
+    "¹²³⁴⁵⁶⁷⁸⁹⁰ⁱ⁺⁻⁼⁽⁾ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓꟹᵝᵞᵟᵋᶿᶥᶹᵠᵡᵦᵧᵨᵩᵪᵅᶜ̧ᶞᵊᶪᶴᶵꭩˀₔᵑ"
+
+
 strings_found_by_type = {}
 non_entity_transform = [string for string
                         in list(transform.keys()) + list(controversial.keys())
@@ -582,9 +586,12 @@ def entity_check(article_title, article_text):
 
         if string in article_text:
             for instance in re.findall(re.escape(string), article_text):
-                result_tuples.append(("UNCONTROVERSIAL", article_title, string))
                 # This intentionally adds the article title as many
                 # times as the string appears
+                if len(string) == 1 and string in low_priority:
+                    result_tuples.append(("LOW_PRIORITY", article_title, string))
+                else:
+                    result_tuples.append(("UNCONTROVERSIAL", article_title, string))
 
         if string == "ϑ" and "θ" not in article_text:
             # Probably not appropriate for basic geometry articles,
@@ -666,6 +673,8 @@ def dump_dict(section_title, dictionary):
     elif section_title == "Unknown":
         output += "Not included in JWB scripts; fix manually or update moss code.\n\n"
     elif section_title == "Uncontroversial entities":
+        output += "Fix automatically with jwb-articles.txt\n\n"
+    elif section_title == "Low priority":
         output += "Fix automatically with jwb-articles.txt\n\n"
     elif section_title == "Greek letters":
         output += "Fix automatically with jwb-articles.txt (articles with {{tag|math}} markup excluded)\n\n"
@@ -778,6 +787,7 @@ def dump_results():
     sections = {
         "Unknown": strings_found_by_type.get("UNKNOWN", {}),
         "To avoid": strings_found_by_type.get("ALERT", {}),
+        "Low priority": strings_found_by_type.get("LOW_PRIORITY", {}),
         "Uncontroversial entities": strings_found_by_type.get("UNCONTROVERSIAL", {}),
         "Numeric": strings_found_by_type.get("NUMERIC", {}),
         "Greek letters": strings_found_by_type.get("GREEK", {}),
@@ -789,7 +799,7 @@ def dump_results():
 
     with open("jwb-combo.json", "w") as combof:
         bad_entities = set()
-        for dic_type in ["ALERT", "UNCONTROVERSIAL", "UNKNOWN", "NUMERIC", "CONTROVERSIAL", "GREEK"]:
+        for dic_type in ["ALERT", "LOW_PRIORITY", "UNCONTROVERSIAL", "UNKNOWN", "NUMERIC", "CONTROVERSIAL", "GREEK"]:
             dictionary = strings_found_by_type.get(dic_type, {})
             bad_entities.update(extract_entities(dictionary))
         dump_for_jwb("combo", bad_entities, file=combof)
@@ -798,7 +808,7 @@ def dump_results():
         """
         # Sorted from least-frequent to most-frequent across all types
         mega_dict = {}
-        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL"]:
+        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL", "LOW_PRIORITY"]:
             mega_dict.update(strings_found_by_type.get(dic_type, {}))
         articles = extract_articles(mega_dict)
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
@@ -807,7 +817,7 @@ def dump_results():
 
         # By section, from least-frequent to most-frequent with each section
         articles = []
-        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL"]:
+        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL", "LOW_PRIORITY"]:
             articles += extract_articles(strings_found_by_type.get(dic_type, {}))
         articles = list(dict.fromkeys(articles))  # uniqify across sublists
         print("\n".join(articles), file=articlesf)
