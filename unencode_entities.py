@@ -532,7 +532,7 @@ transform_unsafe = {
     "&laquo;": "«",
     "&raquo;": "»",
 
-    "&zwj;": "",  # Needed for Malaysian-language citations, makes a difference
+    # "&zwj;": "",  # Needed for Malaysian-language citations, makes a difference
     "&zwnj;": "",
 
     # https://en.wikipedia.org/wiki/Numerals_in_Unicode#Roman_numerals
@@ -1122,7 +1122,7 @@ transform = {
     "&#8203;": "&zwnj;",
     "&#x200C;": "&zwnj;",
     "&#8204;": "&zwnj;",
-    "&#x200D;": "&zwnj;",
+    "&#x200D;": "&zwj;",
     "&#8205;": "&zwj;",
     "&#x2060;": "&NoBreak;",
     "&#8288;": "&NoBreak;",
