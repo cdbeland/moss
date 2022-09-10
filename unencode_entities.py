@@ -695,6 +695,8 @@ transform_unsafe = {
 
     # Below sections per:
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Abbreviations#Unicode_abbreviation_ligatures
+    # Explicitly excluded:
+    # "₨": "Rs",
 
     # https://en.wikipedia.org/wiki/Unicode_compatibility_characters#Semantically_distinct_characters
     "ℵ": "א",  # From U+2135
@@ -710,7 +712,6 @@ transform_unsafe = {
     "ϱ": "ρ",  # From U+03F1
     "ϴ": "Θ",  # From U+03F4
     "ℇ": "ε",  # From U+2107 Euler constant
-    "₨": "Rs",
     "․": ".",  # From U+2024
     "ℹ": "i",  # From U+2139
 
