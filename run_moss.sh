@@ -286,7 +286,7 @@ echo "" >> beland-chemical-formulas.txt
 echo "====Known chemical formulas that don't use subscripts====" >> beland-chemical-formulas.txt
 ../venv/bin/python3 ../chemical_formula_report.py >> beland-chemical-formulas.txt
 
-# ---
+# --- RHYME SCHEMES ---
 
 # Run time: About 2 h
 
@@ -310,13 +310,21 @@ cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/[[$1]] - <nowiki>$2<\/nowiki>/' > b
 
 rm -f tmp-rhyme-dump.xml
 
-# OTHER PROJECTS
+# --- OTHER PROJECTS ---
 
 cd ..
 ./run_not_english.sh
 
 cd $RUN_NAME
 ../run_wiktionary_spell_check.sh
+
+# --- x to times symbol ---
+
+echo "Starting x-to-times"
+echo `date`
+
+venv/bin/python3 dump_grep_csv.py '[0-9]x[^a-zA-Z]' | grep -vP '[a-zA-Z\-_][0-9]+x' | grep -vP 'x[a-zA-Z]' | grep -vP '( 4x4 | 6x6 )' | grep -vP '[0-9]+x[0-9]+px' | grep -v '<math' | grep -vP '[^0-9]0x[0-9]+' | grep -P '[0-9]+x[0-9]*' > x-correct-nospace-with-article.txt
+venv/bin/python3 ./dump_grep_csv.py " x " > x-correct-space-with-article.txt
 
 echo "Done"
 echo `date`
