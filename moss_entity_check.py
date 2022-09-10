@@ -436,6 +436,7 @@ article_blocklist = [
     "'01 (Richard Müller album)",
     "'s Gravenmoer",
     ".հայ",
+    ".577/500 No 2 Black Powder",
 
     # {{lang}} and {{IPA}} interwoven with other templates
     "State Anthem of the Soviet Union",
