@@ -323,8 +323,8 @@ cd $RUN_NAME
 echo "Starting x-to-times"
 echo `date`
 
-venv/bin/python3 dump_grep_csv.py '[0-9]x[^a-zA-Z]' | grep -vP '[a-zA-Z\-_][0-9]+x' | grep -vP 'x[a-zA-Z]' | grep -vP '( 4x4 | 6x6 )' | grep -vP '[0-9]+x[0-9]+px' | grep -v '<math' | grep -vP '[^0-9]0x[0-9]+' | grep -P '[0-9]+x[0-9]*' > x-correct-nospace-with-article.txt
-venv/bin/python3 ./dump_grep_csv.py " x " > x-correct-space-with-article.txt
+../venv/bin/python3 ../dump_grep_csv.py '[0-9]x[^a-zA-Z]' | grep -vP '[a-zA-Z\-_][0-9]+x' | grep -vP 'x[a-zA-Z]' | grep -vP '( 4x4 | 6x6 )' | grep -vP '[0-9]+x[0-9]+px' | grep -v '<math' | grep -vP '[^0-9]0x[0-9]+' | grep -P '[0-9]+x[0-9]*' > x-correct-nospace-with-article.txt
+../venv/bin/python3 ../dump_grep_csv.py " x " > x-correct-space-with-article.txt
 
 # --- l to L for liters ---
 
@@ -334,12 +334,13 @@ echo `date`
 # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
 # Run time: 9-22 min per regex
-../venv/bin/python3 ../dump_grep_csv.py '[0-9] l\W' > liters-fixme1.txt
-../venv/bin/python3 ../dump_grep_csv.py 'illion l\W' > liters-fixme2.txt
-../venv/bin/python3 ../dump_grep_csv.py '(liter|litre)s?\|l]]' > liters-fixme3.txt
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" > liters-fixme4.txt
-../venv/bin/python3 ../dump_grep_csv.py "[^A-Za-z\./][A-Za-z]{1,3}/l[^a-zA-Z'0-9/\-_]" | grep -v w/l | grep -v " a/l" > liters-fixme5.txt
-../venv/bin/python3 ../dump_grep_csv.py '{{convert\|[^\|]+\|[a-zA-Z]+\|l(\||})' > liters-fixme6.txt
+../venv/bin/python3 ../dump_grep_csv.py "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9']" | grep -v " l.jpg" | sort > liters-fixme1.txt
+../venv/bin/python3 ../dump_grep_csv.py "illion l[^a-zA-Z0-9']" | sort > liters-fixme2.txt
+../venv/bin/python3 ../dump_grep_csv.py '(liter|litre)s?\|l]]' | sort > liters-fixme3.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > liters-fixme4.txt
+../venv/bin/python3 ../dump_grep_csv.py "[^A-Za-z\./][A-Za-z]{1,3}/l[^a-zA-Z'0-9/\-_]" | grep -v w/l | grep -vP "[ =]a/l" | grep -v " s/l)" | sort > liters-fixme5.txt
+../venv/bin/python3 ../dump_grep_csv.py '{{convert\|[^\|]+\|[a-zA-Z]+\|l(\||})' | sort > liters-fixme6.txt
+cat liters-fixme* | perl -pe 's/(.*?):.+/$1/' | uniq > liters-all.txt
 
 echo "Done"
 echo `date`
