@@ -1153,7 +1153,7 @@ transform = {
 
     "&gtdot;": "⋗",
     "&ltdot;": "⋖",
-    "&esdot;": "⋖",
+    "&esdot;": "≐",
     "&bullet;": "•",
     "&hyphen;": "-",
 
