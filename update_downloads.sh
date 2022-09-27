@@ -132,9 +132,9 @@ echo `date`
 
 # Run time: ~1h 20min
 
-echo "Converting XML to CSV..."
-venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml > /bulk-wikipedia/enwiki-articles-no-redir.csv
+echo "Converting enwiki XML to CSV..."
 echo `date`
+venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml > /bulk-wikipedia/enwiki-articles-no-redir.csv
 
 ./load_enwiki_categories.sh
 
@@ -145,6 +145,7 @@ wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-a
 bunzip2 enwiktionary-latest-pages-articles-multistream.xml.bz2
 
 echo `date`
+echo "XML to CSV for enwiktionary"
 cd $ORIG_DIR
 venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml > /bulk-wikipedia/enwiktionary-articles-no-redir.csv
 
