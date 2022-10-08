@@ -334,13 +334,13 @@ echo `date`
 # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
 # Run time: 9-22 min per regex
-../venv/bin/python3 ../dump_grep_csv.py "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9']" | grep -v " l.jpg" | sort > liters-fixme1.txt
+../venv/bin/python3 ../dump_grep_csv.py "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'àÁáÂâÃãÄäÇçÈèÉéÊêËëÌìÍíÎîÏïÑñÒòÓóÔôÕõÖŠšÚúùÙÛûÜüÝýŸÿŽž]" | grep -v " l.jpg" | sort > liters-fixme1.txt
 ../venv/bin/python3 ../dump_grep_csv.py "illion l[^a-zA-Z0-9']" | sort > liters-fixme2.txt
-../venv/bin/python3 ../dump_grep_csv.py '(liter|litre)s?\|l]]' | sort > liters-fixme3.txt
+../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]' | sort > liters-fixme3.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > liters-fixme4.txt
-../venv/bin/python3 ../dump_grep_csv.py "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z'0-9/\-_]" | grep -v w/l | grep -vP "[ =]a/l" | grep -v " s/l)" | grep -vP "https?://[A-Za-z\-\./%]+/l[^a-zA-Z]'" | grep -v "[^a-zA-Z0-9]r/l" | grep -vp "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | sort > liters-fixme5.txt
-../venv/bin/python3 ../dump_grep_csv.py '{{convert\|[^\}]+\|l(\||}|/)' | sort > liters-fixme6.txt
-../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > fixme-liters7.txt
+../venv/bin/python3 ../dump_grep_csv.py "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z'0-9/\-_]" | grep -v w/l | grep -vP "[ =]a/l" | grep -vP "[ \(]s/l\)" | grep -vP "https?://[A-Za-z0-9\-\./,\+%]+/l[^a-zA-Z']" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "not a typo\|m?l" | sort > liters-fixme5.txt
+../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > liters-fixme6.txt
+../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > liters-fixme7.txt
 cat liters-fixme* | perl -pe 's/(.*?):.+/$1/' | uniq > liters-all.txt
 
 echo "Done"
