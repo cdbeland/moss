@@ -13,7 +13,7 @@ tac tmp-wiktionary-spell.txt | grep '^*' | ../venv/bin/python3 ../word_categoriz
 echo "==T1+ASCII==" > post-wikt-t1-ascii.txt
 echo >> post-wikt-t1-ascii.txt
 grep ^T1 tmp-words-with-articles-wikt.txt | grep -P '\[\[wikt:[a-z]+\]\]' | perl -pe "s/^T1\t//" >> post-wikt-t1-ascii.txt
-grep ^HB tmp-words-with-articles-wikt.txt | perl -pe "s/^HB\t//" | perl -pe 's/</&lt;/g' | perl -pe 's/>/&gt;/g' > post-wikt-html.txt
+grep ^HB tmp-words-with-articles-wikt.txt | perl -pe "s/^HB\t//" | perl -pe 's/</&lt;/g' | perl -pe 's/>/&gt;/g' | grep -v "Unsupported titles/HTML" > post-wikt-html.txt
 
 echo "Done post-processing"
 echo `date`
