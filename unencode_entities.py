@@ -503,6 +503,7 @@ transform_unsafe = {
     "&#x2019;": "'",   # ’ -> '
     "&#x201C;": '"',
     "&#x201D;": '"',
+    "&#146;": "'",  # mojibake
 
     # These are OK to transform, but must be in a {{lang}} or {{transl}} tag
     "&#700;": "ʼ",
