@@ -75,7 +75,10 @@ echo `date`
 
 echo "Beginning MOS:DOUBLE scan"
 echo `date`
-../venv/bin/python3 ../dump_grep_csv.py " '[A-Za-z ,:\-;]+'[,\. \}\)]" | grep -v '"' | grep -vP "{{([Ll]ang|[Tt]ransl|IPA)" | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > beland-MOS-DOUBLE.txt
+../venv/bin/python3 ../dump_grep_csv.py " '[A-Za-z ,:\-;]+'[,\. \}\)]" | grep -v '"' | grep -vP "{{([Ll]ang|[Tt]ransl|IPA)" | perl -pe 's/^(.*?):.*/$1/' > tmp-MOS-double.txt
+cat tmp-MOS-double.txt | perl ../count.pl | sort -rn > tmp-double-most.txt
+grep -vP "(grammar|languag|species| words)" tmp-double-most.txt | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt
+
 
 # --- MAIN SPELL CHECK ---
 
