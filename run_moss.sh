@@ -303,7 +303,7 @@ cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^,]AB,[ABC
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]" > tmp-rhyme-masked-words.txt
 
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\.b\.[^d-z]" > tmp-rhyme-a.b.txt
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\. b\. [^d-z]" > tmp-rhyme-a.b.space.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z\+/]a\. b\. [^d-z]" | grep -v "Exemplum:" > tmp-rhyme-a.b.space.txt
 
 # These may need to be relaxed in the future
 cat tmp-rhyme-AB-comma.txt > tmp-rhyme.txt
@@ -338,7 +338,7 @@ echo `date`
 
 # Run time: 9-22 min per regex
 ../venv/bin/python3 ../dump_grep_csv.py "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'àÁáÂâÃãÄäÇçÈèÉéÊêËëÌìÍíÎîÏïÑñÒòÓóÔôÕõÖŠšÚúùÙÛûÜüÝýŸÿŽž]" | grep -v " l.jpg" | sort > liters-fixme1.txt
-../venv/bin/python3 ../dump_grep_csv.py "illion l[^a-zA-Z0-9']" | sort > liters-fixme2.txt
+../venv/bin/python3 ../dump_grep_csv.py "[rBbMm]illion l[^a-zA-Z0-9']" | sort > liters-fixme2.txt
 ../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]' | sort > liters-fixme3.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > liters-fixme4.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z'0-9/\-_]" | grep -v w/l | grep -vP "[ =]a/l" | grep -vP "[ \(]s/l\)" | grep -vP "https?://[A-Za-z0-9\-\./,\+%]+/l[^a-zA-Z']" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "not a typo\|m?l" | sort > liters-fixme5.txt
