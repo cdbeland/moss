@@ -80,6 +80,7 @@ article_blocklist = [
     "Compose key",
     "Computer Braille Code",
     "Cork encoding",
+    "CTA-708",
     "Dania transcription",
     "Dash",
     "Devanagari transliteration",
@@ -437,6 +438,7 @@ article_blocklist = [
     "'s Gravenmoer",
     ".հայ",
     ".577/500 No 2 Black Powder",
+    "DNa inscription",
 
     # {{lang}} and {{IPA}} interwoven with other templates
     "State Anthem of the Soviet Union",
