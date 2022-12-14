@@ -336,6 +336,8 @@ transform_unsafe = {
     "&ensp;": " ",  # Or {{sp}} if a regular space is needed
     "&emsp;": " ",  # Or {{sp}} if a regular space is needed
     "&thinsp;": " ",  # Use "{{thin space}}" if retained
+    "&thinspace;": " ",
+    "&thisp;": " ",
     "&hairsp;": "",   # Use "{{hair space}}" if retained
     "&emsp13;": " ",
     "&emsp14;": " ",
@@ -1059,6 +1061,7 @@ transform = {
     "&ell;": "ℓ",
     "&Rarr;": "↠",
     "&star;": "☆",
+    "&starf;": "★",
     "&digamma;": "ϝ",
     "&varepsilon;": "ϵ",
     "&bigcup;": "⋃",
@@ -1357,6 +1360,7 @@ transform = {
     "&curren;": "¤",
     "&dagger;": "†",  # {{dagger}} is also available
     "&Dagger;": "‡",  # {{double-dagger}} is also available
+    "&ddagger;": "‡",
     "&clubs;": "♣",
     "&diams;": "♦",
     "&spades;": "♠",
@@ -1420,6 +1424,14 @@ transform = {
     "&rangle;": "⟩",
     "&pre;": "⪯",
     "&mid;": "{{pipe}}",
+    "&afr;": "𝔞",
+    "&top;": "⊤",
+    "&bot; ": "⊥",
+    "&upharpoonright;": "↾",
+    "&aleph;": "ℵ",
+    "&lrarr;": "⇆",
+    "&preceq;": "(⪯)",
+    "&cfr;": "𝔠",
 
     "㎆": "MB",
     "㎅": "KB",
@@ -1486,6 +1498,9 @@ transform = {
     "&uuml;": "ü",
     "&yacute;": "ý",
     "&thorn;": "þ",
+    "&umacr;": "ū",
+    "&omacr;": "ō",
+    "&nacute;": "ń",
 
     "&#214;": "Ö",
     "&#225;": "á",
@@ -1619,6 +1634,10 @@ transform = {
     "&nbsbp;": "&nbsp;",
     "&bbsp;": "&nbsp;",
     "&nbsbp;": "&nbsp;",
+    "&nbaps;": "&nbsp;",
+    "&mnsp;": "&nbsp;",
+    "&ndasj;": "&ndash;",
+    "&ndash0;": "&ndash;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
