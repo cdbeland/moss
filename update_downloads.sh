@@ -15,12 +15,12 @@ echo `date`
 
 # Download, extract, sort, and uncompress time: About 5 hours
 
-rm -rf /bulk-wikipedia/all-wiktionaries
-mkdir /bulk-wikipedia/all-wiktionaries
+# rm -rf /bulk-wikipedia/all-wiktionaries
+mkdir -p /bulk-wikipedia/all-wiktionaries
 venv/bin/python3 download_all_wiktionaries.py
 
 rm -rf /bulk-wikipedia/moss-subpages
-mkdir /bulk-wikipedia/moss-subpages
+mkdir -p /bulk-wikipedia/moss-subpages
 venv/bin/python3 download_moss_subpages.py
 
 echo `date`
@@ -40,36 +40,36 @@ venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
 cd /bulk-wikipedia/
 
 rm -f Wikispecies:Requested_articles
-wget https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
+wget --continue https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
 
 rm -f moss
-wget https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
+wget --continue https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
 
 rm -f For_Wiktionary
-wget https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/For_Wiktionary
+wget --continue https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/For_Wiktionary
 
 rm -f enwiktionary-latest-page.sql
-wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-page.sql.gz
+wget --continue https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-page.sql.gz
 gunzip enwiktionary-latest-page.sql
 
 rm -f enwiktionary-latest-categorylinks.sql
-wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-categorylinks.sql.gz
+wget --continue https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-categorylinks.sql.gz
 gunzip enwiktionary-latest-categorylinks.sql
 
 rm -f enwiktionary-latest-all-titles-in-ns0
-wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-all-titles-in-ns0.gz
+wget --continue https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-all-titles-in-ns0.gz
 gunzip enwiktionary-latest-all-titles-in-ns0.gz
 
 rm -f enwiki-latest-all-titles-in-ns0.gz
-wget https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-all-titles-in-ns0.gz
+wget --continue https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-all-titles-in-ns0.gz
 gunzip enwiki-latest-all-titles-in-ns0.gz
 
 rm -f specieswiki-latest-all-titles-in-ns0.gz
-wget https://dumps.wikimedia.org/specieswiki/latest/specieswiki-latest-all-titles-in-ns0.gz
+wget --continue https://dumps.wikimedia.org/specieswiki/latest/specieswiki-latest-all-titles-in-ns0.gz
 gunzip specieswiki-latest-all-titles-in-ns0.gz
 
 rm -f enwiki-latest-pages-articles-multistream.xml.bz2
-wget https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2
+wget --continue https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2
 bunzip2 enwiki-latest-pages-articles-multistream.xml.bz2
 
 # FIRST TIME SETUP
@@ -141,7 +141,7 @@ venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiki-latest-pages-articles-mult
 echo "Preparing for enwiktionary spell check"
 cd /bulk-wikipedia/
 rm -f enwiktionary-latest-pages-articles-multistream.xml.bz2
-wget https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles-multistream.xml.bz2
+wget --continue https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles-multistream.xml.bz2
 bunzip2 enwiktionary-latest-pages-articles-multistream.xml.bz2
 
 echo `date`
