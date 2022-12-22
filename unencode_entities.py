@@ -433,6 +433,7 @@ transform_unsafe = {
     "&frac18;": "{{frac|1|8}}",
     "&frac23;": "{{frac|2|3}}",
     "&frac34;": "{{frac|3|4}}",
+    "&frac78;": "{{frac|7|8}}",
     "&#8531;": "{{frac|1|3}}",
 
     "&sol;": "/",
@@ -470,6 +471,7 @@ transform_unsafe = {
     # These are usually spurious, per [[MOS:TMRULES]]
     "&trade;": "",  # ™
     "&reg;": "",  # ®
+    "&COPY;": "&copy;",  # ©
     "&copy;": "",  # ©
     "™": "",
     "℠": "",
