@@ -314,6 +314,9 @@ transform_unsafe = {
     # Per [[MOS:UNITSYMBOLS]]
     "° C": "°C",
     "° F": "°F",
+    "F°": "°F",
+    "C°": "°C",
+    "°K": "K",
 
     # Some of the below might be ordinal indicators for Romance
     # languages, in which case they should use "º" per [[MOS:ORDINAL]]
@@ -1428,7 +1431,7 @@ transform = {
     "&mid;": "{{pipe}}",
     "&afr;": "𝔞",
     "&top;": "⊤",
-    "&bot; ": "⊥",
+    "&bot;": "⊥",
     "&upharpoonright;": "↾",
     "&aleph;": "ℵ",
     "&lrarr;": "⇆",
