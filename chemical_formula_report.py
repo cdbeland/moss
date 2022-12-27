@@ -58,16 +58,13 @@ def dump_results():
         articles_by_formula[formula] = sorted(set(article_list))
     tuples = list(articles_by_formula.items())
     tuples.sort(key=lambda t: (len(t[1]) * -1, t[0]))
-    for length_cap in [25, 5000]:
-        for (formula, article_list) in tuples:
-            short_list = sorted(article_list)[0:length_cap]
-            length = len(article_list)
-            line = f"* {length} - {formula} - [["
-            line += "]], [[".join(short_list)
-            line += "]]"
-            if length > length_cap:
-                line += " ..."
-            print(line)
+    for (formula, article_list) in tuples:
+        short_list = sorted(article_list)
+        length = len(article_list)
+        line = f"* {length} - {formula} - [["
+        line += "]], [[".join(short_list)
+        line += "]]"
+        print(line)
 
 
 if __name__ == '__main__':
