@@ -379,6 +379,7 @@ article_blocklist = [
     "Hillman Minx",
     "Grammaire égyptienne",
     "Ōtaguro Park",
+    "Cinder cloudy catshark",
 
     # DISPLAYTITLE issues
     "Rosa Graham Thomas",
