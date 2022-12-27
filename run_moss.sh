@@ -108,6 +108,15 @@ grep mph tmp-speed-convert.txt >> tmp-speed-convert-all.txt
 
 cat tmp-speed-convert-all.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
 
+# --- FUEL EFFICIENCY CONVERSION ---
+
+../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
+cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.txt
+
+# DEPENDING ON CONTEXT, WILL NEED:
+# {{convert|$1|mpgus|abbr=on}}
+# {{convert|$1|mpgimp|abbr=on}}
+
 # --- BROKEN NBSP ---
 
 # Run time for this segment: ~21 min (8-core parallel)
