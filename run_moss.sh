@@ -108,14 +108,49 @@ grep mph tmp-speed-convert.txt >> tmp-speed-convert-all.txt
 
 cat tmp-speed-convert-all.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
 
+# --- MORE METRIC CONVERSIONS ---
+
+# TODO:
+# * miles
+# * pounds (weight vs. money)
+# * tons (various)
+# * hp
+# * gallons (various)
+
 # --- FUEL EFFICIENCY CONVERSION ---
 
 ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
 cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.txt
 
-# DEPENDING ON CONTEXT, WILL NEED:
+# TODO: DEPENDING ON CONTEXT, WILL NEED:
 # {{convert|$1|mpgus|abbr=on}}
 # {{convert|$1|mpgimp|abbr=on}}
+
+# --- PARSE FAILURE FIXES ---
+
+# Feet and inches - [[MOS:UNITNAMES]]
+
+grep -P "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" err-parse-failures.txt | grep -v ° > tmp-feet-inches1.txt
+grep -P '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' err-parse-failures.txt > tmp-feet-inches2.txt
+grep -P '[0-9\.]+"' err-parse-failures.txt > tmp-feet-inches3.txt
+cat tmp-feet-inches2.txt tmp-feet-inches1.txt tmp-feet-inches3.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | uniq > jwb-feet-inches.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" > tmp-feet-inches-all1.txt
+../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' > tmp-feet-inches-all2.txt
+../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"' > tmp-feet-inches-all3.txt
+cat tmp-feet-inches-all2.txt tmp-feet-inches-all1.txt tmp-feet-inches-all3.txt | perl -pe 's/^(.*?):.*/$1/' | uniq >> jwb-feet-inches.txt
+
+# Units of arc - [[MOS:UNITNAMES]]
+grep -P "[0-9]+° ?[0-9]+' ?[0-9]+\"" err-parse-failures.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | sort | uniq > jwb-arc-units.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]+° ?[0-9]+' ?[0-9]+\"" > tmp-arc-units-all.txt
+cat tmp-arc-units-all.txt | perl -pe 's/^(.*?):.*/$1/' | sort | uniq >> jwb-arc-units.txt
+
+# See also: jwb-straight-quotes-unbalanced.txt
+
+# TODO (enhances semantic web, gives readers a clickable link, but doesn't resolve parse failures):
+# Consider scanning for lat/lon with:
+#  ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(N|S) ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(E|W)
+# and substituting:
+#  {{coord|$1|$2|$4|$6|$7|$8|$10|$12|display=inline}}
 
 # --- BROKEN NBSP ---
 
@@ -167,7 +202,7 @@ rm -rf /tmp/sorted_by_article.txt
 # TODO: Can this run as one line, or is that the source of the .py command not found error?
 # grep ^@ tmp-output.txt | sort -nr -k2 | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 
-grep -P '^!\t' tmp-output.txt | perl -pe 's/.*?\t//' | sort > post-parse-failures.txt
+grep -P '^!\t' tmp-output.txt | perl -pe 's/.*?\t//' | sort > err-parse-failures.txt
 grep -P '^\!Q' tmp-output.txt | perl -pe 's/^\!Q\t\* \[\[(.*?)\]\].*$/$1/' | sort | ../venv/bin/python3 ../sectionalizer.py LARGE > jwb-straight-quotes-unbalanced.txt
 grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2 > debug-spellcheck-ignored.txt
 
@@ -293,7 +328,7 @@ echo `date`
 echo "Possible typos per article: " > post-stats.txt
 cat tmp-articles-linked-words.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../histogram_text.py >> post-stats.txt
 echo "Parse errors: " >> post-stats.txt
-wc -l post-parse-failures.txt >> post-stats.txt
+wc -l err-parse-failures.txt >> post-stats.txt
 echo "Parse errors with [[MOS:STRAIGHT]] violations:" >> post-stats.txt
 wc -l jwb-straight-quotes-unbalanced.txt >> post-stats.txt
 echo "Possible typos by type: " >> post-stats.txt
