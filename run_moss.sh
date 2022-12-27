@@ -50,7 +50,63 @@ echo `date`
 echo "Beginning temperature conversion scan"
 echo `date`
 
-../venv/bin/python3 ../dump_grep_csv.py '[^C]{30}°F[^\|\}][^C]{15}' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-temperature-convert.txt
+# per [[MOS:UNITSYMBOLS]]
+
+# Need to convert to C:
+../venv/bin/python3 ../dump_grep_csv.py '°F' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | grep -vP '°C.{0,30}°F' | grep -vP '°F.{0,30}°C' | grep "°F" > tmp-temperature-convert1.txt
+
+# Need to add ° symbol:
+../venv/bin/python3 ../dump_grep_csv.py '[ \(][0-9](C|F)[^a-zA-Z0-9]' | grep -i "temperature" | sort > tmp-temperature-convert2.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]+s?( |&nbsp;)(C|F)[^a-zA-Z0-9]" | grep -i "temperature" | sort > tmp-temperature-convert3.txt
+../venv/bin/python3 ../dump_grep_csv.py "degrees? \[*(C|c|F)" | perl -pe "s%<ref.*?</ref>%%g" | grep -P "degrees? \[*(C|c|F)" > tmp-temperature-convert4.txt
+
+#
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]0s( |&nbsp;)?F[^b-z]" | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" > tmp-temperature-convert5.txt
+../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep -i "temperature" | grep "0s" > tmp-temperature-convert6.txt
+
+# low 40s F (~5°C)
+# mid 40s F (~7°C)
+# high 40s F (~9°C)
+# low 50s F (~11°C)
+# mid 50s F (~13°C)
+# high 50s F (~14°C)
+# low 60s F (~16°C)
+# mid 60s F (~18°C)
+# high 60s F (~20°C)
+# low 70s F (~22°C)
+# mid 70s F (~24°C)
+# high 70s F (~25°C)
+# low 80s F (~27°C)
+# mid 80s F (~29°C)
+# high 80s F (~31°C)
+# low 90s F (~33°C)
+# mid 90s F (~35°C)
+# high 90s F (~36°C)
+#
+# F  C
+# 40 4.4
+# 45 7.2
+# 50 10
+# 55 12.8
+# 60 15.5
+# 65 18.3
+# 70 21.1
+# 75 23.8
+# 80 26.7
+# 85 29.4
+# 90 32.2
+# 95 35
+# 100 37.8
+
+cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-convert3.txt tmp-temperature-convert4.txt tmp-temperature-convert5.txt tmp-temperature-convert6.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-temperature-convert.txt
+
+# --- SPEED CONVERSION ---
+
+../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h' | grep -iP "\bmph\b" | grep -v ", MPH" | sort > tmp-speed-convert.txt
+grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" tmp-speed-convert-MPH.txt > tmp-speed-convert-all.txt
+grep mph tmp-speed-convert.txt >> tmp-speed-convert-all.txt
+
+cat tmp-speed-convert-all.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
 
 # --- BROKEN NBSP ---
 
@@ -281,13 +337,13 @@ echo `date`
 
 echo "Starting chemical formulas report"
 echo `date`
-echo "====Possible chemical formulas that don't use subscripts====" > beland-chemical-formulas.txt
-grep -P ' ((H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|I|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|R)([2-9]|[1-9][0-9]))+$' debug-spellcheck-ignored.txt | grep -vP ' [KQRBNP][a-h][1-8]$' | grep -vP ' [A-Z]\d\d$' | head -100 >> beland-chemical-formulas.txt
+echo "====Possible chemical formulas that don't use subscripts====" > post-chemical-formulas.txt
+grep -P ' ((H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|I|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|R)([2-9]|[1-9][0-9]))+$' debug-spellcheck-ignored.txt | grep -vP ' [KQRBNP][a-h][1-8]$' | grep -vP ' [A-Z]\d\d$' | head -100 >> post-chemical-formulas.txt
 # [KQRBNP][a-h][1-8] is to exclude [[Algebraic notation (chess)]]
 
-echo "" >> beland-chemical-formulas.txt
-echo "====Known chemical formulas that don't use subscripts====" >> beland-chemical-formulas.txt
-../venv/bin/python3 ../chemical_formula_report.py >> beland-chemical-formulas.txt
+echo "" >> post-chemical-formulas.txt
+echo "====Known chemical formulas that don't use subscripts====" >> post-chemical-formulas.txt
+../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
 
 # --- RHYME SCHEMES ---
 
