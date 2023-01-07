@@ -136,7 +136,7 @@ grep -P '[0-9\.]+"' err-parse-failures.txt > tmp-feet-inches3.txt
 cat tmp-feet-inches2.txt tmp-feet-inches1.txt tmp-feet-inches3.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | uniq > jwb-feet-inches.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" > tmp-feet-inches-all1.txt
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' > tmp-feet-inches-all2.txt
-../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"' > tmp-feet-inches-all3.txt
+../venv/bin/python3 ../dump_grep_csv.py ' [^"][0-9]"' tmp-feet-inches-all3.txt | perl -pe 's/<.*?>//g' | perl -pe 's/[\( \|]"[a-zA-Z][^"]*[0-9]"//g' | perl -pe 's/"[0-9\.]+"//g' | grep -P '[0-9]"' > tmp-feet-inches-all3.txt
 cat tmp-feet-inches-all2.txt tmp-feet-inches-all1.txt tmp-feet-inches-all3.txt | perl -pe 's/^(.*?):.*/$1/' | uniq >> jwb-feet-inches.txt
 
 # Units of arc - [[MOS:UNITNAMES]]
