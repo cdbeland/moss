@@ -36,7 +36,7 @@ print("! Dump (moss version) || Parse failures (articles + articles with [[MOS:S
 print("|-")
 
 instances_sorted = [str(ratings_instances[rating]) for (rating, uniques) in sorted_tuples]
-fails_output = subprocess.run(["wc", "-l", "post-parse-failures.txt"], capture_output=True)
+fails_output = subprocess.run(["wc", "-l", "err-parse-failures.txt"], capture_output=True)
 (num_failed_articles, _filename) = fails_output.stdout.decode("utf-8").split(" ")
 mos_straight_fails_output = subprocess.run(["wc", "-l", "jwb-straight-quotes-unbalanced.txt"], capture_output=True)
 (num_mos_straight_failed, _filename) = mos_straight_fails_output.stdout.decode("utf-8").split(" ")
