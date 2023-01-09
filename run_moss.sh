@@ -53,16 +53,16 @@ echo `date`
 # per [[MOS:UNITSYMBOLS]]
 
 # Need to convert to C:
-../venv/bin/python3 ../dump_grep_csv.py '°F' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | grep -vP '°C.{0,30}°F' | grep -vP '°F.{0,30}°C' | grep "°F" > tmp-temperature-convert1.txt
+../venv/bin/python3 ../dump_grep_csv.py '°F' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | grep -vP '°C.{0,30}°F' | grep -vP '°F.{0,30}°C' | grep "°F" | sort > tmp-temperature-convert1.txt
 
 # Need to add ° symbol:
 ../venv/bin/python3 ../dump_grep_csv.py '[ \(][0-9](C|F)[^a-zA-Z0-9]' | grep -i "temperature" | sort > tmp-temperature-convert2.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]+s?( |&nbsp;)(C|F)[^a-zA-Z0-9]" | grep -i "temperature" | sort > tmp-temperature-convert3.txt
-../venv/bin/python3 ../dump_grep_csv.py "degrees? \[*(C|c|F)" | perl -pe "s%<ref.*?</ref>%%g" | grep -P "degrees? \[*(C|c|F)" > tmp-temperature-convert4.txt
+../venv/bin/python3 ../dump_grep_csv.py "degrees? \[*(C|c|F)" | perl -pe "s%<ref.*?</ref>%%g" | grep -P "degrees? \[*(C|c|F)" | sort > tmp-temperature-convert4.txt
 
 #
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]0s( |&nbsp;)?F[^b-z]" | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" > tmp-temperature-convert5.txt
-../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep -i "temperature" | grep "0s" > tmp-temperature-convert6.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]0s( |&nbsp;)?F[^b-z]" | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert5.txt
+../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep -i "temperature" | grep "0s" | sort > tmp-temperature-convert6.txt
 
 # low 40s F (~5°C)
 # mid 40s F (~7°C)
@@ -102,11 +102,15 @@ cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-co
 
 # --- SPEED CONVERSION ---
 
-../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h' | grep -iP "\bmph\b" | grep -v ", MPH" | sort > tmp-speed-convert.txt
-grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" tmp-speed-convert-MPH.txt > tmp-speed-convert-all.txt
-grep mph tmp-speed-convert.txt >> tmp-speed-convert-all.txt
+# [[MOS:UNITNAMES]]
 
-cat tmp-speed-convert-all.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
+echo "Beginning speed conversion scan"
+echo `date`
+
+../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h' | grep -iP "\bmph\b" | grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" | grep -v "mph=" | sort > tmp-mph-convert.txt
+cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
+
+../venv/bin/python3 ../dump_grep_csv.py '[0-9](&nbsp;| )?kph|KPH' | sort > tmp-kph-convert.txt
 
 # --- MORE METRIC CONVERSIONS ---
 
@@ -119,38 +123,15 @@ cat tmp-speed-convert-all.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-co
 
 # --- FUEL EFFICIENCY CONVERSION ---
 
+echo "Beginning MPG conversion scan"
+echo `date`
+
 ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
 cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.txt
 
 # TODO: DEPENDING ON CONTEXT, WILL NEED:
 # {{convert|$1|mpgus|abbr=on}}
 # {{convert|$1|mpgimp|abbr=on}}
-
-# --- PARSE FAILURE FIXES ---
-
-# Feet and inches - [[MOS:UNITNAMES]]
-
-grep -P "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" err-parse-failures.txt | grep -v ° > tmp-feet-inches1.txt
-grep -P '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' err-parse-failures.txt > tmp-feet-inches2.txt
-grep -P '[0-9\.]+"' err-parse-failures.txt > tmp-feet-inches3.txt
-cat tmp-feet-inches2.txt tmp-feet-inches1.txt tmp-feet-inches3.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | uniq > jwb-feet-inches.txt
-../venv/bin/python3 ../dump_grep_csv.py "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" > tmp-feet-inches-all1.txt
-../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' > tmp-feet-inches-all2.txt
-../venv/bin/python3 ../dump_grep_csv.py ' [^"][0-9]"' tmp-feet-inches-all3.txt | perl -pe 's/<.*?>//g' | perl -pe 's/[\( \|]"[a-zA-Z][^"]*[0-9]"//g' | perl -pe 's/"[0-9\.]+"//g' | grep -P '[0-9]"' > tmp-feet-inches-all3.txt
-cat tmp-feet-inches-all2.txt tmp-feet-inches-all1.txt tmp-feet-inches-all3.txt | perl -pe 's/^(.*?):.*/$1/' | uniq >> jwb-feet-inches.txt
-
-# Units of arc - [[MOS:UNITNAMES]]
-grep -P "[0-9]+° ?[0-9]+' ?[0-9]+\"" err-parse-failures.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | sort | uniq > jwb-arc-units.txt
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]+° ?[0-9]+' ?[0-9]+\"" > tmp-arc-units-all.txt
-cat tmp-arc-units-all.txt | perl -pe 's/^(.*?):.*/$1/' | sort | uniq >> jwb-arc-units.txt
-
-# See also: jwb-straight-quotes-unbalanced.txt
-
-# TODO (enhances semantic web, gives readers a clickable link, but doesn't resolve parse failures):
-# Consider scanning for lat/lon with:
-#  ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(N|S) ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(E|W)
-# and substituting:
-#  {{coord|$1|$2|$4|$6|$7|$8|$10|$12|display=inline}}
 
 # --- BROKEN NBSP ---
 
@@ -292,6 +273,35 @@ echo `date`
 # into a single file for posting to the moss project page.
 
 ../venv/bin/python3 ../collect.py > collected_by_article_and_freq.txt
+
+# --- PARSE FAILURE FIXES ---
+
+echo "Beginning foot/inch conversion scan"
+echo `date`
+
+# Feet and inches - [[MOS:UNITNAMES]]
+
+grep -P "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" err-parse-failures.txt | grep -v ° > tmp-feet-inches1.txt
+grep -P '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' err-parse-failures.txt > tmp-feet-inches2.txt
+grep -P '[0-9\.]+"' err-parse-failures.txt > tmp-feet-inches3.txt
+cat tmp-feet-inches2.txt tmp-feet-inches1.txt tmp-feet-inches3.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | uniq > jwb-feet-inches.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" > tmp-feet-inches-all1.txt
+../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' > tmp-feet-inches-all2.txt
+../venv/bin/python3 ../dump_grep_csv.py ' [^"][0-9]"' tmp-feet-inches-all3.txt | perl -pe 's/<.*?>//g' | perl -pe 's/[\( \|]"[a-zA-Z][^"]*[0-9]"//g' | perl -pe 's/"[0-9\.]+"//g' | grep -P '[0-9]"' > tmp-feet-inches-all3.txt
+cat tmp-feet-inches-all2.txt tmp-feet-inches-all1.txt tmp-feet-inches-all3.txt | perl -pe 's/^(.*?):.*/$1/' | uniq >> jwb-feet-inches.txt
+
+# Units of arc - [[MOS:UNITNAMES]]
+grep -P "[0-9]+° ?[0-9]+' ?[0-9]+\"" err-parse-failures.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | sort | uniq > jwb-arc-units.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]+° ?[0-9]+' ?[0-9]+\"" > tmp-arc-units-all.txt
+cat tmp-arc-units-all.txt | perl -pe 's/^(.*?):.*/$1/' | sort | uniq >> jwb-arc-units.txt
+
+# See also: jwb-straight-quotes-unbalanced.txt
+
+# TODO (enhances semantic web, gives readers a clickable link, but doesn't resolve parse failures):
+# Consider scanning for lat/lon with:
+#  ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(N|S) ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(E|W)
+# and substituting:
+#  {{coord|$1|$2|$4|$6|$7|$8|$10|$12|display=inline}}
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
