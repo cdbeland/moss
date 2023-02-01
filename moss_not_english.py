@@ -18,6 +18,7 @@ ONLY_LONG_SEGMENTS = True
 
 WORD_RE = re.compile(r"[\w']+")
 ACRONYM_RE = re.compile(r"^[A-Z]+$")
+NUMBER_INSIDE_RE = re.compile(r"[0-9]")
 ROMAN_NUM_RE = re.compile(r"^[IVXLCM]+$")
 GOOGLE_LANG_DETECTOR = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
                                                     max_num_bytes=1000)
@@ -105,11 +106,14 @@ def find_non_english(article_title, article_text):
                 paragraph_words_by_lang["en"].append(word_mixedcase)
                 continue
 
-            if word_mixedcase == word_mixedcase.title():
+            if word_mixedcase[0].upper() == word_mixedcase[0]
                 # Capitalized words are usually proper nouns; not helpful
                 # for categorization
                 continue
             if ACRONYM_RE.match(word_mixedcase):
+                continue
+            if NUMBER_INSIDE_RE.search(word_mixedcase):
+                # These are pretty much always science terms like genes
                 continue
 
             lang_code = GOOGLE_LANG_DETECTOR.FindLanguage(word_mixedcase).language
