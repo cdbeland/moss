@@ -106,7 +106,7 @@ def find_non_english(article_title, article_text):
                 paragraph_words_by_lang["en"].append(word_mixedcase)
                 continue
 
-            if word_mixedcase[0].upper() == word_mixedcase[0]
+            if word_mixedcase[0].upper() == word_mixedcase[0]:
                 # Capitalized words are usually proper nouns; not helpful
                 # for categorization
                 continue
