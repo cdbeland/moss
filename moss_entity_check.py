@@ -781,7 +781,19 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += "\n"
 
     # MOS:DOUBLE
-    output_string += r'{"replaceText":" ' + r"'" + r'([A-Za-z ,:\\-;]+)' + r"'" + r'([,\\. }\\)])", "replaceWith":" \"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true}'
+    # output_string += r'{"replaceText":" ' + r"'" + r'([A-Za-z ,:\\-;]+)' + r"'" + r'([,\\. }\\)])", "replaceWith":" \"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true}'
+    # TODO: This is disabled because it fails to respect:
+    # * Single quotes properly nested inside double quotes, if there
+    #   are words between all the quote marks
+    # * {{cite web}} and other templates that put double quote marks
+    #   around fields like "title" and "quote".
+
+    prime_accepted_chars = "dijkrtvwxyzCDEFGHIJKMNUVWXYZγδζξϖπστΕΖΗΙΚΜΝΞΠΣΥϒΧΨcgsuBGOPQRSαβϑθκμνςυχψωΒΘΟΡΩab∂ehmnopqALεϵηιλοϱρφϕΑΔΛΦflTΓΤ"
+
+    # {{prime}} takes preceding text as an argument to adjust whitespace
+    output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+)''{{prime}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    # {{prime}} does not adjust whitespace properly if italics are part of the argument
+    output_string += """{"replaceText":"{{prime|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
 
     output_string += "\n]}}"
     print(output_string, file=file)

@@ -185,7 +185,16 @@ keep = [
 ]
 
 controversial = {
-    # Following objections from User:Headbomb, User:Deacon Vorbis
+
+    # Objections from User:Jacobolus due to what they think is
+    # excessive whitespace added by the template, though Beland thinks
+    # it's actually necessary whitespace.
+    "′": "{{prime}}",
+    "&prime;": "{{prime}}",
+    "″": "{{pprime}}",
+    "&Prime;": "{{pprime}}",
+
+    # Following objections from User:Headbomb and User:Deacon Vorbis
     # (retired), keep these in articles with <math> markup. In these
     # articles, some editors prefer to be able to search by the TeX
     # name (usually the same as the HTML entity) rather than by the
@@ -511,6 +520,13 @@ transform_unsafe = {
     "&#x201C;": '"',
     "&#x201D;": '"',
     "&#146;": "'",  # mojibake
+
+    # See "controversial" section for the named entities.
+    "&#8242;": "{{prime}}",
+    "&#x2032;": "{{prime}}",
+    "&#8243;": "{{pprime}}",
+    "&#x2033;": "{{pprime}}",
+    "&x2034": "{{pprime}}",
 
     # These are OK to transform, but must be in a {{lang}} or {{transl}} tag
     "&#700;": "ʼ",
@@ -1092,15 +1108,6 @@ transform = {
     "&#x200F;": "&rlm;",
     "&#x02C6;": "&circ;",
     "&#x710;": "&circ;",
-    "′": "{{prime}}",
-    "&#8242;": "{{prime}}",
-    "&#x2032;": "{{prime}}",
-    "&prime;": "{{prime}}",
-    "″": "{{pprime}}",
-    "&#8243;": "{{pprime}}",
-    "&#x2033;": "{{pprime}}",
-    "&Prime;": "{{pprime}}",
-    "&x2034": "{{pprime}}",
 
     "&#x2000;": "&ensp;",
     "&#8192;": "&ensp;",
