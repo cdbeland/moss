@@ -143,13 +143,28 @@ for (letter, typos_by_best_type) in typos_by_letter.items():
                 continue
             bad_typo_links = []
             not_typo_links = []
+            chem_links = []
+            transliteration_links = []
+            dna_links = []
             for (index, type_) in enumerate(types):
                 if type_ in probably_wrong:
                     bad_typo_links.append(clean_typo_link(typo_links[index]))
+                elif type_ == "C":
+                    chem_links.append(clean_typo_link(typo_links[index]))
+                elif type_ == "L":
+                    transliteration_links.append(clean_typo_link(typo_links[index]))
+                elif type_ == "D":
+                    dna_links.append(clean_typo_link(typo_links[index]))
                 else:
                     not_typo_links.append(clean_typo_link(typo_links[index]))
             output_line = f'* {len(typo_links)} - [[{article_title}]] - {", ".join(bad_typo_links)}'
+            if chem_links:
+                output_line += f'  (probably needs {{tl|chem name}}: {", ".join(chem_links)})'
+            if transliteration_links:
+                output_line += f'  (probably needs {{tl|transl}}: {", ".join(transliteration_links)})'
+            if dna_links:
+                output_line += f'  (probably needs {{tl|DNA sequence}}: {", ".join(dna_links)})'
             if not_typo_links:
-                output_line += f'  (probably OK: {", ".join(not_typo_links)})'
+                output_line += f'  (possibly OK: {", ".join(not_typo_links)})'
             output_lines.append(output_line)
         print(sectionalize_lines(output_lines))
