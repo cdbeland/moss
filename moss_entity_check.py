@@ -792,20 +792,25 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
 
     # {{prime}} takes preceding text as an argument to adjust whitespace
     output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+)''{{prime}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
     # {{prime}} does not adjust whitespace properly if italics are part of the argument
     output_string += """{"replaceText":"{{prime|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
 
     # CAUTION: Manually edit "north" to "N", etc.
     output_string += r"""{"replaceText":"([0-9])+° ?([0-9])+['′] ?([0-9])+[\"″] ?(N|S|north|south),? ?([0-9])+° ?([0-9])+['′] ?([0-9])+[\"″] ?(E|W|east|west)","""
     output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4|$5|$6|$7|$8|display=inline}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    output_string += r"""{"replaceText":"([0-9+]\.[0-9]+)°? ?(N|S) ?([0-9+]\.[0-9]+)°? ?(E|W)","""
-    output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4|display=inline}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
+    output_string += r"""{"replaceText":"([0-9+]\\.[0-9]+)°? ?(N|S) ?([0-9+]\\.[0-9]+)°? ?(E|W)","""
+    output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4|display=inline}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true}"""
+    output_string += "\n"
 
     # This must come after the {{coord}} transformations
     # CAUTION: Use {{sky}} for celestial coordinates
     output_string += r"""{"replaceText":"([0-9])+° ?([0-9])+['′] ?([0-9])+[\"″]","replaceWith":"$1°$2{{prime}}$3{{pprime}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
 
-    output_string += "\n]}}"
+    output_string += "]}}"
     print(output_string, file=file)
 
 
