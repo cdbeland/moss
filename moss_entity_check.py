@@ -794,7 +794,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+)''{{prime}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
     # {{prime}} does not adjust whitespace properly if italics are part of the argument
-    output_string += """{"replaceText":"{{prime|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"{{prime\\|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
     # CAUTION: Manually edit "north" to "N", etc.
