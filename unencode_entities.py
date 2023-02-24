@@ -1091,6 +1091,10 @@ transform = {
     "&DoubleLongRightArrow;": "⟹",
     "&rightarrow;": "→",
     "&mapsto;": "↦",
+    "&Lscr;": "ℒ",
+    "&LowerLeftArrow;": "↙",
+    "&LowerRightArrow;": "↘",
+    "&shortmid;": "{{pipe}}",
 
     "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
