@@ -1095,6 +1095,8 @@ transform = {
     "&LowerLeftArrow;": "↙",
     "&LowerRightArrow;": "↘",
     "&shortmid;": "{{pipe}}",
+    "&hearts;": "♥",
+    "&Sqrt;": "√",
 
     "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
