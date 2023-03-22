@@ -752,7 +752,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += """{"string":{"articleList":"","summary":"convert special characters found by [[Wikipedia:Typo Team/moss]]","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":true,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n"""  # noqa
 
     # Must be before auto-generated replacements
-    output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":'"',"useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\\"","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
     bad_entities_sorted = []
