@@ -319,6 +319,8 @@ transform_unsafe = {
     "⁰F": "°F",
     "<sup>o<sup>F": "°F",
     "<sup>o<sup> F": "°F",
+    "ºF": "°F",
+    "ºC": "°C",
 
     # Per [[MOS:UNITSYMBOLS]]
     "° C": "°C",

@@ -335,10 +335,6 @@ article_blocklist = [
     # African language needs slash in link
     "2011 South African municipal elections",
 
-    # Chess with ½
-    "World Chess960 Championship",
-    "Algebraic notation (chess)",
-
     # !! in table (&#33; or &#x21;)
     "Cledus T. Judd",
     "Devin the Dude",
@@ -480,7 +476,7 @@ def add_tuples_to_results(tuple_list):
 
 # Lowercase letters for French and Scandanavian languages that use
 # ligatures as standard characters
-#  lc_lig = "a-zøðþęáéóúýǫ́àèòùâêîôûëïöüÿçå"
+lc_lig = "a-zøðþęáéóúýǫ́àèòùâêîôûëïöüÿçå"
 # Proper nouns with ligatures, which are an exception to the general
 # no-ligatures-in-English rule at [[MOS:LIGATURE]].
 #  ligature_suppression_pattern = rf"\W[[:upper:]]{lg_lig}*[æœ]{lg_lig}*\W|\W[ÆŒ]{lg_lig}+\W"
@@ -587,6 +583,13 @@ def entity_check(article_title, article_text):
                 continue
             if "{{frac" not in article_text_lower and "{{sfrac" not in article_text_lower and r"\frac" not in article_text_lower:
                 continue
+
+        if string == "°K" and "°KMW" in article_text:
+            continue
+        if string == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]"):
+            continue
+        if string == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]"):
+            continue
 
         if string in article_text:
             for instance in re.findall(re.escape(string), article_text):
@@ -752,7 +755,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += """{"string":{"articleList":"","summary":"convert special characters found by [[Wikipedia:Typo Team/moss]]","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":true,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n"""  # noqa
 
     # Must be before auto-generated replacements
-    output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\\"","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\"","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
     bad_entities_sorted = []
