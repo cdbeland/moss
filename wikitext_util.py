@@ -395,9 +395,11 @@ line_starts_with_re = re.compile(r"\n[ :†][^\n]*")
 # Starts with space - often computer programming code snippets
 # Starts with colon - generally quotes or technical content
 # † - footnotes
+wikt_line_starts_with_re = re.compile(r"\n#\*[^\n]*")
+# Quotations, often with archaic spelling
 
 
-def get_main_body_wikitext(wikitext_input, strong=False):
+def get_main_body_wikitext(wikitext_input, strong=False, wiktionary=False):
     # Ignore non-prose and segments not parsed for grammar, spelling, etc.
 
     # TODO: Get smarter about these sections.  But for now, ignore
@@ -419,6 +421,9 @@ def get_main_body_wikitext(wikitext_input, strong=False):
     if strong:
         wikitext_working = parenthetical_re.sub("", wikitext_working)
         wikitext_working = ignore_lists_re.sub("", wikitext_working)
+
+    if wiktionary:
+        wikitext_working = wikt_line_starts_with_re.sub("", wikitext_working)
 
     """
     # TODO: Do the same thing for italics and single quote passages
