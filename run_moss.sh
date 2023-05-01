@@ -11,6 +11,7 @@
 # Run time for commit e20e070: 19h 47m (whata)
 # Run time: 12h 38m (whata)
 # Run time for commit e317dab: 3 hours (free-spin)
+# Run time for commit 57a461: 22 hours (big-bucks)
 
 set -e
 
@@ -23,7 +24,7 @@ cd $RUN_NAME
 echo "Beginning HTML entity check"
 echo `date`
 
-# Run time for this segment: ~45 min (8-core parallel)
+# Run time for this segment: ~1 h 20 min (8-core parallel)
 
 # ../venv/bin/python3 ../moss_entity_check.py | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities
@@ -48,7 +49,7 @@ echo `date`
 
 # --- FRAC REPAIR ---
 
-# Run time for this segment: ~12 min (8-core parallel)
+# Run time for this segment: ~15 min (8-core parallel)
 
 echo "Beginning {{frac}} repair scan"
 echo `date`
@@ -57,7 +58,7 @@ echo `date`
 
 # --- TEMPERATURE CONVERSION ---
 
-# Run time for this segment: ~12 min (8-core parallel)
+# Run time for this segment: ~1 h 30 min (8-core parallel)
 
 echo "Beginning temperature conversion scan"
 echo `date`
@@ -157,7 +158,7 @@ echo `date`
 
 # --- MOS:LOGICAL ---
 
-# Run time for this segment: ~22 min (8-core parallel)
+# Run time for this segment: ~10 min (8-core parallel)
 
 echo "Beginning MOS:LOGICAL scan"
 echo `date`
@@ -165,7 +166,7 @@ echo `date`
 
 # --- MOS:DOUBLE ---
 
-# Run time for this segment: ?
+# Run time for this segment: ~20 min
 
 echo "Beginning MOS:DOUBLE scan"
 echo `date`
@@ -176,7 +177,7 @@ grep -vP "(grammar|languag|species| words)" tmp-double-most.txt | perl -pe "s/^\
 
 # --- MAIN SPELL CHECK ---
 
-# Run time for this segment: ~3h (8-core parallel)
+# Run time for this segment: ~4 h 10 min (8-core parallel)
 
 echo "Beginning main spell check"
 echo `date`
@@ -188,7 +189,7 @@ echo `date`
 echo "Beginning word categorization run 1"
 echo `date`
 
-# Run time for this segment: ~36 min (8-core parallel)
+# Run time for this segment: ~25 min (8-core parallel)
 grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
 # Sort takes ~37sec
 cat /tmp/sorted_by_article.txt | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
@@ -203,7 +204,7 @@ grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2
 echo "Beginning word categorization run 2"
 echo `date`
 
-# Run time for this line: ~30 min (8-core parallel)
+# Run time for this line: ~20 min (8-core parallel)
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---
@@ -211,7 +212,7 @@ tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tm
 echo "Beginning by-article post-processing"
 echo `date`
 
-# Run time for here to beginning of readability report: ~1 minute
+# Run time for here to beginning of readability report: ~50 min
 
 cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py > post-main-listings.txt
 
@@ -382,7 +383,7 @@ grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ..
 echo "Beginning readability check"
 echo `date`
 
-# Run time for this segment: 1h (8-core parallel)
+# Run time for this segment: ~1h (8-core parallel)
 
 ../venv/bin/python3 ../moss_readability_check.py > tmp-readability.txt
 sort -k2 -n tmp-readability.txt > post-readability.txt
@@ -390,7 +391,7 @@ rm tmp-readability.txt
 
 # --- SUPERSCRIPTS AND SUBSCRIPTS ---
 
-# Run time for this segment: ~11 min (8-core parallel)
+# Run time for this segment: ~30 min (8-core parallel)
 
 echo "Beginning superscript/subscript audit"
 ../superscripts.sh
@@ -400,7 +401,7 @@ echo `date`
 
 # --- CHEMICAL FORMULAS ---
 
-# Run time: About 3 h 50 min
+# Run time: About 3 h 20 min
 
 echo "Starting chemical formulas report"
 echo `date`
