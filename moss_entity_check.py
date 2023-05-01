@@ -586,9 +586,9 @@ def entity_check(article_title, article_text):
 
         if string == "°K" and "°KMW" in article_text:
             continue
-        if string == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]"):
+        if string == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]", article_text):
             continue
-        if string == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]"):
+        if string == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]", article_text):
             continue
 
         if string in article_text:
