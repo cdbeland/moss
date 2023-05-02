@@ -6,12 +6,18 @@ echo `date`
 ../venv/bin/python3 ../moss_spell_check_wiktionary.py > tmp-wiktionary-spell.txt
 # Run time: About 30 min
 
+../venv/bin/python3 ../moss_spell_check_wiktionary_with_quotations.py > tmp-wiktionary-spell-with-quotations.txt
+# Run time: About 30 min
+
+# --- WITHOUT QUOTATIONS ---
+
 echo "Post-processing Wiktionary results"
 echo `date`
 
 # Few if any English misspellings: H, BW, TF, T/, A, BC, P, L
 
 tac tmp-wiktionary-spell.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles-wikt.txt
+
 echo "==Possible typos from (DUMP NAME) ==" > post-wikt-typos.txt
 
 echo "===T1+ASCII===" > post-wikt-typos.txt
@@ -45,10 +51,18 @@ grep ^TS tmp-words-with-articles-wikt.txt | perl -pe "s/^TS\t//" >> post-wikt-ty
 echo >> post-wikt-typos.txt
 
 echo "===N+DOUBLEDOT===" >> post-wikt-typos.txt
+echo "These are suspected punctuation errors." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 grep ^N tmp-words-with-articles-wikt.txt | grep "\.\." | perl -pe "s/^N\t//" >> post-wikt-typos.txt
 
-grep -P "^(HB|HL)" tmp-words-with-articles-wikt.txt | perl -pe "s/^HB\t//" | perl -pe 's/</&lt;/g' | perl -pe 's/>/&gt;/g' | grep -v "Unsupported titles/HTML" > post-wikt-html.txt
+# --- WITH QUOTATIONS ---
+
+# Run time: About 10 min
+tac tmp-wiktionary-spell-with-quotations.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles-wikt-with-quotations.txt
+
+grep -P "^(HB|HL)" tmp-words-with-articles-wikt-with-quotations.txt | perl -pe "s/^HB\t//" | perl -pe 's/</&lt;/g' | perl -pe 's/>/&gt;/g' | grep -v "Unsupported titles/HTML" > post-wikt-html.txt
+
+grep -vP "^(HB|HL|BW|BC|H|TS)" tmp-words-with-articles-wikt-with-quotations.txt | perl -pe "s/^.*?\t//" | grep -v "(" | grep -v ")" | sort -rn -k2 | head -50 > post-wikt-most-wanted.txt
 
 echo "Done post-processing"
 echo `date`
