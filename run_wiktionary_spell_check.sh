@@ -48,12 +48,6 @@ echo "===TS===" >> post-wikt-typos.txt
 echo "These are suspected whitespace errors." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 grep ^TS tmp-words-with-articles-wikt.txt | perl -pe "s/^TS\t//" >> post-wikt-typos.txt
-echo >> post-wikt-typos.txt
-
-echo "===N+DOUBLEDOT===" >> post-wikt-typos.txt
-echo "These are suspected punctuation errors." >> post-wikt-typos.txt
-echo >> post-wikt-typos.txt
-grep ^N tmp-words-with-articles-wikt.txt | grep "\.\." | perl -pe "s/^N\t//" >> post-wikt-typos.txt
 
 # --- WITH QUOTATIONS ---
 
