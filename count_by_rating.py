@@ -7,6 +7,10 @@ instance_re = re.compile(r"\* (\d+)")
 ratings_uniques = defaultdict(int)
 ratings_instances = defaultdict(int)
 
+# Often none to fix
+ratings_uniques["D"] = 0
+ratings_uniques["P"] = 0
+
 for line in fileinput.input("-"):
     (rating, remainder) = line.split("\t")
     if rating.startswith("TF"):
