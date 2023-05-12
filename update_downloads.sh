@@ -41,6 +41,12 @@ cd /bulk-wikipedia/
 
 rm -f Wikispecies:Requested_articles
 wget --continue https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
+rm -f Before_2019
+wget --continue https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/Before_2019
+rm -f 2020
+wget --continue https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2020
+rm -f 2021
+wget --continue https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2021
 
 rm -f moss
 wget --continue https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss

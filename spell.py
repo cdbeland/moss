@@ -59,6 +59,9 @@ def load_data():
             "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
             "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
             "/bulk-wikipedia/Wikispecies:Requested_articles",
+            "/bulk-wikipedia/Before_2019",
+            "/bulk-wikipedia/2020",
+            "/bulk-wikipedia/2021",
             "/bulk-wikipedia/Old_case_notes",
     ]:
         with open(filename, "r") as title_list:
