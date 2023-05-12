@@ -48,6 +48,9 @@ wget --continue https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
 rm -f For_Wiktionary
 wget --continue https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/For_Wiktionary
 
+rm -f Old_case_notes
+wget --continue https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/Old_case_notes
+
 rm -f enwiktionary-latest-page.sql
 wget --continue https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-page.sql.gz
 gunzip enwiktionary-latest-page.sql
