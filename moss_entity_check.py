@@ -633,7 +633,7 @@ def entity_check(article_title, article_text):
                 continue
 
         if entity in controversial or entity in greek_letters:
-            if "<math>" in article_text:
+            if "<math" in article_text:
                 # Editors in these types of articles prefer the HTML
                 # entity so that special characters can be found by
                 # name in both TeX and HTML markup.
