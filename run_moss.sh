@@ -19,6 +19,8 @@ RUN_NAME=run-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T
 mkdir $RUN_NAME
 cd $RUN_NAME
 
+export NON_ASCII_LETTERS=ạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭīʝÑñÒòÓóÔôÕõÖöớộøŠšÚúùÙÛûÜüũưÝýŸÿŽžəþɛ
+
 # --- HTML ENTITIES ---
 
 echo "Beginning HTML entity check"
@@ -422,16 +424,15 @@ echo `date`
 
 ../venv/bin/python3 ../dump_grep_regex.py "[Rr]hym|[Pp]oem|[Ss]tanza|[Vv]erse|[Ll]yric" > tmp-rhyme-dump.xml
 
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z0-9\-A-Zí][Aa]-[Bb][^a-zA-Z]" | perl -pe '<math.*?(</math>|<\/nowiki>/ig)' | perl -pe '<ref.*?(/ ?>|</ref>|<\/nowiki>/ig)' | perl -pe 's/\{\{cite.*?(\}\}|<\/nowiki>)//ig' | grep -i "a-b" | grep -v "A-B-C-D-E-F-G" | sort > tmp-rhyme-a-b.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z0-9\-A-Z${NON_ASCII_LETTERS}][Aa]-[Bb][^a-zA-Z${NON_ASCII_LETTERS}]" | perl -pe 's/\<math.*?\<\/math\>//ig' | perl -pe 's/<ref.*?(\/ ?>|<\/ref>)//ig' | perl -pe 's/\{\{cite.*?\}\}//ig' | grep -i "a-b" | grep -v "A-B-C-D-E-F-G" | sort > tmp-rhyme-a-b.txt
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^,]AB,[ABC]|AA,AB|AA,B|AB,[ABC]" | grep -v "<math" | grep -vP "^(Rhyme scheme:|The Raven:)" | sort > tmp-rhyme-AB-comma.txt
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]" | perl -pe '<ref.*?(/ ?>|</ref>|<\/nowiki>/ig)' | grep -P "(aa|ab)"  | sort > tmp-rhyme-masked-words.txt
-
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]" | perl -pe 's/<ref.*?(\/ ?>|<\/ref>)//ig' | grep -P "(aa|ab)" | sort > tmp-rhyme-masked-words.txt
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])" | grep -v "Exemplum:"  | sort > tmp-rhyme-a.b.txt
 
 # These may need to be relaxed in the future
-cat tmp-rhyme-AB-comma.txt > tmp-rhyme.txt
-grep --no-filename -iP "rhym|form|poem" tmp-rhyme-a-b.txt tmp-rhyme-a.b.txt >> tmp-rhyme.txt
-grep -iP "rhym" tmp-rhyme-masked-words.txt >> tmp-rhyme.txt
+cat tmp-rhyme-AB-comma.txt | grep -v "{{not a typo" > tmp-rhyme.txt
+grep -iP "rhym" tmp-rhyme-masked-words.txt | grep -v "{{not a typo" >> tmp-rhyme.txt
+grep --no-filename -iP "rhym|poem" tmp-rhyme-a-b.txt tmp-rhyme-a.b.txt >> tmp-rhyme.txt
 cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/* [[$1]] - <nowiki>$2<\/nowiki>/' > beland-rhyme.txt
 
 rm -f tmp-rhyme-dump.xml
@@ -457,8 +458,6 @@ echo "Starting liters style check"
 echo `date`
 
 # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
-
-export NON_ASCII_LETTERS=ạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭīʝÑñÒòÓóÔôÕõÖöớộøŠšÚúùÙÛûÜüũưÝýŸÿŽžəþɛ
 
 # Run time: 9-22 min per regex
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%<math.*?>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’${NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -v "AD-1 l" | sort > liters-fixme1.txt
