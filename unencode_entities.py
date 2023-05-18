@@ -242,6 +242,10 @@ controversial = {
     "&ge;": "≥",  # available at the bottom of the wikitext edit window
     "&GreaterEqual;": "≥",  # available at the bottom of the wikitext edit window
     "&setminus;": "∖",
+    "&approx;": "≈",
+    "&vdash;": "⊢",
+    "&propto;": "∝",
+    "&nvap;": "≍⃒",
 }
 
 # keep.extend(controversial.keys())
@@ -250,6 +254,8 @@ transform_unsafe = {
     # These transformations can't be made in places where the
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
+
+    "&s;": "'",
 
     # "&#91;": "&lsqb;",   # [  {{!(}} will also work
     # "&#93;": "&rsqb;",   # ]  {{)!}} will also work
@@ -349,6 +355,7 @@ transform_unsafe = {
     # Probably convert to regular space or no space
     "&ensp;": " ",  # Or {{sp}} if a regular space is needed
     "&emsp;": " ",  # Or {{sp}} if a regular space is needed
+    "&ThinSpace;": " ",
     "&thinsp;": " ",  # Use "{{thin space}}" if retained
     "&thinspace;": " ",
     "&thisp;": " ",
@@ -1074,13 +1081,15 @@ transform_conditional = {
     "｝": "}",
     "｟": "⸨",
     "｠": "⸩",
-
 }
 
 
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+    "&flat;": "♭",
+    "&rlhar;": "⇌",
+    "&ap;": "&approx;",
     "&ell;": "ℓ",
     "&Rarr;": "↠",
     "&star;": "☆",
@@ -1411,7 +1420,6 @@ transform = {
     "&Ropf;": "ℝ",
     "&Kopf;": "𝕂",
     "&Copf;": "ℂ",
-    "&approx;": "≈",
     "&thickapprox;": "≈",
     "&prop;": "∝",
     "&complexes;": "ℂ",
@@ -1573,6 +1581,7 @@ transform = {
     "&nybsp;": "&nbsp;",
     "&nbsop;": "&nbsp;",
     "&nbdsp;": "&nbsp;",
+    "&nbzp;": "&nbsp;",
     "&nbap;": "&nbsp;",
     "&ndsah;": "&ndash;",
     "&ndasg;": "&ndash;",
