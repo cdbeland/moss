@@ -39,6 +39,7 @@ venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
 # Takes about 10 sec
 cd /bulk-wikipedia/
 
+# Sync with spell.py, moss_not_english.py
 rm -f Wikispecies:Requested_articles
 wget --continue https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
 rm -f Before_2019
