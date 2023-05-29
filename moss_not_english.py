@@ -34,14 +34,25 @@ SPECIES_WORDS = list()
 for filename in [
         "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
         "/bulk-wikipedia/Wikispecies:Requested_articles",
+        "/bulk-wikipedia/Before_2019",
+        "/bulk-wikipedia/2020",
+        "/bulk-wikipedia/2021",
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
             line = line.replace("_", " ").strip()
             SPECIES_WORDS.extend(list(WORD_RE.findall(line)))
 SPECIES_WORDS = set(SPECIES_WORDS)
-with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
-    REQUESTED_SPECIES_HTML = requested_species_file.read()
+
+REQUESTED_SPECIES_HTML = ""
+for filename in [
+        "/bulk-wikipedia/Wikispecies:Requested_articles",
+        "/bulk-wikipedia/Before_2019",
+        "/bulk-wikipedia/2020",
+        "/bulk-wikipedia/2021",
+]:
+    with open(filename, 'r') as requested_species_file:
+        REQUESTED_SPECIES_HTML += requested_species_file.read()
 
 print("Done loading.", file=sys.stderr)
 
