@@ -6,7 +6,7 @@ from string import punctuation
 import sys
 from lru import LRU
 try:
-    from wikitext_util import html_tag_re
+    from wikitext_util import html_tag_re, contractions
     from unencode_entities import entities_re
 except ImportError:
     from .wikitext_util import html_tag_re
@@ -114,156 +114,23 @@ number_formats_allowed_re = re.compile(
 
 # Word blocklist
 bad_words = {
-
     # TODO: Ignore articles with "unmanned aerial vehicle" to reduce
     # false positives on this.
     # Most of the time (experimental!)
     # "manned",
     # "unmanned",
 
-    # Per [[MOS:CONTRACTION]] and sourced from
-    # https://en.wiktionary.org/wiki/Category:English_contractions
-    "aint",
-    "aren't",
-    "can't",
-    "couldn't",
-    "could've",
-    "didn't",
-    "doesn't",
-    "don't",
-    "gonna",
-    "hadn't",
-    "had've",
-    "hasn't",
-    "haven't",
-    "he's",
-    "how'll",
-    "how're",
-    "how's",
-    "I'll",
-    "I'm",
-    "I've",
-    "I'd",
-
-    # For code which does .lower() for everything
-    "i'll",
-    "i'm",
-    "i've",
-    "i'd",
-
-    "isn't",
-    "it'd",
-    "it'll",
-    "it's",
-    "kinda",
-    "let's",
-    "might've",
-    "mightn't",
-    "musn't",
-    "mustn't",
-    "must've",
-    "nobody'd",
-    "not've",
-    "oughtn't",
-    "oughtn't've",
-    "'round",
-    "shalln't",
-    "shall've",
-    "shan't",
-    "she'd",
-    "she'd've",
-    "she'll",
-    "she'll've",
-    "she's",
-    "she've",
-    "shouldn't",
-    "shouldn't've",
-    "should've",
-    "somebody'd",
-    "somebody's",
-    "something's",
-    "sort've",
-    "that'd",
-    "that'd've",
-    "that'll",
-    "that'll've",
-    "that're",
-    "that's",
-    "that've",
-    "there'd",
-    "there'll",
-    "there's",
-    "here'll",
-    "here's",
-    "they'd",
-    "they'd've",
-    "they'll",
-    "they're",
-    "this'll",
-    "this's",
-    "twasn't",
-    "wait'll",
-    "wanna",
-    "wasn't",
-    "we'd",
-    "we'd've",
-    "we'll",
-    "we'll've",
-    "we're",
-    "weren't",
-    "we've",
-    "we'ven't",
-    "what'd",
-    "whatever's",
-    "what'll",
-    "what're",
-    "what's",
-    "what've",
-    "when'd",
-    "whene'er",
-    "when'll",
-    "when's",
-    "where'd",
-    "wheredja",
-    "where'er",
-    "where'm",
-    "where're",
-    "where's",
-    "wheresoe'er",
-    "wheresoeer",
-    "where've",
-    "which's",
-    "which've",
-    "who'd",
-    "who'd've",
-    "who'll",
-    "who're",
-    "who's",
-    "who've",
-    "why'd",
-    "whyn't",
-    "why're",
-    "why's",
-    "will've",
-    "with't",
-    "won't",
-    "wontcha",
-    "won't've",
-    "wouldn't",
-    "would've",
-
     # Per [[MOS:YOU]]
     "you",
-    "you'd",
-    "you'll",
     "your",
-    "you're",
 
     "and/or",  # [[MOS:AND/OR]]
 
     # Bad syntax, requires argument
     "{{formatnum:}}",
 }
+# Per [[MOS:CONTRACTION]] and sourced from
+bad_words.update(contractions)
 
 bad_characters = {
     # Also works for multi-character substrings

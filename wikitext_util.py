@@ -2,6 +2,140 @@
 
 import re
 
+contractions = {
+    # Sourced from
+    # https://en.wiktionary.org/wiki/Category:English_contractions
+    "aint",
+    "aren't",
+    "can't",
+    "couldn't",
+    "could've",
+    "didn't",
+    "doesn't",
+    "don't",
+    "gonna",
+    "hadn't",
+    "had've",
+    "hasn't",
+    "haven't",
+    "he's",
+    "how'll",
+    "how're",
+    "how's",
+    "I'll",
+    "I'm",
+    "I've",
+    "I'd",
+    "isn't",
+    "it'd",
+    "it'll",
+    "it's",
+    "kinda",
+    "let's",
+    "might've",
+    "mightn't",
+    "musn't",
+    "mustn't",
+    "must've",
+    "nobody'd",
+    "not've",
+    "oughtn't",
+    "oughtn't've",
+    "'round",
+    "shalln't",
+    "shall've",
+    "shan't",
+    "she'd",
+    "she'd've",
+    "she'll",
+    "she'll've",
+    "she's",
+    "she've",
+    "shouldn't",
+    "shouldn't've",
+    "should've",
+    "somebody'd",
+    "somebody's",
+    "something's",
+    "sort've",
+    "that'd",
+    "that'd've",
+    "that'll",
+    "that'll've",
+    "that're",
+    "that's",
+    "that've",
+    "there'd",
+    "there'll",
+    "there's",
+    "here'll",
+    "here's",
+    "they'd",
+    "they'd've",
+    "they'll",
+    "they're",
+    "this'll",
+    "this's",
+    "twasn't",
+    "wait'll",
+    "wanna",
+    "wasn't",
+    "we'd",
+    "we'd've",
+    "we'll",
+    "we'll've",
+    "we're",
+    "weren't",
+    "we've",
+    "we'ven't",
+    "what'd",
+    "whatever's",
+    "what'll",
+    "what're",
+    "what's",
+    "what've",
+    "when'd",
+    "whene'er",
+    "when'll",
+    "when's",
+    "where'd",
+    "wheredja",
+    "where'er",
+    "where'm",
+    "where're",
+    "where's",
+    "wheresoe'er",
+    "wheresoeer",
+    "where've",
+    "which's",
+    "which've",
+    "who'd",
+    "who'd've",
+    "who'll",
+    "who're",
+    "who's",
+    "who 've",
+    "why'd",
+    "whyn't",
+    "why're",
+    "why's",
+    "will've",
+    "with't",
+    "won't",
+    "wontcha",
+    "won't've",
+    "wouldn't",
+    "would've",
+    "you'd",
+    "you'll",
+    "you're",
+}
+# Some code does .lower() on the source material
+contractions.update([c.lower() for c in contractions])
+
+# Sometimes these appear at the beginning of a sentence or in a title
+contractions.update([c[0].upper() + c[1:].lower() for c in contractions])
+# .title() messes up contractions that contain '
 
 html_tag_re = re.compile(r"<\??/?\s*[a-zA-Z]+\s*/?\s*>")
 blockquote_re = re.compile(r"(<blockquote.*?</blockquote>|<poem.*?</poem>|{{quote box.*?}})", flags=re.I+re.S)
@@ -358,7 +492,9 @@ def wikitext_to_plaintext(string, flatten_sup_sub=True):
     return string
 
 
-italics_re = re.compile(r"([^'])(''[A-Za-z][^']{0,1000}'')([^'])")
+contractions_alternation = "|".join(contractions)
+bold_italics_re = re.compile(r"([^']|^)('''''[A-Za-z][^']{0,500}(" + contractions_alternation + ")?[^']{0,500}''''')([^']|$)")
+italics_re = re.compile(r"([^']|^)(''[A-Za-z][^']{0,500}(" + contractions_alternation + ")?[^']{0,500}'')([^']|$)")
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
 # "" because the contents may have been removed by a previous replacement
 prose_quote_curly_re = re.compile(r'“\S[^”]{0,1000}?\S”|“\S”|“”')
@@ -408,6 +544,7 @@ def get_main_body_wikitext(wikitext_input, strong=False, wiktionary=False):
 
     wikitext_working = prose_quote_re.sub("✂", wikitext_working)
     wikitext_working = prose_quote_curly_re.sub("✂", wikitext_working)
+    wikitext_working = bold_italics_re.sub(r"\1✂\3", wikitext_working)
     wikitext_working = italics_re.sub(r"\1✂\3", wikitext_working)
     wikitext_working = single_quote_re.sub(r"\1✂\3", wikitext_working)
     wikitext_working = blockquote_re.sub("✂", wikitext_working)
