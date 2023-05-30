@@ -156,7 +156,7 @@ cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.tx
 echo "Beginning broken nbsp scan"
 echo `date`
 
-../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > beland-broken-nbsp.txt
+../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | perl -pe 's/^(.*)$/* [[$1]]' > beland-broken-nbsp.txt
 
 # --- MOS:LOGICAL ---
 
