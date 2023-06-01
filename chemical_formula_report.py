@@ -37,6 +37,12 @@ def chem_formula_check(article_title, article_text):
     article_text = wikitext_to_plaintext(article_text, flatten_sup_sub=False)
     article_text = get_main_body_wikitext(article_text)
 
+    # If we ever start looking inside templates, we will need
+    # something like this to avoid false alarms for [[Template:Infobox
+    # geologic timespan]]:
+    # parameter_exclude_re = re.compile(r"\| c?o2 *=")
+    # article_text = parameter_exclude_re.sub("", article_text)
+
     # Fast but over-matches
     matches = [f for f in formulas if f in article_text]
     if matches:
