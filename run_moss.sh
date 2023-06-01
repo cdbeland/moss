@@ -432,7 +432,7 @@ cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "([^a-z\+/]a
 # These may need to be relaxed in the future
 grep -v "{{not a typo" tmp-rhyme-AB-comma.txt > tmp-rhyme.txt
 grep -iP "rhym" tmp-rhyme-masked-words.txt | grep -v "{{not a typo" >> tmp-rhyme.txt
-grep --no-filename -iP "rhym|poem" tmp-rhyme-a-b.txt tmp-rhyme-a.b.txt >> tmp-rhyme.txt
+grep --no-filename -iP "rhym|poem" tmp-rhyme-a-b.txt tmp-rhyme-a.b.txt | grep -v "{{not a typo" >> tmp-rhyme.txt
 cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/* [[$1]] - <nowiki>$2<\/nowiki>/' > beland-rhyme.txt
 
 rm -f tmp-rhyme-dump.xml
