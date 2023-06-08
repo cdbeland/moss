@@ -112,7 +112,7 @@ def clean_typo_link(typo_link):
 def extract_linked_articles():
     linked_articles = set()
     for letter in ["before_A"] + list(string.ascii_uppercase) + ["after_Z"]:
-        with open(f"/bulk-wikipedia/moss-subpages/{letter}", "r") as subpage_file:
+        with open(f"/var/local/moss/bulk-wikipedia/moss-subpages/{letter}", "r") as subpage_file:
             subpage_html = subpage_file.read()
             linked_articles_this_page = re.findall('<a href="/wiki/([^"]+)"', subpage_html)
             linked_articles_this_page = linked_articles.update(linked_articles_this_page)

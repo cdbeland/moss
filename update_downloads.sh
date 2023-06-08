@@ -15,19 +15,19 @@ echo `date`
 
 # Download, extract, sort, and uncompress time: About 5 hours
 
-# rm -rf /bulk-wikipedia/all-wiktionaries
-mkdir -p /bulk-wikipedia/all-wiktionaries
+# rm -rf /var/local/moss/bulk-wikipedia/all-wiktionaries
+mkdir -p /var/local/moss/bulk-wikipedia/all-wiktionaries
 venv/bin/python3 download_all_wiktionaries.py
 
-rm -rf /bulk-wikipedia/moss-subpages
-mkdir -p /bulk-wikipedia/moss-subpages
+rm -rf /var/local/moss/bulk-wikipedia/moss-subpages
+mkdir -p /var/local/moss/bulk-wikipedia/moss-subpages
 venv/bin/python3 download_moss_subpages.py
 
 echo `date`
 echo "Uncompressing and sorting..."
 
 ORIG_DIR=`pwd`
-cd /bulk-wikipedia/
+cd /var/local/moss/bulk-wikipedia/
 gunzip all-wiktionaries/*
 sort --unique all-wiktionaries/* > titles_all_wiktionaries_uniq.txt
 # This sort takes about 2 min
@@ -35,9 +35,9 @@ sort --unique all-wiktionaries/* > titles_all_wiktionaries_uniq.txt
 cd $ORIG_DIR
 echo `date`
 echo "Transliterating..."
-venv/bin/python3 transliterate.py > /bulk-wikipedia/transliterations.txt
+venv/bin/python3 transliterate.py > /var/local/moss/bulk-wikipedia/transliterations.txt
 # Takes about 10 sec
-cd /bulk-wikipedia/
+cd /var/local/moss/bulk-wikipedia/
 
 # Sync with spell.py, moss_not_english.py
 rm -f Wikispecies:Requested_articles
@@ -129,7 +129,7 @@ echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D e
 
 cd $ORIG_DIR
 echo `date`
-venv/bin/python3 extract_english.py > /bulk-wikipedia/english_words_only.txt
+venv/bin/python3 extract_english.py > /var/local/moss/bulk-wikipedia/english_words_only.txt
 # extract_english.py takes about 26 minutes
 echo `date`
 
@@ -144,12 +144,12 @@ echo `date`
 
 echo "Converting enwiki XML to CSV..."
 echo `date`
-venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml > /bulk-wikipedia/enwiki-articles-no-redir.csv
+venv/bin/python3 xml_to_csv.py /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml > /var/local/moss/bulk-wikipedia/enwiki-articles-no-redir.csv
 
 ./load_enwiki_categories.sh
 
 echo "Preparing for enwiktionary spell check"
-cd /bulk-wikipedia/
+cd /var/local/moss/bulk-wikipedia/
 rm -f enwiktionary-latest-pages-articles-multistream.xml.bz2
 wget --continue https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles-multistream.xml.bz2
 bunzip2 enwiktionary-latest-pages-articles-multistream.xml.bz2
@@ -157,7 +157,7 @@ bunzip2 enwiktionary-latest-pages-articles-multistream.xml.bz2
 echo `date`
 echo "XML to CSV for enwiktionary"
 cd $ORIG_DIR
-venv/bin/python3 xml_to_csv.py /bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml > /bulk-wikipedia/enwiktionary-articles-no-redir.csv
+venv/bin/python3 xml_to_csv.py /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml > /var/local/moss/bulk-wikipedia/enwiktionary-articles-no-redir.csv
 
 echo `date`
 echo "Done"

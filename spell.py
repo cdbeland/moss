@@ -46,7 +46,7 @@ def load_data():
     # this all into Python, even though accessing in-memory data is
     # very fast.
 
-    with open("/bulk-wikipedia/For_Wiktionary", "r") as moss_html_file:
+    with open("/var/local/moss/bulk-wikipedia/For_Wiktionary", "r") as moss_html_file:
         moss_html = moss_html_file.read()
         queued_matches = re.findall('"https://en.wiktionary.org/wiki/(.*?)"', moss_html)
         if not queued_matches:
@@ -55,14 +55,14 @@ def load_data():
             add_tokens(queued_match)
 
     for filename in [
-            "/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
-            "/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
-            "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
-            "/bulk-wikipedia/Wikispecies:Requested_articles",
-            "/bulk-wikipedia/Before_2019",
-            "/bulk-wikipedia/2020",
-            "/bulk-wikipedia/2021",
-            "/bulk-wikipedia/Old_case_notes",
+            "/var/local/moss/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0",
+            "/var/local/moss/bulk-wikipedia/enwiki-latest-all-titles-in-ns0",
+            "/var/local/moss/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
+            "/var/local/moss/bulk-wikipedia/Wikispecies:Requested_articles",
+            "/var/local/moss/bulk-wikipedia/Before_2019",
+            "/var/local/moss/bulk-wikipedia/2020",
+            "/var/local/moss/bulk-wikipedia/2021",
+            "/var/local/moss/bulk-wikipedia/Old_case_notes",
     ]:
         with open(filename, "r") as title_list:
             for line in title_list:

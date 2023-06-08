@@ -16,8 +16,8 @@ cd ~
 git clone https://github.com/cdbeland/moss.git
 cd moss/
 ./reset_environment.sh
-sudo mkdir /bulk-wikipedia/
-sudo chown $USER /bulk-wikipedia/
+sudo mkdir /var/local/moss/bulk-wikipedia/
+sudo chown $USER /var/local/moss/bulk-wikipedia/
 Run "FIRST TIME SETUP" steps in ./update_downloads.sh
 
 DOWNLOAD DATA:

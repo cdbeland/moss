@@ -7,7 +7,7 @@ def download_page(letter, delay=10):
     url = f"https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/{letter}"
     print(f"Downloading {url}")
     try:
-        urllib.request.urlretrieve(url, f"/bulk-wikipedia/moss-subpages/{letter}")
+        urllib.request.urlretrieve(url, f"/var/local/moss/bulk-wikipedia/moss-subpages/{letter}")
     except (urllib.error.URLError,  urllib.error.HTTPError) as error:
         print(error)
         print(f"Temporary failure? Retrying in {delay} seconds")

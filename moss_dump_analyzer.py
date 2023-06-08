@@ -9,7 +9,7 @@ import re
 
 # Runtime: ~1.5 hours (with a simple callback, whata, single-threaded)
 
-DEFAULT_CSV_FILE = "/bulk-wikipedia/enwiki-articles-no-redir.csv"
+DEFAULT_CSV_FILE = "/var/local/moss/bulk-wikipedia/enwiki-articles-no-redir.csv"
 PAGE_RE = re.compile(r"^.*(<page.*?</page>).*$", flags=re.MULTILINE+re.DOTALL)
 
 

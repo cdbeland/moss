@@ -25,18 +25,18 @@ GOOGLE_LANG_DETECTOR = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
 
 print("Loading dictionaries...", file=sys.stderr)
 
-with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
+with open("/var/local/moss/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
     ALL_WORDS = set(word.strip() for word in title_list)
-with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
+with open("/var/local/moss/bulk-wikipedia/english_words_only.txt", "r") as title_list:
     ENGLISH_WORDS = set(word.strip() for word in title_list)
 
 SPECIES_WORDS = list()
 for filename in [
-        "/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
-        "/bulk-wikipedia/Wikispecies:Requested_articles",
-        "/bulk-wikipedia/Before_2019",
-        "/bulk-wikipedia/2020",
-        "/bulk-wikipedia/2021",
+        "/var/local/moss/bulk-wikipedia/specieswiki-latest-all-titles-in-ns0",
+        "/var/local/moss/bulk-wikipedia/Wikispecies:Requested_articles",
+        "/var/local/moss/bulk-wikipedia/Before_2019",
+        "/var/local/moss/bulk-wikipedia/2020",
+        "/var/local/moss/bulk-wikipedia/2021",
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
@@ -46,10 +46,10 @@ SPECIES_WORDS = set(SPECIES_WORDS)
 
 REQUESTED_SPECIES_HTML = ""
 for filename in [
-        "/bulk-wikipedia/Wikispecies:Requested_articles",
-        "/bulk-wikipedia/Before_2019",
-        "/bulk-wikipedia/2020",
-        "/bulk-wikipedia/2021",
+        "/var/local/moss/bulk-wikipedia/Wikispecies:Requested_articles",
+        "/var/local/moss/bulk-wikipedia/Before_2019",
+        "/var/local/moss/bulk-wikipedia/2020",
+        "/var/local/moss/bulk-wikipedia/2021",
 ]:
     with open(filename, 'r') as requested_species_file:
         REQUESTED_SPECIES_HTML += requested_species_file.read()

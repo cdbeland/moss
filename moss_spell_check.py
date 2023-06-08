@@ -85,7 +85,7 @@ bracket_missing_whitespace_re = re.compile(r"([a-zA-Z]+\([a-zA-Z]+\)?"
 punct_extra_whitespace_re = re.compile(r"\w+ ,\w+|\w+ \.\w+|\w+ \)|\( \w+|\[ \w+|\w+ ]")
 
 requested_species_html = ""
-with open('/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
+with open('/var/local/moss/bulk-wikipedia/Wikispecies:Requested_articles', 'r') as requested_species_file:
     requested_species_html = requested_species_file.read()
 
 article_skip_list = [

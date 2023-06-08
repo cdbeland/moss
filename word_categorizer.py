@@ -591,16 +591,16 @@ def load_data():
     # (at list creation time?) since these won't be matched anyway.
     print(datetime.datetime.now(), file=sys.stderr)
     print("Loading all languages...", file=sys.stderr)
-    with open("/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
+    with open("/var/local/moss/bulk-wikipedia/titles_all_wiktionaries_uniq.txt", "r") as title_list:
         titles_all_wiktionaries = set([line.strip() for line in title_list])
 
     print("Loading transliterations...", file=sys.stderr)
-    with open("/bulk-wikipedia/transliterations.txt", "r") as title_list:
+    with open("/var/local/moss/bulk-wikipedia/transliterations.txt", "r") as title_list:
         transliterations = set([line.strip().split("\t")[1] for line in title_list
                                 if "\t" in line.strip() and "_" not in line])
 
     print("Loading English words only...", file=sys.stderr)
-    with open("/bulk-wikipedia/english_words_only.txt", "r") as title_list:
+    with open("/var/local/moss/bulk-wikipedia/english_words_only.txt", "r") as title_list:
         english_words = set([line.strip() for line in title_list])
 
     print("Indexing English words by length...", file=sys.stderr)

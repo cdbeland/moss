@@ -11,7 +11,7 @@ language_codes = re.findall(r"([_a-z]+)wiktionary</a>: <span class='(done|partia
 
 def download_wiktionary(language_code):
     file_name = "%swiktionary-latest-all-titles-in-ns0.gz" % language_code
-    full_path = "/bulk-wikipedia/all-wiktionaries/%s" % file_name
+    full_path = "/var/local/moss/bulk-wikipedia/all-wiktionaries/%s" % file_name
     if exists(full_path):
         print(f"Skipping existing file - {full_path}")
         return

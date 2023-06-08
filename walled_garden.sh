@@ -1,6 +1,6 @@
 # REMEMBER: First, remove any existing dump due to limited hard drive space!
 
-cd /bulk-wikipedia/
+cd /var/local/moss/bulk-wikipedia/
 
 echo `date`
 echo "Loading page data..."

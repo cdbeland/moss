@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 set -e
-cd /bulk-wikipedia/
+cd /var/local/moss/bulk-wikipedia/
 
 # ONE-TIME SETUP:
 # su
