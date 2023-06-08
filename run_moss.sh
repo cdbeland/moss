@@ -19,7 +19,7 @@ RUN_NAME=run-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T
 mkdir $RUN_NAME
 cd $RUN_NAME
 
-export NON_ASCII_LETTERS=ạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭīʝÑñÒòÓóÔôÕõÖöớộøŠšÚúùÙÛûÜüũưÝýŸÿŽžəþɛ
+export NON_ASCII_LETTERS=ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ
 
 # --- HTML ENTITIES ---
 
@@ -142,12 +142,16 @@ cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.
 echo "Beginning MPG conversion scan"
 echo `date`
 
-../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
+# {{cvt}} or {{convert}} should probably be used in all instances to
+# convert between US and imperial gallons (ug!)
+# ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
+../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | sort > tmp-mpg-convert.txt
+
 cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.txt
 
-# TODO: DEPENDING ON CONTEXT, WILL NEED:
-# {{convert|$1|mpgus|abbr=on}}
-# {{convert|$1|mpgimp|abbr=on}}
+# DEPENDING ON CONTEXT, WILL NEED:
+# {{convert|$1|mpgUS}}
+# {{convert|$1|mpgimp}}
 
 # --- BROKEN NBSP ---
 
@@ -460,19 +464,41 @@ echo `date`
 # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
 # Run time: 9-22 min per regex
-../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{not a typo.*?\}\}%%g" | perl -pe "s%<math.*?>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’${NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -v "AD-1 l" | sort > liters-fixme1.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{(Transliteration|lang|IPA|not a typo).*?\}\}%%g" | perl -pe "s%<math.*?</math>%%g" | perl -pe "s/(File|Image):.*?[\|\n]//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’${NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -vP "image[0-9]? *=.* l[ \.].jpg" | grep -v "AD-1 l" | grep -v "l=" | grep -v "[[Pound sterling|l" | grep -v "{{not English inline}}" | sort > liters-fixme1.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[rBbMm]illion l[^a-zA-Z0-9']" | sort > liters-fixme2.txt
 ../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]'| perl -pe "s%\{\{cite.*?\}\}%%g" | sort > liters-fixme3.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > liters-fixme4.txt
-../venv/bin/python3 ../dump_grep_csv.py "/l" | perl -pe "s/{{not a typo.*?}}//" | perl -pe "s/{{math.*?}}//" | perl -pe "s%<math>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z${NON_ASCII_LETTERS}'0-9/\-_]" | grep -vP "w/l(-[0-9])? *=" | grep -vP "(https?://|data:)[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]" | grep -v "Malaysian names#Indian names|a/l" | grep -v "Length at the waterline|w/l" | grep -v "Waterline length|w/l" | sort > liters-fixme5.txt
-# TODO for fixme5:
+../venv/bin/python3 ../dump_grep_csv.py "/l" | perl -pe "s/{{not a typo.*?}}//" | perl -pe "s/{{math.*?}}//" | perl -pe "s%<math>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z${NON_ASCII_LETTERS}'0-9/\-_]" | grep -vP "w/l(-[0-9])? *=" | grep -vP "(https?://|data:)[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]" | grep -vP "\{\{cite.{5,100} a/l .{5,100}\}\}" | grep -v "Malaysian names#Indian names|a/l" | grep -vP "Length at the waterline\|(Length )?w/l" | grep -v "Waterline length|w/l" | sort > liters-fixme5.txt
+# Done for fixme5:
 # expand "m/l" to "music and lyrics" or drop
 # expand "w/l" to "win/loss"
 # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
-# change "a/l" to "[[Malaysian names#Indian names|a/l]]"
+# change "a/l" to "[[Malaysian names#Indian names|a/l]]" except inside internal or external links
 ../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > liters-fixme6.txt
 ../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > liters-fixme7.txt
 cat liters-fixme* | perl -pe 's/(.*?):.+/$1/' | uniq > liters-all.txt
+
+# --- Bad quote marks ---
+
+echo "Starting bad quote mark report..."
+echo `date`
+
+# ../venv/bin/python3 ../dump_grep_csv.py '\{\{[Cc]ite (web|news|journal)[^\}]+(quote|title) *= *"' | sort > tmp-bad-quotes1.txt
+# Run time: About 2h per regex
+
+../venv/bin/python3 ../dump_grep_regex.py "(\{\{[Cc]ite |<blockquote>|(C|c|R|r|Block|block)[Qq]uote)" > tmp-quote-dump.xml
+# Run time: About 3h
+
+cat tmp-quote-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py '\{\{[Cc]ite (web|news|journal)[^\}]+(quote|title) *= *"' | sort > tmp-bad-quotes1.txt
+cat tmp-quote-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py '\{\{[Cc]ite book[^\}]+chapter *= *"' | sort > tmp-bad-quotes2.txt
+cat tmp-quote-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py '<blockquote>[ \n]*"' | sort > tmp-bad-quotes3.txt
+cat tmp-quote-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py '\{\{([Bb]lockquote|[Qu]uote|[Cc]quote|[Qq]uote frame) *\| *"' | sort > tmp-bad-quotes4.txt
+cat tmp-quote-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py '\{\{([Bb]lockquote|[Qu]uote)[^\}]*?\| *text *= *"' | sort > tmp-bad-quotes5.txt
+cat tmp-quote-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py '\{\{([Qu]uote box|[Qq]uote frame|[Rr]quote]|[Cc]quote)[^\}]*?\| *quote *= *"' | sort > tmp-bad-quotes6.txt
+
+cat tmp-bad-quotes1.txt tmp-bad-quotes2.txt tmp-bad-quotes3.txt tmp-bad-quotes4.txt tmp-bad-quotes5.txt tmp-bad-quotes6.txt | perl -pe 's/(.*?):.+/$1/' | uniq > jwb-bad-quotes.txt
+
+rm -f tmp-quote-dump.xml
 
 echo "Done"
 echo `date`
