@@ -28,12 +28,12 @@ gunzip enwiki-latest-page.sql
 
 echo `date`
 echo "Loading enwiki-latest-page.sql..."
-# Run time: about 7h20m
+# Run time: about 31 hours
 cat enwiki-latest-page.sql | mysql -D enwiki
 
 echo `date`
 echo "Building page_categories table..."
-# Run time: several hours
+# Run time: About 25 hours
 
 echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiki
 echo "CREATE TABLE page_categories (
