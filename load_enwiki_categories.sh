@@ -52,5 +52,8 @@ echo "INSERT INTO page_categories (title, category_name)
 echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mysql -D enwiki
 echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D enwiki
 
+echo "DROP TABLE categorylinks;" | mysql -D enwiki
+echo "DROP TABLE page;" | mysql -D enwiki
+
 echo "All done!"
 echo `date`
