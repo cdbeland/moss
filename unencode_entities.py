@@ -199,6 +199,7 @@ controversial = {
     # articles, some editors prefer to be able to search by the TeX
     # name (usually the same as the HTML entity) rather than by the
     # Unicode character.
+    "&bigcap;": "⋂",
     "&asymp;": "≈",
     "&empty;": "∅",
     "&emptyset;": "∅",
@@ -238,6 +239,7 @@ controversial = {
     "&sum;": "Σ",  # U+03A3 Greek Capital Letter Sigma
     "&rarr;": "→",
     "&larr;": "←",
+    "&uparrow;": "↑",
     "&le;": "≤",  # available at the bottom of the wikitext edit window
     "&ge;": "≥",  # available at the bottom of the wikitext edit window
     "&GreaterEqual;": "≥",  # available at the bottom of the wikitext edit window
@@ -246,6 +248,7 @@ controversial = {
     "&vdash;": "⊢",
     "&propto;": "∝",
     "&nvap;": "≍⃒",
+    "&NotEqual;": "≠",
 }
 
 # keep.extend(controversial.keys())
@@ -454,6 +457,7 @@ transform_unsafe = {
     "&frac18;": "{{frac|1|8}}",
     "&frac23;": "{{frac|2|3}}",
     "&frac34;": "{{frac|3|4}}",
+    "&frac58;": "{{frac|5|8}}",
     "&frac78;": "{{frac|7|8}}",
     "&#8531;": "{{frac|1|3}}",
 
@@ -1584,6 +1588,8 @@ transform = {
     "&nbdsp;": "&nbsp;",
     "&nbzp;": "&nbsp;",
     "&nbap;": "&nbsp;",
+    "&hnbsp;": "&nbsp;",
+    "&nbspc;": "&nbsp;",
     "&ndsah;": "&ndash;",
     "&ndasg;": "&ndash;",
     "&ndaash;": "&ndash;",
