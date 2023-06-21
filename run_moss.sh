@@ -21,12 +21,22 @@ cd $RUN_NAME
 
 export NON_ASCII_LETTERS=ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ
 
+# --- PERFORMANCE ---
+
+# If SSD becomes a bottleneck:
+#  https://wiki.archlinux.org/title/Solid_state_drive
+# TRIM is enabled on weekly timer by default:
+#  systemctl list-timers
+# Other optimizations not yet investigated (discard is for TRIM):
+#  https://askubuntu.com/questions/78971/best-etc-fstab-settings-for-boosting-ssd-hdd-performance
+#  https://askubuntu.com/questions/1400/how-do-i-optimize-the-os-for-ssds
+
 # --- HTML ENTITIES ---
 
 echo "Beginning HTML entity check"
 echo `date`
 
-# Run time for this segment: ~1 h 20 min (8-core parallel)
+# Run time for this segment: ~4 h 10 min (8-core parallel)
 
 # ../venv/bin/python3 ../moss_entity_check.py | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
 ../venv/bin/python3 ../moss_entity_check.py > tmp-entities
@@ -42,6 +52,8 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 echo "Beginning prime template check"
 echo `date`
 
+# Run time for this segment: ~3 h 50 min
+
 # Incorrect template usage
 ../venv/bin/python3 ../dump_grep_csv.py "\{\{prime\}\}" | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > jwb-articles-prime.txt
 ../venv/bin/python3 ../dump_grep_csv.py "\{\{prime\|'" | perl -pe 's/^(.*?):.*/$1/' | uniq | sort >> jwb-articles-prime.txt
@@ -51,7 +63,7 @@ echo `date`
 
 # --- FRAC REPAIR ---
 
-# Run time for this segment: ~15 min (8-core parallel)
+# Run time for this segment: ~2 h (8-core parallel)
 
 echo "Beginning {{frac}} repair scan"
 echo `date`
@@ -60,7 +72,7 @@ echo `date`
 
 # --- TEMPERATURE CONVERSION ---
 
-# Run time for this segment: ~1 h 30 min (8-core parallel)
+# Run time for this segment: ~2h (8-core parallel)
 
 echo "Beginning temperature conversion scan"
 echo `date`
@@ -76,7 +88,6 @@ echo `date`
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9]°' | grep -iP "heat|chill|weather" | sort > tmp-temperature-convert4b.txt
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9][0-9],' | grep -iP "weather=" | sort > tmp-temperature-convert4c.txt
 
-#
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]0s( |&nbsp;)?F[^b-z]" | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert5.txt
 ../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep -i "temperature" | grep "0s" | sort > tmp-temperature-convert6.txt
 
@@ -123,6 +134,8 @@ cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-co
 echo "Beginning speed conversion scan"
 echo `date`
 
+# Run time for this segment: About 1 h 40 min
+
 ../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h' | grep -iP "\bmph\b" | grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" | grep -v "mph=" | sort > tmp-mph-convert.txt
 cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
 
@@ -142,6 +155,8 @@ cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.
 echo "Beginning MPG conversion scan"
 echo `date`
 
+# Run time for this segment: About 1 h 30 min
+
 # {{cvt}} or {{convert}} should probably be used in all instances to
 # convert between US and imperial gallons (ug!)
 # ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
@@ -155,16 +170,16 @@ cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.tx
 
 # --- BROKEN NBSP ---
 
-# Run time for this segment: ~21 min (8-core parallel)
+# Run time for this segment: ?
 
 echo "Beginning broken nbsp scan"
 echo `date`
 
-../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | perl -pe 's/^(.*)$/* [[$1]]' > beland-broken-nbsp.txt
+../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | perl -pe 's/^(.*)$/* [[$1]]/' > beland-broken-nbsp.txt
 
 # --- MOS:LOGICAL ---
 
-# Run time for this segment: ~10 min (8-core parallel)
+# Run time for this segment: ~15 min (8-core parallel)
 
 echo "Beginning MOS:LOGICAL scan"
 echo `date`
@@ -431,7 +446,7 @@ echo `date`
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^a-z0-9\-A-Z${NON_ASCII_LETTERS}][Aa]-[Bb][^a-zA-Z${NON_ASCII_LETTERS}]" | perl -pe 's/\<math.*?\<\/math\>//ig' | perl -pe 's/<ref.*?(\/ ?>|<\/ref>)//ig' | perl -pe 's/\{\{cite.*?\}\}//ig' | grep -i "a-b" | grep -v "A-B-C-D-E-F-G" | sort > tmp-rhyme-a-b.txt
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^,]AB,[ABC]|AA,AB|AA,B|AB,[ABC]" | grep -v "<math" | grep -vP "^(Rhyme scheme:|The Raven:)" | sort > tmp-rhyme-AB-comma.txt
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]" | perl -pe 's/<ref.*?(\/ ?>|<\/ref>)//ig' | grep -P "(aa|ab)" | sort > tmp-rhyme-masked-words.txt
-cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])" | grep -v "Exemplum:"  | sort > tmp-rhyme-a.b.txt
+cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])" | grep -v "Exemplum:" | sort > tmp-rhyme-a.b.txt
 
 # These may need to be relaxed in the future
 grep -v "{{not a typo" tmp-rhyme-AB-comma.txt > tmp-rhyme.txt
@@ -454,8 +469,8 @@ cd $RUN_NAME
 echo "Starting x-to-times"
 echo `date`
 
-../venv/bin/python3 ../dump_grep_csv.py '[0-9]x[^a-zA-Z]' | grep -vP '[a-zA-Z\-_][0-9]+x' | grep -vP 'x[a-zA-Z]' | grep -vP '( 4x4 | 6x6 )' | grep -vP '[0-9]+x[0-9]+px' | grep -v '<math' | grep -vP '[^0-9]0x[0-9]+' | grep -P '[0-9]+x[0-9]*' > x-correct-nospace-with-article.txt
-../venv/bin/python3 ../dump_grep_csv.py " x " > x-correct-space-with-article.txt
+../venv/bin/python3 ../dump_grep_csv.py '[0-9]x[^a-zA-Z]' | perl -pe 's/\[\[(File|Image):.*?\]\]//' | perl -pe s'/\| *image[0-9]? *=$//' | perl -pe 's/https?:.*? //' | grep -vP '[a-zA-Z\-_][0-9]+x' | grep -vP 'x[a-zA-Z]' | grep -vP '( 4x4 | 6x6 )' | grep -vP '[0-9]+x[0-9]+px' | grep -v '<math' | grep -vP '[^0-9]0x[0-9]+' | grep -P '[0-9]+x[0-9]*' | perl -pe 's/:.*$//' | uniq | sort > x-correct-nospace-with-article.txt
+../venv/bin/python3 ../dump_grep_csv.py " x " | perl -pe 's/:.*$//' | uniq | sort > x-correct-space-with-article.txt
 
 # --- l to L for liters ---
 echo "Starting liters style check"
@@ -464,18 +479,29 @@ echo `date`
 # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
 # Run time: 9-22 min per regex
-../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{(Transliteration|lang|IPA|not a typo).*?\}\}%%g" | perl -pe "s%<math.*?</math>%%g" | perl -pe "s/(File|Image):.*?[\|\n]//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’${NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -vP "image[0-9]? *=.* l[ \.].jpg" | grep -v "AD-1 l" | grep -v "l=" | grep -v "[[Pound sterling|l" | grep -v "{{not English inline}}" | sort > liters-fixme1.txt
+
+# For "(l)", "(l/c/d)", etc. in table headers
+../venv/bin/python3 ../dump_grep_csv.py '\(l(/[a-zA-Z/]+)?\)' | grep -v '(l)\!' | grep -v '(r)' | grep -vP "[a-zA-Z${NON_ASCII_LETTERS}]\(l\)" | grep -vP "\(l\)[a-zA-Z${NON_ASCII_LETTERS}]" | grep -vP '</?math' | sort > liters-fixme0.txt
+
+../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{(Transliteration|lang|IPA|not a typo).*?\}\}%%g" | perl -pe "s%<math.*?</math>%%g" | perl -pe "s/(File|Image):.*?[\|\n]//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’${NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -vP "image[0-9]? *=.* l[ \.].jpg" | grep -v "AD-1 l" | grep -v "l=" | grep -v "\[\[Pound sterling|l" | grep -v "{{not English inline}}" | sort > liters-fixme1.txt
+
 ../venv/bin/python3 ../dump_grep_csv.py "[rBbMm]illion l[^a-zA-Z0-9']" | sort > liters-fixme2.txt
+
 ../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]'| perl -pe "s%\{\{cite.*?\}\}%%g" | sort > liters-fixme3.txt
+
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > liters-fixme4.txt
+
 ../venv/bin/python3 ../dump_grep_csv.py "/l" | perl -pe "s/{{not a typo.*?}}//" | perl -pe "s/{{math.*?}}//" | perl -pe "s%<math>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z${NON_ASCII_LETTERS}'0-9/\-_]" | grep -vP "w/l(-[0-9])? *=" | grep -vP "(https?://|data:)[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]" | grep -vP "\{\{cite.{5,100} a/l .{5,100}\}\}" | grep -v "Malaysian names#Indian names|a/l" | grep -vP "Length at the waterline\|(Length )?w/l" | grep -v "Waterline length|w/l" | sort > liters-fixme5.txt
 # Done for fixme5:
 # expand "m/l" to "music and lyrics" or drop
 # expand "w/l" to "win/loss"
 # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
 # change "a/l" to "[[Malaysian names#Indian names|a/l]]" except inside internal or external links
+
 ../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > liters-fixme6.txt
+
 ../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > liters-fixme7.txt
+
 cat liters-fixme* | perl -pe 's/(.*?):.+/$1/' | uniq > liters-all.txt
 
 # --- Bad quote marks ---
