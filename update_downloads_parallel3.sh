@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 set -e
+# Loading enwiki categories
+
 cd /var/local/moss/bulk-wikipedia/
 
 # ONE-TIME SETUP:
@@ -16,11 +18,11 @@ echo "Adding enwiki categories..."
 echo "Starting downloads and decompression..."
 
 rm -f enwiki-latest-categorylinks.sql
-# wget https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-categorylinks.sql.gz
-# gunzip enwiki-latest-categorylinks.sql.gz
-# echo `date`
-# echo "Loading enwiki-latest-categorylinks.sql..."
-# cat enwiki-latest-categorylinks.sql | mysql -D enwiki
+wget https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-categorylinks.sql.gz
+gunzip enwiki-latest-categorylinks.sql.gz
+echo `date`
+echo "Loading enwiki-latest-categorylinks.sql..."
+cat enwiki-latest-categorylinks.sql | mysql -D enwiki
 
 rm -f enwiki-latest-page.sql
 wget https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-page.sql.gz
