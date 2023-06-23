@@ -58,8 +58,10 @@ cat enwiktionary-latest-categorylinks.sql | mysql -D enwiktionary
 # Prereqs for this very long page_categories table rebuild are now
 # done; parallelize this because it only uses 1 CPU (for mysqld)
 echo `date`
+cd $ORIG_DIR
 ./update_downloads_parallel5.sh >& /bulk-wikipedia/download-parallel5.log &
 echo "parallel5 launched"
+cd /var/local/moss/bulk-wikipedia/
 
 echo `date`
 echo "Decompressing enwiki titles..."
@@ -73,10 +75,6 @@ echo "XML to CSV for enwiktionary..."
 # Run time: About 50 minutes
 cd $ORIG_DIR
 venv/bin/python3 xml_to_csv.py /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml > /var/local/moss/bulk-wikipedia/enwiktionary-articles-no-redir.csv
-
-echo `date`
-venv/bin/python3 extract_english.py > /var/local/moss/bulk-wikipedia/english_words_only.txt
-# extract_english.py takes about 2.5 hours
 
 echo `date`
 echo "Done."

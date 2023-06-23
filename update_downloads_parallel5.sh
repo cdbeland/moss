@@ -24,4 +24,8 @@ echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mysql -D enwikti
 echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D enwiktionary
 
 echo `date`
+venv/bin/python3 extract_english.py > /var/local/moss/bulk-wikipedia/english_words_only.txt
+# extract_english.py takes about 2.5 hours
+
+echo `date`
 echo "Done."

@@ -21,6 +21,7 @@ cd /var/local/moss/bulk-wikipedia/
 echo `date`
 echo "Decompressing enwiki multistream..."
 bunzip2 enwiki-latest-pages-articles-multistream.xml.bz2
+# About 2 hours
 
 echo `date`
 echo "Converting enwiki XML to CSV..."
