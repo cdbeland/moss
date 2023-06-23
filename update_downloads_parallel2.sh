@@ -8,13 +8,15 @@ cd /var/local/moss/bulk-wikipedia/
 echo `date`
 
 rm -f enwiki-latest-pages-articles-multistream.xml.bz2
-wget --continue https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2
+wget --no-verbose https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2
 
 # Wait until here to kick this off to keep only one dump server
 # connection at a time
 echo `date`
-./update_downloads_parallel4.sh >& /bulk-wikipedia/download-parallel4.log
+cd $ORIG_DIR
+./update_downloads_parallel4.sh >& /bulk-wikipedia/download-parallel4.log &
 echo "parallel4 launched"
+cd /var/local/moss/bulk-wikipedia/
 
 echo `date`
 echo "Decompressing enwiki multistream..."
