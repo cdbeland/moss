@@ -1,9 +1,5 @@
-echo "Starting not-English report"
 echo `date`
-
-RUN_NAME=run-not-english-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T"`
-mkdir $RUN_NAME
-cd $RUN_NAME
+echo "Starting not-English report..."
 
 ../venv/bin/python3 ../moss_not_english.py > not-english-output.csv
 # Both # and % seem like good red flags, so take the highest from both metrics
@@ -14,6 +10,5 @@ echo '! Article !! # non-Eng !! % non-Eng !! [[Language code|Lang code]] !! Samp
 sort tmp-not-english.csv -k3 -nr -t$'\t' | uniq | perl -pe 's/(.*?)\t/|-\n| [[$1]]\t/' | perl -pe 's/\t/ || /g' >> post-not-english.txt
 echo "|}" >> post-not-english.txt
 
-cd ..
-echo "Finished"
 echo `date`
+echo "Finished."

@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# Run time: ~30 min (8-core parallel)
+
 set -e
 
 # 0. Extract articles with superscript and subscript issues
@@ -56,3 +58,5 @@ grep '{{lang' super-sub-sorted.txt > super-sub-tl-lang-audit.txt
 # [[Classical Japanese]]:
 #  {{IPA|hɑ'''n'''<sup>H</sup>d͡zɨ<sup>H</sup>}})
 cat super-sub-sorted.txt |grep -P 'languages?:' > super-sub-languages-audit.txt
+
+echo "Superscript/subscript audit complete."
