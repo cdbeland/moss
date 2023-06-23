@@ -21,7 +21,7 @@ sudo chown $USER /var/local/moss/bulk-wikipedia/
 Run "FIRST TIME SETUP" steps in ./update_downloads.sh
 
 DOWNLOAD DATA:
-./update_downloads.sh
+./update_downloads_parallel.sh
 
 RUN SPELL CHECK AND FRIENDS:
-./run_moss.sh
+./run_moss_parallel.sh
