@@ -33,22 +33,22 @@ echo "Downloading special pages..."
 
 # Sync with spell.py, moss_not_english.py
 rm -f Wikispecies:Requested_articles
-wget --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
+wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
 rm -f Before_2019
-wget --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/Before_2019
+wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/Before_2019
 rm -f 2020
-wget --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2020
+wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2020
 rm -f 2021
-wget --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2021
+wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2021
 
 rm -f moss
-wget --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
+wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
 
 rm -f For_Wiktionary
-wget --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/For_Wiktionary
+wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/For_Wiktionary
 
 rm -f Old_case_notes
-wget --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/Old_case_notes
+wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/Old_case_notes
 
 echo `date`
 echo "Done."

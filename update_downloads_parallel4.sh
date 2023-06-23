@@ -14,22 +14,22 @@ cd /var/local/moss/bulk-wikipedia/
 echo `date`
 echo "Starting medium-sized downloads..."
 rm -f enwiktionary-latest-pages-articles-multistream.xml.bz2
-wget --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles-multistream.xml.bz2
+wget -o - --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles-multistream.xml.bz2
 echo `date`
 rm -f enwiktionary-latest-page.sql
-wget --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-page.sql.gz
+wget -o - --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-page.sql.gz
 echo `date`
 rm -f enwiktionary-latest-categorylinks.sql
-wget --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-categorylinks.sql.gz
+wget -o - --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-categorylinks.sql.gz
 echo `date`
 rm -f enwiktionary-latest-all-titles-in-ns0
-wget --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-all-titles-in-ns0.gz
+wget -o - --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-all-titles-in-ns0.gz
 echo `date`
 rm -f enwiki-latest-all-titles-in-ns0.gz
-wget --no-verbose https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-all-titles-in-ns0.gz
+wget -o - --no-verbose https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-all-titles-in-ns0.gz
 echo `date`
 rm -f specieswiki-latest-all-titles-in-ns0.gz
-wget --no-verbose https://dumps.wikimedia.org/specieswiki/latest/specieswiki-latest-all-titles-in-ns0.gz
+wget -o - --no-verbose https://dumps.wikimedia.org/specieswiki/latest/specieswiki-latest-all-titles-in-ns0.gz
 echo `date`
 
 echo `date`

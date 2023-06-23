@@ -8,7 +8,7 @@ cd /var/local/moss/bulk-wikipedia/
 echo `date`
 
 rm -f enwiki-latest-pages-articles-multistream.xml.bz2
-wget --no-verbose https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2
+wget -o - --no-verbose https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2
 
 # Wait until here to kick this off to keep only one dump server
 # connection at a time
