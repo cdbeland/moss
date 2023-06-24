@@ -1,5 +1,3 @@
-# Run time: About 17 minutes
-
 from moss_dump_analyzer import read_en_article_text
 import re
 import sys
@@ -10,11 +8,12 @@ from unencode_entities import (
 low_priority = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ" \
     "¹²³⁴⁵⁶⁷⁸⁹⁰ⁱ⁺⁻⁼⁽⁾ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓꟹᵝᵞᵟᵋᶿᶥᶹᵠᵡᵦᵧᵨᵩᵪᵅᶜ̧ᶞᵊᶪᶴᶵꭩˀₔᵑ"
 
-
 strings_found_by_type = {}
 non_entity_transform = [string for string
                         in list(transform.keys()) + list(controversial.keys())
                         if not string.startswith("&")]
+non_entity_transform_re = re.compile("(" + "|".join([re.escape(s) for s in non_entity_transform]) + ")")
+alert_re = re.compile("(" + "|".join([re.escape(s) for s in alert]) + ")")
 
 article_blocklist = [
     # Characters themselves are discussed or listed as part of a mapping
@@ -335,29 +334,6 @@ article_blocklist = [
     # African language needs slash in link
     "2011 South African municipal elections",
 
-    # !! in table (&#33; or &#x21;)
-    "Cledus T. Judd",
-    "Devin the Dude",
-    "Frank Sinatra discography",
-    "Kis-My-Ft2",
-    "Kunio-kun",
-    "Lattice tower",
-    "List of Castlevania media",
-    "List of Dragon Ball films",
-    "List of Enix games",
-    "List of Iwata Asks interviews",
-    "List of Sega Saturn games",
-    "List of songs recorded by Super Junior",
-    "Rina Aiuchi discography",
-    "Super Junior discography",
-    "Super Junior-T",
-    "The Aquabats",
-    "The Chats",
-    "V6 discography",
-
-    # # in external link
-    "WalangForever",
-
     # Special character in URL
     "Almah",
     "Cray XC50",
@@ -369,36 +345,13 @@ article_blocklist = [
     "Naoya Uchida",
     "Yoshito Yasuhara",
 
-    # Roman numeral in image name (<gallery> or parameter)
+    # Special character in file name (<gallery> or parameter)
     "Collection (publishing)",
     "Découvertes Gallimard",
     "Hillman Minx",
     "Grammaire égyptienne",
     "Ōtaguro Park",
     "Cinder cloudy catshark",
-
-    # DISPLAYTITLE issues
-    "Rosa Graham Thomas",
-
-    # Blackboard bold characters used as anchors
-    "Glossary of mathematical symbols",
-
-    # Objection from Headbomb
-    "Xi baryon",
-
-    # Capital Alpha not in Greek word, exactly
-    "Kamen Rider Agito",
-
-    # &lowbar; needed to retain underscore in proper name
-    "Double Fine",
-
-    # Matching the actual unpronouncable album and song titles
-    "Four Tet discography",
-
-    # {{lang}} can't be used in {{cite}}
-    "Everett, Washington",
-
-    # Special character in file name
     "Piano Concerto (Khachaturian)",
     "Charles Francis Adams III",
     "Daihatsu Boon",
@@ -437,6 +390,21 @@ article_blocklist = [
     ".577/500 No 2 Black Powder",
     "DNa inscription",
 
+    # Blackboard bold characters used as anchors
+    "Glossary of mathematical symbols",
+
+    # Capital Alpha not in Greek word, exactly
+    "Kamen Rider Agito",
+
+    # &lowbar; needed to retain underscore in proper name
+    "Double Fine",
+
+    # Matching the actual unpronouncable album and song titles
+    "Four Tet discography",
+
+    # {{lang}} can't be used in {{cite}}
+    "Everett, Washington",
+
     # {{lang}} and {{IPA}} interwoven with other templates
     "State Anthem of the Soviet Union",
     "National anthem of Bolivia",
@@ -444,8 +412,6 @@ article_blocklist = [
     # {{not a typo}} not working well due to intersecting/nested templates
     "Beta",
     "Kappa",
-    # {{Rust}} not working well due to intersecting/nested templates
-    "Rust (programming language)",
 
     # Mixed thetas are intentional
     "Chebyshev function",
@@ -491,37 +457,25 @@ lc_lig = "a-zøðþęáéóúýǫ́àèòùâêîôûëïöüÿçå"
 
 
 suppression_patterns = [
-    re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", flags=re.I+re.S),
-    re.compile(r"<source.*?</source>", flags=re.I+re.S),
-    re.compile(r"{{Rust\|.*?}}", flags=re.I+re.S),
-    re.compile(r"<code.*?</code>", flags=re.I+re.S),
-    re.compile(r"<timeline.*?</timeline>", flags=re.I+re.S),
-    re.compile(r"{{code\s*\|.*?}}", flags=re.I+re.S),
-
-    re.compile(r"\[\[File:.*?(\||\])", flags=re.I+re.S),
-    re.compile(r"\[\[Image:.*?(\||\])", flags=re.I+re.S),
-
-    re.compile(r"{{[Nn]ot a typo.*?}}", flags=re.S),
-    re.compile(r"{{[Ss]hort description.*?}}", flags=re.S),
-    re.compile(r"{{proper name.*?}}", flags=re.S),
-    re.compile(r"{{DISPLAYTITLE.*?}}", flags=re.S),
-    re.compile(r"{{IPA.*?}}", flags=re.S),
-    re.compile(r"{{UPA.*?}}", flags=re.S),
-    re.compile(r"{{angle.*?}}", flags=re.I+re.S),
-    re.compile(r"{{angbr.*?}}", flags=re.I+re.S),
+    re.compile(r"<(syntaxhighlight.*?</syntaxhighlight"
+               r"|blockquote lang=.*?</blockquote"
+               r"|<source.*?</source"
+               r"|code.*?</code"
+               r"|timeline.*?</timeline"
+               ")>", flags=re.I+re.S),
+    re.compile(r"\[\[(File|Image):.*?(\||\])", flags=re.I+re.S),
+    # 7seg uses superscript = as a parameter value
+    re.compile(r"{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE|7seg|[Cc]har"
+               r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA|[Tt]ransl"
+               r"|[Rr]ust\|"
+               r"|[Cc]ode\s*\|"
+               r").*?}}", flags=re.S),
     re.compile(r'{\|\s*class="wikitable IPA".*?\|}', flags=re.S),
     re.compile(r'{\|\s*class="IPA wikitable".*?\|}', flags=re.S),
-    re.compile(r"{{transl.*?}}", flags=re.I+re.S),
-    re.compile(r"{{angbr IPA.*?}}", flags=re.I+re.S),
-    re.compile(r"{{Audio-IPA.*?}}", flags=re.I+re.S),
     re.compile(r"ipa symbol\d? *= *[^\n]+"),
     re.compile(r"poj *= *[^\n]+"),
-    re.compile(r"{{PIE.*?}}", flags=re.S),
-    re.compile(r"<blockquote lang=.*?</blockquote>", flags=re.I+re.S),
-    re.compile(r"{{7seg.*?}}", flags=re.S),  # Uses superscript = as a parameter value
     re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
     re.compile(r"{{([Ii]nfobox )?[Cc]hinese.*?}}", flags=re.I+re.S),
-    re.compile(r"{{[Cc]har.*?}}", flags=re.S),
 
     # Used in various non-English orthographies and transliterations,
     # but must be tagged with the language.
@@ -533,11 +487,8 @@ suppression_patterns = [
 
     # It's unclear if these should be using Unicode or HTML
     # superscripts/subscripts; ignoring for now.
-    re.compile(r"{{[Ll]ang.*?}}", flags=re.S),
-    re.compile(r"{{[Zz]h.*?}}", flags=re.S),
-
+    re.compile(r"{{([Ll]ang|[Zz]h).*?}}", flags=re.S),
     re.compile(r".{0,100}{{[Nn]eeds IPA.*?}}", flags=re.S),
-
     # It's unclear if tones like <sup>H</sup> in IPA templates should
     # be converted to Unicode.
 ]
@@ -563,44 +514,34 @@ def entity_check(article_title, article_text):
 
     result_tuples = []
 
-    for string in alert:
-        if string == "₤" and ("lira" in article_text_lower or "lire" in article_text_lower):
+    for instance in alert_re.findall(article_text):
+        if instance == "₤" and ("lira" in article_text_lower or "lire" in article_text_lower):
             # Per [[MOS:CURRENCY]]
             continue
 
-        for instance in re.findall(string, article_text):
-            result_tuples.append(("ALERT", article_title, string))
-            # This intentionally adds the article title as many times
-            # as the string appears
+        result_tuples.append(("ALERT", article_title, instance))
+        # This intentionally adds the article title for each instance
+        # of every alert string
 
-    for string in non_entity_transform:
-        if string in ["¼", "½", "¾"]:
+    for instance in non_entity_transform_re.findall(article_text):
+        if instance in ["¼", "½", "¾"]:
             # Per [[MOS:FRAC]]
-            if string == "½" and ("chess" in article_text_lower):
+            if instance == "½" and ("chess" in article_text_lower):
                 continue
-            if string in article_title:
+            if instance in article_title:
                 # e.g. Ranma ½, Bentley 4½ Litre, in future Category:4 ft 6½ in gauge railways, 1980 Massachusetts Proposition 2½
                 continue
             if "{{frac" not in article_text_lower and "{{sfrac" not in article_text_lower and r"\frac" not in article_text_lower:
                 continue
 
-        if string == "°K" and "°KMW" in article_text:
+        if instance == "°K" and "°KMW" in article_text:
             continue
-        if string == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]", article_text):
+        if instance == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]", article_text):
             continue
-        if string == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]", article_text):
+        if instance == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]", article_text):
             continue
 
-        if string in article_text:
-            for instance in re.findall(re.escape(string), article_text):
-                # This intentionally adds the article title as many
-                # times as the string appears
-                if len(string) == 1 and string in low_priority:
-                    result_tuples.append(("LOW_PRIORITY", article_title, string))
-                else:
-                    result_tuples.append(("UNCONTROVERSIAL", article_title, string))
-
-        if string == "ϑ" and "θ" not in article_text:
+        if instance == "ϑ" and "θ" not in article_text:
             # Probably not appropriate for basic geometry articles,
             # but some branches of mathematics may prefer it
             # (e.g. [[Chebyshev function]] and [[Lovász number]] - see
@@ -613,6 +554,13 @@ def entity_check(article_title, article_text):
             # This will miss some articles that use cursive theta in
             # Greek words and for simple high school geometry angles.
             continue
+
+        # This intentionally adds the article title as many
+        # times as the string appears
+        if len(instance) == 1 and instance in low_priority:
+            result_tuples.append(("LOW_PRIORITY", article_title, instance))
+        else:
+            result_tuples.append(("UNCONTROVERSIAL", article_title, instance))
 
     for entity in entities_re.findall(article_text):
         if entity in keep:
