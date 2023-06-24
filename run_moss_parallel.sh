@@ -24,8 +24,8 @@ export NON_ASCII_LETTERS=ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊ�
 # are parallelized to use all cores, sometimes the parent thread
 # becomes a bottleneck, and CPUs are underused.
 
-./run_moss_parallel1.sh >& thread1.log &
-./run_moss_parallel2.sh >& thread2.log &
+../run_moss_parallel1.sh >& thread1.log &
+../run_moss_parallel2.sh >& thread2.log &
 ../superscripts.sh >& superscripts.log &
 ../run_not_english.sh >& not_english.log &
-../run_wiktionary_spell_check.sh > wiktionary.log &
+../run_wiktionary_spell_check.sh >& wiktionary.log &
