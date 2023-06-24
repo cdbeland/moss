@@ -185,7 +185,6 @@ keep = [
 ]
 
 controversial = {
-
     # Objections from User:Jacobolus due to what they think is
     # excessive whitespace added by the template, though Beland thinks
     # it's actually necessary whitespace.

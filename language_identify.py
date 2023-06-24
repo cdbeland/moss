@@ -47,7 +47,7 @@ def lang_code_to_name(code):
         return languages.get(alpha_2=code).name + script
     if len(code) == 3:
         return languages.get(alpha_3=code).name + script
-    raise(Exception(f"Unknown code {code}"))
+    raise Exception(f"Unknown code {code}")
 
 
 for (lang_code, word_tuples) in sorted(lang_table.items(),

@@ -48,7 +48,7 @@ def chem_formula_check(article_title, article_text):
     if matches:
         # Slow but fewer false matches
         matches = formulas_re.findall(article_text)
-    return(article_title, matches)
+    return (article_title, matches)
 
 
 def add_tuples_to_results(tuple_list):
