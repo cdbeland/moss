@@ -510,12 +510,13 @@ def entity_check(article_title, article_text):
     for pattern in suppression_patterns:
         article_text = pattern.sub("", article_text)
 
-    article_text_lower = article_text.lower()
+    # Not doing article_text.lower() here because it's rarely needed
+    # and uses a lot of CPU (.5 sec per 10k articles)
 
     result_tuples = []
 
     for instance in alert_re.findall(article_text):
-        if instance == "₤" and ("lira" in article_text_lower or "lire" in article_text_lower):
+        if instance == "₤" and re.match("lira|lire", article_text, flags=re.I+re.S):
             # Per [[MOS:CURRENCY]]
             continue
 
@@ -525,6 +526,8 @@ def entity_check(article_title, article_text):
 
     for instance in non_entity_transform_re.findall(article_text):
         if instance in ["¼", "½", "¾"]:
+            article_text_lower = article_text.lower()
+
             # Per [[MOS:FRAC]]
             if instance == "½" and ("chess" in article_text_lower):
                 continue
