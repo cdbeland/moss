@@ -60,7 +60,12 @@ echo `date`
 
 ./update_downloads_parallel1.sh >& /bulk-wikipedia/download-parallel1.log &
 ./update_downloads_parallel2.sh >& /bulk-wikipedia/download-parallel2.log &
-./update_downloads_parallel3.sh >& /bulk-wikipedia/download-parallel3.log &
+# 4 and 5 are kicked off from 2
+
+# ./update_downloads_parallel3.sh >& /bulk-wikipedia/download-parallel3.log &
+# Only used by chemical formula report, takes more than 24 hours,
+# disabled until performance can be improved or the report is manually
+# run.
 
 echo `date`
 echo "Parallel scripts launched."

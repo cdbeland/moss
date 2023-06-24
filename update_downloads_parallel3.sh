@@ -30,7 +30,6 @@ gunzip enwiki-latest-page.sql
 
 echo `date`
 echo "Loading enwiki-latest-page.sql..."
-# Run time: about 31 hours
 cat enwiki-latest-page.sql | mysql -D enwiki
 
 echo `date`

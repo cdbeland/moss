@@ -216,5 +216,8 @@ grep -P ' ((H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|
 
 echo "" >> post-chemical-formulas.txt
 echo "====Known chemical formulas that don't use subscripts====" >> post-chemical-formulas.txt
-../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
+echo "" >> post-chemical-formulas.txt
+
+echo "(REPORT DISABLED DUE TO LONG RUN TIME; START MANUALLY)" >> post-chemical-formulas.txt
+# ../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
 
