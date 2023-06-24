@@ -510,8 +510,9 @@ def entity_check(article_title, article_text):
     for pattern in suppression_patterns:
         article_text = pattern.sub("", article_text)
 
-    # Not doing article_text.lower() here because it's rarely needed
-    # and uses a lot of CPU (.5 sec per 10k articles)
+    article_text_lower = None
+    # Not constructing here because it's rarely needed and uses a lot
+    # of CPU (.5 sec per 10,000 articles)
 
     result_tuples = []
 
@@ -524,10 +525,12 @@ def entity_check(article_title, article_text):
         # This intentionally adds the article title for each instance
         # of every alert string
 
+    net_instances = non_entity_transform_re.findall(article_text)
+
+    if "¼" in net_instances or  "½" in net_instances or "¾" in net_instances:
+        article_text_lower = article_text.lower()
     for instance in non_entity_transform_re.findall(article_text):
         if instance in ["¼", "½", "¾"]:
-            article_text_lower = article_text.lower()
-
             # Per [[MOS:FRAC]]
             if instance == "½" and ("chess" in article_text_lower):
                 continue
@@ -535,6 +538,8 @@ def entity_check(article_title, article_text):
                 # e.g. Ranma ½, Bentley 4½ Litre, in future Category:4 ft 6½ in gauge railways, 1980 Massachusetts Proposition 2½
                 continue
             if "{{frac" not in article_text_lower and "{{sfrac" not in article_text_lower and r"\frac" not in article_text_lower:
+                # If no other fractions are present, these three are
+                # allowed (they are compatible with screen readers)
                 continue
 
         if instance == "°K" and "°KMW" in article_text:
