@@ -25,7 +25,7 @@ bunzip2 enwiki-latest-pages-articles-multistream.xml.bz2
 
 echo `date`
 echo "Converting enwiki XML to CSV..."
-# Run time: ~21 hours?
+# About 4 h 40 min
 cd $ORIG_DIR
 venv/bin/python3 xml_to_csv.py /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml > /var/local/moss/bulk-wikipedia/enwiki-articles-no-redir.csv
 
