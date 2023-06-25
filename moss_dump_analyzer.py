@@ -3,9 +3,10 @@
 # http://dumps.wikimedia.org/backup-index.html
 # http://meta.wikimedia.org/wiki/Data_dumps
 
+import datetime
 from multiprocessing import Pool
 import re
-
+import sys
 
 # Runtime: ~1.5 hours (with a simple callback, whata, single-threaded)
 
@@ -23,9 +24,9 @@ def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=
     if not filename:
         # Necessary backstop for dump_grep_regex.py
         filename = DEFAULT_CSV_FILE
+    count = 0
     if parallel:
         with Pool(8) as pool:
-            count = 0
             for (article_title, article_text) in page_generator_fast(filename):
                 result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback)
                 count += 1
@@ -36,6 +37,8 @@ def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=
                     # because article text isn't garbage collected until
                     # the callback is complete.)
                     result.wait()
+                    print(f"Processed {count} articles - " + str(datetime.datetime.now().isoformat()),
+                          file=sys.stderr)
             pool.close()
             pool.join()
     else:
