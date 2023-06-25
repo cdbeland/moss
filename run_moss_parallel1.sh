@@ -5,22 +5,7 @@ set -e
 
 # *** STANDALONE REPORTS ***
 
-
-# --- HTML ENTITIES ---
-
-echo "Beginning HTML entity check"
-echo `date`
-
-# Run time for this segment: ~4 h 10 min (8-core parallel)
-
-# ../venv/bin/python3 ../moss_entity_check.py | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
-../venv/bin/python3 ../moss_entity_check.py > tmp-entities
-cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entities.txt
-# "Worst" report disabled because it's mostly [[MOS:STRAIGHT]]
-# violations, which are not a priority.
-# ../venv/bin/python3 ../moss_entity_check.py > tmp-entities.txt
-# mv tmp-worst.txt post-entities.txt
-# cat tmp-entities.txt | ../venv/bin/python3 ../summarizer.py --find-all >> post-entities.txt
+export NON_ASCII_LETTERS=ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ
 
 # --- l TO L FOR LITERS ---
 echo "Starting liters style check"
