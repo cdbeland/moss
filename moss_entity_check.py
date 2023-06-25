@@ -12,8 +12,37 @@ strings_found_by_type = {}
 non_entity_transform = [string for string
                         in list(transform.keys()) + list(controversial.keys())
                         if not string.startswith("&")]
-non_entity_transform_re = re.compile("(" + "|".join([re.escape(s) for s in non_entity_transform]) + ")")
-alert_re = re.compile("(" + "|".join([re.escape(s) for s in alert]) + ")")
+
+# -- PERFORMANCE NOTES --
+
+# Trie-based regex is a little faster than a regular regex, but both
+# are a lot slower than string.count() method
+# non_entity_transform_re = re.compile("(" + "|".join([re.escape(s) for s in non_entity_transform]) + ")")
+# ../venv/bin/pip install trieregex
+# from trieregex import TrieRegEx as TRE
+# non_entity_transform_words = [re.escape(s) for s in non_entity_transform]
+# non_entity_transform_tre = TRE(*non_entity_transform_words)
+# non_entity_transform_re = re.compile(non_entity_transform_tre.regex())
+
+# alert_re = re.compile("(" + "|".join([re.escape(s) for s in alert]) + ")")
+# Sadly, trie-regex here is slower than a regular regex
+# from trieregex import TrieRegEx as TRE
+# alert_tre = TRE(*alert)
+# alert_re = re.compile(alert_tre.regex())
+
+# No faster than a regular expression
+# ../venv/bin/pip install pyahocorasick
+# import ahocorasick
+# alert_automaton = ahocorasick.Automaton()
+# for needle in alert:
+#     alert_automaton.add_word(needle, needle)
+#
+# alert_automaton.make_automaton()
+#
+# In code:
+# for (_end_index, instance) in alert_automaton.iter(article_text):
+
+# --
 
 article_blocklist = [
     # Characters themselves are discussed or listed as part of a mapping
@@ -464,34 +493,52 @@ suppression_patterns = [
                r"|timeline.*?</timeline"
                ")>", flags=re.I+re.S),
     re.compile(r"\[\[(File|Image):.*?(\||\])", flags=re.I+re.S),
-    # 7seg uses superscript = as a parameter value
-    re.compile(r"{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE|7seg|[Cc]har"
-               r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA|[Tt]ransl"
-               r"|[Rr]ust\|"
-               r"|[Cc]ode\s*\|"
-               r").*?}}", flags=re.S),
-    re.compile(r'{\|\s*class="wikitable IPA".*?\|}', flags=re.S),
-    re.compile(r'{\|\s*class="IPA wikitable".*?\|}', flags=re.S),
-    re.compile(r"ipa symbol\d? *= *[^\n]+"),
-    re.compile(r"poj *= *[^\n]+"),
-    re.compile(r"{{[Ii]nterlinear ?\| ?lang=.*?}}", flags=re.S),
-    re.compile(r"{{([Ii]nfobox )?[Cc]hinese.*?}}", flags=re.I+re.S),
 
-    # Used in various non-English orthographies and transliterations,
-    # but must be tagged with the language.
-    re.compile(r"{{(lang|Lang|transl|Transl)[^}]+[ʿʾʻʼ][^}]}}", flags=re.S),
+    re.compile(r"{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE"
+               # 7seg uses superscript = as a parameter value
+               r"|7seg"
+
+               # Unclear if these should be using Unicode or HTML
+               # superscripts/subscripts (including tones like
+               # <sup>H</sup> in IPA templates); ignoring for now.
+               r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA"
+               r"|[Ll]ang\|"
+               r"|[Tt]ransl\|"
+               r"|[Zz]h\|"
+               r"|[Ii]nterlinear ?\| ?lang="
+
+               r"|([Ii]nfobox )?[Cc]hinese"
+               r"|[Cc]har"
+               r"|[Cc]ode\s*\|"
+               r"|[Rr]ust\|"
+               r").*?}}", flags=re.S),
+    re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable)".*?\|}', flags=re.S),
+    re.compile(r"(ipa symbol\d?|poj) *= *[^\n]+"),
+
+    # Allow these characters:
     # ʿ U+02BF Modifier letter left half ring,
     # ʾ U+02BE Modifier letter right half ring
     # ʻ U+02BB 'Okina
     # ʼ U+02BC Modifier letter apostrophe
-
-    # It's unclear if these should be using Unicode or HTML
-    # superscripts/subscripts; ignoring for now.
-    re.compile(r"{{([Ll]ang|[Zz]h).*?}}", flags=re.S),
-    re.compile(r".{0,100}{{[Nn]eeds IPA.*?}}", flags=re.S),
-    # It's unclear if tones like <sup>H</sup> in IPA templates should
-    # be converted to Unicode.
+    # to be used in various non-English orthographies and transliterations,
+    # if tagged with the language.
+    #
+    # re.compile(r"{{(lang|Lang|transl|Transl)[^}]+[ʿʾʻʼ][^}]+}}", flags=re.S),
+    # Disabled for performance - redundant to above
 ]
+
+needs_ipa_detect_re = re.compile(r"{{[Nn]eeds IPA", flags=re.S)
+needs_ipa_remove_re = re.compile(r".{0,100}{{[Nn]eeds IPA.*?}}", flags=re.S)
+
+
+def get_redacted_article_text(article_text):
+    for pattern in suppression_patterns:
+        article_text = pattern.sub("", article_text)
+
+    if needs_ipa_detect_re.match(article_text):
+        article_text = needs_ipa_remove_re.sub("", article_text)
+
+    return article_text
 
 
 def entity_check(article_title, article_text):
@@ -507,49 +554,102 @@ def entity_check(article_title, article_text):
     if "{{move to Wiki" in article_text or "{{Move to Wiki" in article_text:
         return
 
-    for pattern in suppression_patterns:
-        article_text = pattern.sub("", article_text)
+    # Entities that need to be reported are rare, and text redaction
+    # is expensive, so check unredacted text first.
+    result_tuples = []
+    article_text_redacted = None
+
+    # This is the fastest check
+    results_tmp = subcheck_html_entity(article_text, article_title)
+    if results_tmp:
+        article_text_redacted = get_redacted_article_text(article_text)
+        result_tuples.extend(subcheck_html_entity(article_text_redacted, article_title))
+
+    # This check hits most often but is somewhat slow, so it's better to run it on redacted text
+    if article_text_redacted:
+        result_tuples.extend(subcheck_non_entity(article_text_redacted, article_title))
+    else:
+        results_tmp = subcheck_non_entity(article_text, article_title)
+        if results_tmp:
+            # Hint avoids redoing a lot of work
+            article_text_redacted = get_redacted_article_text(article_text)
+            found_check_strings = set([tup[2] for tup in results_tmp])
+            result_tuples.extend(subcheck_non_entity(article_text_redacted, article_title, hint=found_check_strings))
+
+    # This check is the least likely to hit, and is somewhat slow so it's better to run on redacted text
+    if article_text_redacted:
+        result_tuples.extend(subcheck_alert(article_text_redacted, article_title))
+    else:
+        results_tmp = subcheck_alert(article_text, article_title)
+        if results_tmp:
+            # Hint avoids redoing a lot of work
+            article_text_redacted = get_redacted_article_text(article_text)
+            found_check_strings = set([tup[2] for tup in results_tmp])
+            result_tuples.extend(subcheck_alert(article_text_redacted, article_title, hint=found_check_strings))
+
+    return result_tuples
+
+
+# hint is a list of the only characters that can possibly be in article_text
+def subcheck_alert(article_text, article_title, hint=None):
+    result_tuples = []
+
+    # Weirdly, this is a lot faster than a pre-compiled regular
+    # expression or Aho-Corasick automaton.
+    # if not any(alert_word in article_text for alert_word in alert):
+    #     return
+    # for instance in alert_re.findall(article_text):
+
+    for check_string in hint or alert:
+        found_count = article_text.count(check_string)
+        if not found_count:
+            continue
+
+        if check_string == "₤" and re.match("lira|lire", article_text, flags=re.I+re.S):
+            # Per [[MOS:CURRENCY]]
+            continue
+
+        # Add the article title for each instance
+        for i in range(0, found_count):
+            result_tuples.append(("ALERT", article_title, check_string))
+    return result_tuples
+
+
+def subcheck_non_entity(article_text, article_title, hint=None):
+    result_tuples = []
 
     article_text_lower = None
     # Not constructing here because it's rarely needed and uses a lot
     # of CPU (.5 sec per 10,000 articles)
 
-    result_tuples = []
-
-    for instance in alert_re.findall(article_text):
-        if instance == "₤" and re.match("lira|lire", article_text, flags=re.I+re.S):
-            # Per [[MOS:CURRENCY]]
+    for check_string in hint or non_entity_transform:
+        found_count = article_text.count(check_string)
+        if not found_count:
             continue
 
-        result_tuples.append(("ALERT", article_title, instance))
-        # This intentionally adds the article title for each instance
-        # of every alert string
-
-    net_instances = non_entity_transform_re.findall(article_text)
-
-    if "¼" in net_instances or  "½" in net_instances or "¾" in net_instances:
-        article_text_lower = article_text.lower()
-    for instance in non_entity_transform_re.findall(article_text):
-        if instance in ["¼", "½", "¾"]:
-            # Per [[MOS:FRAC]]
-            if instance == "½" and ("chess" in article_text_lower):
+        if check_string in ["¼", "½", "¾"]:
+            if check_string in article_title:
+                # e.g. Ranma ½, Bentley 4½ Litre,
+                # Category:4 ft 6½ in gauge railways,
+                # 1980 Massachusetts Proposition 2½
                 continue
-            if instance in article_title:
-                # e.g. Ranma ½, Bentley 4½ Litre, in future Category:4 ft 6½ in gauge railways, 1980 Massachusetts Proposition 2½
+            article_text_lower = article_text.lower()
+            # Per [[MOS:FRAC]]
+            if check_string == "½" and ("chess" in article_text_lower):
                 continue
             if "{{frac" not in article_text_lower and "{{sfrac" not in article_text_lower and r"\frac" not in article_text_lower:
                 # If no other fractions are present, these three are
                 # allowed (they are compatible with screen readers)
                 continue
 
-        if instance == "°K" and "°KMW" in article_text:
+        if check_string == "°K" and "°KMW" in article_text:
             continue
-        if instance == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]", article_text):
+        if check_string == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]", article_text):
             continue
-        if instance == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]", article_text):
+        if check_string == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]", article_text):
             continue
 
-        if instance == "ϑ" and "θ" not in article_text:
+        if check_string == "ϑ" and "θ" not in article_text:
             # Probably not appropriate for basic geometry articles,
             # but some branches of mathematics may prefer it
             # (e.g. [[Chebyshev function]] and [[Lovász number]] - see
@@ -565,11 +665,19 @@ def entity_check(article_title, article_text):
 
         # This intentionally adds the article title as many
         # times as the string appears
-        if len(instance) == 1 and instance in low_priority:
-            result_tuples.append(("LOW_PRIORITY", article_title, instance))
+        if len(check_string) == 1 and check_string in low_priority:
+            for i in range(0, found_count):
+                result_tuples.append(("LOW_PRIORITY", article_title, check_string))
         else:
-            result_tuples.append(("UNCONTROVERSIAL", article_title, instance))
+            for i in range(0, found_count):
+                result_tuples.append(("UNCONTROVERSIAL", article_title, check_string))
+    return result_tuples
 
+
+def subcheck_html_entity(article_text, article_title):
+    result_tuples = []
+
+    # This is super fast, probably because "&" is an uncommon character
     for entity in entities_re.findall(article_text):
         if entity in keep:
             continue
