@@ -15,6 +15,8 @@ non_entity_transform = [string for string
 
 # -- PERFORMANCE NOTES --
 
+# Run time: About 2.5 hours on 8 cores for 6.6M articles, nothing else running
+
 # Trie-based regex is a little faster than a regular regex, but both
 # are a lot slower than string.count() method
 # non_entity_transform_re = re.compile("(" + "|".join([re.escape(s) for s in non_entity_transform]) + ")")
@@ -535,7 +537,7 @@ def get_redacted_article_text(article_text):
     for pattern in suppression_patterns:
         article_text = pattern.sub("", article_text)
 
-    if needs_ipa_detect_re.match(article_text):
+    if needs_ipa_detect_re.search(article_text):
         article_text = needs_ipa_remove_re.sub("", article_text)
 
     return article_text
@@ -605,7 +607,7 @@ def subcheck_alert(article_text, article_title, hint=None):
         if not found_count:
             continue
 
-        if check_string == "₤" and re.match("lira|lire", article_text, flags=re.I+re.S):
+        if check_string == "₤" and re.search("lira|lire", article_text, flags=re.I+re.S):
             # Per [[MOS:CURRENCY]]
             continue
 
