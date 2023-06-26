@@ -115,6 +115,10 @@ echo `date`
 
 ../venv/bin/python3 ../collect.py > collected_by_article_and_freq.txt
 
+# --- ARTICLES THAT NEED {{copyedit}} ---
+
+grep -v "TF+" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z][\,\.][A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' | grep -vP '[a-zA-Z][\(\)\[\]][A-Za-z]' > post-copyedit.txt
+
 # --- PARSE FAILURE FIXES ---
 
 echo "Beginning foot/inch conversion scan"
@@ -143,10 +147,6 @@ cat tmp-arc-units-all.txt | perl -pe 's/^(.*?):.*/$1/' | sort | uniq >> jwb-arc-
 #  ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(N|S) ([0-9]+)° ?([0-9]+)(′|\{\{prime\}\}) ?([0-9]+)(″|\{\{pprime\}\}) ?(E|W)
 # and substituting:
 #  {{coord|$1|$2|$4|$6|$7|$8|$10|$12|display=inline}}
-
-# --- ARTICLES THAT NEED {{copyedit}} ---
-
-grep -v "TF+" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z][\,\.][A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' | grep -vP '[a-zA-Z][\(\)\[\]][A-Za-z]' > post-copyedit.txt
 
 # --- BY WORD LENGTH ---
 
