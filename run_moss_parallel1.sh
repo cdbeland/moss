@@ -16,28 +16,28 @@ echo `date`
 # Run time: 9-22 min per regex
 
 # For "(l)", "(l/c/d)", etc. in table headers
-../venv/bin/python3 ../dump_grep_csv.py '\(l(/[a-zA-Z/]+)?\)' | grep -v '(l)\!' | grep -v '(r)' | grep -vP "[a-zA-Z${NON_ASCII_LETTERS}]\(l\)" | grep -vP "\(l\)[a-zA-Z${NON_ASCII_LETTERS}]" | grep -vP '</?math' | sort > liters-fixme0.txt
+../venv/bin/python3 ../dump_grep_csv.py '\(l(/[a-zA-Z/]+)?\)' | grep -v '(l)\!' | grep -v '(r)' | grep -vP "[a-zA-Z${NON_ASCII_LETTERS}]\(l\)" | grep -vP "\(l\)[a-zA-Z${NON_ASCII_LETTERS}]" | grep -vP '</?math' | sort > tmp-liters-fixme0.txt
 
-../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{(Transliteration|lang|IPA|not a typo).*?\}\}%%g" | perl -pe "s%<math.*?</math>%%g" | perl -pe "s/(File|Image):.*?[\|\n]//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’${NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -vP "image[0-9]? *=.* l[ \.].jpg" | grep -v "AD-1 l" | grep -v "l=" | grep -v "\[\[Pound sterling|l" | grep -v "{{not English inline}}" | sort > liters-fixme1.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{(Transliteration|lang|IPA|not a typo).*?\}\}%%g" | perl -pe "s%<math.*?</math>%%g" | perl -pe "s/(File|Image):.*?[\|\n]//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’${NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -vP "image[0-9]? *=.* l[ \.].jpg" | grep -v "AD-1 l" | grep -v "l=" | grep -v "\[\[Pound sterling|l" | grep -v "{{not English inline}}" | sort > tmp-liters-fixme1.txt
 
-../venv/bin/python3 ../dump_grep_csv.py "[rBbMm]illion l[^a-zA-Z0-9']" | sort > liters-fixme2.txt
+../venv/bin/python3 ../dump_grep_csv.py "[rBbMm]illion l[^a-zA-Z0-9']" | sort > tmp-liters-fixme2.txt
 
-../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]'| perl -pe "s%\{\{cite.*?\}\}%%g" | sort > liters-fixme3.txt
+../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]'| perl -pe "s%\{\{cite.*?\}\}%%g" | sort > tmp-liters-fixme3.txt
 
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > liters-fixme4.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > tmp-liters-fixme4.txt
 
-../venv/bin/python3 ../dump_grep_csv.py "/l" | perl -pe "s/{{not a typo.*?}}//" | perl -pe "s/{{math.*?}}//" | perl -pe "s%<math>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z${NON_ASCII_LETTERS}'0-9/\-_]" | grep -vP "w/l(-[0-9])? *=" | grep -vP "(https?://|data:)[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]" | grep -vP "\{\{cite.{5,100} a/l .{5,100}\}\}" | grep -v "Malaysian names#Indian names|a/l" | grep -vP "Length at the waterline\|(Length )?w/l" | grep -v "Waterline length|w/l" | sort > liters-fixme5.txt
+../venv/bin/python3 ../dump_grep_csv.py "/l" | perl -pe "s/{{not a typo.*?}}//" | perl -pe "s/{{math.*?}}//" | perl -pe "s%<math>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z${NON_ASCII_LETTERS}'0-9/\-_]" | grep -vP "w/l(-[0-9])? *=" | grep -vP "(https?://|data:)[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]" | grep -vP "\{\{cite.{5,100} a/l .{5,100}\}\}" | grep -v "Malaysian names#Indian names|a/l" | grep -vP "Length at the waterline\|(Length )?w/l" | grep -v "Waterline length|w/l" | sort > tmp-liters-fixme5.txt
 # Done for fixme5:
 # expand "m/l" to "music and lyrics" or drop
 # expand "w/l" to "win/loss"
 # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
 # change "a/l" to "[[Malaysian names#Indian names|a/l]]" except inside internal or external links
 
-../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > liters-fixme6.txt
+../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > tmp-liters-fixme6.txt
 
-../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > liters-fixme7.txt
+../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > tmp-liters-fixme7.txt
 
-cat liters-fixme* | perl -pe 's/(.*?):.+/$1/' | uniq > liters-all.txt
+cat tmp-liters-fixme* | perl -pe 's/(.*?):.+/$1/' | uniq > liters-all.txt
 
 # --- X TO TIMES SYMBOL ---
 
@@ -62,7 +62,10 @@ cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "[^A-Za-z0-9
 cat tmp-rhyme-dump.xml | ../venv/bin/python3 ../dump_grep_inline.py "([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])" | grep -v "Exemplum:" | sort > tmp-rhyme-a.b.txt
 
 # These may need to be relaxed in the future
+# set +e to allow for exit status 1 from grep (if there are no matches)
+set +e
 grep -v "{{not a typo" tmp-rhyme-AB-comma.txt > tmp-rhyme.txt
+set -e
 grep -iP "rhym" tmp-rhyme-masked-words.txt | grep -v "{{not a typo" >> tmp-rhyme.txt
 grep --no-filename -iP "rhym|poem" tmp-rhyme-a-b.txt tmp-rhyme-a.b.txt | grep -v "{{not a typo" >> tmp-rhyme.txt
 cat tmp-rhyme.txt | perl -pe 's/^(.*?):(.*)$/* [[$1]] - <nowiki>$2<\/nowiki>/' > beland-rhyme.txt
@@ -239,12 +242,9 @@ cat tmp-bad-quotes1.txt tmp-bad-quotes2.txt tmp-bad-quotes3.txt tmp-bad-quotes4.
 
 rm -f tmp-quote-dump.xml
 
-echo "Done"
-echo `date`
-
 # --- READABILITY ---
 
-echo "Beginning readability check"
+echo "Beginning readability check..."
 echo `date`
 
 # Run time for this segment: ~1h (8-core parallel)
@@ -253,3 +253,5 @@ echo `date`
 sort -k2 -n tmp-readability.txt > post-readability.txt
 rm tmp-readability.txt
 
+echo "Done."
+echo `date`
