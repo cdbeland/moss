@@ -781,8 +781,8 @@ def dump_dict(section_title, dictionary):
             len(article_list),
             len(article_set),
             key,
-            ", ".join(["[[%s]]" % article for article in sorted(article_set)][0:500])
-            # Limit at 500 to avoid sorting 100,000+ titles, several
+            ", ".join(["[[%s]]" % article for article in sorted(article_set)][0:5000])
+            # Limit at 5000 to avoid sorting 100,000+ titles, several
             # times.  Sampled articles aren't always the ones at the
             # beginning of the alphabet as a result, but this doesn't
             # really matter.
