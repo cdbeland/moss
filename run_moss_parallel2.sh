@@ -2,11 +2,18 @@
 
 set -e
 
-# --- MAIN SPELL CHECK ---
+# --- WIKTIONARY SPELL CHECK ---
+
+echo "Beginning Wiktionary spell check"
+echo `date`
+
+../run_wiktionary_spell_check.sh >& wiktionary.log
+
+# --- MAIN (WIKIPEDIA) SPELL CHECK ---
 
 # Run time for this segment: ~4 h 10 min (8-core parallel)
 
-echo "Beginning main spell check"
+echo "Beginning main Wikipedia spell check"
 echo `date`
 
 ../venv/bin/python3 ../moss_spell_check.py > tmp-output.txt
@@ -221,3 +228,16 @@ echo "" >> post-chemical-formulas.txt
 echo "(REPORT DISABLED DUE TO LONG RUN TIME; START MANUALLY)" >> post-chemical-formulas.txt
 # ../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
 
+# ---
+
+echo "Beginning not-English check"
+echo `date`
+
+../run_not_english.sh >& not_english.log
+
+echo "Beginning superscript/subscript check"
+echo `date`
+
+../superscripts.sh >& superscripts.log
+
+echo "Done."

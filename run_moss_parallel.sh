@@ -31,17 +31,11 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 
 # --- PARALLELIZED REPORTS ---
 
-# Run multiple main threads because even though all the calculations
-# are parallelized to use all cores, sometimes the parent thread
-# becomes a bottleneck, and CPUs are underused.
+# Run multiple main threads because even though most calculations are
+# parallelized to use all cores, some are not, and sometimes the
+# parent thread becomes a bottleneck, and CPUs are underused. Only run
+# 2 tasks at a time to avoid CPU bottleneck that slows down the first
+# reports to finish (which are usually urgently needed).
 
 ../run_moss_parallel1.sh >& thread1.log &
 ../run_moss_parallel2.sh >& thread2.log &
-
-# TODO: Add the below to whichever of the above finishes first.
-
-# The first two are fast; run these sequentially to avoid CPU
-# over-tasking
-../run_wiktionary_spell_check.sh >& wiktionary.log
-../superscripts.sh >& superscripts.log
-../run_not_english.sh >& not_english.log
