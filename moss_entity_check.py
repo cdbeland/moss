@@ -867,6 +867,9 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
 
     prime_accepted_chars = "dijkrtvwxyzCDEFGHIJKMNUVWXYZγδζξϖπστΕΖΗΙΚΜΝΞΠΣΥϒΧΨcgsuBGOPQRSαβϑθκμνςυχψωΒΘΟΡΩab∂ehmnopqALεϵηιλοϱρφϕΑΔΛΦflTΓΤ"
 
+    # Common error
+    output_string += """{"replaceText":"{{prime}}\\.([0-9]+)","replaceWith":".$1{{prime}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+
     # {{prime}} takes preceding text as an argument to adjust whitespace
     output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+)''{{prime}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
