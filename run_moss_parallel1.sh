@@ -79,19 +79,24 @@ rm -f tmp-rhyme-dump.xml
 echo "Beginning temperature conversion scan"
 echo `date`
 
-# per [[MOS:UNITSYMBOLS]]
+# per [[MOS:UNITSYMBOLS]], need to convert to C
 
-# Need to convert to C:
-../venv/bin/python3 ../dump_grep_csv.py '°F' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | grep -vP '°C.{0,30}°F' | grep -vP '°F.{0,30}°C' | grep -vP "(min|max|mean)_temp_[0-9]" | grep "°F" | sort > tmp-temperature-convert1.txt
+echo "  Beginning F scan..."
+echo `date`
+../venv/bin/python3 ../dump_grep_csv.py F | grep -P "(°F|0s( |&nbsp;)F[^b-z])" > tmp-temp-F.txt
 
-../venv/bin/python3 ../dump_grep_csv.py '[ \(][0-9](C|F)[^a-zA-Z0-9]' | grep -iP "weather|temperature" | sort > tmp-temperature-convert2.txt
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]+s?( |&nbsp;)(C|F)[^a-zA-Z0-9]" | grep -iP "weather|temperature" | sort > tmp-temperature-convert3.txt
-../venv/bin/python3 ../dump_grep_csv.py "degrees? \[*(C|c|F)" | perl -pe "s%<ref.*?</ref>%%g" | grep -P "degrees? \[*(C|c|F)" | sort > tmp-temperature-convert4.txt
-../venv/bin/python3 ../dump_grep_csv.py '[0-9]°' | grep -iP "heat|chill|weather" | sort > tmp-temperature-convert4b.txt
-../venv/bin/python3 ../dump_grep_csv.py '[0-9][0-9],' | grep -iP "weather=" | sort > tmp-temperature-convert4c.txt
+grep '°F' tmp-temp-F.txt | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | grep -vP '°C.{0,30}°F' | grep -vP '°F.{0,30}°C' | grep -vP "(min|max|mean)_temp_[0-9]" | grep "°F" | sort > tmp-temperature-convert1.txt
+grep "[0-9]0s( |&nbsp;)?F[^b-z]" tmp-temp-F.txt | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert5.txt
 
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]0s( |&nbsp;)?F[^b-z]" | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert5.txt
-../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep -i "temperature" | grep "0s" | sort > tmp-temperature-convert6.txt
+echo "  Beginning weather scan..."
+echo `date`
+../venv/bin/python3 ../dump_grep_csv.py "([Ww]eather|WEATHER|[Tt]emperature|TEMPERATURE|[Hh]eat|HEAT|[Cc]hill|CHILL)" > tmp-temp-weather.txt
+
+grep '[ \(][0-9](C|F)[^a-zA-Z0-9]' tmp-temp-weather.txt | sort > tmp-temperature-convert2.txt
+grep "[0-9]+s?( |&nbsp;)(C|F)[^a-zA-Z0-9]" tmp-temp-weather.txt | sort > tmp-temperature-convert3.txt
+grep '[0-9]°' tmp-temp-weather.txt | sort > tmp-temperature-convert4b.txt
+grep '[0-9][0-9],' tmp-temp-weather.txt | grep -iP "weather=" | sort > tmp-temperature-convert4c.txt
+../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert6.txt
 
 # low 40s F (~5°C)
 # mid 40s F (~7°C)
@@ -127,7 +132,14 @@ echo `date`
 # 95 35
 # 100 37.8
 
+
+echo "  Beginning degree scan..."
+../venv/bin/python3 ../dump_grep_csv.py "degrees? \[*(C|c|F)" | perl -pe "s%<ref.*?</ref>%%g" | grep -P "degrees? \[*(C|c|F)" | sort > tmp-temperature-convert4.txt
+
 cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-convert3.txt tmp-temperature-convert4.txt tmp-temperature-convert4b.txt tmp-temperature-convert4c.txt tmp-temperature-convert5.txt tmp-temperature-convert6.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-temperature-convert.txt
+
+# rm -f tmp-temp-weather.txt
+# rm -f tmp-temp-F.txt
 
 # --- SPEED CONVERSION ---
 
@@ -252,6 +264,9 @@ echo `date`
 ../venv/bin/python3 ../moss_readability_check.py > tmp-readability.txt
 sort -k2 -n tmp-readability.txt > post-readability.txt
 rm tmp-readability.txt
+
+# TODO:
+# " ,". "( ", " )", " !", " .[^0-9]", "[0-9]%"
 
 echo "Done."
 echo `date`
