@@ -248,6 +248,7 @@ controversial = {
     "&propto;": "∝",
     "&nvap;": "≍⃒",
     "&NotEqual;": "≠",
+    "&aleph;": "ℵ",
 }
 
 # keep.extend(controversial.keys())
@@ -1460,7 +1461,6 @@ transform = {
     "&top;": "⊤",
     "&bot;": "⊥",
     "&upharpoonright;": "↾",
-    "&aleph;": "ℵ",
     "&lrarr;": "⇆",
     "&preceq;": "(⪯)",
     "&cfr;": "𝔠",
