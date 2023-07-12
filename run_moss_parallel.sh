@@ -39,3 +39,6 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 
 ../run_moss_parallel1.sh >& thread1.log &
 ../run_moss_parallel2.sh >& thread2.log &
+
+echo "Parallel threads started."
+echo `date`
