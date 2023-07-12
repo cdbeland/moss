@@ -1,12 +1,19 @@
 #!/usr/bin/bash
 
-set -e
+
 
 
 # *** ONE-LINE-AT-A-TIME STYLE PROBLEMS ***
 
+set -e
+echo "Starting style check by line..."
+echo `date`
 ../venv/bin/python3 ../moss_check_style_by_line.py > tmp-style-by-line.txt
+# "grep" returns non-zero exit status if there are no matches
+echo "Finished style check by line; processing..."
+echo `date`
 
+set +e
 grep ^L tmp-style-by-line.txt > fixme-liters.txt
 grep ^X tmp-style-by-line.txt > fixme-x-to-times.txt
 grep ^T tmp-style-by-line.txt > fixme-temp.txt
@@ -20,6 +27,7 @@ grep ^R tmp-style-by-line.txt > fixme-rhyme-scheme.txt
 grep ^QL tmp-style-by-line.txt > fixme-logical-quoting.txt
 grep ^QB tmp-style-by-line.txt > fixme-bad-quoting.txt
 
+set -e
 grep ^QD tmp-style-by-line.txt > tmp-double-quoting.txt
 cat tmp-double-quoting.txt | perl ../count.pl | sort -rn > tmp-double-most.txt
 grep -vP "(grammar|languag|species| words)" tmp-double-most.txt | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt

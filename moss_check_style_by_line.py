@@ -5,7 +5,7 @@ NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêË�
 
 remove_math_re = re.compile(r"\<math.*?\<\/math\>")
 remove_ref_re = re.compile(r"<ref.*?(\/ ?>|<\/ref>)")
-remove_cite_re = re.compile(r"\{\{cite.*?\}\}"")
+remove_cite_re = re.compile(r"\{\{cite.*?\}\}")
 remove_not_a_typo_re = re.compile(r"\{\{not a typo.*?\}\}")
 poetry_re = re.compile(r"[Rr]hym|[Pp]oem|[Ss]tanza|[Vv]erse|[Ll]yric")
 
@@ -19,11 +19,11 @@ def check_style_by_line(article_title, article_text):
 
     # --
 
-    lines_to_report = []
+    problem_line_tuples = []
 
     for line in article_text.splitlines():
         if "ypo" in line:
-            line = remove_not_a_typo_re.sub(line, "✂")
+            line = remove_not_a_typo_re.sub("✂", line)
 
         line_flags = dict()
         if any(char.isdigit() for char in line):
@@ -32,9 +32,13 @@ def check_style_by_line(article_title, article_text):
             line_flags["has_digit"] = False
 
         if article_flags["poetry"]:
-            lines_to_report.extend(rhyme_scheme_check(line, line_flags))
+            problem_line_tuples.extend(rhyme_scheme_check(line, line_flags))
 
-    return lines_to_report
+    if not problem_line_tuples:
+        return None
+    line_string = "\n".join([f"{code}\t{article_title}\t{line_text}"
+                             for (code, line_text) in problem_line_tuples])
+    return line_string
 
 
 rhyme_dashed_re = re.compile(r"[^a-z0-9\-A-Z{NON_ASCII_LETTERS}][Aa]-[Bb][^a-zA-Z{NON_ASCII_LETTERS}]")
@@ -51,55 +55,44 @@ def rhyme_scheme_check(line, line_flags):
     if "A" in line:
         line_flags["A"] = True
     else:
-        line_flags["a"] = False
+        line_flags["A"] = False
 
     if (not line_flags["a"]) and not line_flags["A"]:
         return []
 
     if rhyme_dashed_re.search(line) or rhyme_comma_re.search(line) or rhyme_dot_re.search(line) or rhyme_masked_re.search(line):
-        line_tmp = remove_math_re.sub(line, "✂")
-        line_tmp = remove_ref_re.sub(line_tmp, "✂")
-        line_tmp = remove_cite_re.sub(line_tmp, "✂")
+        line_tmp = remove_math_re.sub("✂", line)
+        line_tmp = remove_ref_re.sub("✂", line_tmp)
+        line_tmp = remove_cite_re.sub("✂", line_tmp)
         if "A-B-C-D-E-F-G" in line_tmp:
             return []
         # Re-confirm match after filtering:
         if poetry_re.search(line_tmp):
             if rhyme_dashed_re.search(line) or rhyme_comma_re.search(line) or rhyme_dot_re.search(line) or rhyme_masked_re.search(line):
-                return [line]
+                return [("R", line)]
+    return []
 
 
-if __name__ == "__main__":
-    read_en_article_text(check_style_by_line, parallel=True)
+def liter_lowercase_check(line, line_flags):
+    # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
+
+    if "l" not in line:
+        return []
 
 
 r"""
-#!/usr/bin/bash
-
-set -e
-
-
-# *** STANDALONE REPORTS ***
-
-export NON_ASCII_LETTERS=ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ
-
-# --- l TO L FOR LITERS ---
-echo "Starting liters style check"
-echo `date`
-
-# Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
-
-# Run time: 9-22 min per regex
-
 # For "(l)", "(l/c/d)", etc. in table headers
-../venv/bin/python3 ../dump_grep_csv.py '\(l(/[a-zA-Z/]+)?\)' | grep -v '(l)\!' | grep -v '(r)' | grep -vP "[a-zA-Z{NON_ASCII_LETTERS}]\(l\)" | grep -vP "\(l\)[a-zA-Z{NON_ASCII_LETTERS}]" | grep -vP '</?math' | sort > tmp-liters-fixme0.txt
+
 
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{(Transliteration|lang|IPA|not a typo).*?\}\}%%g" | perl -pe "s%<math.*?</math>%%g" | perl -pe "s/(File|Image):.*?[\|\n]//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’{NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -vP "image[0-9]? *=.* l[ \.].jpg" | grep -v "AD-1 l" | grep -v "l=" | grep -v "\[\[Pound sterling|l" | grep -v "{{not English inline}}" | sort > tmp-liters-fixme1.txt
 
 ../venv/bin/python3 ../dump_grep_csv.py "[rBbMm]illion l[^a-zA-Z0-9']" | sort > tmp-liters-fixme2.txt
+../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > tmp-liters-fixme4.txt
+../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > tmp-liters-fixme7.txt
 
 ../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]'| perl -pe "s%\{\{cite.*?\}\}%%g" | sort > tmp-liters-fixme3.txt
-
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > tmp-liters-fixme4.txt
+../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > tmp-liters-fixme6.txt
+../venv/bin/python3 ../dump_grep_csv.py '\(l(/[a-zA-Z/]+)?\)' | grep -v '(l)\!' | grep -v '(r)' | grep -vP "[a-zA-Z{NON_ASCII_LETTERS}]\(l\)" | grep -vP "\(l\)[a-zA-Z{NON_ASCII_LETTERS}]" | grep -vP '</?math' | sort > tmp-liters-fixme0.txt
 
 ../venv/bin/python3 ../dump_grep_csv.py "/l" | perl -pe "s/{{not a typo.*?}}//" | perl -pe "s/{{math.*?}}//" | perl -pe "s%<math>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z{NON_ASCII_LETTERS}'0-9/\-_]" | grep -vP "w/l(-[0-9])? *=" | grep -vP "(https?://|data:)[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]" | grep -vP "\{\{cite.{5,100} a/l .{5,100}\}\}" | grep -v "Malaysian names#Indian names|a/l" | grep -vP "Length at the waterline\|(Length )?w/l" | grep -v "Waterline length|w/l" | sort > tmp-liters-fixme5.txt
 # Done for fixme5:
@@ -107,12 +100,9 @@ echo `date`
 # expand "w/l" to "win/loss"
 # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
 # change "a/l" to "[[Malaysian names#Indian names|a/l]]" except inside internal or external links
+"""
 
-../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > tmp-liters-fixme6.txt
-
-../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > tmp-liters-fixme7.txt
-
-cat tmp-liters-fixme* | perl -pe 's/(.*?):.+/$1/' | uniq > liters-all.txt
+r"""
 
 # --- X TO TIMES SYMBOL ---
 
@@ -310,3 +300,7 @@ rm -f tmp-quote-dump.xml
 # " ,". "( ", " )", " !", " .[^0-9]", "[0-9]%"
 
 """
+
+
+if __name__ == "__main__":
+    read_en_article_text(check_style_by_line, parallel=True)
