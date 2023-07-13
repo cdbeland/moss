@@ -249,6 +249,7 @@ controversial = {
     "&nvap;": "≍⃒",
     "&NotEqual;": "≠",
     "&aleph;": "ℵ",
+    "&parallel;": "∥",
 }
 
 # keep.extend(controversial.keys())
