@@ -505,7 +505,7 @@ suppression_patterns = [
                # <sup>H</sup> in IPA templates); ignoring for now.
                r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA"
                r"|[Ll]ang\|"
-               r"|[Tt]ransl\|"
+               r"|[Tt]ransl(iteration)?\|"
                r"|[Zz]h\|"
                r"|[Ii]nterlinear ?\| ?lang="
 
