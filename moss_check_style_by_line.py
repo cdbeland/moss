@@ -8,7 +8,7 @@ from moss_dump_analyzer import read_en_article_text
 NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ"
 
 digit_re = re.compile(r"[0-9]")
-remove_math_re = re.compile(r"\<math.*?\<\/math\>")
+remove_math_re = re.compile(r"(<math.*?(</math>|$)|\{\{math[^}]+\}?\}?)")
 remove_ref_re = re.compile(r"<ref.*?(\/ ?>|<\/ref>)")
 remove_cite_re = re.compile(r"\{\{cite.*?\}\}")
 remove_not_a_typo_re = re.compile(r"\{\{not a typo.*?\}\}")
@@ -104,7 +104,7 @@ def rhyme_scheme_check(line, line_flags):
         return []
     # Re-confirm match after filtering:
     if poetry_re.search(line_tmp):
-        if rhyme_dashed_re.search(line) or rhyme_comma_re.search(line) or rhyme_dot_re.search(line) or rhyme_masked_re.search(line):
+        if rhyme_dashed_re.search(line_tmp) or rhyme_comma_re.search(line_tmp) or rhyme_dot_re.search(line_tmp) or rhyme_masked_re.search(line_tmp):
             return [("R", line)]
     return []
 
@@ -115,11 +115,18 @@ x_no_space_exclusions = re.compile(r"([a-zA-Z\-_][0-9]+x"
                                    r"| 6x6 "
                                    r"|[0-9]+x[0-9]+px"
                                    r"|[^0-9]0x[0-9]+)")
+x_space_exclusions = re.compile(r"("
+                                r"x ="
+                                r"|\| x \|"
+                                r")")
 
 
 def x_to_times_check(line, line_flags):
     if " x " in line:
-        return [("XS", line)]  # X with Space
+        line_tmp = remove_math_re.sub("✂", line)
+        line_tmp = x_space_exclusions.sub("✂", line_tmp)
+        if " x " in line_tmp:
+            return [("XS", line_tmp)]  # X with Space
 
     if line_flags["has_digit"]:
         if not x_no_space_re.search(line):
@@ -130,7 +137,7 @@ def x_to_times_check(line, line_flags):
         line_tmp = remove_url_re.sub("✂", line_tmp)
         line_tmp = remove_math_re.sub("✂", line_tmp)
         if x_no_space_re.search(line_tmp):
-            return [("XNS", line)]  # X with No Space
+            return [("XNS", line_tmp)]  # X with No Space
 
     return []
 
@@ -360,4 +367,4 @@ rm -f tmp-quote-dump.xml
 
 
 if __name__ == "__main__":
-    read_en_article_text(check_style_by_line, parallel=False) ###
+    read_en_article_text(check_style_by_line, parallel=True) ###
