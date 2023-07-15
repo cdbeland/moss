@@ -1,38 +1,59 @@
+# For CPU performance trace:
+# venv/bin/pip install mtprof
+# venv/bin/python3 -m mtprof moss_check_style_by_line.py
+
 import re
 from moss_dump_analyzer import read_en_article_text
 
 NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ"
 
+digit_re = re.compile(r"[0-9]")
 remove_math_re = re.compile(r"\<math.*?\<\/math\>")
 remove_ref_re = re.compile(r"<ref.*?(\/ ?>|<\/ref>)")
 remove_cite_re = re.compile(r"\{\{cite.*?\}\}")
 remove_not_a_typo_re = re.compile(r"\{\{not a typo.*?\}\}")
+remove_url_re = re.compile(r"https?:[^ \]]+")
+remove_image_re = re.compile(r"\[\[(File|Image):.*?\|")
+remove_image_param_re = re.compile(r"\| *image[0-9]? *=.*$")
 poetry_re = re.compile(r"[Rr]hym|[Pp]oem|[Ss]tanza|[Vv]erse|[Ll]yric")
 
 
-def check_style_by_line(article_title, article_text):
+def remove_image_filenames(line):
+    remove_image_re.sub("✂", line)
+    remove_image_param_re.sub("✂", line)
+    return line
+
+
+def set_article_flags(article_text):
     article_flags = dict()
     if poetry_re.search(article_text):
         article_flags["poetry"] = True
     else:
         article_flags["poetry"] = False
+    return article_flags
 
-    # --
 
+def set_line_flags(line):
+    line_flags = dict()
+    if digit_re.search(line):
+        line_flags["has_digit"] = True
+    else:
+        line_flags["has_digit"] = False
+    return line_flags
+
+
+def check_style_by_line(article_title, article_text):
+    article_flags = set_article_flags(article_text)
     problem_line_tuples = []
 
     for line in article_text.splitlines():
         if "ypo" in line:
             line = remove_not_a_typo_re.sub("✂", line)
-
-        line_flags = dict()
-        if any(char.isdigit() for char in line):
-            line_flags["has_digit"] = True
-        else:
-            line_flags["has_digit"] = False
+        line_flags = set_line_flags(line)
 
         if article_flags["poetry"]:
             problem_line_tuples.extend(rhyme_scheme_check(line, line_flags))
+        problem_line_tuples.extend(x_to_times_check(line, line_flags))
 
     if not problem_line_tuples:
         return None
@@ -41,9 +62,10 @@ def check_style_by_line(article_title, article_text):
     return line_string
 
 
+rhyme_fast_re = re.compile(r"[Aa][,\-\.]?[AaBb]")
 rhyme_dashed_re = re.compile(r"[^a-z0-9\-A-Z{NON_ASCII_LETTERS}][Aa]-[Bb][^a-zA-Z{NON_ASCII_LETTERS}]")
-rhyme_comma_re = re.compile(r"[^,]AB,[ABC]|AA,AB|AA,B|AB,[ABC]")
-rhyme_masked_re = re.compile(r"[^A-Za-z0-9\./%#=_\-](aa|ab|aaa|aab|aba|abb|abc|aaaa|aaba|aabb|aabc|abaa|abab|abba|abca|abcb|abcc|abcd)[^a-z0-9/]")
+rhyme_comma_re = re.compile(r"AA,A?B|AB,[ABC]")
+rhyme_masked_re = re.compile(r"[^A-Za-z0-9\./%#=_\-]a(a|b|aa|ab|ba|bb|bc|aaa|aba|abb|abc|baa|bab|bba|bca|bcb|bcc|bcd)[^a-z0-9/]")
 rhyme_dot_re = re.compile(r"([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])")
 
 
@@ -57,30 +79,113 @@ def rhyme_scheme_check(line, line_flags):
     else:
         line_flags["A"] = False
 
-    if (not line_flags["a"]) and not line_flags["A"]:
+    if not (line_flags["a"] or line_flags["A"]):
         return []
 
-    if rhyme_dashed_re.search(line) or rhyme_comma_re.search(line) or rhyme_dot_re.search(line) or rhyme_masked_re.search(line):
-        line_tmp = remove_math_re.sub("✂", line)
-        line_tmp = remove_ref_re.sub("✂", line_tmp)
-        line_tmp = remove_cite_re.sub("✂", line_tmp)
-        if "A-B-C-D-E-F-G" in line_tmp:
-            return []
-        # Re-confirm match after filtering:
-        if poetry_re.search(line_tmp):
-            if rhyme_dashed_re.search(line) or rhyme_comma_re.search(line) or rhyme_dot_re.search(line) or rhyme_masked_re.search(line):
-                return [("R", line)]
+    if not rhyme_fast_re.search(line):
+        return []
+
+    outer_match = False
+    if rhyme_dashed_re.search(line):
+        outer_match = True
+    if line_flags["a"] and (rhyme_dot_re.search(line) or rhyme_masked_re.search(line)):
+        outer_match = True
+        outer_match = True
+    if line_flags["A"] and rhyme_comma_re.search(line):
+        outer_match = True
+
+    if not outer_match:
+        return []
+
+    line_tmp = remove_ref_re.sub("✂", line)
+    line_tmp = remove_cite_re.sub("✂", line_tmp)
+    line_tmp = remove_math_re.sub("✂", line_tmp)
+    if "A-B-C-D-E-F-G" in line_tmp:
+        return []
+    # Re-confirm match after filtering:
+    if poetry_re.search(line_tmp):
+        if rhyme_dashed_re.search(line) or rhyme_comma_re.search(line) or rhyme_dot_re.search(line) or rhyme_masked_re.search(line):
+            return [("R", line)]
     return []
 
 
+x_no_space_re = re.compile(r"[0-9]x[0-9]")
+x_no_space_exclusions = re.compile(r"([a-zA-Z\-_][0-9]+x"
+                                   r"| 4x4 "
+                                   r"| 6x6 "
+                                   r"|[0-9]+x[0-9]+px"
+                                   r"|[^0-9]0x[0-9]+)")
+
+
+def x_to_times_check(line, line_flags):
+    if " x " in line:
+        return [("XS", line)]  # X with Space
+
+    if line_flags["has_digit"]:
+        if not x_no_space_re.search(line):
+            return []
+        if x_no_space_exclusions.search(line):
+            return []
+        line_tmp = remove_image_filenames(line)
+        line_tmp = remove_url_re.sub("✂", line_tmp)
+        line_tmp = remove_math_re.sub("✂", line_tmp)
+        if x_no_space_re.search(line_tmp):
+            return [("XNS", line)]  # X with No Space
+
+    return []
+
+
+r"""
+
+# --- SPEED CONVERSION ---
+
+# [[MOS:UNITNAMES]]
+
+echo "Beginning speed conversion scan"
+echo `date`
+
+# Run time for this segment: About 1 h 40 min
+
+../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h' | grep -iP "\bmph\b" | grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" | grep -v "mph=" | sort > tmp-mph-convert.txt
+cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
+
+../venv/bin/python3 ../dump_grep_csv.py '[0-9](&nbsp;| )?kph|KPH' | sort > tmp-kph-convert.txt
+
+# --- FRAC REPAIR ---
+
+# Run time for this segment: ~2 h (8-core parallel)
+
+echo "Beginning {{frac}} repair scan"
+echo `date`
+
+../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > jwb-frac-repair.txt
+
+# --- BROKEN NBSP ---
+
+# Run time for this segment: ?
+
+echo "Beginning broken nbsp scan"
+echo `date`
+
+../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | perl -pe 's/^(.*)$/* [[$1]]/' > beland-broken-nbsp.txt
+
+# --- MOS:LOGICAL ---
+
+# Run time for this segment: ~15 min (8-core parallel)
+
+echo "Beginning MOS:LOGICAL scan"
+echo `date`
+../venv/bin/python3 ../dump_grep_csv.py '"[a-z ,:\-;]+[,\.]"' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > beland-MOS-LOGICAL.txt
+"""
+
+
+r"""
 def liter_lowercase_check(line, line_flags):
     # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
     if "l" not in line:
         return []
 
-
-r"""
 # For "(l)", "(l/c/d)", etc. in table headers
 
 
@@ -103,14 +208,6 @@ r"""
 """
 
 r"""
-
-# --- X TO TIMES SYMBOL ---
-
-echo "Starting x-to-times"
-echo `date`
-
-../venv/bin/python3 ../dump_grep_csv.py '[0-9]x[^a-zA-Z]' | perl -pe 's/\[\[(File|Image):.*?\]\]//' | perl -pe s'/\| *image[0-9]? *=$//' | perl -pe 's/https?:.*? //' | grep -vP '[a-zA-Z\-_][0-9]+x' | grep -vP 'x[a-zA-Z]' | grep -vP '( 4x4 | 6x6 )' | grep -vP '[0-9]+x[0-9]+px' | grep -v '<math' | grep -vP '[^0-9]0x[0-9]+' | grep -P '[0-9]+x[0-9]*' | perl -pe 's/:.*$//' | uniq | sort > x-correct-nospace-with-article.txt
-../venv/bin/python3 ../dump_grep_csv.py " x " | perl -pe 's/:.*$//' | uniq | sort > x-correct-space-with-article.txt
 
 
 # --- TEMPERATURE CONVERSION ---
@@ -182,20 +279,6 @@ cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-co
 # rm -f tmp-temp-weather.txt
 # rm -f tmp-temp-F.txt
 
-# --- SPEED CONVERSION ---
-
-# [[MOS:UNITNAMES]]
-
-echo "Beginning speed conversion scan"
-echo `date`
-
-# Run time for this segment: About 1 h 40 min
-
-../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h' | grep -iP "\bmph\b" | grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" | grep -v "mph=" | sort > tmp-mph-convert.txt
-cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
-
-../venv/bin/python3 ../dump_grep_csv.py '[0-9](&nbsp;| )?kph|KPH' | sort > tmp-kph-convert.txt
-
 # --- MORE METRIC CONVERSIONS ---
 
 # TODO:
@@ -237,32 +320,6 @@ echo `date`
 # Can be converted to {{coord}} or {{sky}} or {{prime}}
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]+° ?[0-9]+['′] ?" | perl -pe 's/^(.*?):.*/$1/' | uniq | sort >> jwb-articles-prime.txt
 
-# --- FRAC REPAIR ---
-
-# Run time for this segment: ~2 h (8-core parallel)
-
-echo "Beginning {{frac}} repair scan"
-echo `date`
-
-../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > jwb-frac-repair.txt
-
-# --- BROKEN NBSP ---
-
-# Run time for this segment: ?
-
-echo "Beginning broken nbsp scan"
-echo `date`
-
-../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | perl -pe 's/^(.*)$/* [[$1]]/' > beland-broken-nbsp.txt
-
-# --- MOS:LOGICAL ---
-
-# Run time for this segment: ~15 min (8-core parallel)
-
-echo "Beginning MOS:LOGICAL scan"
-echo `date`
-../venv/bin/python3 ../dump_grep_csv.py '"[a-z ,:\-;]+[,\.]"' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > beland-MOS-LOGICAL.txt
-
 # --- MOS:DOUBLE ---
 
 # Run time for this segment: ~20 min
@@ -303,4 +360,4 @@ rm -f tmp-quote-dump.xml
 
 
 if __name__ == "__main__":
-    read_en_article_text(check_style_by_line, parallel=True)
+    read_en_article_text(check_style_by_line, parallel=False) ###
