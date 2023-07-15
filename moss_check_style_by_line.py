@@ -51,9 +51,15 @@ def check_style_by_line(article_title, article_text):
             line = remove_not_a_typo_re.sub("✂", line)
         line_flags = set_line_flags(line)
 
+        # Avoiding extend() helps performance massively
         if article_flags["poetry"]:
-            problem_line_tuples.extend(rhyme_scheme_check(line, line_flags))
-        problem_line_tuples.extend(x_to_times_check(line, line_flags))
+            result = rhyme_scheme_check(line, line_flags)
+            if result:
+                problem_line_tuples.extend(result)
+        for check_function in [x_to_times_check, broken_nbsp_check]:
+            result = check_function(line, line_flags)
+            if result:
+                problem_line_tuples.extend(result)
 
     if not problem_line_tuples:
         return None
@@ -80,10 +86,10 @@ def rhyme_scheme_check(line, line_flags):
         line_flags["A"] = False
 
     if not (line_flags["a"] or line_flags["A"]):
-        return []
+        return
 
     if not rhyme_fast_re.search(line):
-        return []
+        return
 
     outer_match = False
     if rhyme_dashed_re.search(line):
@@ -95,18 +101,18 @@ def rhyme_scheme_check(line, line_flags):
         outer_match = True
 
     if not outer_match:
-        return []
+        return
 
     line_tmp = remove_ref_re.sub("✂", line)
     line_tmp = remove_cite_re.sub("✂", line_tmp)
     line_tmp = remove_math_re.sub("✂", line_tmp)
     if "A-B-C-D-E-F-G" in line_tmp:
-        return []
+        return
     # Re-confirm match after filtering:
     if poetry_re.search(line_tmp):
         if rhyme_dashed_re.search(line_tmp) or rhyme_comma_re.search(line_tmp) or rhyme_dot_re.search(line_tmp) or rhyme_masked_re.search(line_tmp):
             return [("R", line)]
-    return []
+    return
 
 
 x_no_space_re = re.compile(r"[0-9]x[0-9]")
@@ -130,16 +136,23 @@ def x_to_times_check(line, line_flags):
 
     if line_flags["has_digit"]:
         if not x_no_space_re.search(line):
-            return []
+            return
         if x_no_space_exclusions.search(line):
-            return []
+            return
         line_tmp = remove_image_filenames(line)
         line_tmp = remove_url_re.sub("✂", line_tmp)
         line_tmp = remove_math_re.sub("✂", line_tmp)
         if x_no_space_re.search(line_tmp):
             return [("XNS", line_tmp)]  # X with No Space
 
-    return []
+
+broken_nbsp_re = re.compile(r"&nbsp[^;}]")
+
+
+def broken_nbsp_check(line, line_flags):
+    if broken_nbsp_re.search(line):
+        if not re.search(r"https?:[^ ]+&nbsp"):
+            return [("N", line)]  # broken Nbsp
 
 
 r"""
@@ -167,14 +180,6 @@ echo `date`
 
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > jwb-frac-repair.txt
 
-# --- BROKEN NBSP ---
-
-# Run time for this segment: ?
-
-echo "Beginning broken nbsp scan"
-echo `date`
-
-../venv/bin/python3 ../dump_grep_csv.py "&nbsp[^;}]" | grep -vP 'https?:[^ ]+&nbsp' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | perl -pe 's/^(.*)$/* [[$1]]/' > beland-broken-nbsp.txt
 
 # --- MOS:LOGICAL ---
 
@@ -367,4 +372,4 @@ rm -f tmp-quote-dump.xml
 
 
 if __name__ == "__main__":
-    read_en_article_text(check_style_by_line, parallel=True) ###
+    read_en_article_text(check_style_by_line, parallel=False) ###
