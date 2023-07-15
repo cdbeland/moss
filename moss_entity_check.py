@@ -808,8 +808,8 @@ def extract_articles(dictionary):
                                          key=lambda tup: len(tup[1])):
         if len(article_list) >= 100000:
             continue
-        articles.extend(sorted(article_list)[0:100])
-        # Limit 100 to avoid getting stuck on one common entity and getting bored
+        articles.extend(sorted(article_list)[0:1000])
+        # Limit 1000 to avoid excessive report file size
 
     articles = list(dict.fromkeys(articles))  # uniqify
     return articles
