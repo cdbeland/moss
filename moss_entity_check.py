@@ -887,6 +887,9 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4|display=inline}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
+    output_string += """{"replaceText":"No.([A-Za-z0-9])","replaceWith":"No. $1","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
+
     # This must come after the {{coord}} transformations
     # CAUTION: Use {{sky}} for celestial coordinates
     output_string += r"""{"replaceText":"([0-9]+)° ?([0-9]+)['′] ?([0-9]+)[\"″]","replaceWith":"$1°$2{{prime}}$3{{pprime}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true}"""
