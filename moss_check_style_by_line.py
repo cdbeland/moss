@@ -8,7 +8,8 @@ from moss_dump_analyzer import read_en_article_text
 NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ"
 
 digit_re = re.compile(r"[0-9]")
-remove_math_re = re.compile(r"(<math.*?(</math>|$)|\{\{math[^}]+\}?\}?)")
+remove_math_line_re = re.compile(r"(<math.*?(</math>|$)|\{\{math[^}]+\}?\}?)")
+remove_math_article_re = re.compile(r"(<math.*?</math>|\{\{math[^}]+\}?\}?)")
 remove_ref_re = re.compile(r"<ref.*?(\/ ?>|<\/ref>)")
 remove_cite_re = re.compile(r"\{\{cite.*?\}\}")
 remove_not_a_typo_re = re.compile(r"\{\{not a typo.*?\}\}")
@@ -42,13 +43,25 @@ def set_line_flags(line):
     return line_flags
 
 
+def universal_article_text_cleanup(article_text):
+    if "math" in article_text:
+        article_text = remove_math_article_re.sub("✂", article_text)
+    return article_text
+
+
+def universal_line_cleanup(line):
+    if "ypo" in line:
+        line = remove_not_a_typo_re.sub("✂", line)
+    return line
+
+
 def check_style_by_line(article_title, article_text):
     article_flags = set_article_flags(article_text)
     problem_line_tuples = []
+    article_text = universal_article_text_cleanup(article_text)
 
     for line in article_text.splitlines():
-        if "ypo" in line:
-            line = remove_not_a_typo_re.sub("✂", line)
+        line = universal_line_cleanup(line)
         line_flags = set_line_flags(line)
 
         # Avoiding extend() helps performance massively
@@ -107,7 +120,7 @@ def rhyme_scheme_check(line, line_flags):
 
     line_tmp = remove_ref_re.sub("✂", line)
     line_tmp = remove_cite_re.sub("✂", line_tmp)
-    line_tmp = remove_math_re.sub("✂", line_tmp)
+    # line_tmp = remove_math_line_re.sub("✂", line_tmp)
     if "A-B-C-D-E-F-G" in line_tmp:
         return
     # Re-confirm match after filtering:
@@ -126,13 +139,14 @@ x_no_space_exclusions = re.compile(r"([a-zA-Z\-_][0-9]+x"
 x_space_exclusions = re.compile(r"("
                                 r"x ="
                                 r"|\| x \|"
+                                r"<code.*?</code>"
                                 r")")
 
 
 def x_to_times_check(line, line_flags):
     if " x " in line:
-        line_tmp = remove_math_re.sub("✂", line)
-        line_tmp = x_space_exclusions.sub("✂", line_tmp)
+        # line_tmp = remove_math_line_re.sub("✂", line)
+        line_tmp = x_space_exclusions.sub("✂", line)
         if " x " in line_tmp:
             return [("XS", line_tmp)]  # X with Space
 
@@ -143,7 +157,7 @@ def x_to_times_check(line, line_flags):
             return
         line_tmp = remove_image_filenames(line)
         line_tmp = remove_url_re.sub("✂", line_tmp)
-        line_tmp = remove_math_re.sub("✂", line_tmp)
+        # line_tmp = remove_math_line_re.sub("✂", line_tmp)
         if x_no_space_re.search(line_tmp):
             return [("XNS", line_tmp)]  # X with No Space
 
@@ -152,6 +166,8 @@ broken_nbsp_re = re.compile(r"&nbsp[^;}]")
 
 
 def broken_nbsp_check(line, line_flags):
+    if "&nbsp" not in line:
+        return
     if broken_nbsp_re.search(line):
         if not re.search(r"https?:[^ ]+&nbsp"):
             return [("N", line)]  # broken Nbsp
