@@ -43,6 +43,15 @@ def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=
             pool.join()
     else:
         for (article_title, article_text) in page_generator_fast(filename):
+            """
+            # For debugging performance issues
+            count += 1
+            if count % 100 == 0:
+                print(f"Processed {count} articles - " + str(datetime.datetime.now().isoformat()),
+                      file=sys.stderr)
+            if count % 1001 == 0:
+                exit(0)
+            """
             callback_function(article_title, article_text)
 
 
