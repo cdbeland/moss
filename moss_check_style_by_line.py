@@ -56,7 +56,9 @@ def check_style_by_line(article_title, article_text):
             result = rhyme_scheme_check(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
-        for check_function in [x_to_times_check, broken_nbsp_check]:
+        for check_function in [x_to_times_check,
+                               broken_nbsp_check,
+                               frac_repair]:
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -155,6 +157,18 @@ def broken_nbsp_check(line, line_flags):
             return [("N", line)]  # broken Nbsp
 
 
+frac_repair_re = re.compile(r"[0-9]\{\{frac\|[0-9]+\|")
+
+
+def frac_repair(line, line_flags):
+    if not line_flags["has_digit"]:
+        return
+    if "frac" not in line:
+        return
+    if frac_repair_re.search(line):
+        return [("FR", line)]  # FRaction repair needed
+
+
 r"""
 
 # --- SPEED CONVERSION ---
@@ -171,15 +185,6 @@ cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.
 
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9](&nbsp;| )?kph|KPH' | sort > tmp-kph-convert.txt
 
-# --- FRAC REPAIR ---
-
-# Run time for this segment: ~2 h (8-core parallel)
-
-echo "Beginning {{frac}} repair scan"
-echo `date`
-
-../venv/bin/python3 ../dump_grep_csv.py '[0-9]\{\{frac\|[0-9]+\|' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort > jwb-frac-repair.txt
-
 
 # --- MOS:LOGICAL ---
 
@@ -188,10 +193,9 @@ echo `date`
 echo "Beginning MOS:LOGICAL scan"
 echo `date`
 ../venv/bin/python3 ../dump_grep_csv.py '"[a-z ,:\-;]+[,\.]"' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > beland-MOS-LOGICAL.txt
-"""
 
+# ---
 
-r"""
 def liter_lowercase_check(line, line_flags):
     # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
@@ -372,4 +376,4 @@ rm -f tmp-quote-dump.xml
 
 
 if __name__ == "__main__":
-    read_en_article_text(check_style_by_line, parallel=False) ###
+    read_en_article_text(check_style_by_line, parallel=True)
