@@ -2,6 +2,8 @@
 # venv/bin/pip install mtprof
 # venv/bin/python3 -m mtprof moss_check_style_by_line.py
 
+# Run time (commit af4ead3, 4 types of complaint): ~2 hours, 8-core parallel
+
 import re
 from moss_dump_analyzer import read_en_article_text
 
@@ -9,14 +11,19 @@ NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêË�
 
 digit_re = re.compile(r"[0-9]")
 remove_math_line_re = re.compile(r"(<math.*?(</math>|$)|\{\{math[^}]+\}?\}?)")
-remove_math_article_re = re.compile(r"(<math.*?</math>|\{\{math[^}]+\}?\}?)")
+remove_math_article_re = re.compile(r"(<math.*?</math>|\{\{math[^}]+\}?\}?)", flags=re.S)
 remove_ref_re = re.compile(r"<ref.*?(\/ ?>|<\/ref>)")
 remove_cite_re = re.compile(r"\{\{cite.*?\}\}")
 remove_not_a_typo_re = re.compile(r"\{\{not a typo.*?\}\}")
 remove_url_re = re.compile(r"https?:[^ \]]+")
 remove_image_re = re.compile(r"\[\[(File|Image):.*?\|")
 remove_image_param_re = re.compile(r"\| *image[0-9]? *=.*$")
-poetry_re = re.compile(r"[Rr]hym|[Pp]oem|[Ss]tanza|[Vv]erse|[Ll]yric")
+
+poetry_flags = ["rhym", "poem", "stanza", "verse", "lyric"]
+poetry_flags += [word.title() for word in poetry_flags]
+
+remove_code_re = re.compile(r"<code.*?</code>", re.S)
+remove_syntaxhighlight_re = re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", re.S)
 
 
 def remove_image_filenames(line):
@@ -25,12 +32,17 @@ def remove_image_filenames(line):
     return line
 
 
+def poetry_match(text):
+    # Considerably faster than a regex
+    for word in poetry_flags:
+        if word in text:
+            return True
+    return False
+
+
 def set_article_flags(article_text):
     article_flags = dict()
-    if poetry_re.search(article_text):
-        article_flags["poetry"] = True
-    else:
-        article_flags["poetry"] = False
+    article_flags["poetry"] = poetry_match(article_text)
     return article_flags
 
 
@@ -46,6 +58,13 @@ def set_line_flags(line):
 def universal_article_text_cleanup(article_text):
     if "math" in article_text:
         article_text = remove_math_article_re.sub("✂", article_text)
+
+    if "syntaxhighlight" in article_text:
+        article_text = remove_syntaxhighlight_re.sub("✂", article_text)
+
+    if "code" in article_text:
+        article_text = remove_code_re.sub("✂", article_text)
+
     return article_text
 
 
@@ -124,7 +143,7 @@ def rhyme_scheme_check(line, line_flags):
     if "A-B-C-D-E-F-G" in line_tmp:
         return
     # Re-confirm match after filtering:
-    if poetry_re.search(line_tmp):
+    if poetry_match(line_tmp):
         if rhyme_dashed_re.search(line_tmp) or rhyme_comma_re.search(line_tmp) or rhyme_dot_re.search(line_tmp) or rhyme_masked_re.search(line_tmp):
             return [("R", line)]
     return
@@ -139,7 +158,6 @@ x_no_space_exclusions = re.compile(r"([a-zA-Z\-_][0-9]+x"
 x_space_exclusions = re.compile(r"("
                                 r"x ="
                                 r"|\| x \|"
-                                r"<code.*?</code>"
                                 r")")
 
 
@@ -169,7 +187,7 @@ def broken_nbsp_check(line, line_flags):
     if "&nbsp" not in line:
         return
     if broken_nbsp_re.search(line):
-        if not re.search(r"https?:[^ ]+&nbsp"):
+        if not re.search(r"https?:[^ ]+&nbsp", line):
             return [("N", line)]  # broken Nbsp
 
 
