@@ -879,6 +879,9 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += """{"replaceText":"{{prime\\\\|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
+    output_string += """{"replaceText":"[0-9]°[CF]","replaceWith":"$1&nbsp;°$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
+
     # CAUTION: Manually edit "north" to "N", etc.
     output_string += r"""{"replaceText":"([0-9]+)° ?([0-9]+)['′] ?([0-9]+)[\"″] ?(N|S|north|south),? ?([0-9]+)° ?([0-9]+)['′] ?([0-9]+)[\"″] ?(E|W|east|west)","""
     output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4|$5|$6|$7|$8|display=inline}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
