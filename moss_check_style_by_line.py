@@ -286,6 +286,12 @@ grep '[0-9]°' tmp-temp-weather.txt | sort > tmp-temperature-convert4b.txt
 grep '[0-9][0-9],' tmp-temp-weather.txt | grep -iP "weather=" | sort > tmp-temperature-convert4c.txt
 ../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert6.txt
 
+FROM:([0-9]+)° (and|to)([0-9]+)°(&nbsp;| )?(C|F)
+TO:$1 $2°&nbsp;$4
+
+FROM:([0-9]+)°( |-)([0-9]+)°(&nbsp;| )?(C|F)
+TO:$1-$2°&nbsp;$4
+
 # low 40s F (~5°C)
 # mid 40s F (~7°C)
 # high 40s F (~9°C)
@@ -406,6 +412,10 @@ rm -f tmp-quote-dump.xml
 # TODO:
 # " ,". "( ", " )", " !", " .[^0-9]", "[0-9]%"
 
+per annum -> per year
+
+FROM:"([a-z]{4})&nbsp;([a-z]{4})"
+TO:"$1 $2"
 """
 
 
