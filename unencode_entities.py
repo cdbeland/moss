@@ -250,6 +250,8 @@ controversial = {
     "&NotEqual;": "≠",
     "&aleph;": "ℵ",
     "&parallel;": "∥",
+    "&darr;": "↓",  # {{down-arrow}} is also available
+    "&uarr;": "↑",  # {{up-arrow}} is also available
 }
 
 # keep.extend(controversial.keys())
@@ -1433,7 +1435,6 @@ transform = {
     "&cir;": "○",
     "&compfn;": "∘",
     "&rightleftharpoons;": "⇌",
-    "&darr;": "↓",  # {{down-arrow}} is also available
     "&subseteq;": "⊆",
     "&rceil;": "⌉",
     "&lceil;": "⌈",
@@ -1443,7 +1444,6 @@ transform = {
     "&rArr;": "⇒",
     "&lArr;": "⇐",
     "&harr;": "↔",
-    "&uarr;": "↑",  # {{up-arrow}} is also available
     "&uArr;": "⇑",
     "&crarr;": "↵",
     "&Lt;": "≪",
