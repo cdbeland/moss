@@ -27,10 +27,10 @@ grep ^R tmp-style-by-line.txt > fixme-rhyme-scheme.txt
 grep ^QL tmp-style-by-line.txt > fixme-logical-quoting.txt
 grep ^QB tmp-style-by-line.txt > fixme-bad-quoting.txt
 
-set -e
 grep ^QD tmp-style-by-line.txt > tmp-double-quoting.txt
 cat tmp-double-quoting.txt | perl ../count.pl | sort -rn > tmp-double-most.txt
 grep -vP "(grammar|languag|species| words)" tmp-double-most.txt | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt
+set -e
 
 # --- READABILITY ---
 
