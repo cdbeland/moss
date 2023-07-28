@@ -556,6 +556,9 @@ def entity_check(article_title, article_text):
     if "{{move to Wiki" in article_text or "{{Move to Wiki" in article_text:
         return
 
+    if "{{MOS" in article_text:
+        return
+
     # Entities that need to be reported are rare, and text redaction
     # is expensive, so check unredacted text first.
     result_tuples = []
@@ -848,9 +851,9 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
                 fixed_entity)
 
     # {{frac}} repair
-    output_string += r'{"replaceText":"([0-9,]+){{frac\\|([0-9]+)}}","replaceWith":"{{frac|$1|1|$2}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
+    output_string += r'{"replaceText":"([0-9]+) ?{{frac\\|([0-9]+)}}","replaceWith":"{{frac|$1|1|$2}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
     output_string += "\n"
-    output_string += r'{"replaceText":"([0-9,]+){{frac\\|([0-9]+)\\|([0-9]+)}}","replaceWith":"{{frac|$1|$2|$3}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
+    output_string += r'{"replaceText":"([0-9]+) ?{{frac\\|([0-9]+)\\|([0-9]+)}}","replaceWith":"{{frac|$1|$2|$3}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
     output_string += "\n"
 
     # MOS:LOGICAL
@@ -875,11 +878,13 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += "\n"
     output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+){{prime}}''","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
+    output_string += """{"replaceText":"([""" + prime_accepted_chars + """]){{prime}}","replaceWith":"{{prime|$1}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
     # {{prime}} does not adjust whitespace properly if italics are part of the argument
     output_string += """{"replaceText":"{{prime\\\\|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
-    output_string += """{"replaceText":"[0-9]°[CF]","replaceWith":"$1&nbsp;°$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"([0-9])°([CF])","replaceWith":"$1&nbsp;°$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
     output_string += """{"replaceText":"&nbsp; ","replaceWith":" ","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
@@ -888,14 +893,18 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += "\n"
 
     # CAUTION: Manually edit "north" to "N", etc.
-    output_string += r"""{"replaceText":"([0-9]+)° ?([0-9]+)['′] ?([0-9]+)[\"″] ?(N|S|north|south),? ?([0-9]+)° ?([0-9]+)['′] ?([0-9]+)[\"″] ?(E|W|east|west)","""
-    output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4|$5|$6|$7|$8|display=inline}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"([0-9]+)° *([0-9]+)('|′|{{prime}}) *([0-9]+)(\"|″|{{pprime}}) *(N|S|north|south),? """
+    output_string += r"""*([0-9]+)° *([0-9]+)('|′|{{prime}}) *([0-9]+)(\"|″|{{pprime}}) ?(E|W|east|west)","""
+    output_string += r""""replaceWith":"{{coord|$1|$2|$4|$6|$7|$8|$10|$12}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
     output_string += r"""{"replaceText":"([0-9]+\\.[0-9]+)°? ?(N|S) ?([0-9]+\\.[0-9]+)°? ?(E|W)","""
-    output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4|display=inline}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += "\n"
+    output_string += r"""{"replaceText":"([0-9]+)° *([0-9]+)('|′|{{prime}}) *(N|S|north|south),? *([0-9]+)° *([0-9]+)('|′|{{prime}}) *(E|W|east|west)","""
+    output_string += r""""replaceWith":"{{coord|$1|$2|$4|$5|$6|$8}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
-    output_string += """{"replaceText":"No.([A-Za-z0-9])","replaceWith":"No. $1","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"No\\.([0-9])","replaceWith":"No. $1","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
     # This must come after the {{coord}} transformations
