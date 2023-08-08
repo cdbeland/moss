@@ -496,6 +496,11 @@ suppression_patterns = [
                ")>", flags=re.I+re.S),
     re.compile(r"\[\[(File|Image):.*?(\||\])", flags=re.I+re.S),
 
+    # For <gallery> blocks
+    re.compile(r"^(File|Image):.*?\|"),
+
+    re.compile(r"\| *image[0-9]? *=.*"),
+
     re.compile(r"{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE"
                # 7seg uses superscript = as a parameter value
                r"|7seg"
