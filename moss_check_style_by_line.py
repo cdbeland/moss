@@ -338,7 +338,7 @@ cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-co
 # --- MORE METRIC CONVERSIONS ---
 
 # TODO:
-# * miles
+# * miles, including {{frac|...}} miles (and fractions for other US units)
 # * pounds (weight vs. money)
 # * tons (various)
 # * hp
