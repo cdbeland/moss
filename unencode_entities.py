@@ -800,7 +800,7 @@ transform_unsafe = {
     "ϱ": "ρ",  # From U+03F1
     "ϴ": "Θ",  # From U+03F4
     "ℇ": "ε",  # From U+2107 Euler constant
-    "․": ".",  # From U+2024
+    # "․": ".",  # From U+2024 - Armenian center-of-line period - retain
     "ℹ": "i",  # From U+2139
 
     # Unclear these are substitutable directly:
