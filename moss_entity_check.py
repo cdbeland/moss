@@ -909,7 +909,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += r""""replaceWith":"{{coord|$1|$2|$4|$5|$6|$8}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
-    output_string += """{"replaceText":"No\\.([0-9])","replaceWith":"No. $1","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"No\\.([0-9])","replaceWith":"No. $1","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
     output_string += "\n"
 
     # This must come after the {{coord}} transformations
