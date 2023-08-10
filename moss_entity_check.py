@@ -376,51 +376,6 @@ article_blocklist = [
     "Naoya Uchida",
     "Yoshito Yasuhara",
 
-    # Special character in file name (<gallery> or parameter)
-    "Collection (publishing)",
-    "Découvertes Gallimard",
-    "Hillman Minx",
-    "Grammaire égyptienne",
-    "Ōtaguro Park",
-    "Cinder cloudy catshark",
-    "Piano Concerto (Khachaturian)",
-    "Charles Francis Adams III",
-    "Daihatsu Boon",
-    "Daihatsu Wake",
-    "KARI KSR-3",
-    "Nanzen-ji",
-    "National Chung-Shan Institute of Science and Technology",
-    "Sumida, Tokyo",
-    "Tokyo",
-    "Tokyo Skytree",
-    "Patrice Bart-Williams",
-    "Nomura Securities",
-    "Rui En vol. 01",
-    "Jan de Herdt",
-    "H-IIB",
-    "AGC Inc.",
-    "Daihatsu Charade",
-    "Daihatsu Move Canbus",
-    "DeNA",
-    "Doppelmayr/Garaventa Group",
-    "Norinchukin Bank",
-    "On the Road to Timbuktu: Explorers in Africa",
-    "Palette Town",
-    "Shibuya Hikarie",
-    "Skyliner",
-    "Halanaerobium praevalens",
-    "Leonardo da Vinci: The Mind of the Renaissance",
-    "Cirsium toyoshimae",
-    "Cultural impact of Madonna",
-    "Akita Northern Happinets",
-    "Kyoto Hannaryz",
-    "Isuzu 810",
-    "'01 (Richard Müller album)",
-    "'s Gravenmoer",
-    ".հայ",
-    ".577/500 No 2 Black Powder",
-    "DNa inscription",
-
     # Blackboard bold characters used as anchors
     "Glossary of mathematical symbols",
 
@@ -488,6 +443,9 @@ lc_lig = "a-zøðþęáéóúýǫ́àèòùâêîôûëïöüÿçå"
 
 
 suppression_patterns = [
+    # TODO: Some substitutions should be made anyway in certain
+    # contexts. For example, "&#39;" -> "'" is safe inside filenames.
+
     re.compile(r"<(syntaxhighlight.*?</syntaxhighlight"
                r"|blockquote lang=.*?</blockquote"
                r"|<source.*?</source"
@@ -496,8 +454,10 @@ suppression_patterns = [
                ")>", flags=re.I+re.S),
     re.compile(r"\[\[(File|Image):.*?(\||\])", flags=re.I+re.S),
 
-    # For <gallery> blocks
-    re.compile(r"^(File|Image):.*?\|"),
+    # For <gallery> blocks. Must use non-matching lookahead to avoid
+    # consuming the beginning of the next line, which is needed to
+    # exclude the next filename.
+    re.compile(r"(^|\n)(File|Image):.*?(?=\||\n)"),
 
     re.compile(r"\| *image[0-9]? *=.*"),
 
@@ -658,6 +618,8 @@ def subcheck_non_entity(article_text, article_title, hint=None):
             continue
         if check_string == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]", article_text):
             continue
+        if check_string == "C°" and article_title = "Complementizer":
+            continue
 
         if check_string == "ϑ" and "θ" not in article_text:
             # Probably not appropriate for basic geometry articles,
@@ -672,6 +634,13 @@ def subcheck_non_entity(article_text, article_title, hint=None):
             # This will miss some articles that use cursive theta in
             # Greek words and for simple high school geometry angles.
             continue
+
+        if check_string in ["¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"]:
+            if ("{{Infobox Chinese" in article_text
+                    or "{{infobox Chinese" in article_text
+                    or "{{Chinese" in article_text):
+                # For tones in some transcription systems
+                continue
 
         # This intentionally adds the article title as many
         # times as the string appears
@@ -699,7 +668,7 @@ def subcheck_html_entity(article_text, article_title):
             result_tuples.append(("LOW_PRIORITY", article_title, entity))
             continue
 
-        if entity in ["&ast;", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"]:
+        if entity == "&ast;":
             if ("{{Infobox Chinese" in article_text
                     or "{{infobox Chinese" in article_text
                     or "{{Chinese" in article_text):
