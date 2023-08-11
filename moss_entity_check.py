@@ -365,17 +365,6 @@ article_blocklist = [
     # African language needs slash in link
     "2011 South African municipal elections",
 
-    # Special character in URL
-    "Almah",
-    "Cray XC50",
-    "Rallying",
-    "Pegeen Vail Guggenheim",
-    "Power electronic substrate",
-    ".450 No 2 Nitro Express",
-    "Armengol de Aspa",
-    "Naoya Uchida",
-    "Yoshito Yasuhara",
-
     # Blackboard bold characters used as anchors
     "Glossary of mathematical symbols",
 
@@ -460,6 +449,9 @@ suppression_patterns = [
     re.compile(r"(^|\n)(File|Image):.*?(?=\||\n)"),
 
     re.compile(r"\| *image[0-9]? *=.*"),
+
+    # TODO: These can be URL-escaped
+    re.compile(r"https?://[^ \n\|&]+"),
 
     re.compile(r"{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE"
                # 7seg uses superscript = as a parameter value
