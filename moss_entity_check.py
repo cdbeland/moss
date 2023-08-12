@@ -449,6 +449,7 @@ suppression_patterns = [
     re.compile(r"(^|\n)(File|Image):.*?(?=\||\n)"),
 
     re.compile(r"\| *image[0-9]? *=.*"),
+    re.compile(r"\| *cover *=.*jpg"),
 
     # TODO: These can be URL-escaped
     re.compile(r"https?://[^ \n\|&]+"),
@@ -610,7 +611,7 @@ def subcheck_non_entity(article_text, article_title, hint=None):
             continue
         if check_string == "° C" and not re.search(rf"° C(elsius)?[^a-zA-Z{lc_lig}]", article_text):
             continue
-        if check_string == "C°" and article_title = "Complementizer":
+        if check_string == "C°" and article_title == "Complementizer":
             continue
 
         if check_string == "ϑ" and "θ" not in article_text:
