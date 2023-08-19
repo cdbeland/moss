@@ -8,9 +8,10 @@ import re
 import sys
 
 
-# Runtime: ~1.5 hours (with a simple callback, whata, single-threaded)
-
-XML_FILE = sys.argv[1]
+if len(sys.argv) > 1:
+    XML_FILE = sys.argv[1]
+else:
+    XML_FILE = sys.stdin
 PAGE_RE = re.compile(r"^.*(<page.*?</page>).*$", flags=re.MULTILINE+re.DOTALL)
 NEWLINE_RE = re.compile(r"\n")
 

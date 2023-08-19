@@ -41,9 +41,6 @@ echo `date`
 echo "Processing medium-sized dumps..."
 
 echo `date`
-echo "Decompressing enwiktionary multistream..."
-bunzip2 enwiktionary-latest-pages-articles-multistream.xml.bz2  # ~20 min
-echo `date`
 echo "Decompressing enwiktionary titles..."
 gunzip enwiktionary-latest-all-titles-in-ns0.gz
 echo `date`
@@ -70,11 +67,11 @@ echo `date`
 echo "Decompressing specieswiki titles..."
 gunzip specieswiki-latest-all-titles-in-ns0.gz
 
-echo `date`
-echo "XML to CSV for enwiktionary..."
-# Run time: About 50 minutes
 cd $ORIG_DIR
-venv/bin/python3 xml_to_csv.py /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml > /var/local/moss/bulk-wikipedia/enwiktionary-articles-no-redir.csv
+echo `date`
+echo "Decompressing enwiktionary multistream and converting XML to CSV..."
+bunzip2 -c /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml.bz2 | venv/bin/python3 xml_to_csv.py > /var/local/moss/bulk-wikipedia/enwiktionary-articles-no-redir.csv
+rm -f /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml.bz2
 
 echo `date`
 echo "Done."

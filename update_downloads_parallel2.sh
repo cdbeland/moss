@@ -19,15 +19,11 @@ echo "parallel4 launched"
 cd /var/local/moss/bulk-wikipedia/
 
 echo `date`
-echo "Decompressing enwiki multistream..."
-bunzip2 enwiki-latest-pages-articles-multistream.xml.bz2
-# About 2 hours
-
-echo `date`
-echo "Converting enwiki XML to CSV..."
-# About 4 h 40 min
+echo "Decompressing enwiki multistream and converting XML to CSV..."
 cd $ORIG_DIR
-venv/bin/python3 xml_to_csv.py /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml > /var/local/moss/bulk-wikipedia/enwiki-articles-no-redir.csv
+bunzip2 -c /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml.bz2 | venv/bin/python3 xml_to_csv.py > /var/local/moss/bulk-wikipedia/enwiki-articles-no-redir.csv
+rm -f /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml.bz2
+# 1 Aug 2023: .xml.bz2 20GB, .xml 90GB, .csv 54GB
 
 echo `date`
 echo "Done."
