@@ -416,6 +416,8 @@ per annum -> per year
 
 FROM:"([a-z]{4})&nbsp;([a-z]{4})"
 TO:"$1 $2"
+
+* External links not inside <ref></ref> or in "External links" section
 """
 
 

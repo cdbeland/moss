@@ -333,9 +333,6 @@ article_blocklist = [
     "Komi Nje",
     "Flow process chart",
 
-    # Legitimate use of <h2> due to complex layout
-    "Main Page",
-
     # &zwj; apparently needed
     "Rasm",
     "The Partisan",
@@ -376,6 +373,11 @@ article_blocklist = [
 
     # Matching the actual unpronouncable album and song titles
     "Four Tet discography",
+
+    # -- Below probably can't be {{not a typo}}'d, above probably can --
+
+    # Legitimate use of <h2> due to complex layout
+    "Main Page",
 
     # {{lang}} can't be used in {{cite}}
     "Everett, Washington",
