@@ -350,6 +350,8 @@ transform_unsafe = {
     "&#x5b;": "[",
     "&#x5d;": "]",
 
+    "&#145;": "'",
+
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
 
