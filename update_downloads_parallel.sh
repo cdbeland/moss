@@ -37,6 +37,9 @@
 # binlog_row_image = minimal
 # # innodb_flush_method parameter = O_DSYNC  # Tries to open too many files
 
+# sudo mkdir -p /usr/local/moss/bulk-wikipedia
+# sudo chown -R $USER /usr/local/moss
+
 set -e
 
 echo `date`
