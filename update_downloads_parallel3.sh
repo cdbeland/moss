@@ -4,15 +4,6 @@ set -e
 
 cd /var/local/moss/bulk-wikipedia/
 
-# ONE-TIME SETUP:
-# su
-# mysql
-#  CREATE DATABASE enwiki;
-#  USE enwiki;
-#  CREATE USER 'beland'@'localhost';
-#  GRANT ALL PRIVILEGES ON enwiki TO 'beland'@'localhost' WITH GRANT OPTION;
-#  GRANT ALL PRIVILEGES ON enwiki.* TO 'beland'@'localhost' WITH GRANT OPTION;
-
 echo `date`
 echo "Adding enwiki categories..."
 echo "Starting downloads and decompression..."

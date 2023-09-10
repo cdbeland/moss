@@ -4,8 +4,9 @@
 
 # Change "beland" to the Unix user you want to set up for
 
-# su
+# sudo su
 # apt-get install mariadb-server
+#  (Fedora: dnf install mariadb-server)
 # service mariadb restart
 # mysql
 #  CREATE DATABASE enwiktionary;
@@ -13,6 +14,10 @@
 #  CREATE USER 'beland'@'localhost';
 #  GRANT ALL PRIVILEGES ON enwiktionary TO 'beland'@'localhost' WITH GRANT OPTION;
 #  GRANT ALL PRIVILEGES ON enwiktionary.* TO 'beland'@'localhost' WITH GRANT OPTION;
+#  CREATE DATABASE enwiki;
+#  USE enwiki;
+#  GRANT ALL PRIVILEGES ON enwiki TO 'beland'@'localhost' WITH GRANT OPTION;
+#  GRANT ALL PRIVILEGES ON enwiki.* TO 'beland'@'localhost' WITH GRANT OPTION;
 
 # Optimization suggestions for my.cnf:
 #
@@ -37,8 +42,8 @@
 # binlog_row_image = minimal
 # # innodb_flush_method parameter = O_DSYNC  # Tries to open too many files
 
-# sudo mkdir -p /usr/local/moss/bulk-wikipedia
-# sudo chown -R $USER /usr/local/moss
+# sudo mkdir -p /var/local/moss/bulk-wikipedia
+# sudo chown -R $USER /var/local/moss
 
 set -e
 
@@ -61,8 +66,8 @@ echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiki
 
 echo `date`
 
-./update_downloads_parallel1.sh >& /bulk-wikipedia/download-parallel1.log &
-./update_downloads_parallel2.sh >& /bulk-wikipedia/download-parallel2.log &
+./update_downloads_parallel1.sh >& /var/local/moss/bulk-wikipedia/download-parallel1.log &
+./update_downloads_parallel2.sh >& /var/local/moss/bulk-wikipedia/download-parallel2.log &
 # 4 and 5 are kicked off from 2
 
 # ./update_downloads_parallel3.sh >& /bulk-wikipedia/download-parallel3.log &
