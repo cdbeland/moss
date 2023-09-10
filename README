@@ -18,7 +18,7 @@ cd moss/
 ./reset_environment.sh
 sudo mkdir /var/local/moss/bulk-wikipedia/
 sudo chown $USER /var/local/moss/bulk-wikipedia/
-Run "FIRST TIME SETUP" steps in ./update_downloads.sh
+Run "FIRST TIME SETUP" steps in ./update_downloads_parallel.sh
 
 DOWNLOAD DATA:
 ./update_downloads_parallel.sh
