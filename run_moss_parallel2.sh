@@ -236,7 +236,9 @@ echo "(REPORT DISABLED DUE TO LONG RUN TIME; START MANUALLY)" >> post-chemical-f
 echo "Beginning not-English check"
 echo `date`
 
-../run_not_english.sh >& not_english.log
+# ../run_not_english.sh >& not_english.log
+echo "gcld3 compilation problems" > not_english.log
+
 
 echo "Beginning superscript/subscript check"
 echo `date`

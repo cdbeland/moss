@@ -31,7 +31,6 @@
 from collections import defaultdict
 import datetime
 import fileinput
-import gcld3
 from multiprocessing import Pool
 from nltk.metrics import distance
 import re
@@ -77,10 +76,6 @@ known_bad_link = {"<http>", "<https>", "<http/>", "<https/>", "<www>"}
 not_html = {"<a>", "<name>", "<r>", "<h>"}
 # <a> is not turned into a link by Mediawiki, so it's almost always
 # intentional like linguistics markup.
-
-google_lang_detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
-                                                    max_num_bytes=1000)
-
 
 # -- INITIALIZATION HELPERS AND GLOBAL VARIABLES --
 
@@ -442,6 +437,14 @@ def near_common_word(word):
         # equal distance will show up
     return (False, False)
 
+def tag_by_lang(word):
+    return "T+gcld3_broken"
+
+
+"""
+import gcld3
+google_lang_detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
+                                                    max_num_bytes=1000)
 
 def tag_by_lang(word):
     # TODO: Very unreliable for Korean. Try using script detection?
@@ -455,7 +458,7 @@ def tag_by_lang(word):
             lang_code = "he"
             # ISO 639 code change for Hebrew
         return f"TF+{lang_code}"
-
+"""
 
 # -- Main loop functions --
 

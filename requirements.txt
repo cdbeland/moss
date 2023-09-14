@@ -10,7 +10,15 @@ stopit
 unidecode
 wikipedia
 textstat
-gcld3
+
+
+# gcld3
+
+# protobuf
+# protobuf-compiler
+# cpython
+# grpcio
+
 pycountry
 
 git+https://github.com/wikimedia/pywikibot.git
