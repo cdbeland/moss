@@ -14,7 +14,7 @@ wget -o - --no-verbose https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-p
 # connection at a time
 echo `date`
 cd $ORIG_DIR
-./update_downloads_parallel4.sh >& /bulk-wikipedia/download-parallel4.log &
+./update_downloads_parallel4.sh >& /var/local/moss/bulk-wikipedia/download-parallel4.log &
 echo "parallel4 launched"
 cd /var/local/moss/bulk-wikipedia/
 
