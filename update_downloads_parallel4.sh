@@ -56,7 +56,7 @@ cat enwiktionary-latest-categorylinks.sql | mysql -D enwiktionary
 # done; parallelize this because it only uses 1 CPU (for mysqld)
 echo `date`
 cd $ORIG_DIR
-./update_downloads_parallel5.sh >& /bulk-wikipedia/download-parallel5.log &
+./update_downloads_parallel5.sh >& /var/local/moss/bulk-wikipedia/download-parallel5.log &
 echo "parallel5 launched"
 cd /var/local/moss/bulk-wikipedia/
 
