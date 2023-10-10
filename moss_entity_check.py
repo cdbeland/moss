@@ -464,7 +464,7 @@ suppression_patterns = [
                # superscripts/subscripts (including tones like
                # <sup>H</sup> in IPA templates); ignoring for now.
                r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA"
-               r"|[Ll]ang\|"
+               r"|[Ll]ang(-rus)?\|"
                r"|[Tt]ransl(iteration)?\|"
                r"|[Zz]h\|"
                r"|[Ii]nterlinear ?\| ?lang="
