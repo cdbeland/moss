@@ -16,6 +16,7 @@ non_entity_transform = [string for string
 # -- PERFORMANCE NOTES --
 
 # Run time: About 2.5 hours on 8 cores for 6.6M articles, nothing else running
+# (big-bucks), about 30 min on big-board
 
 # Trie-based regex is a little faster than a regular regex, but both
 # are a lot slower than string.count() method
