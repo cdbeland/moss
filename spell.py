@@ -128,6 +128,10 @@ bad_words = {
 
     # Bad syntax, requires argument
     "{{formatnum:}}",
+
+    # Should be "God" when in regular prose, not necessarily in direct
+    # quotes and titles
+    "G-d",
 }
 # Per [[MOS:CONTRACTION]] and sourced from
 bad_words.update(contractions)
