@@ -452,6 +452,7 @@ suppression_patterns = [
     re.compile(r"(^|\n)(File|Image):.*?(?=\||\n)"),
 
     re.compile(r"\| *image[0-9]? *=.*"),
+    re.compile(r"\| *ImageFile *=.*"),
     re.compile(r"\| *cover *=.*jpg"),
 
     # TODO: These can be URL-escaped
@@ -608,6 +609,8 @@ def subcheck_non_entity(article_text, article_title, hint=None):
                 # allowed (they are compatible with screen readers)
                 continue
 
+        if check_string == "`" and "{{`}}" in article_text:
+            continue
         if check_string == "°K" and "°KMW" in article_text:
             continue
         if check_string == "° F" and not re.search(rf"° F(ahrenheit)?[^a-zA-Z{lc_lig}]", article_text):
