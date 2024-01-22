@@ -138,12 +138,10 @@ keep = [
     "&lt;",    # <
     "&gt;",    # >
 
-    # https://en.wikipedia.org/wiki/Zero-width_non-joiner Used in
-    # German, Arabic, Hebrew, etc.  Sometimes abused to fix wikitext
-    # markup issues, but would require manual review to determine
-    # that.  TODO: Automate ignoring situations where this is inside
-    # {{lang}}.
-    "&zwnj;",
+    # Needed for Malaysian-language citations, makes a
+    # difference. Should be tagged {{lang}} but this is not possible
+    # inside <ref> tags.
+    "&zwj;",
 
     "&#x1F610;",   # Emoji presentation selector, non-printing
 
@@ -249,6 +247,7 @@ controversial = {
     "&nvap;": "≍⃒",
     "&NotEqual;": "≠",
     "&aleph;": "ℵ",
+    "&beth;": "ℶ",
     "&parallel;": "∥",
     "&darr;": "↓",  # {{down-arrow}} is also available
     "&uarr;": "↑",  # {{up-arrow}} is also available
@@ -275,6 +274,7 @@ controversial = {
     "&crarr;": "↵",
     "&Lt;": "≪",
     "&Gt;": "≫",
+    "&GT;": "&gt;",
     "&vDash;": "⊨",
     "&nvDash;": "⊭",
     "&odot;": "⊙",
@@ -292,6 +292,7 @@ controversial = {
     "&lrarr;": "⇆",
     "&preceq;": "(⪯)",
     "&cfr;": "𝔠",
+    "&angzarr;": "⍼",
 }
 
 # keep.extend(controversial.keys())
@@ -349,6 +350,9 @@ transform_unsafe = {
     "&#x005D;": "]",
     "&#x5b;": "[",
     "&#x5d;": "]",
+
+    "&lpar;": "(",
+    "&rpar;": ")",
 
     "&#145;": "'",
 
@@ -532,6 +536,7 @@ transform_unsafe = {
     "&VerticalLine;": "{{pipe}}",
     "&verbar;": "{{pipe}}",
     "&vert;": "{{pipe}}",
+    "&pipe;": "{{pipe}}",
     # {{!}} in tables?
     # https://www.mediawiki.org/wiki/Help:Magic_words#Other
 
@@ -614,9 +619,18 @@ transform_unsafe = {
     # are 70k+ pages with « or », so those can be ignored for now.
     "&laquo;": "«",
     "&raquo;": "»",
+    "&lsaquo;": "‹",
+    "&rsaquo;": "›",
 
-    # "&zwj;": "",  # Needed for Malaysian-language citations, makes a difference
+    # https://en.wikipedia.org/wiki/Zero-width_non-joiner Used in
+    # German, Arabic, Hebrew, etc.  Sometimes abused to fix wikitext
+    # markup issues, but would require manual review to determine
+    # that.  Ignore inside {{lang}}.
     "&zwnj;": "",
+
+    # Usually just not needed
+    "&ZeroWidthSpace;": "",
+    "&NoBreak;": "",
 
     # https://en.wikipedia.org/wiki/Numerals_in_Unicode#Roman_numerals
     "Ⅰ": "I",
@@ -1470,6 +1484,7 @@ transform = {
     "㎅": "KB",
     "&#x00B4;": "&acute;",
     "&ordf;": "ª",
+    "&ordm;": "º",
     "&ang;": "∠",
 
     # Latin and Germanic letters
@@ -1505,12 +1520,16 @@ transform = {
     "&icirc;": "î",
     "&igrave;": "ì",
     "&iuml;": "ï",
+    "&hbar;": "ℏ",
+    "&nacute;": "ń",
     "&Ntilde;": "Ñ",
     "&ntilde;": "ñ",
     "&oacute;": "ó",
-    "&ocirc;": "ô",
     "&Oacute;": "Ó",
+    "&ocirc;": "ô",
+    "&ocy;": "о̀",
     "&ograve;": "ò",
+    "&omacr;": "ō",
     "&Oslash;": "Ø",
     "&oslash;": "ø",
     "&otilde;": "õ",
@@ -1527,14 +1546,12 @@ transform = {
     "&Ucirc;": "Û",
     "&ucirc;": "û",
     "&ugrave;": "ù",
+    "&umacr;": "ū",
     "&Uuml;": "Ü",
     "&uuml;": "ü",
     "&yacute;": "ý",
+    "&ycirc;": "ŷ",
     "&thorn;": "þ",
-    "&umacr;": "ū",
-    "&omacr;": "ō",
-    "&nacute;": "ń",
-
     "&#214;": "Ö",
     "&#225;": "á",
     "&#227;": "ã",
@@ -1674,6 +1691,12 @@ transform = {
     "&mnsp;": "&nbsp;",
     "&ndasj;": "&ndash;",
     "&ndash0;": "&ndash;",
+    "&npsp;": "&nbsp;",
+    "&nbspp;": "&nbsp;",
+    "&ndsash;": "&ndash;",
+    "&nbsh;": "&nbsp;",
+    "&nbsdp;": "&nbsp;",
+    "&mnbsp;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
