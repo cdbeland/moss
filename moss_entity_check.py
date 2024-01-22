@@ -449,10 +449,11 @@ suppression_patterns = [
     # For <gallery> blocks. Must use non-matching lookahead to avoid
     # consuming the beginning of the next line, which is needed to
     # exclude the next filename.
-    re.compile(r"(^|\n)(File|Image):.*?(?=\||\n)"),
+    re.compile(r"(^|\n)\|? *(File|Image):.*?(?=\||\n)"),
 
     re.compile(r"\| *image[0-9]? *=.*"),
     re.compile(r"\| *ImageFile *=.*"),
+    re.compile(r"\| *image_skyline *=.*"),
     re.compile(r"\| *cover *=.*jpg"),
 
     # TODO: These can be URL-escaped
