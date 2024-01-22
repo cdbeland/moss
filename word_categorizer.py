@@ -437,6 +437,7 @@ def near_common_word(word):
         # equal distance will show up
     return (False, False)
 
+
 def tag_by_lang(word):
     return "T+gcld3_broken"
 
@@ -461,6 +462,7 @@ def tag_by_lang(word):
 """
 
 # -- Main loop functions --
+
 
 def get_word_category(word):
     category = None
