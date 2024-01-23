@@ -22,8 +22,6 @@ variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);",
 alert = [
     "&frasl;",
 
-    "₤",  # per [[MOS:CURRENCY]] should be £ for GBP, but this is used for Italian Lira
-
     # Convert to straight quotes per [[MOS:CONFORM]]
     # but LEAVE when internal to non-English text per [[MOS:STRAIGHT]]
     # Also seen in URL titles (used as stylized field separators)
@@ -301,6 +299,10 @@ transform_unsafe = {
     # These transformations can't be made in places where the
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
+
+    # Per [[MOS:CURRENCY]] should be £ for pound currencies (GBP, AUP,
+    # NZP, etc.)  CAUTION: Keep ₤ or lira and link, e.g.: [[Italian lira|₤]]
+    "₤": "£",
 
     "&s;": "'",
 
