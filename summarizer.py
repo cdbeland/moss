@@ -26,7 +26,9 @@ for line in fileinput.input("-"):
 
     special_word = False
 
-    if word.startswith("<"):
+    if word == "₤":
+        special_word = True
+    elif word.startswith("<"):
         special_word = True
         better_line = "* %s - <nowiki>%s</nowiki> - [[%s]]" % (article_count, word, article_list_str)
     elif word.startswith("&"):
