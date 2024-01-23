@@ -90,7 +90,8 @@ def check_style_by_line(article_title, article_text):
                 problem_line_tuples.extend(result)
         for check_function in [x_to_times_check,
                                broken_nbsp_check,
-                               frac_repair]:
+                               frac_repair,
+                               logical_quoting_check]:
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -203,6 +204,17 @@ def frac_repair(line, line_flags):
         return [("FR", line)]  # FRaction repair needed
 
 
+logical_quoting_re = re.compile(r'"[a-z ,:\-;]+[,\.]"')
+
+
+def logical_quoting_check(line, line_flags):
+    # Per [[MOS:LOGICAL]]
+    if '"' not in line:
+        return
+    if logical_quoting_re.search(line):
+        return [("QL", line)]  # Quoting must be Logical
+
+
 r"""
 
 # --- SPEED CONVERSION ---
@@ -219,14 +231,6 @@ cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.
 
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9](&nbsp;| )?kph|KPH' | sort > tmp-kph-convert.txt
 
-
-# --- MOS:LOGICAL ---
-
-# Run time for this segment: ~15 min (8-core parallel)
-
-echo "Beginning MOS:LOGICAL scan"
-echo `date`
-../venv/bin/python3 ../dump_grep_csv.py '"[a-z ,:\-;]+[,\.]"' | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > beland-MOS-LOGICAL.txt
 
 # ---
 
