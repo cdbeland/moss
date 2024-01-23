@@ -816,7 +816,7 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
         fixed_entity = jwb_escape(fixed_entity)
         if fixed_entity in ["\n"]:
             fixed_entity = r"\n"
-        if fixed_entity in ["\r", "\t", "", "", ""]:  # \r is ^M
+        if fixed_entity in ["\r", "\t", "", "", "", ""]:  # \r is ^M
             fixed_entity == " "
 
         if entity != fixed_entity:
