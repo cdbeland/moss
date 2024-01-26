@@ -38,5 +38,13 @@ echo `date`
 sort -k2 -n tmp-readability.txt > post-readability.txt
 rm tmp-readability.txt
 
+# --- RETF ---
+
+echo "Beginning RETF scan..."
+echo `date`
+../venv/bin/python ../regex_typo_fixer_offline.py > jwb-retf-articles.txt
+
+# ---
+
 echo "Done."
 echo `date`

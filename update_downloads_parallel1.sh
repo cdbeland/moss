@@ -50,5 +50,8 @@ wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/Fo
 rm -f Old_case_notes
 wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/Old_case_notes
 
+# For regex_typo_fixer_offline.py
+wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:AutoWikiBrowser/Typos
+
 echo `date`
 echo "Done."
