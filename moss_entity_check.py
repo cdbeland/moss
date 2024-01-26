@@ -510,21 +510,25 @@ def get_redacted_article_text(article_text):
     return article_text
 
 
+skip_article_strings = [
+    "{{cleanup lang",
+    "{{Cleanup lang",
+    "{{cleanup-lang",
+    "{{Cleanup-lang",
+    "{{which lang",
+    "{{move to Wiki",
+    "{{Move to Wiki",
+    "{{MOS",
+]
+
+
 def entity_check(article_title, article_text):
     if article_title in article_blocklist:
         return
 
-    if "{{cleanup lang" in article_text or "{{Cleanup lang" in article_text:
-        return
-
-    if "{{which lang" in article_text:
-        return
-
-    if "{{move to Wiki" in article_text or "{{Move to Wiki" in article_text:
-        return
-
-    if "{{MOS" in article_text:
-        return
+    for skip_string in skip_article_strings:
+        if skip_string in article_text:
+            return
 
     # Entities that need to be reported are rare, and text redaction
     # is expensive, so check unredacted text first.
