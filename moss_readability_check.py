@@ -49,7 +49,7 @@ def check_reading_level(article_title, article_text):
         return
     if year_in_re.match(article_title):
         return
-    if article_text.startswith("#REDIRECT") or article_text.startswith("# REDIRECT"):
+    if article_text.startswith("#REDIRECT") or article_text.startswith("#redirect"):
         return
     """
     if (article_title.endswith("season")
