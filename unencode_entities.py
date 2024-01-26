@@ -978,6 +978,9 @@ transform_unsafe = {
     "℻": "Fax",
     "⅍": "A/S",
 
+    # https://en.wikipedia.org/wiki/Wikipedia:AutoWikiBrowser/Typos
+    "㉐": "PTE",
+
     # See similar list in spell.py!
     # [[MOS:LIGATURE]], list adapted from
     # https://en.wikipedia.org/wiki/Ligature_(writing)
