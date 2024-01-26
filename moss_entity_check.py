@@ -467,16 +467,20 @@ suppression_patterns = [
                # superscripts/subscripts (including tones like
                # <sup>H</sup> in IPA templates); ignoring for now.
                r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA"
-               r"|[Ll]ang(-rus)?\|"
+               r"|[Ll]ang(-\w\w+)?\|"
                r"|[Tt]ransl(iteration)?\|"
                r"|[Zz]h\|"
+               r"|[Ss]cript/|"
+               r"|[Nn]astaliq"
                r"|[Ii]nterlinear ?\| ?lang="
-
                r"|([Ii]nfobox )?[Cc]hinese"
                r"|[Cc]har"
+               r"|[Ii]ll"  # Interlanguage link
                r"|[Cc]ode\s*\|"
                r"|[Rr]ust\|"
+               r"|{{[Cc]ite[^}]+lang(uage)?="
                r").*?}}", flags=re.S),
+
     re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable)".*?\|}', flags=re.S),
     re.compile(r"(ipa symbol\d?|poj) *= *[^\n]+"),
 
