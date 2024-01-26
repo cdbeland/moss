@@ -42,7 +42,7 @@ rm tmp-readability.txt
 
 echo "Beginning RETF scan..."
 echo `date`
-../venv/bin/python ../regex_typo_fixer_offline.py > jwb-retf-articles.txt
+../venv/bin/python ../regex_typo_fixer_offline.py | sort > fixme-retf.csv
 
 # ---
 
