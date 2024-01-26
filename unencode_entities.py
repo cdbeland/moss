@@ -291,6 +291,7 @@ controversial = {
     "&preceq;": "(⪯)",
     "&cfr;": "𝔠",
     "&angzarr;": "⍼",
+    "&hbar;": "ℏ",
 }
 
 # keep.extend(controversial.keys())
@@ -303,6 +304,7 @@ transform_unsafe = {
     # Per [[MOS:CURRENCY]] should be £ for pound currencies (GBP, AUP,
     # NZP, etc.)  CAUTION: Keep ₤ or lira and link, e.g.: [[Italian lira|₤]]
     "₤": "£",
+    "£": "£",  # U+FFE1
 
     "&s;": "'",
 
@@ -744,7 +746,7 @@ transform_unsafe = {
     "𝕌": r"<math>\mathbb{U}</math>",
     "𝕍": r"<math>\mathbb{V}</math>",
     "𝕎": r"<math>\mathbb{W}</math>",
-    "𝕏": r"<math>\mathbb{X}</math>",
+    "𝕏": r"X",  # Because Twitter
     "𝕐": r"<math>\mathbb{Y}</math>",
     "ℤ": r"<math>\mathbb{Z}</math>",
     "&Zopf;": r"<math>\mathbb{Z}</math>",
@@ -1522,7 +1524,6 @@ transform = {
     "&icirc;": "î",
     "&igrave;": "ì",
     "&iuml;": "ï",
-    "&hbar;": "ℏ",
     "&nacute;": "ń",
     "&Ntilde;": "Ñ",
     "&ntilde;": "ñ",
