@@ -3217,7 +3217,7 @@ regex_frequencies = {
     "They'(r/v)e": 675,
     "of all time": 681,
     "On board": 687,
-    "you'(d\\ve\\re\\ll)_": 698,
+    "you'(d/ve/re/ll)_": 698,
     "co-chairman": 703,
     "Vice-director(1)": 712,
     "? medal-winning": 718,
