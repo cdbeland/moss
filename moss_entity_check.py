@@ -756,11 +756,14 @@ def dump_dict(section_title, dictionary):
 
         article_set = set(article_list)
 
+        """
+        # Actually, can do these with help from more volunteers, if we remember "skip" outcomes
         if len(article_set) > 100000:
             # These should probably be addressed by bot or policy
             # change or more targeted cleanup; leave them off this
             # todo list
             continue
+        """
 
         output += "* %s/%s - %s - %s\n" % (
             len(article_list),
@@ -807,6 +810,10 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
 
     # Must be before auto-generated replacements
     output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\"","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"<br ?/?> *&bull;","replaceWith":"\n*","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"\* *(.*?)<br ?/?>\n?","replaceWith":"* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"\n&bull; *(.*?)(<br ?/?>)?\n","replaceWith":"\n* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+
     output_string += "\n"
 
     bad_entities_sorted = []
