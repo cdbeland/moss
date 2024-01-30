@@ -3489,9 +3489,7 @@ def show_replacement(result, regex_tuple, article_text):
     if snippet == changed_to:
         return None
     else:
-        snippet = snippet.replace("\n", "\\n")
-        changed_to = changed_to.replace("\n", "\\n")
-        return (f'"{snippet}" -> "{changed_to}"')
+        return (f'{pformat(snippet)} -> {pformat(changed_to)}')
 
 
 def full_regex_callback(article_title, article_text):
