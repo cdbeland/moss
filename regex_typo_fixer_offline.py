@@ -3425,6 +3425,9 @@ general_suppressor_patterns = [
     r"[0-9a-zA-Z\-\.]+\.(com|edu|org|gov)",
     r"<!--.*?-->",
     r"{{not a typo.*?}}",
+    r"{{char.*?}}",
+    r"{{proper name.*?}}",
+    r"\| *image[0-9]* *=.*?\n",
 ]
 general_suppressor_regexes = [re.compile(p, flags=re.S) for p in general_suppressor_patterns]
 
