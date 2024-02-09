@@ -390,12 +390,6 @@ article_blocklist = [
     # {{not a typo}} not working well due to intersecting/nested templates
     "Beta",
     "Kappa",
-
-    # Mixed thetas are intentional
-    "Chebyshev function",
-    "Eisenstein series",
-    "J-invariant",
-    "Kamassian language",
 ]
 
 
@@ -642,6 +636,17 @@ def subcheck_non_entity(article_text, article_title, hint=None):
             # This will miss some articles that use cursive theta in
             # Greek words and for simple high school geometry angles.
             continue
+        elif check_string == "ϑ":
+            # Mixed thetas are intentional
+            if article_title in [
+                    "Chebyshev function",
+                    "Eisenstein series",
+                    "J-invariant",
+                    "Kamassian language",
+                    "Scythian languages",
+                    "Scythian religion",
+            ]:
+                continue
 
         if check_string in ["¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"]:
             if ("{{Infobox Chinese" in article_text
