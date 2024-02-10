@@ -26,10 +26,7 @@ for line in fileinput.input("-"):
 
     special_word = False
 
-    if word == "₤":
-        special_word = True
-        better_line = line
-    elif word.startswith("<"):
+    if word.startswith("<"):
         special_word = True
         better_line = "* %s - <nowiki>%s</nowiki> - [[%s]]" % (article_count, word, article_list_str)
     elif word.startswith("&"):
@@ -37,6 +34,8 @@ for line in fileinput.input("-"):
         word_no_amp = word.lstrip("&")
         better_line = "* %s - &amp;%s (%s) - [[%s]]" % (article_count, word_no_amp, word, article_list_str)
     else:
+        if word == "₤":
+            special_word = True
         better_line = "* %s - [[wikt:%s]] - [[%s]]" % (article_count, word, article_list_str)
 
     if len(sys.argv) > 1 and sys.argv[1] == "--find-all":
