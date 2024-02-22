@@ -137,6 +137,10 @@ echo `date`
 
 # Feet and inches - [[MOS:UNITNAMES]]
 
+### TODO: This also needs to handle {{frac}} in place of pure digits
+# {{s?frac|[0-9]+|[0-9]+(|[0-9]+)?}}
+# Integrate with moss_check_style_by_line.py ?
+
 grep -P "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" err-parse-failures.txt | grep -v ° > tmp-feet-inches1.txt
 grep -P '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' err-parse-failures.txt > tmp-feet-inches2.txt
 grep -P '[0-9\.]+"' err-parse-failures.txt > tmp-feet-inches3.txt
