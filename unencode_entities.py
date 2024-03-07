@@ -228,6 +228,7 @@ controversial = {
     "&geq;": "≥",
     "&leq;": "≤",
     "&plusmn;": "±",
+    "&mnplus;": "∓",
     "&vellip;": "⋮",
     "&ctdot;": "⋯",
     "&dtdot;": "⋱",
@@ -544,6 +545,7 @@ transform_unsafe = {
     # {{!}} in tables?
     # https://www.mediawiki.org/wiki/Help:Magic_words#Other
 
+    "&Vert;": "‖",
     "&Verbar;": "‖",
     "&squ;": "□",
 
@@ -1641,6 +1643,7 @@ transform = {
     "&mdasg;": "&mdash;",
     "&nsbp;": "&nbsp;",
     "&nbps;": "&nbsp;",
+    "&nbps;": "&nbsp;",
     "&bnsp;": "&nbsp;",
     "&spnb;": "&nbsp;",
     "&ndsp;": "&nbsp;",
@@ -1719,6 +1722,7 @@ greek_letters = {
     "&zeta;": "ζ",
     "&eta;": "η",
     "&theta;": "θ",
+    "&vartheta;": "ϑ",
     "&iota;": "ι",
     "&lambda;": "λ",
     "&mu;": "μ",
