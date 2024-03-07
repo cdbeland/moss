@@ -815,9 +815,12 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
 
     # Must be before auto-generated replacements
     output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\"","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    output_string += r"""{"replaceText":"<br ?/?> *&bull;","replaceWith":"\n*","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    output_string += r"""{"replaceText":"\\* *(.*?)<br ?/?>\n?","replaceWith":"* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    output_string += r"""{"replaceText":"\n&bull; *(.*?)(<br ?/?>)?\n","replaceWith":"\n* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+
+    # These were useful when there were a lot of badly formatted
+    # lists, but now they just make a lot of bad changes.
+    # output_string += r"""{"replaceText":"<br ?/?> *&bull;","replaceWith":"\n*","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    # output_string += r"""{"replaceText":"\\* *(.*?)<br ?/?>\n?","replaceWith":"* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    # output_string += r"""{"replaceText":"\n&bull; *(.*?)(<br ?/?>)?\n","replaceWith":"\n* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
 
     output_string += "\n"
 
