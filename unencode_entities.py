@@ -809,7 +809,7 @@ transform_unsafe = {
     # "₨": "Rs",
 
     # https://en.wikipedia.org/wiki/Unicode_compatibility_characters#Semantically_distinct_characters
-    "ℵ": "א",  # From U+2135
+    # "ℵ": "א",  # From U+2135  Used in math without the RTL direction, probably OK
     "ℶ": "ב",  # From U+2136
     "ℷ": "ג",  # From U+2137
     "ℸ": "ד‎",  # From U+2138
