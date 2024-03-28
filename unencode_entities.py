@@ -1606,6 +1606,7 @@ transform = {
     "&ccedi;": "ç",
     "&Amp;": "&amp;",
     "&AMP;": "&amp;",
+    "&NBSP;": "&nbsp;",
     "&6nbsp;": "&nbsp;",
     "&Ndash;": "&ndash;",
     "&nybsp;": "&nbsp;",
