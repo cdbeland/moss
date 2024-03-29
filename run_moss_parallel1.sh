@@ -42,7 +42,7 @@ rm tmp-readability.txt
 
 echo "Beginning RETF scan..."
 echo `date`
-../venv/bin/python ../regex_typo_fixer_offline.py | sort > tmp-retf.csv
+../venv/bin/python ../retf_offline_scan.py | sort > tmp-retf.csv
 cat tmp-retf.csv | perl -pe 's/^.*\t(.*?)\t.*?$/$1/' | sort | perl ../count.pl | sort -n > retf-counts.txt
 sort tmp-retf.csv --stable -n -k5 -t "	" > retf-by-regex.csv
 # Above, -t "(tab character)"
