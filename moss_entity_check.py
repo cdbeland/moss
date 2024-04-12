@@ -814,14 +814,14 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     output_string += """{"string":{"articleList":"","summary":"convert special characters found by [[Wikipedia:Typo Team/moss]]","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":true,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n"""  # noqa
 
     # Must be before auto-generated replacements
-    output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\"","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    output_string += r"""{"replaceText":"&apos;''","replaceWith":"{{'}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    output_string += r"""{"replaceText":"''&apos;","replaceWith":"''{{'}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\"","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
+    output_string += r"""{"replaceText":"&apos;''","replaceWith":"{{'}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
+    output_string += r"""{"replaceText":"''&apos;","replaceWith":"''{{'}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     # These were useful when there were a lot of badly formatted
     # lists, but now they just make a lot of bad changes.
-    # output_string += r"""{"replaceText":"<br ?/?> *&bull;","replaceWith":"\n*","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    # output_string += r"""{"replaceText":"\\* *(.*?)<br ?/?>\n?","replaceWith":"* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
-    # output_string += r"""{"replaceText":"\n&bull; *(.*?)(<br ?/?>)?\n","replaceWith":"\n* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    # output_string += r"""{"replaceText":"<br ?/?> *&bull;","replaceWith":"\n*","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
+    # output_string += r"""{"replaceText":"\\* *(.*?)<br ?/?>\n?","replaceWith":"* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
+    # output_string += r"""{"replaceText":"\n&bull; *(.*?)(<br ?/?>)?\n","replaceWith":"\n* $1\n","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
 
     output_string += "\n"
 
@@ -844,22 +844,22 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
             fixed_entity == " "
 
         if entity != fixed_entity:
-            output_string += '{"replaceText":"%s","replaceWith":"%s","useRegex":true,"regexFlags":"g","ignoreNowiki":true},\n' % (
+            output_string += '{"replaceText":"%s","replaceWith":"%s","useRegex":true,"regexFlags":"g","ignoreNowiki":false},\n' % (
                 entity,
                 fixed_entity)
 
     # {{frac}} repair
-    output_string += r'{"replaceText":"([0-9]+) ?{{frac\\|([0-9]+)}}","replaceWith":"{{frac|$1|1|$2}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
+    output_string += r'{"replaceText":"([0-9]+) ?{{frac\\|([0-9]+)}}","replaceWith":"{{frac|$1|1|$2}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},'
     output_string += "\n"
-    output_string += r'{"replaceText":"([0-9]+) ?{{frac\\|([0-9]+)\\|([0-9]+)}}","replaceWith":"{{frac|$1|$2|$3}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
+    output_string += r'{"replaceText":"([0-9]+) ?{{frac\\|([0-9]+)\\|([0-9]+)}}","replaceWith":"{{frac|$1|$2|$3}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},'
     output_string += "\n"
 
     # MOS:LOGICAL
-    output_string += r'{"replaceText":"\"([a-z ,:\\-;]+)([,\\.])\"","replaceWith":"\"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true},'
+    output_string += r'{"replaceText":"\"([a-z ,:\\-;]+)([,\\.])\"","replaceWith":"\"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":false},'
     output_string += "\n"
 
     # MOS:DOUBLE
-    # output_string += r'{"replaceText":" ' + r"'" + r'([A-Za-z ,:\\-;]+)' + r"'" + r'([,\\. }\\)])", "replaceWith":" \"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true}'
+    # output_string += r'{"replaceText":" ' + r"'" + r'([A-Za-z ,:\\-;]+)' + r"'" + r'([,\\. }\\)])", "replaceWith":" \"$1\"$2","useRegex":true,"regexFlags":"g","ignoreNowiki":false}'
     # TODO: This is disabled because it fails to respect:
     # * Single quotes properly nested inside double quotes, if there
     #   are words between all the quote marks
@@ -869,45 +869,45 @@ def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
     prime_accepted_chars = "dijkrtvwxyzCDEFGHIJKMNUVWXYZγδζξϖπστΕΖΗΙΚΜΝΞΠΣΥϒΧΨcgsuBGOPQRSαβϑθκμνςυχψωΒΘΟΡΩab∂ehmnopqALεϵηιλοϱρφϕΑΔΛΦflTΓΤ"
 
     # Common error
-    output_string += """{"replaceText":"{{prime}}\\\\.([0-9]+)","replaceWith":".$1{{prime}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"{{prime}}\\\\.([0-9]+)","replaceWith":".$1{{prime}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
 
     # {{prime}} takes preceding text as an argument to adjust whitespace
-    output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+)''{{prime}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+)''{{prime}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
-    output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+){{prime}}''","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"''(['""" + prime_accepted_chars + """]+){{prime}}''","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
-    output_string += """{"replaceText":"([""" + prime_accepted_chars + """]){{prime}}","replaceWith":"{{prime|$1}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"([""" + prime_accepted_chars + """]){{prime}}","replaceWith":"{{prime|$1}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
     # {{prime}} does not adjust whitespace properly if italics are part of the argument
-    output_string += """{"replaceText":"{{prime\\\\|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"{{prime\\\\|''([""" + prime_accepted_chars + """]+)''}}","replaceWith":"''{{prime|$1}}''","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
 
-    output_string += """{"replaceText":"([0-9])°([CF])","replaceWith":"$1&nbsp;°$2","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"([0-9])°([CF])","replaceWith":"$1&nbsp;°$2","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
 
-    output_string += """{"replaceText":"&nbsp; ","replaceWith":" ","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":"&nbsp; ","replaceWith":" ","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
-    output_string += """{"replaceText":" &nbsp;","replaceWith":" ","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += """{"replaceText":" &nbsp;","replaceWith":" ","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
 
     # CAUTION: Manually edit "north" to "N", etc.
     output_string += r"""{"replaceText":"([0-9]+)° *([0-9]+)('|′|{{prime}}) *([0-9]+)(\"|″|{{pprime}}) *(N|S|north|south),? """
     output_string += r"""*([0-9]+)° *([0-9]+)('|′|{{prime}}) *([0-9]+)(\"|″|{{pprime}}) ?(E|W|east|west)","""
-    output_string += r""""replaceWith":"{{coord|$1|$2|$4|$6|$7|$8|$10|$12}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r""""replaceWith":"{{coord|$1|$2|$4|$6|$7|$8|$10|$12}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
     output_string += r"""{"replaceText":"([0-9]+\\.[0-9]+)°? ?(N|S) ?([0-9]+\\.[0-9]+)°? ?(E|W)","""
-    output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r""""replaceWith":"{{coord|$1|$2|$3|$4}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
     output_string += r"""{"replaceText":"([0-9]+)° *([0-9]+)('|′|{{prime}}) *(N|S|north|south),? *([0-9]+)° *([0-9]+)('|′|{{prime}}) *(E|W|east|west)","""
-    output_string += r""""replaceWith":"{{coord|$1|$2|$4|$5|$6|$8}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r""""replaceWith":"{{coord|$1|$2|$4|$5|$6|$8}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
 
-    output_string += r"""{"replaceText":"No\\.([0-9])","replaceWith":"No. $1","useRegex":true,"regexFlags":"g","ignoreNowiki":true},"""
+    output_string += r"""{"replaceText":"No\\.([0-9])","replaceWith":"No. $1","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
     output_string += "\n"
 
     # This must come after the {{coord}} transformations
     # CAUTION: Use {{sky}} for celestial coordinates
-    output_string += r"""{"replaceText":"([0-9]+)° ?([0-9]+)['′] ?([0-9]+)[\"″]","replaceWith":"$1°$2{{prime}}$3{{pprime}}","useRegex":true,"regexFlags":"g","ignoreNowiki":true}"""
+    output_string += r"""{"replaceText":"([0-9]+)° ?([0-9]+)['′] ?([0-9]+)[\"″]","replaceWith":"$1°$2{{prime}}$3{{pprime}}","useRegex":true,"regexFlags":"g","ignoreNowiki":false}"""
     output_string += "\n"
 
     output_string += "]}}"
