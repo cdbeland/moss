@@ -575,10 +575,6 @@ def subcheck_alert(article_text, article_title, hint=None):
         if not found_count:
             continue
 
-        if check_string == "₤" and re.search("lira|lire", article_text, flags=re.I+re.S):
-            # Per [[MOS:CURRENCY]]
-            continue
-
         # Add the article title for each instance
         for i in range(0, found_count):
             result_tuples.append(("ALERT", article_title, check_string))
@@ -595,6 +591,10 @@ def subcheck_non_entity(article_text, article_title, hint=None):
     for check_string in hint or non_entity_transform:
         found_count = article_text.count(check_string)
         if not found_count:
+            continue
+
+        if check_string == "₤" and re.search("lira|lire", article_text, flags=re.I+re.S):
+            # Per [[MOS:CURRENCY]]
             continue
 
         if check_string in ["¼", "½", "¾"]:
