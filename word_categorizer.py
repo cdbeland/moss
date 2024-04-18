@@ -71,7 +71,7 @@ known_html_bad = {"<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
                   "<dl>", "<cite>", "<p>", "<strong>", "<b>", "<hr>",
                   "<hr/>", "<font>", "</br>", "<center>", "<strike>",
                   "<ins>", "<q>", "<wbr>", "<ruby>", "<rt>",
-                  "<rp>"}
+                  "<rp>", "<var>"}
 known_bad_link = {"<http>", "<https>", "<http/>", "<https/>", "<www>"}
 not_html = {"<a>", "<name>", "<r>", "<h>"}
 # <a> is not turned into a link by Mediawiki, so it's almost always
