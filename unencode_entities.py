@@ -22,6 +22,10 @@ variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);",
 alert = [
     "&frasl;",
 
+    # Use \circ in <math>...</math> instead, per [[MOS:MATHSPECIAL]]
+    "∘",
+    "○",
+
     # Convert to straight quotes per [[MOS:CONFORM]]
     # but LEAVE when internal to non-English text per [[MOS:STRAIGHT]]
     # Also seen in URL titles (used as stylized field separators)
