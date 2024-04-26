@@ -364,6 +364,7 @@ transform_unsafe = {
     "&rpar;": ")",
 
     "&#145;": "'",
+    "&commat;": "@",
 
     "&equals;": "=",  # Can mess up wikitext
     "&lowbar;": "_",  # Sometimes needed in links to avoid AWB, etc. auto-deleting
@@ -416,10 +417,13 @@ transform_unsafe = {
     # Probably convert to regular space or no space
     "&ensp;": " ",  # Or {{sp}} if a regular space is needed
     "&emsp;": " ",  # Or {{sp}} if a regular space is needed
+
+    "&thnsp;": "&thinsp;",
+    "&thisp;": "&thinsp;",
+
     "&ThinSpace;": " ",
     "&thinsp;": " ",  # Use "{{thin space}}" if retained
     "&thinspace;": " ",
-    "&thisp;": " ",
     "&hairsp;": "",   # Use "{{hair space}}" if retained
     "&emsp13;": " ",
     "&emsp14;": " ",
