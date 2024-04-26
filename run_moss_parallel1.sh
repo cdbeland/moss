@@ -16,9 +16,9 @@ grep ^R tmp-style-by-line.txt > fixme-rhyme-scheme.txt
 grep ^X tmp-style-by-line.txt > fixme-x-to-times.txt
 grep ^FR tmp-style-by-line.txt > fixme-fraction.txt
 grep ^QL tmp-style-by-line.txt > fixme-logical-quoting.txt
+grep ^L tmp-style-by-line.txt > fixme-liters.txt
 
 echo "moss_check-style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
-# grep ^L tmp-style-by-line.txt > fixme-liters.txt
 # grep ^T tmp-style-by-line.txt > fixme-temp.txt
 # grep ^S tmp-style-by-line.txt > fixme-speed.txt
 # grep ^FU tmp-style-by-line.txt > fixme-fuel-efficiency.txt

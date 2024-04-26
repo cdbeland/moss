@@ -15,7 +15,7 @@ remove_math_article_re = re.compile(r"(<math.*?</math>|\{\{math[^}]+\}?\}?)", fl
 remove_ref_re = re.compile(r"<ref.*?(\/ ?>|<\/ref>)")
 remove_cite_re = re.compile(r"\{\{cite.*?\}\}")
 remove_not_a_typo_re = re.compile(r"\{\{not a typo.*?\}\}")
-remove_url_re = re.compile(r"https?:[^ \]]+")
+remove_url_re = re.compile(r"https?:[^ \]\|]+")
 remove_image_re = re.compile(r"\[\[(File|Image):.*?\|")
 remove_image_param_re = re.compile(r"\| *image[0-9]? *=.*$")
 
@@ -193,11 +193,14 @@ def broken_nbsp_check(line, line_flags):
 
 
 frac_repair_re = re.compile(r"[0-9]\{\{frac\|[0-9]+\|")
+frac_repair_dash_re = re.compile(r"[0-9]-[0-9]+/[0-9]")
 
 
 def frac_repair(line, line_flags):
     if not line_flags["has_digit"]:
         return
+    if frac_repair_dash_re.search(line):
+        return [("FR", line)]  # FRaction repair needed
     if "frac" not in line:
         return
     if frac_repair_re.search(line):
@@ -215,8 +218,83 @@ def logical_quoting_check(line, line_flags):
         return [("QL", line)]  # Quoting must be Logical
 
 
-r"""
+# --- LITERS ---
 
+# Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
+
+liter_link_re = re.compile(r"[Ll]iter|[Ll]itre)s?\|l\]\]")
+liter_convert_re = re.compile(r"{{(convert|cvt)\|[^\}]+\|l(\||}|/)")
+liter_parens_re = re.compile(rf"[^a-zA-Z{NON_ASCII_LETTERS}]\(l(/[a-zA-Z/]+)?\)[^a-zA-Z{NON_ASCII_LETTERS}]")
+liter_prefix_re = re.compile(r"[0-9]( |&nbsp;)?(ql|rl|yl|zl|al|fl|pl|μl|ml|cl|dl|dal|hl|kl|Ml|Gl|Tl|Pl|El|Zl|Yl|Rl|Ql)")
+liter_illion_re = re.compile(r"[rBbMm]illion( |&nbsp;)l")
+liter_qty_re = re.compile(r"[0-9]( |&nbsp;)?l[^A-Za-z'0-9]")
+liter_numerator_re = re.compile(r" [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]")
+
+
+def liter_lowercase_check(line, line_flags):
+    if "l" not in line:
+        return
+
+    if liter_link_re(line):
+        return [("L1", line)]
+
+    # "(l)" and "(l/c/d)" (per capita per day) show up in table
+    # headers sometimes
+    if liter_parens_re(line):
+        if "(l)!" in line:
+            return
+        if "(r)" in line:  # Right and left
+            return
+        return [("L2", line)]
+
+    if "illion" in line and liter_illion_re(line):
+        return [("L3", line)]
+
+    if not line_flags["has_digit"]:
+        return
+    if liter_prefix_re(line):
+        return [("L4", line)]
+    if liter_qty_re(line):
+        # Might need:
+        # | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’{NON_ASCII_LETTERS}]"
+        # | grep -vi " l.jpg"
+        # | grep -vP "image[0-9]? *=.* l[ \.].jpg"
+        # | grep -v "AD-1 l"
+        # | grep -v "l="
+        # | grep -v "\[\[Pound sterling|l"
+        # | grep -v "{{not English inline}}"
+        return [("L5", line)]
+    if liter_numerator_re(line):
+        return [("L6", line)]
+
+    # Denominator checks
+    line_tmp = remove_url_re.sub("✂", line)
+    if "/l" in line_tmp:
+        # May need to manually fix some instances:
+        # expand "m/l" to "music and lyrics" or drop
+        # expand "w/l" to "win/loss"
+        # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
+        # and these:
+        if "Malaysian names#Indian names|a/l" in line_tmp:
+            return
+        if "Length at the waterline|w/l" in line_tmp:
+            return
+        if "Length at the waterline|Length w/l" in line_tmp:
+            return
+        if "Waterline length|w/l" in line_tmp:
+            return
+
+        # May need to:
+        # | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z{NON_ASCII_LETTERS}'0-9/\-_]"
+        # | grep -vP "w/l(-[0-9])? *="
+        # | grep -vP "data:[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]"
+        # | grep -vP "[^a-zA-Z0-9]r/l"
+        # | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]"
+        # | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]"
+        return [("L7", line)]
+
+
+r"""
 # --- SPEED CONVERSION ---
 
 # [[MOS:UNITNAMES]]
@@ -226,42 +304,11 @@ echo `date`
 
 # Run time for this segment: About 1 h 40 min
 
-../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h' | grep -iP "\bmph\b" | grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" | grep -v "mph=" | sort > tmp-mph-convert.txt
+../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h'
+| grep -iP "\bmph\b" | grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" | grep -v "mph=" | sort > tmp-mph-convert.txt
 cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
 
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9](&nbsp;| )?kph|KPH' | sort > tmp-kph-convert.txt
-
-
-# ---
-
-def liter_lowercase_check(line, line_flags):
-    # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
-
-    if "l" not in line:
-        return []
-
-# For "(l)", "(l/c/d)", etc. in table headers
-
-
-../venv/bin/python3 ../dump_grep_csv.py "[0-9] l" | perl -pe "s%\{\{cite.*?\}\}%%g" | perl -pe "s%\{\{(Transliteration|lang|IPA|not a typo).*?\}\}%%g" | perl -pe "s%<math.*?</math>%%g" | perl -pe "s/(File|Image):.*?[\|\n]//g" | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’{NON_ASCII_LETTERS}]" | grep -vi " l.jpg" | grep -vP "image[0-9]? *=.* l[ \.].jpg" | grep -v "AD-1 l" | grep -v "l=" | grep -v "\[\[Pound sterling|l" | grep -v "{{not English inline}}" | sort > tmp-liters-fixme1.txt
-
-../venv/bin/python3 ../dump_grep_csv.py "[rBbMm]illion l[^a-zA-Z0-9']" | sort > tmp-liters-fixme2.txt
-../venv/bin/python3 ../dump_grep_csv.py "[0-9]&nbsp;l[^A-Za-z'0-9]" | sort > tmp-liters-fixme4.txt
-../venv/bin/python3 ../dump_grep_csv.py ' [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]' | sort > tmp-liters-fixme7.txt
-
-../venv/bin/python3 ../dump_grep_csv.py '([Ll]iter|[Ll]itre)s?\|l]]'| perl -pe "s%\{\{cite.*?\}\}%%g" | sort > tmp-liters-fixme3.txt
-../venv/bin/python3 ../dump_grep_csv.py '{{(convert|cvt)\|[^\}]+\|l(\||}|/)' | sort > tmp-liters-fixme6.txt
-../venv/bin/python3 ../dump_grep_csv.py '\(l(/[a-zA-Z/]+)?\)' | grep -v '(l)\!' | grep -v '(r)' | grep -vP "[a-zA-Z{NON_ASCII_LETTERS}]\(l\)" | grep -vP "\(l\)[a-zA-Z{NON_ASCII_LETTERS}]" | grep -vP '</?math' | sort > tmp-liters-fixme0.txt
-
-../venv/bin/python3 ../dump_grep_csv.py "/l" | perl -pe "s/{{not a typo.*?}}//" | perl -pe "s/{{math.*?}}//" | perl -pe "s%<math>.*?</math>%%g" | perl -pe "s/(File|Image):.*?\|//g" | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z{NON_ASCII_LETTERS}'0-9/\-_]" | grep -vP "w/l(-[0-9])? *=" | grep -vP "(https?://|data:)[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]" | grep -vP "[^a-zA-Z0-9]r/l" | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]" | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]" | grep -vP "\{\{cite.{5,100} a/l .{5,100}\}\}" | grep -v "Malaysian names#Indian names|a/l" | grep -vP "Length at the waterline\|(Length )?w/l" | grep -v "Waterline length|w/l" | sort > tmp-liters-fixme5.txt
-# Done for fixme5:
-# expand "m/l" to "music and lyrics" or drop
-# expand "w/l" to "win/loss"
-# expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
-# change "a/l" to "[[Malaysian names#Indian names|a/l]]" except inside internal or external links
-"""
-
-r"""
 
 
 # --- TEMPERATURE CONVERSION ---
@@ -277,18 +324,21 @@ echo "  Beginning F scan..."
 echo `date`
 ../venv/bin/python3 ../dump_grep_csv.py F | grep -P "(°F|0s( |&nbsp;)F[^b-z])" > tmp-temp-F.txt
 
-grep '°F' tmp-temp-F.txt | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | grep -vP '°C.{0,30}°F' | grep -vP '°F.{0,30}°C' | grep -vP "(min|max|mean)_temp_[0-9]" | grep "°F" | sort > tmp-temperature-convert1.txt
-grep "[0-9]0s( |&nbsp;)?F[^b-z]" tmp-temp-F.txt | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert5.txt
+grep '°F' tmp-temp-F.txt | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | grep -vP '°C.{0,30}°F'
+| grep -vP '°F.{0,30}°C' | grep -vP "(min|max|mean)_temp_[0-9]" | grep "°F"
+| sort > tmp-temp-convert1.txt
+
+grep "[0-9]0s( |&nbsp;)?F[^b-z]" tmp-temp-F.txt | grep -vP "[0-9]{3}0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temp-convert5.txt
 
 echo "  Beginning weather scan..."
 echo `date`
 ../venv/bin/python3 ../dump_grep_csv.py "([Ww]eather|WEATHER|[Tt]emperature|TEMPERATURE|[Hh]eat|HEAT|[Cc]hill|CHILL)" > tmp-temp-weather.txt
 
-grep '[ \(][0-9](C|F)[^a-zA-Z0-9]' tmp-temp-weather.txt | sort > tmp-temperature-convert2.txt
-grep "[0-9]+s?( |&nbsp;)(C|F)[^a-zA-Z0-9]" tmp-temp-weather.txt | sort > tmp-temperature-convert3.txt
-grep '[0-9]°' tmp-temp-weather.txt | sort > tmp-temperature-convert4b.txt
-grep '[0-9][0-9],' tmp-temp-weather.txt | grep -iP "weather=" | sort > tmp-temperature-convert4c.txt
-../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temperature-convert6.txt
+grep '[ \(][0-9](C|F)[^a-zA-Z0-9]' tmp-temp-weather.txt | sort > tmp-temp-convert2.txt
+grep "[0-9]+s?( |&nbsp;)(C|F)[^a-zA-Z0-9]" tmp-temp-weather.txt | sort > tmp-temp-convert3.txt
+grep '[0-9]°' tmp-temp-weather.txt | sort > tmp-temp-convert4b.txt
+grep '[0-9][0-9],' tmp-temp-weather.txt | grep -iP "weather=" | sort > tmp-temp-convert4c.txt
+../venv/bin/python3 ../dump_grep_csv.py "(low|lower|mid|middle|high|upper|the)[ \-][0-9][0-9]?0s" | perl -pe "s%<ref.*?</ref>%%g" | grep -v "Celsius" | grep "0s" | sort > tmp-temp-convert6.txt
 
 FROM:([0-9]+)° (and|to)([0-9]+)°(&nbsp;| )?(C|F)
 TO:$1 $2°&nbsp;$4
@@ -332,9 +382,11 @@ TO:$1-$2°&nbsp;$4
 
 
 echo "  Beginning degree scan..."
-../venv/bin/python3 ../dump_grep_csv.py "degrees? \[*(C|c|F)" | perl -pe "s%<ref.*?</ref>%%g" | grep -P "degrees? \[*(C|c|F)" | sort > tmp-temperature-convert4.txt
+../venv/bin/python3 ../dump_grep_csv.py "degrees? \[*(C|c|F)" | perl -pe "s%<ref.*?</ref>%%g"
+| grep -P "degrees? \[*(C|c|F)" | sort > tmp-temp-convert4.txt
 
-cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-convert3.txt tmp-temperature-convert4.txt tmp-temperature-convert4b.txt tmp-temperature-convert4c.txt tmp-temperature-convert5.txt tmp-temperature-convert6.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-temperature-convert.txt
+cat tmp-temp-convert1.txt tmp-temp-convert2.txt tmp-temp-convert3.txt tmp-temp-convert4.txt tmp-temp-convert4b.txt tmp-temp-convert4c.txt tmp-temp-convert5.txt tmp-temp-convert6.txt
+| perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-temperature-convert.txt
 
 # rm -f tmp-temp-weather.txt
 # rm -f tmp-temp-F.txt
@@ -342,7 +394,8 @@ cat tmp-temperature-convert1.txt tmp-temperature-convert2.txt tmp-temperature-co
 # --- MORE METRIC CONVERSIONS ---
 
 # TODO:
-# * miles, including {{frac|...}} miles (and fractions for other US units)
+# * miles, including {{frac|...}} miles and e.g. "1 1/2 miles"
+#   (and fractions for other US units)
 # * pounds (weight vs. money)
 # * tons (various)
 # * hp
@@ -357,8 +410,13 @@ echo `date`
 
 # {{cvt}} or {{convert}} should probably be used in all instances to
 # convert between US and imperial gallons (ug!)
-# ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
-../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | sort > tmp-mpg-convert.txt
+# ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g"
+| perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg"
+| grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
+
+../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g"
+| perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | sort > tmp-mpg-convert.txt
+
 
 cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.txt
 
