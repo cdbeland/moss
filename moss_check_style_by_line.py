@@ -13,11 +13,12 @@ digit_re = re.compile(r"[0-9]")
 remove_math_line_re = re.compile(r"(<math.*?(</math>|$)|\{\{math[^}]+\}?\}?)")
 remove_math_article_re = re.compile(r"(<math.*?</math>|\{\{math[^}]+\}?\}?)", flags=re.S)
 remove_ref_re = re.compile(r"<ref.*?(\/ ?>|<\/ref>)")
-remove_cite_re = re.compile(r"\{\{cite.*?\}\}")
+remove_cite_re = re.compile(r"\{\{([Cc]ite|[Ss]fn).*?\}\}")
 remove_not_a_typo_re = re.compile(r"\{\{not a typo.*?\}\}")
 remove_url_re = re.compile(r"https?:[^ \]\|]+")
-remove_image_re = re.compile(r"\[\[(File|Image):.*?\|")
-remove_image_param_re = re.compile(r"\| *image[0-9]? *=.*$")
+remove_image_re = re.compile(r"(\[\[)?(File|Image):.*?[\|\]]")
+remove_image_param_re = re.compile(r"\| *(image[0-9]?|logo|screenshot|sound) *=.*$")
+remove_image_no_end_re = re.compile(r"(File|Image):.*?\.(JPG|jpg|SVG|svg|PNG|png|OGG|ogg|JPEG|jpeg|WEBM|webm|GIF|gif|TIF|tif|TIFF|tiff|WEBP|webp|PDF|pdf|MP3|mp3|ogv)")
 
 poetry_flags = ["rhym", "poem", "stanza", "verse", "lyric"]
 poetry_flags += [word.title() for word in poetry_flags]
@@ -27,8 +28,9 @@ remove_syntaxhighlight_re = re.compile(r"<syntaxhighlight.*?</syntaxhighlight>",
 
 
 def remove_image_filenames(line):
-    remove_image_re.sub("✂", line)
-    remove_image_param_re.sub("✂", line)
+    line = remove_image_re.sub("✂", line)
+    line = remove_image_param_re.sub("✂", line)
+    line = remove_image_no_end_re.sub("✂", line)
     return line
 
 
@@ -52,6 +54,14 @@ def set_line_flags(line):
         line_flags["has_digit"] = True
     else:
         line_flags["has_digit"] = False
+
+    line_tmp = remove_ref_re.sub("✂", line)
+    line_tmp = remove_cite_re.sub("✂", line_tmp)
+    line_flags["text_no_refs"] = line_tmp
+    line_tmp = remove_image_filenames(line_tmp)
+    line_tmp = remove_url_re.sub("✂", line_tmp)
+    line_flags["text_no_refs_images_urls"] = line_tmp
+
     return line_flags
 
 
@@ -91,7 +101,8 @@ def check_style_by_line(article_title, article_text):
         for check_function in [x_to_times_check,
                                broken_nbsp_check,
                                frac_repair,
-                               logical_quoting_check]:
+                               logical_quoting_check,
+                               liter_lowercase_check]:
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -138,9 +149,7 @@ def rhyme_scheme_check(line, line_flags):
     if not outer_match:
         return
 
-    line_tmp = remove_ref_re.sub("✂", line)
-    line_tmp = remove_cite_re.sub("✂", line_tmp)
-    # line_tmp = remove_math_line_re.sub("✂", line_tmp)
+    line_tmp = line_flags["text_no_refs"]
     if "A-B-C-D-E-F-G" in line_tmp:
         return
     # Re-confirm match after filtering:
@@ -164,7 +173,6 @@ x_space_exclusions = re.compile(r"("
 
 def x_to_times_check(line, line_flags):
     if " x " in line:
-        # line_tmp = remove_math_line_re.sub("✂", line)
         line_tmp = x_space_exclusions.sub("✂", line)
         if " x " in line_tmp:
             return [("XS", line_tmp)]  # X with Space
@@ -174,11 +182,9 @@ def x_to_times_check(line, line_flags):
             return
         if x_no_space_exclusions.search(line):
             return
-        line_tmp = remove_image_filenames(line)
-        line_tmp = remove_url_re.sub("✂", line_tmp)
-        # line_tmp = remove_math_line_re.sub("✂", line_tmp)
-        if x_no_space_re.search(line_tmp):
-            return [("XNS", line_tmp)]  # X with No Space
+        line_reduced = line_flags["text_no_refs_images_urls"]
+        if x_no_space_re.search(line_reduced):
+            return [("XNS", line_reduced)]  # X with No Space
 
 
 broken_nbsp_re = re.compile(r"&nbsp[^;}]")
@@ -222,54 +228,55 @@ def logical_quoting_check(line, line_flags):
 
 # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
-liter_link_re = re.compile(r"[Ll]iter|[Ll]itre)s?\|l\]\]")
+liter_link_re = re.compile(r"([Ll]iter|[Ll]itre)s?\|l]]")
 liter_convert_re = re.compile(r"{{(convert|cvt)\|[^\}]+\|l(\||}|/)")
 liter_parens_re = re.compile(rf"[^a-zA-Z{NON_ASCII_LETTERS}]\(l(/[a-zA-Z/]+)?\)[^a-zA-Z{NON_ASCII_LETTERS}]")
-liter_prefix_re = re.compile(r"[0-9]( |&nbsp;)?(ql|rl|yl|zl|al|fl|pl|μl|ml|cl|dl|dal|hl|kl|Ml|Gl|Tl|Pl|El|Zl|Yl|Rl|Ql)")
-liter_illion_re = re.compile(r"[rBbMm]illion( |&nbsp;)l")
+liter_prefix_re = re.compile(rf"[^a-zA-Z0-9{NON_ASCII_LETTERS}][0-9]+( |&nbsp;)?(ql|rl|yl|zl|al|fl|pl|µL|μl|ml|cl|dl|dal|hl|kl|Ml|Gl|Tl|Pl|El|Zl|Yl|Rl|Ql)[^a-zA-Z0-9{NON_ASCII_LETTERS}]")
+liter_prefix_exclusion_re = re.compile(r"(El [A-Z]|al-[A-Z]|align|fl\.?( |&nbsp;)?oz)")
+liter_illion_re = re.compile(r"[rBbMm]illion( |&nbsp;)l[^a-zA-Z0-9]")
 liter_qty_re = re.compile(r"[0-9]( |&nbsp;)?l[^A-Za-z'0-9]")
 liter_numerator_re = re.compile(r" [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]")
 
 
 def liter_lowercase_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+
     if "l" not in line:
         return
 
-    if liter_link_re(line):
+    if liter_link_re.search(line):
         return [("L1", line)]
 
     # "(l)" and "(l/c/d)" (per capita per day) show up in table
     # headers sometimes
-    if liter_parens_re(line):
-        if "(l)!" in line:
-            return
-        if "(r)" in line:  # Right and left
-            return
-        return [("L2", line)]
+    if liter_parens_re.search(line):
+        if not "(l)!" and not "(r)" in line:  # (r) for right
+            return [("L2", line)]
 
-    if "illion" in line and liter_illion_re(line):
+    if "illion" in line and liter_illion_re.search(line):
         return [("L3", line)]
 
     if not line_flags["has_digit"]:
         return
-    if liter_prefix_re(line):
-        return [("L4", line)]
-    if liter_qty_re(line):
+
+    if liter_prefix_re.search(line):
+        line_tmp = liter_prefix_exclusion_re.sub("✂", line)
+        if liter_prefix_re.search(line_tmp):
+            return [("L4", line)]
+    if liter_qty_re.search(line):
         # Might need:
         # | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’{NON_ASCII_LETTERS}]"
         # | grep -vi " l.jpg"
-        # | grep -vP "image[0-9]? *=.* l[ \.].jpg"
         # | grep -v "AD-1 l"
-        # | grep -v "l="
         # | grep -v "\[\[Pound sterling|l"
         # | grep -v "{{not English inline}}"
-        return [("L5", line)]
-    if liter_numerator_re(line):
+        if "l=" not in line and "uSTR" not in line and "l\\" not in line:
+            return [("L5", line)]
+    if liter_numerator_re.search(line):
         return [("L6", line)]
 
     # Denominator checks
-    line_tmp = remove_url_re.sub("✂", line)
-    if "/l" in line_tmp:
+    if "/l" in line:
         # May need to manually fix some instances:
         # expand "m/l" to "music and lyrics" or drop
         # expand "w/l" to "win/loss"
