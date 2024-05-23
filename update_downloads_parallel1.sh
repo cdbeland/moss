@@ -25,7 +25,7 @@ cd $ORIG_DIR
 echo `date`
 echo "Transliterating..."
 venv/bin/python3 transliterate.py > /var/local/moss/bulk-wikipedia/transliterations.txt
-# Takes about 10 sec
+# Takes about 20 sec
 cd /var/local/moss/bulk-wikipedia/
 
 echo `date`
