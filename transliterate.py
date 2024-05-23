@@ -1,7 +1,7 @@
 from unidecode import unidecode
 
 for filename in [
-    "/var/local/moss/bulk-wikipedia/all-wiktionaries/enwiktionary-latest-all-titles-in-ns0"
+    "/var/local/moss/bulk-wikipedia/enwiktionary-latest-all-titles-in-ns0"
 ]:
     with open(filename, "r") as title_list:
         for line in title_list:
