@@ -11,16 +11,17 @@ echo "Finished style check by line; processing..."
 echo `date`
 
 set +e
-grep ^N tmp-style-by-line.txt > fixme-broken-nbsp.txt
-grep ^R tmp-style-by-line.txt > fixme-rhyme-scheme.txt
-grep ^X tmp-style-by-line.txt > fixme-x-to-times.txt
-grep ^FR tmp-style-by-line.txt > fixme-fraction.txt
-grep ^QL tmp-style-by-line.txt > fixme-logical-quoting.txt
-grep ^L tmp-style-by-line.txt > fixme-liters.txt
-grep ^W tmp-style-by-line.txt > fixme-washington-state.txt
-grep ^SPEED tmp-style-by-line.txt > fixme-speed.txt
-grep ^FE tmp-style-by-line.txt > fixme-fuel-efficiency.txt
-grep ^TEMP tmp-style-by-line.txt > fixme-temp.txt
+grep ^N tmp-style-by-line.txt | sort > fixme-broken-nbsp.txt
+grep ^R tmp-style-by-line.txt| sort  > fixme-rhyme-scheme.txt
+grep ^X tmp-style-by-line.txt | sort > fixme-x-to-times.txt
+grep ^FR tmp-style-by-line.txt | sort > fixme-fraction.txt
+grep ^QL tmp-style-by-line.txt | sort > fixme-logical-quoting.txt
+grep ^L tmp-style-by-line.txt | sort > fixme-liters.txt
+grep ^W tmp-style-by-line.txt | sort > fixme-washington-state.txt
+grep ^SPEED tmp-style-by-line.txt | sort > fixme-speed.txt
+grep ^MAN_MADE tmp-style-by-line.txt | sort > fixme-man-made.txt
+grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
+grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 
 echo "moss_check-style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
 # grep ^P tmp-style-by-line.txt > fixme-prime.txt

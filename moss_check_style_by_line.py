@@ -100,6 +100,7 @@ def check_style_by_line(article_title, article_text):
                 problem_line_tuples.extend(result)
         for check_function in [washington_state_check,
                                cvt_speed_check,
+                               man_made_check,
                                cvt_fuel_efficiency_check,
                                mos_double_check,
                                x_to_times_check,
@@ -120,6 +121,7 @@ def check_style_by_line(article_title, article_text):
 
 washington_state_foo_re = re.compile(r"Washington State [A-Z]")
 foo_of_washington_state_re = re.compile(r"[A-Z][A-Za-z]+ of Washington State")
+
 
 # TODO: Seek consensus on talk page (notifying WikiProject US?)
 # https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(geographic_names)#States
@@ -356,6 +358,16 @@ def cvt_speed_check(line, line_flags):
         # Should be "mph" per [[MOS:UNITSYMBOLS]], and also converted to km/h
         return [("SPEED_MIH", line)]
     # print(f"no hits on {line}")
+    return
+
+
+man_made_re = re.compile(r"[^A-Za-z]([Mm]an[- ]?made|MAN[- ]?MADE)")
+
+
+def man_made_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+    if man_made_re.search(line):
+        return [("MAN_MADE", line)]
     return
 
 
