@@ -98,7 +98,11 @@ def check_style_by_line(article_title, article_text):
             result = rhyme_scheme_check(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
-        for check_function in [x_to_times_check,
+        for check_function in [washington_state_check,
+                               cvt_speed_check,
+                               cvt_fuel_efficiency_check,
+                               mos_double_check,
+                               x_to_times_check,
                                broken_nbsp_check,
                                frac_repair,
                                logical_quoting_check,
@@ -112,6 +116,29 @@ def check_style_by_line(article_title, article_text):
     line_string = "\n".join([f"{code}\t{article_title}\t{line_text}"
                              for (code, line_text) in problem_line_tuples])
     return line_string
+
+
+washington_state_foo_re = re.compile(r"Washington State [A-Z]")
+foo_of_washington_state_re = re.compile(r"[A-Z][A-Za-z]+ of Washington State")
+
+# TODO: Seek consensus on talk page (notifying WikiProject US?)
+# https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(geographic_names)#States
+# proscriptive, not descriptive, if these guidelines are accepted
+# across lots of articles.
+def washington_state_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+    if "Washington" not in line:
+        return
+
+    if "state of Washington" in line:
+        return [("W", line)]
+
+    if "Washington State" in line:
+        line_tmp = washington_state_foo_re.sub("", line)
+        line_tmp = foo_of_washington_state_re.sub("", line_tmp)
+        if "Washington State" in line_tmp:
+            return [("W", line)]
+    return
 
 
 rhyme_fast_re = re.compile(r"[Aa][,\-\.]?[AaBb]")
@@ -250,7 +277,7 @@ def liter_lowercase_check(line, line_flags):
     # "(l)" and "(l/c/d)" (per capita per day) show up in table
     # headers sometimes
     if liter_parens_re.search(line):
-        if not "(l)!" and not "(r)" in line:  # (r) for right
+        if "(l)!" not in line and "(r)" not in line:  # (r) for right
             return [("L2", line)]
 
     if "illion" in line and liter_illion_re.search(line):
@@ -301,21 +328,84 @@ def liter_lowercase_check(line, line_flags):
         return [("L7", line)]
 
 
+no_num_kph_re = re.compile(r"\bkph|KPH\b")
+convert_tag_re = re.compile(r"\{\{([Cc]onvert|[Cc]vt).*?\}\}")
+kmh_nearby_re = re.compile(r"km/h.{0,30}mph|mph.{0,30}km/h")
+mph_isolated_re = re.compile(r"\b(mph|MPH)\b")
+
+
+def cvt_speed_check(line, line_flags):
+    # Per [[MOS:UNITNAMES]]
+    line = line_flags["text_no_refs_images_urls"]
+    if "ph" not in line and "PH" not in line:
+        return
+    line_tmp = convert_tag_re.sub("", line)
+    if ("mph" in line and "mph=" not in line) or "MPH" in line:
+        if "km/h" in line_tmp:
+            line_tmp_b = kmh_nearby_re.sub("", line_tmp)
+            if "mph" in line_tmp_b:
+                return [("SPEED_MPH1", line)]
+        elif mph_isolated_re.search(line_tmp):
+            return [("SPEED_MPH2", line)]
+        # TODO: May need to add equivalent of:
+        #  grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)"
+    if no_num_kph_re.search(line_tmp):
+        # Per [[MOS:UNITSYMBOLS]], change "kph" to "km/s"
+        return [("SPEED_KPH", line)]
+    if "mi/h" in line_tmp:
+        # Should be "mph" per [[MOS:UNITSYMBOLS]], and also converted to km/h
+        return [("SPEED_MIH", line)]
+    # print(f"no hits on {line}")
+    return
+
+
+def cvt_fuel_efficiency_check(line, line_flags):
+    pass
+
+
+def mos_double_check(line, line_flags):
+    pass
+
+
+def cvt_temperature_check(line, line_flags):
+    pass
+
+
 r"""
-# --- SPEED CONVERSION ---
 
-# [[MOS:UNITNAMES]]
+# --- FUEL EFFICIENCY CONVERSION ---
 
-echo "Beginning speed conversion scan"
+echo "Beginning MPG conversion scan"
 echo `date`
 
-# Run time for this segment: About 1 h 40 min
+# Run time for this segment: About 1 h 30 min
 
-../venv/bin/python3 ../dump_grep_csv.py 'mph|MPH' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g" | perl -pe "s%<ref.*?</ref>%%g" | grep -vP 'km/h.{0,30}mph' | grep -vP 'mph.{0,30}km/h'
-| grep -iP "\bmph\b" | grep -v ", MPH" | grep -iP "(speed|mile|[0-9](&nbsp;| )MPH)" | grep -v "mph=" | sort > tmp-mph-convert.txt
-cat tmp-mph-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-speed-convert.txt
+# {{cvt}} or {{convert}} should probably be used in all instances to
+# convert between US and imperial gallons (ug!)
+# ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g"
+| perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg"
+| grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
 
-../venv/bin/python3 ../dump_grep_csv.py '[0-9](&nbsp;| )?kph|KPH' | sort > tmp-kph-convert.txt
+../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g"
+| perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | sort > tmp-mpg-convert.txt
+
+
+cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.txt
+
+# DEPENDING ON CONTEXT, WILL NEED:
+# {{convert|$1|mpgUS}}
+# {{convert|$1|mpgimp}}
+
+
+# --- MOS:DOUBLE ---
+
+# Run time for this segment: ~20 min
+
+echo "Beginning MOS:DOUBLE scan"
+echo `date`
+../venv/bin/python3 ../dump_grep_csv.py " '[A-Za-z ,:\-;]+'[,\. \}\)]" | grep -v '"' | grep -vP "{{([Ll]ang|[Tt]ransl|IPA)" | perl -pe 's/^(.*?):.*/$1/' > tmp-MOS-double.txt
+cat tmp-MOS-double.txt | perl ../count.pl | sort -rn > tmp-double-most.txt
+grep -vP "(grammar|languag|species| words)" tmp-double-most.txt | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt
 
 
 # --- TEMPERATURE CONVERSION ---
@@ -403,33 +493,17 @@ cat tmp-temp-convert1.txt tmp-temp-convert2.txt tmp-temp-convert3.txt tmp-temp-c
 # TODO:
 # * miles, including {{frac|...}} miles and e.g. "1 1/2 miles"
 #   (and fractions for other US units)
+# * inch and foot, cu ft, cfs
 # * pounds (weight vs. money)
+# * oz (troy, avdp, etc.), fl oz, pint (various), quart (various), gallon (various)
+# * psi
 # * tons (various)
 # * hp
-# * gallons (various)
-
-# --- FUEL EFFICIENCY CONVERSION ---
-
-echo "Beginning MPG conversion scan"
-echo `date`
-
-# Run time for this segment: About 1 h 30 min
-
-# {{cvt}} or {{convert}} should probably be used in all instances to
-# convert between US and imperial gallons (ug!)
-# ../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g"
-| perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg"
-| grep -vP 'L/100.{0,30}mpg' | grep -vP 'mpg.{0,30}L/100'| sort > tmp-mpg-convert.txt
-
-../venv/bin/python3 ../dump_grep_csv.py 'mpg|MPG' | perl -pe "s/\{\{([Cc]onvert|[Cc]vt).*?\}\}//g"
-| perl -pe "s%<ref.*?</ref>%%g" | grep -iP "\bmpg\b" | grep -iP "[0-9]( |&nbsp;)mpg" | sort > tmp-mpg-convert.txt
-
-
-cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.txt
-
-# DEPENDING ON CONTEXT, WILL NEED:
-# {{convert|$1|mpgUS}}
-# {{convert|$1|mpgimp}}
+# * hand
+# * knot
+# * cu ft
+# * carat
+# * cal, kcal
 
 # --- PRIME ---
 
@@ -444,16 +518,6 @@ echo `date`
 
 # Can be converted to {{coord}} or {{sky}} or {{prime}}
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]+° ?[0-9]+['′] ?" | perl -pe 's/^(.*?):.*/$1/' | uniq | sort >> jwb-articles-prime.txt
-
-# --- MOS:DOUBLE ---
-
-# Run time for this segment: ~20 min
-
-echo "Beginning MOS:DOUBLE scan"
-echo `date`
-../venv/bin/python3 ../dump_grep_csv.py " '[A-Za-z ,:\-;]+'[,\. \}\)]" | grep -v '"' | grep -vP "{{([Ll]ang|[Tt]ransl|IPA)" | perl -pe 's/^(.*?):.*/$1/' > tmp-MOS-double.txt
-cat tmp-MOS-double.txt | perl ../count.pl | sort -rn > tmp-double-most.txt
-grep -vP "(grammar|languag|species| words)" tmp-double-most.txt | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt
 
 # --- BAD QUOTE MARKS ---
 
