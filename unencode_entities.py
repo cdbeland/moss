@@ -240,6 +240,7 @@ controversial = {
     "&rarr;": "→",
     "&larr;": "←",
     "&uparrow;": "↑",
+    "&swarr;": "↙",
     "&le;": "≤",  # available at the bottom of the wikitext edit window
     "&ge;": "≥",  # available at the bottom of the wikitext edit window
     "&GreaterEqual;": "≥",  # available at the bottom of the wikitext edit window
