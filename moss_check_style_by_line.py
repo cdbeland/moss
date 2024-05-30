@@ -42,9 +42,22 @@ def poetry_match(text):
     return False
 
 
+birthplace_param_re = re.compile(r"birthplace *= *(.*?)(\n|\|)")
+
+
+def birthplace_infobox_match(text):
+    if "birthplace" not in text:
+        return False
+    matches = birthplace_param_re.search(text)
+    if not matches or len(matches) > 1:
+        return False
+    return matches[0]
+
+
 def set_article_flags(article_text):
     article_flags = dict()
     article_flags["poetry"] = poetry_match(article_text)
+    article_flags["birthplace_infobox"] = birthplace_infobox_match(article_text)
     return article_flags
 
 
@@ -102,13 +115,14 @@ def check_style_by_line(article_title, article_text):
                                cvt_speed_check,
                                man_made_check,
                                cvt_fuel_efficiency_check,
+                               nationality_check,
                                mos_double_check,
                                x_to_times_check,
                                broken_nbsp_check,
                                frac_repair,
                                logical_quoting_check,
                                liter_lowercase_check]:
-            result = check_function(line, line_flags)
+            result = check_function(line, line_flags, article_flags)
             if result:
                 problem_line_tuples.extend(result)
 
@@ -127,7 +141,7 @@ foo_of_washington_state_re = re.compile(r"[A-Z][A-Za-z]+ of Washington State")
 # https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(geographic_names)#States
 # proscriptive, not descriptive, if these guidelines are accepted
 # across lots of articles.
-def washington_state_check(line, line_flags):
+def washington_state_check(line, line_flags, _article_flags):
     line = line_flags["text_no_refs_images_urls"]
     if "Washington" not in line:
         return
@@ -150,7 +164,7 @@ rhyme_masked_re = re.compile(r"[^A-Za-z0-9\./%#=_\-]a(a|b|aa|ab|ba|bb|bc|aaa|aba
 rhyme_dot_re = re.compile(r"([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])")
 
 
-def rhyme_scheme_check(line, line_flags):
+def rhyme_scheme_check(line, line_flags, _article_flags):
     if "a" in line:
         line_flags["a"] = True
     else:
@@ -200,7 +214,7 @@ x_space_exclusions = re.compile(r"("
                                 r")")
 
 
-def x_to_times_check(line, line_flags):
+def x_to_times_check(line, line_flags, _article_flags):
     if " x " in line:
         line_tmp = x_space_exclusions.sub("✂", line)
         if " x " in line_tmp:
@@ -219,7 +233,7 @@ def x_to_times_check(line, line_flags):
 broken_nbsp_re = re.compile(r"&nbsp[^;}]")
 
 
-def broken_nbsp_check(line, line_flags):
+def broken_nbsp_check(line, line_flags, _article_flags):
     if "&nbsp" not in line:
         return
     if broken_nbsp_re.search(line):
@@ -231,7 +245,7 @@ frac_repair_re = re.compile(r"[0-9]\{\{frac\|[0-9]+\|")
 frac_repair_dash_re = re.compile(r"[0-9]-[0-9]+/[0-9]")
 
 
-def frac_repair(line, line_flags):
+def frac_repair(line, line_flags, _article_flags):
     if not line_flags["has_digit"]:
         return
     if frac_repair_dash_re.search(line):
@@ -245,7 +259,7 @@ def frac_repair(line, line_flags):
 logical_quoting_re = re.compile(r'"[a-z ,:\-;]+[,\.]"')
 
 
-def logical_quoting_check(line, line_flags):
+def logical_quoting_check(line, line_flags, _article_flags):
     # Per [[MOS:LOGICAL]]
     if '"' not in line:
         return
@@ -267,7 +281,7 @@ liter_qty_re = re.compile(r"[0-9]( |&nbsp;)?l[^A-Za-z'0-9]")
 liter_numerator_re = re.compile(r" [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]")
 
 
-def liter_lowercase_check(line, line_flags):
+def liter_lowercase_check(line, line_flags, _article_flags):
     line = line_flags["text_no_refs_images_urls"]
 
     if "l" not in line:
@@ -336,7 +350,7 @@ kmh_nearby_re = re.compile(r"km/h.{0,30}mph|mph.{0,30}km/h")
 mph_isolated_re = re.compile(r"\b(mph|MPH)\b")
 
 
-def cvt_speed_check(line, line_flags):
+def cvt_speed_check(line, line_flags, _article_flags):
     # Per [[MOS:UNITNAMES]]
     line = line_flags["text_no_refs_images_urls"]
     if "ph" not in line and "PH" not in line:
@@ -364,22 +378,42 @@ def cvt_speed_check(line, line_flags):
 man_made_re = re.compile(r"[^A-Za-z]([Mm]an[- ]?made|MAN[- ]?MADE)")
 
 
-def man_made_check(line, line_flags):
+def man_made_check(line, line_flags, _article_flags):
     line = line_flags["text_no_refs_images_urls"]
-    if man_made_re.search(line):
+    if man_made_re.findall(line):
         return [("MAN_MADE", line)]
     return
 
 
-def cvt_fuel_efficiency_check(line, line_flags):
+def cvt_fuel_efficiency_check(line, line_flags, _article_flags):
     pass
 
 
-def mos_double_check(line, line_flags):
+nationality_citizenship_re = re.compile(r"(nationality|citizenship) *= *.*?(\||$)")
+
+
+def nationality_check(line, line_flags, article_flags):
+    if not article_flags["birthplace_infobox"]:
+        return
+    param_match = nationality_citizenship_re.search(line)
+    if not param_match:
+        return
+
+    # Complicated cases that deserve the parameter
+    if "<br" in param_match:
+        return
+
+    # If birthplace country matches nationality or citizenship, only
+    # birthplace should be kept. Country should be added to birthplace
+    # if missing.
+    return [("INFONAT", line)]
+
+
+def mos_double_check(line, line_flag, _article_flagss):
     pass
 
 
-def cvt_temperature_check(line, line_flags):
+def cvt_temperature_check(line, line_flags, _article_flags):
     pass
 
 
@@ -505,7 +539,7 @@ cat tmp-temp-convert1.txt tmp-temp-convert2.txt tmp-temp-convert3.txt tmp-temp-c
 # TODO:
 # * miles, including {{frac|...}} miles and e.g. "1 1/2 miles"
 #   (and fractions for other US units)
-# * inch and foot, cu ft, cfs
+# * inch and foot, cu ft, cfs - adapt from run_moss_parallel2.sh
 # * pounds (weight vs. money)
 # * oz (troy, avdp, etc.), fl oz, pint (various), quart (various), gallon (various)
 # * psi
@@ -513,9 +547,9 @@ cat tmp-temp-convert1.txt tmp-temp-convert2.txt tmp-temp-convert3.txt tmp-temp-c
 # * hp
 # * hand
 # * knot
-# * cu ft
 # * carat
 # * cal, kcal
+# * furlong
 
 # --- PRIME ---
 
