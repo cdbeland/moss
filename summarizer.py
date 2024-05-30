@@ -39,11 +39,12 @@ for line in fileinput.input("-"):
         better_line = "* %s - [[wikt:%s]] - [[%s]]" % (article_count, word, article_list_str)
 
     if len(sys.argv) > 1 and sys.argv[1] == "--find-all":
+        word_safe = re.sub(" ", "+", word)
         if special_word:
             # Strip ">" instead of encoding it so we find instances
             # with HTML attributes
             # word_safe = re.sub(">", "%3E", word_safe)
-            word_safe = re.sub(">", "", word)
+            word_safe = re.sub(">", "", word_safe)
 
             word_safe = word_safe.replace("/", r"\/")
             word_safe = word_safe.replace("<", r"\<\/?")  # This also merges start and end tags
@@ -51,5 +52,5 @@ for line in fileinput.input("-"):
             better_line += f" ... [https://en.wikipedia.org/w/index.php?search=insource%3A%2F{word_safe}%2Fi&ns0=1 find all]"
 
         else:
-            better_line += f" ... [https://en.wikipedia.org/w/index.php?search=%22{word}%22&ns0=1 find all]"
+            better_line += f" ... [https://en.wikipedia.org/w/index.php?search=%22{word_safe}%22&ns0=1 find all]"
     print(better_line)
