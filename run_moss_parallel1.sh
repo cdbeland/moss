@@ -23,6 +23,11 @@ grep ^MAN_MADE tmp-style-by-line.txt | sort > fixme-man-made.txt
 grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
 grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 
+grep ^INFONAT tmp-style-by-line.txt | grep "citizenship" | grep -P '({US}|USA|US$|United States|American)' | perl -pe 's/:.*//' | sort > fixme-infonat-usa-citizen.txt
+grep ^INFONAT tmp-style-by-line.txt | grep "nationality" | grep -P '({US}|USA|US$|United States|American)' | perl -pe 's/:.*//' | sort > fixme-infonat-usa-national.txt
+grep ^INFONAT tmp-style-by-line.txt | grep "citizenship" | grep -vP '({US}|USA|US$|United States|American)' | sort -k3 > fixme-infonat-citizen-remainder.txt
+grep ^INFONAT tmp-style-by-line.txt | grep "nationality" | grep -vP '({US}|USA|US$|United States|American)' | sort -k3 > fixme-infonat-nationality-remainder.txt
+
 echo "moss_check-style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
 # grep ^P tmp-style-by-line.txt > fixme-prime.txt
 # grep ^QB tmp-style-by-line.txt > fixme-bad-quoting.txt
