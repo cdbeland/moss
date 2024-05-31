@@ -42,16 +42,23 @@ def poetry_match(text):
     return False
 
 
-birthplace_param_re = re.compile(r"birthplace *= *(.*?)(\n|\|)")
+birthplace_param_re = re.compile(r"birth_?place *= *(.*?)(\n|\| )")
 
 
 def birthplace_infobox_match(text):
-    if "birthplace" not in text:
+    if "birth" not in text:
         return False
-    matches = birthplace_param_re.search(text)
-    if not matches or len(matches) > 1:
-        return False
-    return matches[0]
+    matches = birthplace_param_re.findall(text)
+    if matches:
+        matches = list(matches)
+        if len(matches) > 1:
+            # Multiple matches mean the situation is complicated
+            return False
+        else:
+            birthplace_value = matches[0][0]
+            if birthplace_value:
+                return birthplace_value
+    return False
 
 
 def set_article_flags(article_text):
@@ -111,21 +118,23 @@ def check_style_by_line(article_title, article_text):
             result = rhyme_scheme_check(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
+        if article_flags["birthplace_infobox"]:
+            result = nationality_check(line, line_flags, article_flags)
+            if result:
+                problem_line_tuples.extend(result)
         for check_function in [washington_state_check,
                                cvt_speed_check,
                                man_made_check,
                                cvt_fuel_efficiency_check,
-                               nationality_check,
                                mos_double_check,
                                x_to_times_check,
                                broken_nbsp_check,
                                frac_repair,
                                logical_quoting_check,
                                liter_lowercase_check]:
-            result = check_function(line, line_flags, article_flags)
+            result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
-
     if not problem_line_tuples:
         return None
     line_string = "\n".join([f"{code}\t{article_title}\t{line_text}"
@@ -141,7 +150,7 @@ foo_of_washington_state_re = re.compile(r"[A-Z][A-Za-z]+ of Washington State")
 # https://en.wikipedia.org/wiki/Wikipedia:Naming_conventions_(geographic_names)#States
 # proscriptive, not descriptive, if these guidelines are accepted
 # across lots of articles.
-def washington_state_check(line, line_flags, _article_flags):
+def washington_state_check(line, line_flags):
     line = line_flags["text_no_refs_images_urls"]
     if "Washington" not in line:
         return
@@ -164,7 +173,7 @@ rhyme_masked_re = re.compile(r"[^A-Za-z0-9\./%#=_\-]a(a|b|aa|ab|ba|bb|bc|aaa|aba
 rhyme_dot_re = re.compile(r"([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])")
 
 
-def rhyme_scheme_check(line, line_flags, _article_flags):
+def rhyme_scheme_check(line, line_flags):
     if "a" in line:
         line_flags["a"] = True
     else:
@@ -214,7 +223,7 @@ x_space_exclusions = re.compile(r"("
                                 r")")
 
 
-def x_to_times_check(line, line_flags, _article_flags):
+def x_to_times_check(line, line_flags):
     if " x " in line:
         line_tmp = x_space_exclusions.sub("✂", line)
         if " x " in line_tmp:
@@ -233,7 +242,7 @@ def x_to_times_check(line, line_flags, _article_flags):
 broken_nbsp_re = re.compile(r"&nbsp[^;}]")
 
 
-def broken_nbsp_check(line, line_flags, _article_flags):
+def broken_nbsp_check(line, line_flags):
     if "&nbsp" not in line:
         return
     if broken_nbsp_re.search(line):
@@ -245,7 +254,7 @@ frac_repair_re = re.compile(r"[0-9]\{\{frac\|[0-9]+\|")
 frac_repair_dash_re = re.compile(r"[0-9]-[0-9]+/[0-9]")
 
 
-def frac_repair(line, line_flags, _article_flags):
+def frac_repair(line, line_flags):
     if not line_flags["has_digit"]:
         return
     if frac_repair_dash_re.search(line):
@@ -259,7 +268,7 @@ def frac_repair(line, line_flags, _article_flags):
 logical_quoting_re = re.compile(r'"[a-z ,:\-;]+[,\.]"')
 
 
-def logical_quoting_check(line, line_flags, _article_flags):
+def logical_quoting_check(line, line_flags):
     # Per [[MOS:LOGICAL]]
     if '"' not in line:
         return
@@ -281,7 +290,7 @@ liter_qty_re = re.compile(r"[0-9]( |&nbsp;)?l[^A-Za-z'0-9]")
 liter_numerator_re = re.compile(r" [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]")
 
 
-def liter_lowercase_check(line, line_flags, _article_flags):
+def liter_lowercase_check(line, line_flags):
     line = line_flags["text_no_refs_images_urls"]
 
     if "l" not in line:
@@ -350,7 +359,7 @@ kmh_nearby_re = re.compile(r"km/h.{0,30}mph|mph.{0,30}km/h")
 mph_isolated_re = re.compile(r"\b(mph|MPH)\b")
 
 
-def cvt_speed_check(line, line_flags, _article_flags):
+def cvt_speed_check(line, line_flags):
     # Per [[MOS:UNITNAMES]]
     line = line_flags["text_no_refs_images_urls"]
     if "ph" not in line and "PH" not in line:
@@ -378,29 +387,29 @@ def cvt_speed_check(line, line_flags, _article_flags):
 man_made_re = re.compile(r"[^A-Za-z]([Mm]an[- ]?made|MAN[- ]?MADE)")
 
 
-def man_made_check(line, line_flags, _article_flags):
+def man_made_check(line, line_flags):
     line = line_flags["text_no_refs_images_urls"]
     if man_made_re.findall(line):
         return [("MAN_MADE", line)]
     return
 
 
-def cvt_fuel_efficiency_check(line, line_flags, _article_flags):
+def cvt_fuel_efficiency_check(line, line_flags):
     pass
 
 
-nationality_citizenship_re = re.compile(r"(nationality|citizenship) *= *.*?(\||$)")
+nationality_citizenship_re = re.compile(r"(nationality|citizenship) *= *(.*?)(\||$)")
 
 
 def nationality_check(line, line_flags, article_flags):
-    if not article_flags["birthplace_infobox"]:
-        return
     param_match = nationality_citizenship_re.search(line)
     if not param_match:
         return
-
+    param_str = param_match.group(2)
     # Complicated cases that deserve the parameter
-    if "<br" in param_match:
+    if "<br" in param_str or "," in param_str or "(" in param_str:
+        return
+    if "{{hlist" in param_str or "==" in param_str:
         return
 
     # If birthplace country matches nationality or citizenship, only
@@ -409,11 +418,11 @@ def nationality_check(line, line_flags, article_flags):
     return [("INFONAT", line)]
 
 
-def mos_double_check(line, line_flag, _article_flagss):
+def mos_double_check(line, line_flags):
     pass
 
 
-def cvt_temperature_check(line, line_flags, _article_flags):
+def cvt_temperature_check(line, line_flags):
     pass
 
 
