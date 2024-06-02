@@ -114,12 +114,12 @@ def check_style_by_line(article_title, article_text):
         line_flags = set_line_flags(line)
 
         # Avoiding extend() helps performance massively
-        if article_flags["poetry"]:
-            result = rhyme_scheme_check(line, line_flags)
-            if result:
-                problem_line_tuples.extend(result)
         if article_flags["birthplace_infobox"]:
             result = nationality_check(line, line_flags, article_flags)
+            if result:
+                problem_line_tuples.extend(result)
+        if article_flags["poetry"]:
+            result = rhyme_scheme_check(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
         for check_function in [washington_state_check,
@@ -400,6 +400,7 @@ def cvt_fuel_efficiency_check(line, line_flags):
 
 nationality_citizenship_re = re.compile(r"(nationality|citizenship) *= *(.*?)(\||$)")
 usa_re = re.compile(r"({US}|USA|US$|United States|American|U.S.)\]*")
+piped_link_re = re.compile(r"\[\[([^\]]+)\|([^\]]+)\]\]")
 
 country_map = {
     "Andorra": "ad",
@@ -419,6 +420,7 @@ country_map = {
     "Åland Islands": "ax",
     "Azerbaijan": "az",
     "Bosnia and Herzegovina": "ba",
+    "Bosnia": "ba",
     "Barbados": "bb",
     "Bangladesh": "bd",
     "Belgium": "be",
@@ -429,7 +431,7 @@ country_map = {
     "Benin": "bj",
     "Saint Barthélemy": "bl",
     "Bermuda": "bm",
-    "Brunei Darussalam": "bn",
+    "Brunei": "bn",
     "Bolivia": "bo",
     "Bonaire, Sint Eustatius and Saba": "bq",
     "Brazil": "br",
@@ -457,6 +459,7 @@ country_map = {
     "Costa Rica": "cr",
     "Cuba": "cu",
     "Cabo Verde": "cv",
+    "Cape Verde": "cv",
     "Curaçao": "cw",
     "Christmas Island": "cx",
     "Cyprus": "cy",
@@ -492,6 +495,7 @@ country_map = {
     "Northern Ireland": "gb",
     "Grenada": "gd",
     "Georgia (country)": "ge",
+    "Democratic Republic of Georgia": "ge",
     "French Guiana": "gf",
     "Guernsey": "gg",
     "Ghana": "gh",
@@ -547,6 +551,7 @@ country_map = {
     "Saint Lucia": "lc",
     "Liechtenstein": "li",
     "Sri Lanka": "lk",
+    "Ceylon": "lk",
     "Liberia": "lr",
     "Lesotho": "ls",
     "Lithuania": "lt",
@@ -561,8 +566,10 @@ country_map = {
     "Madagascar": "mg",
     "Marshall Islands": "mh",
     "North Macedonia": "mk",
+    "Republic of Macedonia": "mk",
     "Mali": "ml",
     "Myanmar": "mm",
+    "Burma": "mm",
     "Mongolia": "mn",
     "Macao": "mo",
     "Northern Mariana Islands": "mp",
@@ -626,9 +633,10 @@ country_map = {
     "Suriname": "sr",
     "South Sudan": "ss",
     "Sao Tome and Principe": "st",
+    "São Tomé and Príncipe": "st",
     "El Salvador": "sv",
     "Sint Maarten": "sx",
-    "Syrian Arab Republic": "sy",
+    "Syria": "sy",
     "Eswatini": "sz",
     "Turks and Caicos Islands": "tc",
     "Chad": "td",
@@ -652,6 +660,7 @@ country_map = {
     "USA": "us",
     "US": "us",
     "U.S.": "us",
+    "U. S.": "us",
     "America": "us",
     "Uruguay": "uy",
     "Uzbekistan": "uz",
@@ -673,8 +682,8 @@ country_map = {
     "Zambia": "zm",
     "Zimbabwe": "zw",
 
-    # Historical countries (using 3-letter codes so they won't collide
-    # with official codes)
+    # Historical and disputed countries (using 3-letter codes so they
+    # won't collide with official codes)
     "Holy Roman Empire": "hre",
     "Prussia": "pru",
     "Soviet Union": "usr",
@@ -687,12 +696,26 @@ country_map = {
     "Venice": "ven",
     "Castilian": "cas",
     "Castile": "cas",
+    "Byzantine Empire": "byz",
+    "Kingdom of Bavaria": "bav",
+    "Kingdom of Sardinia": "sar",
+    "Kingdom of Naples": "nap",
+    "Kosovo": "kos",
+    "Manchukuo": "man",
+    "Somaliland": "som",
+    "Yugoslavia": "yug",
+    "Abkhazia": "abk",
+    "Colony of Newfoundland": "new",
+    "Dominion of Newfoundland": "new",
+    "Papal States": "pap",
+    "Qing Dynasty": "qin",
 
     # Demonyms
     "French": "fr",
     "German": "de",
     "Italian": "it",
     "Spanish": "es",
+    "Spaniard": "es",
     "Portuguese": "pt",
     "American": "us",
     "Irish": "ie",
@@ -707,6 +730,7 @@ country_map = {
     "Dutch": "nl",
     "Netherlandish": "nl",
     "Danish": "dk",
+    "Danes": "dk",
     "Norse": "no",
     "Norwegian": "no",
     "Swedish": "se",
@@ -725,10 +749,63 @@ country_map = {
     "Czech": "cz",
     "Mexican": "mx",
     "Finnish": "fi",
+    "Finn": "fi",
     "Serb": "rs",
     "Puerto Rican": "pr",
     "Georgian": "ge",
     "Argentine": "ar",
+    "Honduran": "hn",
+    "Afghan": "af",
+    "Burmese": "mm",
+    "Filipino": "ph",
+    "Filipina": "ph",
+    "Philippine": "ph",
+    "Lebanese": "lb",
+    "Moroccan": "ma",
+    "Mozambiquan": "mz",
+    "Ottoman": "oem",
+    "Thai": "th",
+    "Trinidadian": "tt",
+    "Tobagonian": "tt",
+    "Ukrainian": "ua",
+    "Yugoslav": "yug",
+    "Abkhaz": "abk",
+    "Bahamian": "bs",
+    "Barbadian": "bb",
+    "Bermudian": "bm",
+    "Canadien": "ca",
+    "Caymanian": "ky",
+    "Central African": "cf",
+    "Cook Islander": "ck",
+    "Croat": "hr",
+    "Falkland Islander": "fk",
+    "Faroe Islander": "fo",
+    "Faroese": "fo",
+    "Guyanese": "gy",
+    "Guianese": "fr",  # French Guiana
+    "Honduran": "hn",
+    "Italia": "it",
+    "Kyrgyz": "kg",
+    "Lebanese": "lb",
+    "Macedonian": "mk",
+    "Maldivian": "mv",
+    "Maltese": "mt",
+    "Manx": "im",
+    "Mauritian": "mr",
+    "Moldovian": "md",
+    "Montenegrin": "me",
+    "Palestinian": "ps",
+    "Persian": "ir",
+    "Rwandese": "rw",
+    "Salvadoran": "sv",
+    "Santomean": "st",
+    "Seychellois": "sc",
+    "Slovak": "sk",
+    "Slovene": "si",
+    "Solomon Islander": "sb",
+    "Somali people": "so",
+    "Turkmen": "tm",
+    "Uzbek": "uz",
 }
 country_keys = sorted(country_map.keys(), key=lambda s: len(s), reverse=True)
 
@@ -880,6 +957,9 @@ def country_match(input_str):
             country_codes.append(country_map[match_str])
 
     if country_codes:
+        if len(country_codes) > 1:
+            # Uniqify; country name and demonym often both match
+            country_codes = list(set(country_codes))
         return country_codes
     for match_str in usa_place_strings:
         if match_str in input_str:
@@ -888,15 +968,25 @@ def country_match(input_str):
 
 
 def nationality_check(line, line_flags, article_flags):
-    param_match = nationality_citizenship_re.search(line)
+    if "==" in line:
+        return
+    if "Infobox" in line or "infobox" in line:
+        return [("INFONAT_ERR", line)]
+
+    line_tmp = piped_link_re.sub("[[$1 PIPE $2]]", line)
+    param_match = nationality_citizenship_re.search(line_tmp)
     if not param_match:
         return
     param_str = param_match.group(2).strip()
     if not param_str:
         return [("INFONAT_BIRTHPLACE_ONLY", line)]
-    if "nationality cannot be inferred from the birthplace" in param_str:
+    if "be inferred from" in param_str or "same as citizenzhip" in param_str:
         return [("INFONAT_BIRTHPLACE_ONLY", line)]
     if "<!-- use only when necessary per [[WP:INFONAT]] -->" == param_str:
+        return [("INFONAT_BIRTHPLACE_ONLY", line)]
+    if "<!-- will not display if national_team is defined -->" == param_str:
+        return [("INFONAT_BIRTHPLACE_ONLY", line)]
+    if "implied by birthplace" in param_str or "different from birthplace" in param_str:
         return [("INFONAT_BIRTHPLACE_ONLY", line)]
 
     # Complicated cases that deserve the parameter
@@ -906,11 +996,9 @@ def nationality_check(line, line_flags, article_flags):
                   "{{cslist", "{{Hlist", "{{Plainlist", "{{Unbullletd"]
     if any(t in param_str for t in list_types):
         return
-    if "flag" in param_str or "Flag" in param_str or "{{" in param_str:
+    if "File:" in param_str or "flag" in param_str or "Flag" in param_str or "{{" in param_str:
         # Remove flag per [[MOS:FLAGBIO]]
         return [("INFONAT_FLAG", line)]
-    if "==" in param_str:
-        return
 
     # If birthplace country matches nationality or citizenship, only
     # birthplace should be kept. Country should be added to birthplace
@@ -937,6 +1025,8 @@ def nationality_check(line, line_flags, article_flags):
     if birthplace_countries[0] == citnat_countries[0]:
         return [(f"INFONAT_REDUNDANT_{country_code}",
                  line + "//" + birthplace)]
+    if "not needed" in param_str or "Not needed" in param_str:
+        return [("INFONAT_REDUNDANT", line)]
 
     # When did citizenship or nationality change?
     return [(f"INFONAT_EXPLAIN_{country_code}",

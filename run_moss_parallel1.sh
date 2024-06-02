@@ -33,14 +33,17 @@ grep ^INFONAT_REDUNDANT tmp-infonat.txt | sort | perl -pe 's/INFONAT.*?\t(.*?)\t
 
 # Remove citizenship/nationality fields and add ", United States" to birth_place
 grep ^INFONAT_EXPLAIN_us_state tmp-infonat.txt | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' > fixme-infonat-add-usa.txt
+grep ^INFONAT_BIRTHPLACE_NO_COUNTRY tmp-infonat.txt | sort -k3 -t $'\t' > fixme-infonat-add-country.txt
 
 # Probably need to improve demonym list in moss_check_style_by_line.py
-grep NO_COUNTRY tmp-infonat.txt | sort -k3 -t $'\t' > fixme-infonat-no-country.txt
+grep ^INFONAT_CITNAT_NO_COUNTRY tmp-infonat.txt | sort -k3 -t $'\t' > fixme-infonat-no-country.txt
 
 # Either the field is being abused or change of status needs to be
 # dated or explained as from-birth or something.
 grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "citizenship" | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' > fixme-infonat-citizenship-usa.txt
 grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "nationality" | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' > fixme-infonat-nationality-usa.txt
+
+grep ^INFONAT_ERR tmp-infonat.txt | sort > fixme-infonat-err.txt
 
 echo "moss_check-style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
 # grep ^P tmp-style-by-line.txt > fixme-prime.txt
