@@ -23,10 +23,24 @@ grep ^MAN_MADE tmp-style-by-line.txt | sort > fixme-man-made.txt
 grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
 grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 
-grep ^INFONAT tmp-style-by-line.txt | grep "citizenship" | grep -P '({US}|USA|US$|United States|American)' | perl -pe 's/:.*//' | sort > fixme-infonat-usa-citizen.txt
-grep ^INFONAT tmp-style-by-line.txt | grep "nationality" | grep -P '({US}|USA|US$|United States|American)' | perl -pe 's/:.*//' | sort > fixme-infonat-usa-national.txt
-grep ^INFONAT tmp-style-by-line.txt | grep "citizenship" | grep -vP '({US}|USA|US$|United States|American)' | sort -k3 > fixme-infonat-citizen-remainder.txt
-grep ^INFONAT tmp-style-by-line.txt | grep "nationality" | grep -vP '({US}|USA|US$|United States|American)' | sort -k3 > fixme-infonat-nationality-remainder.txt
+grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
+
+# Remove flag per [[MOS:FLAGBIO]]
+grep ^INFONAT_FLAG tmp-infonat.txt | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | sort > fixme-infonat-mos-flagbio.txt
+
+# Remove citizenship/nationality fields
+grep ^INFONAT_REDUNDANT tmp-infonat.txt | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' > fixme-infonat-redundant.txt
+
+# Remove citizenship/nationality fields and add ", United States" to birth_place
+grep ^INFONAT_EXPLAIN_us_state tmp-infonat.txt | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' > fixme-infonat-add-usa.txt
+
+# Probably need to improve demonym list in moss_check_style_by_line.py
+grep NO_COUNTRY tmp-infonat.txt | sort -k3 -t $'\t' > fixme-infonat-no-country.txt
+
+# Either the field is being abused or change of status needs to be
+# dated or explained as from-birth or something.
+grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "citizenship" | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' > fixme-infonat-citizenship-usa.txt
+grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "nationality" | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' > fixme-infonat-nationality-usa.txt
 
 echo "moss_check-style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
 # grep ^P tmp-style-by-line.txt > fixme-prime.txt
