@@ -408,7 +408,6 @@ country_map = {
     "UAE": "ae",
     "Afghanistan": "af",
     "Antigua and Barbuda": "ag",
-    "Anguilla": "ai",
     "Albania": "al",
     "Armenia": "am",
     "Angola": "ao",
@@ -480,12 +479,12 @@ country_map = {
     "Ethiopia": "et",
     "Finland": "fi",
     "Fiji": "fj",
-    "Falkland Islands": "fk",
     "Federated States of Micronesia": "fm",
     "FSM": "fm",
     "Faroe Islands": "fo",
     "France": "fr",
     "Gabon": "ga",
+
     "United Kingdom": "gb",
     "UK": "gb",
     "Britain": "gb",
@@ -493,20 +492,35 @@ country_map = {
     "Scotland": "gb",
     "Wales": "gb",
     "Northern Ireland": "gb",
+
+    # All BOT Citizens (except those attached to Akrotiri and
+    # Dhekelia) are full British Citizens now:
+    "Falkland Islands": "gb",  # "fk"
+    "Gibraltar": "gb",  # "gi"
+    "Isle of Man": "gb",  # "im"
+    "British Indian Ocean Territory": "gb",  # "io"
+    "Montserrat": "gb",  # "ms"
+    "Anguilla": "gb",  # "ai"
+    "British Virgin Islands": "gb",  # "vg"
+    "BVI": "gb",  # "vg"
+    "Cayman Islands": "gb",  # "ky"
+    "Pitcairn": "gb",  # "pn"
+    "Saint Helena, Ascension and Tristan da Cunha": "gb",  # "sh"
+    "South Georgia and the South Sandwich Islands": "gb",  # "gs"
+    "Turks and Caicos Islands": "gb",  # "tc"
+
     "Grenada": "gd",
     "Georgia (country)": "ge",
     "Democratic Republic of Georgia": "ge",
     "French Guiana": "gf",
     "Guernsey": "gg",
     "Ghana": "gh",
-    "Gibraltar": "gi",
     "Greenland": "gl",
     "Gambia": "gm",
     "Guinea": "gn",
     "Guadeloupe": "gp",
     "Equatorial Guinea": "gq",
     "Greece": "gr",
-    "South Georgia and the South Sandwich Islands": "gs",
     "Guatemala": "gt",
     "Guam": "gu",
     "Guinea-Bissau": "gw",
@@ -520,9 +534,7 @@ country_map = {
     "Indonesia": "id",
     "Ireland": "ie",
     "Israel": "il",
-    "Isle of Man": "im",
     "India": "in",
-    "British Indian Ocean Territory": "io",
     "Iraq": "iq",
     "Iran": "ir",
     "Iceland": "is",
@@ -543,7 +555,6 @@ country_map = {
     "South Korea": "kr",
     "Republic of Korea": "kr",
     "Kuwait": "kw",
-    "Cayman Islands": "ky",
     "Kazakhstan": "kz",
     "Lao People's Democratic Republic": "la",
     "Laos": "la",
@@ -575,7 +586,6 @@ country_map = {
     "Northern Mariana Islands": "mp",
     "Martinique": "mq",
     "Mauritania": "mr",
-    "Montserrat": "ms",
     "Malta": "mt",
     "Mauritius": "mu",
     "Maldives": "mv",
@@ -604,7 +614,6 @@ country_map = {
     "Pakistan": "pk",
     "Poland": "pl",
     "Saint Pierre and Miquelon": "pm",
-    "Pitcairn": "pn",
     "Puerto Rico": "pr",
     "Palestine": "ps",
     "Portugal": "pt",
@@ -623,7 +632,6 @@ country_map = {
     "Sudan": "sd",
     "Sweden": "se",
     "Singapore": "sg",
-    "Saint Helena, Ascension and Tristan da Cunha": "sh",
     "Slovenia": "si",
     "Slovakia": "sk",
     "Sierra Leone": "sl",
@@ -638,7 +646,6 @@ country_map = {
     "Sint Maarten": "sx",
     "Syria": "sy",
     "Eswatini": "sz",
-    "Turks and Caicos Islands": "tc",
     "Chad": "td",
     "Togo": "tg",
     "Thailand": "th",
@@ -667,8 +674,6 @@ country_map = {
     "Vatican City": "va",
     "Saint Vincent and the Grenadines": "vc",
     "Venezuela": "ve",
-    "British Virgin Islands": "vg",
-    "BVI": "vg",
     "US Virgin Islands": "vi",
     "U.S. Virgin Islands": "vi",
     "United States Virgin Islands": "vi",
@@ -711,6 +716,13 @@ country_map = {
     "Qing Dynasty": "qin",
 
     # Demonyms
+    "Falkland Islander": "gb",
+    "English": "gb",
+    "British": "gb",
+    "Northern Irish": "gb",
+    "Welsh": "gb",
+    "Scottish": "gb",
+
     "French": "fr",
     "German": "de",
     "Italian": "it",
@@ -719,11 +731,6 @@ country_map = {
     "Portuguese": "pt",
     "American": "us",
     "Irish": "ie",
-    "English": "gb",
-    "British": "gb",
-    "Northern Irish": "gb",
-    "Welsh": "gb",
-    "Scottish": "gb",
     "Polish": "pl",
     "Australian": "au",
     "Canadian": "ca",
@@ -778,7 +785,6 @@ country_map = {
     "Central African": "cf",
     "Cook Islander": "ck",
     "Croat": "hr",
-    "Falkland Islander": "fk",
     "Faroe Islander": "fo",
     "Faroese": "fo",
     "Guyanese": "gy",
@@ -968,16 +974,17 @@ def country_match(input_str):
 
 
 def nationality_check(line, line_flags, article_flags):
-    if "==" in line:
-        return
-    if "Infobox" in line or "infobox" in line:
-        return [("INFONAT_ERR", line)]
-
-    line_tmp = piped_link_re.sub("[[$1 PIPE $2]]", line)
+    line_tmp = piped_link_re.sub(r"[[\1 PIPE \2]]", line)
     param_match = nationality_citizenship_re.search(line_tmp)
     if not param_match:
         return
     param_str = param_match.group(2).strip()
+
+    if "==" in param_str:
+        return
+    if "Infobox" in line or "infobox" in param_str:
+        return [("INFONAT_ERR", line)]
+
     if not param_str:
         return [("INFONAT_BIRTHPLACE_ONLY", line)]
     if "be inferred from" in param_str or "same as citizenzhip" in param_str:
@@ -1015,22 +1022,22 @@ def nationality_check(line, line_flags, article_flags):
         return
     if not citnat_countries:
         return [("INFONAT_CITNAT_NO_COUNTRY",
-                 line + "//" + param_str)]
+                 line + " ❦ " + param_str)]
     if not birthplace_countries:
         country_code = citnat_countries[0]
         return [(f"INFONAT_BIRTHPLACE_NO_COUNTRY_{country_code}",
-                 line + "//" + birthplace)]
+                 line + " ❦ " + birthplace)]
 
     country_code = birthplace_countries[0]
     if birthplace_countries[0] == citnat_countries[0]:
         return [(f"INFONAT_REDUNDANT_{country_code}",
-                 line + "//" + birthplace)]
+                 line + " ❦ " + birthplace)]
     if "not needed" in param_str or "Not needed" in param_str:
         return [("INFONAT_REDUNDANT", line)]
 
     # When did citizenship or nationality change?
     return [(f"INFONAT_EXPLAIN_{country_code}",
-             line + "//" + birthplace)]
+             line + " ❦ " + birthplace)]
 
 
 def mos_double_check(line, line_flags):
