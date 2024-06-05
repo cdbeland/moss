@@ -29,10 +29,11 @@ grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 grep ^INFONAT_FLAG tmp-infonat.txt | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | sort | uniq > fixme-infonat-mos-flagbio.txt
 
 # Remove citizenship/nationality fields
-grep ^INFONAT_REDUNDANT tmp-infonat.txt | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant.txt
+grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-jus-soli.txt
+grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep -v JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-not-jus-soli.txt
 
 # Remove citizenship/nationality fields and add ", United States" to birth_place
-grep ^INFONAT_EXPLAIN_us_state tmp-infonat.txt | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-add-usa.txt
+grep ^INFONAT_EXPLAIN_us_state tmp-infonat.txt | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-add-usa.txt
 grep ^INFONAT_BIRTHPLACE_NO_COUNTRY tmp-infonat.txt | sort -k3 -t $'\t' > fixme-infonat-add-country.txt
 
 # Probably need to improve demonym list in moss_check_style_by_line.py
@@ -40,8 +41,8 @@ grep ^INFONAT_CITNAT_NO_COUNTRY tmp-infonat.txt | sort -k3 -t $'\t' > fixme-info
 
 # Either the field is being abused or change of status needs to be
 # dated or explained as from-birth or something.
-grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "citizenship" | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-citizenship-usa.txt
-grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "nationality" | sort | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-nationality-usa.txt
+grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "citizenship" | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-citizenship-usa.txt
+grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "nationality" | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-nationality-usa.txt
 
 grep ^INFONAT_ERR tmp-infonat.txt | sort > fixme-infonat-err.txt
 
