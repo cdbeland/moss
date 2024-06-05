@@ -402,6 +402,48 @@ nationality_citizenship_re = re.compile(r"(nationality|citizenship) *= *(.*?)(\|
 usa_re = re.compile(r"({US}|USA|US$|United States|American|U.S.)\]*")
 piped_link_re = re.compile(r"\[\[([^\]]+)\|([^\]]+)\]\]")
 
+
+# Birthright citizenship for everyone born in the territory per
+# https://en.wikipedia.org/wiki/Jus_soli#Unrestricted_jus_soli
+jus_soli = [
+    "td",
+    "ls",
+    "tz",
+    "ag",
+    "bb",
+    "bz",
+    "ca",
+    "cr",
+    "cu",
+    "dm",
+    "sv",
+    "gd",
+    "gt",
+    "hn",
+    "jm",
+    "mx",
+    "ni",
+    "pa",
+    "kn",
+    "lc",
+    "vc",
+    "tt",
+    "us",
+    "ar",
+    "bo",
+    "br",
+    "cl",
+    "ec",
+    "gu",
+    "py",
+    "pe",
+    "uy",
+    "ve",
+    "fj",
+    "tv",
+]
+
+
 country_map = {
     "Andorra": "ad",
     "United Arab Emirates": "ae",
@@ -412,7 +454,7 @@ country_map = {
     "Armenia": "am",
     "Angola": "ao",
     "Argentina": "ar",
-    "American Samoa": "as",
+
     "Austria": "at",
     "Australia": "au",
     "Aruba": "aw",
@@ -494,7 +536,8 @@ country_map = {
     "Northern Ireland": "gb",
 
     # All BOT Citizens (except those attached to Akrotiri and
-    # Dhekelia) are full British Citizens now:
+    # Dhekelia) are full British Citizens now (but possibly not in the
+    # past):
     "Falkland Islands": "gb",  # "fk"
     "Gibraltar": "gb",  # "gi"
     "Isle of Man": "gb",  # "im"
@@ -522,7 +565,6 @@ country_map = {
     "Equatorial Guinea": "gq",
     "Greece": "gr",
     "Guatemala": "gt",
-    "Guam": "gu",
     "Guinea-Bissau": "gw",
     "Guyana": "gy",
     "Hong Kong": "hk",
@@ -583,7 +625,6 @@ country_map = {
     "Burma": "mm",
     "Mongolia": "mn",
     "Macao": "mo",
-    "Northern Mariana Islands": "mp",
     "Martinique": "mq",
     "Mauritania": "mr",
     "Malta": "mt",
@@ -614,7 +655,6 @@ country_map = {
     "Pakistan": "pk",
     "Poland": "pl",
     "Saint Pierre and Miquelon": "pm",
-    "Puerto Rico": "pr",
     "Palestine": "ps",
     "Portugal": "pt",
     "Palau": "pw",
@@ -662,6 +702,7 @@ country_map = {
     "Tanzania": "tz",
     "Ukraine": "ua",
     "Uganda": "ug",
+
     "United States of America": "us",
     "United States": "us",
     "USA": "us",
@@ -669,14 +710,24 @@ country_map = {
     "U.S.": "us",
     "U. S.": "us",
     "America": "us",
+
+    # U.S. nationals by birth location, possibly citizens by
+    # parentage, depending on year of birth
+    "American Samoa": "as",
+
+    # U.S. citizens by birth location, depending on year of birth
+    "US Virgin Islands": "vi",
+    "U.S. Virgin Islands": "vi",
+    "United States Virgin Islands": "vi",
+    "Guam": "gu",
+    "Puerto Rico": "pr",
+    "Northern Mariana Islands": "mp",
+
     "Uruguay": "uy",
     "Uzbekistan": "uz",
     "Vatican City": "va",
     "Saint Vincent and the Grenadines": "vc",
     "Venezuela": "ve",
-    "US Virgin Islands": "vi",
-    "U.S. Virgin Islands": "vi",
-    "United States Virgin Islands": "vi",
     "Vietnam": "vn",
     "Vanuatu": "vu",
     "Wallis and Futuna": "wf",
@@ -1030,8 +1081,12 @@ def nationality_check(line, line_flags, article_flags):
 
     country_code = birthplace_countries[0]
     if birthplace_countries[0] == citnat_countries[0]:
-        return [(f"INFONAT_REDUNDANT_{country_code}",
-                 line + " ❦ " + birthplace)]
+        if country_code in jus_soli:
+            return [(f"INFONAT_REDUNDANT_{country_code}_JUS_SOLI",
+                     line + " ❦ " + birthplace)]
+        else:
+            return [(f"INFONAT_REDUNDANT_{country_code}",
+                     line + " ❦ " + birthplace)]
     if "not needed" in param_str or "Not needed" in param_str:
         return [("INFONAT_REDUNDANT", line)]
 
