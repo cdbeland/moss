@@ -114,7 +114,7 @@ def check_style_by_line(article_title, article_text):
         line_flags = set_line_flags(line)
 
         # Avoiding extend() helps performance massively
-        if article_flags["birthplace_infobox"]:
+        if article_flags["birthplace_infobox"] or "nationality2" in line:
             result = nationality_check(line, line_flags, article_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -398,7 +398,7 @@ def cvt_fuel_efficiency_check(line, line_flags):
     pass
 
 
-nationality_citizenship_re = re.compile(r"(nationality|citizenship) *= *(.*?)(\||$)")
+nationality_citizenship_re = re.compile(r"(nationality|citizenship)[0-9]? *= *(.*?)(\||$)")
 usa_re = re.compile(r"({US}|USA|US$|United States|American|U.S.)\]*")
 piped_link_re = re.compile(r"\[\[([^\]]+)\|([^\]]+)\]\]")
 
@@ -1025,6 +1025,8 @@ def country_match(input_str):
 
 
 def nationality_check(line, line_flags, article_flags):
+    if "nationality2" in line:
+        return [("INFONAT_REDUNDANT", line)]
     line_tmp = piped_link_re.sub(r"[[\1 PIPE \2]]", line)
     param_match = nationality_citizenship_re.search(line_tmp)
     if not param_match:
@@ -1089,6 +1091,12 @@ def nationality_check(line, line_flags, article_flags):
                      line + " ❦ " + birthplace)]
     if "not needed" in param_str or "Not needed" in param_str:
         return [("INFONAT_REDUNDANT", line)]
+
+    # Remove flag per [[MOS:FLAGBIO]]
+    if "Flag" in birthplace or "flag" in birthplace
+        return [("INFONAT_FLAG_BIRTHPLACE", line)]
+    if "<ref" not in birthplace and  "{{" in birthplace:
+        return [("INFONAT_FLAG_BIRTHPLACE", line)]
 
     # When did citizenship or nationality change?
     return [(f"INFONAT_EXPLAIN_{country_code}",
