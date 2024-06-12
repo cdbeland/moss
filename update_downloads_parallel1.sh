@@ -17,15 +17,11 @@ echo "Uncompressing and sorting..."
 # Takes about 12 minutes
 
 ORIG_DIR=`pwd`
+
 cd /var/local/moss/bulk-wikipedia/
 gunzip all-wiktionaries/*
 sort --unique all-wiktionaries/* > titles_all_wiktionaries_uniq.txt
 
-cd $ORIG_DIR
-echo `date`
-echo "Transliterating..."
-venv/bin/python3 transliterate.py > /var/local/moss/bulk-wikipedia/transliterations.txt
-# Takes about 20 sec
 cd /var/local/moss/bulk-wikipedia/
 
 echo `date`

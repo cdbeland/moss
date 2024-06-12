@@ -68,6 +68,12 @@ echo "Decompressing specieswiki titles..."
 gunzip specieswiki-latest-all-titles-in-ns0.gz
 
 cd $ORIG_DIR
+
+echo `date`
+echo "Transliterating..."
+venv/bin/python3 transliterate.py > /var/local/moss/bulk-wikipedia/transliterations.txt
+# Takes about 20 sec
+
 echo `date`
 echo "Decompressing enwiktionary multistream and converting XML to CSV..."
 # Run time: About 2 hours
