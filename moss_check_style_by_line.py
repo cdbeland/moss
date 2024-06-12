@@ -43,6 +43,8 @@ def poetry_match(text):
 
 
 birthplace_param_re = re.compile(r"birth_?place *= *(.*?)(\n|\| )")
+birth_date_param_re = re.compile(r"birth_date *= *(.*?)(\n|\| )")
+birth_year_re = re.compile(r"1[0-9][0-9][0-9]")
 
 
 def birthplace_infobox_match(text):
@@ -61,10 +63,33 @@ def birthplace_infobox_match(text):
     return False
 
 
+def birth_year_match(text):
+    matches = birth_date_param_re.findall(text)
+    if matches:
+        matches = list(matches)
+        if len(matches) > 1:
+            # Multiple matches mean the situation is complicated
+            return False
+        else:
+            birth_date_value = matches[0][0]
+            if birth_date_value:
+                matches = birth_year_re.findall(birth_date_value)
+                if matches:
+                    matches = list(matches)
+                    if len(matches) > 1:
+                        # Multiple matches mean the parse is unreliable
+                        return False
+                    else:
+                        return matches[0]
+    return False
+
+
 def set_article_flags(article_text):
     article_flags = dict()
     article_flags["poetry"] = poetry_match(article_text)
     article_flags["birthplace_infobox"] = birthplace_infobox_match(article_text)
+    if article_flags["birthplace_infobox"]:
+        article_flags["birth_year"] = birth_year_match(article_text)
     return article_flags
 
 
@@ -334,13 +359,13 @@ def liter_lowercase_check(line, line_flags):
         # expand "w/l" to "win/loss"
         # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
         # and these:
-        if "Malaysian names#Indian names|a/l" in line_tmp:
+        if "Malaysian names#Indian names|a/l" in line:
             return
-        if "Length at the waterline|w/l" in line_tmp:
+        if "Length at the waterline|w/l" in line:
             return
-        if "Length at the waterline|Length w/l" in line_tmp:
+        if "Length at the waterline|Length w/l" in line:
             return
-        if "Waterline length|w/l" in line_tmp:
+        if "Waterline length|w/l" in line:
             return
 
         # May need to:
@@ -1082,25 +1107,37 @@ def nationality_check(line, line_flags, article_flags):
                  line + " ❦ " + birthplace)]
 
     country_code = birthplace_countries[0]
+    birth_year = article_flags["birth_year"]
+    birth_century = "MISC"
+    if birth_year:
+        birth_year = int(birth_year)
+        if birth_year > 1999:
+            birth_century = "2000s"
+        elif birth_year > 1899:
+            birth_century = "1900s"
+        elif birth_year > 1799:
+            birth_century = "1800s"
+
     if birthplace_countries[0] == citnat_countries[0]:
         if country_code in jus_soli:
-            return [(f"INFONAT_REDUNDANT_{country_code}_JUS_SOLI",
+            return [(f"INFONAT_REDUNDANT_{country_code}_JUS_SOLI_{birth_century}",
                      line + " ❦ " + birthplace)]
         else:
-            return [(f"INFONAT_REDUNDANT_{country_code}",
+            return [(f"INFONAT_REDUNDANT_{country_code}_{birth_century}",
                      line + " ❦ " + birthplace)]
     if "not needed" in param_str or "Not needed" in param_str:
         return [("INFONAT_REDUNDANT", line)]
 
     # Remove flag per [[MOS:FLAGBIO]]
-    if "Flag" in birthplace or "flag" in birthplace
+    if "Flag" in birthplace or "flag" in birthplace:
         return [("INFONAT_FLAG_BIRTHPLACE", line)]
-    if "<ref" not in birthplace and  "{{" in birthplace:
+    if "<ref" not in birthplace and "{{" in birthplace:
         return [("INFONAT_FLAG_BIRTHPLACE", line)]
 
     # When did citizenship or nationality change?
-    return [(f"INFONAT_EXPLAIN_{country_code}",
-             line + " ❦ " + birthplace)]
+    if "{{explain citnat" not in line and "{{Explain citnat" not in line:
+        return [(f"INFONAT_EXPLAIN_{country_code}",
+                 line + " ❦ " + birthplace)]
 
 
 def mos_double_check(line, line_flags):
@@ -1112,6 +1149,13 @@ def cvt_temperature_check(line, line_flags):
 
 
 r"""
+
+# "internet" -> "Internet" outside of quotations
+
+# TODO: Ignore articles with "unmanned aerial vehicle" to reduce
+# false positives on this.
+# "manned",
+# "unmanned",
 
 # --- FUEL EFFICIENCY CONVERSION ---
 

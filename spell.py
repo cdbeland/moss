@@ -114,12 +114,6 @@ number_formats_allowed_re = re.compile(
 
 # Word blocklist
 bad_words = {
-    # TODO: Ignore articles with "unmanned aerial vehicle" to reduce
-    # false positives on this.
-    # Most of the time (experimental!)
-    # "manned",
-    # "unmanned",
-
     # Per [[MOS:YOU]]
     "you",
     "your",
