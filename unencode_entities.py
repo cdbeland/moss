@@ -298,6 +298,7 @@ controversial = {
     "&cfr;": "𝔠",
     "&angzarr;": "⍼",
     "&hbar;": "ℏ",
+    "ϕ": "Φ",  # From U+03D5
 }
 
 # keep.extend(controversial.keys())
@@ -310,7 +311,7 @@ transform_unsafe = {
     # Per [[MOS:CURRENCY]] should be £ for pound currencies (GBP, AUP,
     # NZP, etc.)  CAUTION: Keep ₤ or lira and link, e.g.: [[Italian lira|₤]]
     "₤": "£",
-    "£": "£",  # U+FFE1
+    "￡": "£",  # U+FFE1 (full width) to U+00A3
 
     "&s;": "'",
 
@@ -823,7 +824,6 @@ transform_unsafe = {
     "ℷ": "ג",  # From U+2137
     "ℸ": "ד‎",  # From U+2138
     "ϐ": "β",  # From U+03D0
-    "ϕ": "Φ",  # From U+03D5
     # "ϖ": "π", # U+03D6 seems to be used legitimately, visually
     #           distinct, this looks like a combined omega + pi,
     #           and matches the presentation in some TeX used in articles.
@@ -1124,7 +1124,6 @@ transform_unsafe = {
     # "＿": "_",
     # "｀": "`",
     # "￠": "¢",
-    # "￡": "£",
     # "￥": "¥",
     # "￦": "₩",
     # "＜": "<",
@@ -1547,6 +1546,7 @@ transform = {
     "&ocy;": "о̀",
     "&ograve;": "ò",
     "&omacr;": "ō",
+    "&Omacr;": "Ō",
     "&Oslash;": "Ø",
     "&oslash;": "ø",
     "&otilde;": "õ",
