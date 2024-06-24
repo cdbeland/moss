@@ -44,7 +44,7 @@ def poetry_match(text):
 
 birthplace_param_re = re.compile(r"birth_?place *= *(.*?)(\n|\| )")
 birth_date_param_re = re.compile(r"birth_date *= *(.*?)(\n|\| )")
-birth_year_re = re.compile(r"1[0-9][0-9][0-9]")
+birth_year_re = re.compile(r"[12][0-9][0-9][0-9]")
 
 
 def birthplace_infobox_match(text):
@@ -1108,7 +1108,7 @@ def nationality_check(line, line_flags, article_flags):
 
     country_code = birthplace_countries[0]
     birth_year = article_flags["birth_year"]
-    birth_century = "MISC"
+    birth_century = "UNK"
     if birth_year:
         birth_year = int(birth_year)
         if birth_year > 1999:
@@ -1117,6 +1117,10 @@ def nationality_check(line, line_flags, article_flags):
             birth_century = "1900s"
         elif birth_year > 1799:
             birth_century = "1800s"
+        elif birth_year > 1699:
+            birth_century = "1700s"
+        else:
+            birth_century = "MISC"
 
     if birthplace_countries[0] == citnat_countries[0]:
         if country_code in jus_soli:
