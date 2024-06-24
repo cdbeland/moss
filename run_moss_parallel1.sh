@@ -25,12 +25,58 @@ grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 
 grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 
+# TODO:
+# * USA -> US, U.S.A. -> U.S. in infoboxes, prose
+# * Unpipe country name in birth_place
+
+cat tmp-infonat.txt | perl -pe 's/^(.*?_[A-Z]*?)[_ \t].*$/$1/'  | sort | perl ../count.pl | sort -n > infonat-count-overall.txt
+cat tmp-infonat.txt | perl -pe 's/^(.*?)\t.*$/$1/'  | sort | perl ../count.pl | sort -n > infonat-count-detail.txt
+
+# -- Remove citizenship/nationality fields --
+
+# Can be updated from infonat-count-detail.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_(1700s|MISC)' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1700s-misc.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_2000s' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-2000s.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1800s' tmp-infonat.txt | grep -P 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1800s-big-countries.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1800s' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1800s-small-countries.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1900s' tmp-infonat.txt | grep -P 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1900s-big-countries.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1900s' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1900s-small-countries.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_UNK' tmp-infonat.txt | grep -P 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-UNK-big-countries.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_UNK' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-UNK-small-countries.txt
+
+grep -P '^INFONAT_REDUNDANT_us_state' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-us-state.txt
+
+grep -P '^INFONAT_REDUNDANT_(au|be|cn|de|dk|es|fi|fr|gb|hu|ie|in|ir|it|jp|nl|no|ph|pl|se|tr|ug|za)' tmp-infonat.txt | sort > tmp-infonat-large-non-jus-soli.txt
+grep -P '^INFONAT_REDUNDANT_(al|am|ao|at|az|bd|bg|by|ch|cm|co|cz|dz|ee|eg|gh|gr|hr|id|il|in|iq|is|ke|kr|lb|lk|lt|lu|lv|ma|mk|mm|my|np|nz|pk|pr|ps|pt|ru|sa|sg|si|sn|sy|th|tn|tw|ua|vn)' tmp-infonat.txt | sort > tmp-infonat-medium-non-jus-soli.txt
+grep -P '^INFONAT_REDUNDANT_' tmp-infonat.txt | grep -v JUS_SOLI | grep -v _us_state | grep -vP '^INFONAT_REDUNDANT_(au|be|cn|de|dk|es|fi|fr|gb|hu|ie|in|ir|it|jp|nl|no|ph|pl|se|tr|ug|za|al|am|ao|at|az|bd|bg|by|ch|cm|co|cz|dz|ee|eg|gh|gr|hr|id|il|in|iq|is|ke|kr|lb|lk|lt|lu|lv|ma|mk|mm|my|np|nz|pk|pr|ps|pt|ru|sa|sg|si|sn|sy|th|tn|tw|ua|vn)' | sort > tmp-infonat-small-non-jus-soli.txt
+
+grep -P '_UNK' tmp-infonat-small-non-jus-soli.txt > infonat-redundant-small-non-jus-soli-unk.txt
+grep -P '_(1700s|MISC)' tmp-infonat-small-non-jus-soli.txt > infonat-redundant-small-non-jus-soli-1700s-misc.txt
+grep -P '_1800s' tmp-infonat-small-non-jus-soli.txt > infonat-redundant-small-non-jus-soli-1800s.txt
+grep -P '_1900s' tmp-infonat-small-non-jus-soli.txt > infonat-redundant-small-non-jus-soli-1900s.txt
+grep -P '_2000s' tmp-infonat-small-non-jus-soli.txt > infonat-redundant-small-non-jus-soli-2000s.txt
+grep -P '_UNK' tmp-infonat-medium-non-jus-soli.txt > infonat-redundant-medium-non-jus-soli-unk.txt
+grep -P '_MISC' tmp-infonat-medium-non-jus-soli.txt > infonat-redundant-medium-non-jus-soli-misc.txt
+grep -P '_1700s' tmp-infonat-medium-non-jus-soli.txt > infonat-redundant-medium-non-jus-soli-1700s.txt
+grep -P '_1800s' tmp-infonat-medium-non-jus-soli.txt > infonat-redundant-medium-non-jus-soli-1800s.txt
+grep -P '_1900s' tmp-infonat-medium-non-jus-soli.txt > infonat-redundant-medium-non-jus-soli-1900s.txt
+grep -P '_2000s' tmp-infonat-medium-non-jus-soli.txt > infonat-redundant-medium-non-jus-soli-2000s.txt
+grep -P '_UNK' tmp-infonat-large-non-jus-soli.txt > infonat-redundant-large-non-jus-soli-unk.txt
+grep -P '_MISC' tmp-infonat-large-non-jus-soli.txt > infonat-redundant-large-non-jus-soli-misc.txt
+grep -P '_1700s' tmp-infonat-large-non-jus-soli.txt > infonat-redundant-large-non-jus-soli-1700s.txt
+grep -P '_1800s' tmp-infonat-large-non-jus-soli.txt > infonat-redundant-large-non-jus-soli-1800s.txt
+grep -P '_1900s' tmp-infonat-large-non-jus-soli.txt > infonat-redundant-large-non-jus-soli-1900s.txt
+grep -P '_2000s' tmp-infonat-large-non-jus-soli.txt > infonat-redundant-large-non-jus-soli-2000s.txt
+
+
+# grep ^INFONAT_REDUNDANT tmp-infonat.txt | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant.txt
+# grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-jus-soli.txt
+# grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep -v JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-not-jus-soli.txt
+
+# --
+
 # Remove flag per [[MOS:FLAGBIO]]
 grep ^INFONAT_FLAG tmp-infonat.txt | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | sort | uniq > fixme-infonat-mos-flagbio.txt
-
-# Remove citizenship/nationality fields
-grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-jus-soli.txt
-grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep -v JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-not-jus-soli.txt
 
 # Remove citizenship/nationality fields and add ", United States" to birth_place
 grep ^INFONAT_EXPLAIN_us_state tmp-infonat.txt | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-add-usa.txt
