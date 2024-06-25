@@ -808,10 +808,11 @@ def extract_articles(dictionary):
     return articles
 
 
-def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout):
-
+def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout, articles=[]):
     output_string = '{"%s":' % pulldown_name
-    output_string += """{"string":{"articleList":"","summary":"convert special characters found by [[Wikipedia:Typo Team/moss]]","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":true,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n"""  # noqa
+    output_string += '{"string":{"articleList":"'
+    output_string += articles.join(r"\\n")
+    output_string =+ '","summary":"convert special characters found by [[Wikipedia:Typo Team/moss]]","watchPage":"nochange","skipContains":"","skipNotContains":"","containFlags":"","moveTo":"","editProt":"all","moveProt":"all","protectExpiry":"","namespacelist":["0"],"cmtitle":"","linksto-title":"","pssearch":"","pltitles":""},"bool":{"preparse":false,"minorEdit":true,"viaJWB":true,"enableRETF":true,"redir-follow":false,"redir-skip":false,"redir-edit":true,"skipNoChange":true,"exists-yes":false,"exists-no":true,"exists-neither":false,"skipAfterAction":true,"containRegex":false,"suppressRedir":false,"movetalk":false,"movesubpage":false,"categorymembers":false,"cmtype-page":true,"cmtype-subcg":true,"cmtype-file":true,"linksto":false,"backlinks":true,"embeddedin":false,"imageusage":false,"rfilter-redir":false,"rfilter-nonredir":false,"rfilter-all":true,"linksto-redir":true,"prefixsearch":false,"watchlistraw":false,"proplinks":false},"replaces":[\n'  # noqa
 
     # Must be before auto-generated replacements
     output_string += r"""{"replaceText":"(&#0?39;'|'&#0?39;)","replaceWith":"\"","useRegex":true,"regexFlags":"g","ignoreNowiki":false},"""
@@ -928,30 +929,35 @@ def dump_results():
         output = dump_dict(section_title, dictionary)
         print(output)
 
+    # Make list of articles to fix in JWB
+    """
+    # Sorted from least-frequent to most-frequent across all types
+    mega_dict = {}
+    for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL", "LOW_PRIORITY"]:
+        mega_dict.update(strings_found_by_type.get(dic_type, {}))
+    articles = extract_articles(mega_dict)
+    articles = list(dict.fromkeys(articles))  # uniqify across sublists
+    print("\n".join(articles[0:1000]), file=articlesf)
+    """
+
+    # By section, from least-frequent to most-frequent with each section
+    articles = []
+    for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL", "LOW_PRIORITY"]:
+        articles += extract_articles(strings_found_by_type.get(dic_type, {}))
+    articles = list(dict.fromkeys(articles))  # uniqify across sublists
+
+    # If the list is too long, it starts to slow down JWB JavaScript
+    articles = articles[0:2500]
+
+    # with open("jwb-articles.txt", "w") as articlesf:
+    #     print("\n".join(articles), file=articlesf)
+
     with open("jwb-combo.json", "w") as combof:
         bad_entities = set()
         for dic_type in ["ALERT", "LOW_PRIORITY", "UNCONTROVERSIAL", "UNKNOWN", "NUMERIC", "CONTROVERSIAL", "GREEK"]:
             dictionary = strings_found_by_type.get(dic_type, {})
             bad_entities.update(extract_entities(dictionary))
-        dump_for_jwb("combo", bad_entities, file=combof)
-
-    with open("jwb-articles.txt", "w") as articlesf:
-        """
-        # Sorted from least-frequent to most-frequent across all types
-        mega_dict = {}
-        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL", "LOW_PRIORITY"]:
-            mega_dict.update(strings_found_by_type.get(dic_type, {}))
-        articles = extract_articles(mega_dict)
-        articles = list(dict.fromkeys(articles))  # uniqify across sublists
-        print("\n".join(articles[0:1000]), file=articlesf)
-        """
-
-        # By section, from least-frequent to most-frequent with each section
-        articles = []
-        for dic_type in ["CONTROVERSIAL", "GREEK", "NUMERIC", "UNCONTROVERSIAL", "LOW_PRIORITY"]:
-            articles += extract_articles(strings_found_by_type.get(dic_type, {}))
-        articles = list(dict.fromkeys(articles))  # uniqify across sublists
-        print("\n".join(articles), file=articlesf)
+        dump_for_jwb("combo", bad_entities, file=combof, articles=articles)
 
 
 if __name__ == '__main__':
