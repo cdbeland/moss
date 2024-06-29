@@ -622,6 +622,9 @@ def subcheck_non_entity(article_text, article_title, hint=None):
         if check_string == "C°" and article_title == "Complementizer":
             continue
 
+        if check_string in controversial and "<math" in article_text:
+            continue
+
         if check_string == "ϑ" and "θ" not in article_text:
             # Probably not appropriate for basic geometry articles,
             # but some branches of mathematics may prefer it
