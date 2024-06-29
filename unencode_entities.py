@@ -1037,8 +1037,8 @@ transform_unsafe = {
     # https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)
     # No objections from:
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China/Archive_31#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
-    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
-    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles/Archive_28#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea/Archive_21#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
     "０": "0",
     "１": "1",
     "２": "2",
@@ -1102,40 +1102,46 @@ transform_unsafe = {
     "ｙ": "y",
     "ｚ": "z",
 
-    # May need to update:
+    # If there are no objections, update:
     #  Wikipedia:Manual of Style/China- and Chinese-related articles
     #  Wikipedia:Manual of Style/Korea-related articles
     #  Wikipedia:Manual of Style/Japan-related articles
 
-    # Need to consult CJK language Wikiprojects
-    # "＂": '"',
-    # "＃": "#",
-    # "＄": "$",
-    # "％": "%",
-    # "＆": "&",
-    # "＇": "'",
-    # "＊": "*",
-    # "＋": "+",
-    # "－": "-",
-    # "／": "/",
-    # "＠": "@",
-    # "＼": "\\",
-    # "＾": "^",
-    # "＿": "_",
-    # "｀": "`",
-    # "￠": "¢",
-    # "￥": "¥",
-    # "￦": "₩",
-    # "＜": "<",
-    # "＝": "=",
-    # "＞": ">",
-    # "｜": "{{pipe}}",
-    # "￤": "¦",
+    # Asked about these at:
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Japan#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/China-_and_Chinese-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Korea-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+
+    "＂": '"',
+    "＃": "#",
+    "＄": "$",
+    "％": "%",
+    "＆": "&",
+    "＇": "'",
+    "＊": "*",
+    "＋": "+",
+    "－": "-",
+    "／": "/",
+    "＠": "@",
+    "＼": "\\",
+    "＾": "^",
+    "＿": "_",  # U+FF3F full-width underscore
+    "｀": "`",
+    "￠": "¢",
+    "￥": "¥",
+    "￦": "₩",
+    "＜": "<",
+    "＝": "=",
+    "＞": ">",
+    "｜": "{{pipe}}",
+    "￤": "¦",
+    "　": " ",  # U+3000 full-width space
 
     # Ignoring for now:
     # ￣
-    # Vertical writing:
-    # ￢
     # Half-width:
     # "｡": "。",
     # "｢": "「",
