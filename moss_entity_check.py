@@ -5,8 +5,7 @@ from unencode_entities import (
     alert, keep, controversial, transform, greek_letters, find_char_num,
     entities_re, fix_text, should_keep_as_is)
 
-low_priority = "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ" \
-    "¹²³⁴⁵⁶⁷⁸⁹⁰ⁱ⁺⁻⁼⁽⁾ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓꟹᵝᵞᵟᵋᶿᶥᶹᵠᵡᵦᵧᵨᵩᵪᵅᶜ̧ᶞᵊᶪᶴᶵꭩˀₔᵑ"
+low_priority = "¹²³⁴⁵⁶⁷⁸⁹⁰ⁱ⁺⁻⁼⁽⁾ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓꟹᵝᵞᵟᵋᶿᶥᶹᵠᵡᵦᵧᵨᵩᵪᵅᶜ̧ᶞᵊᶪᶴᶵꭩˀₔᵑ"
 
 strings_found_by_type = {}
 non_entity_transform = [string for string
@@ -453,7 +452,7 @@ suppression_patterns = [
     # TODO: These can be URL-escaped
     re.compile(r"https?://[^ \n\|&]+"),
 
-    re.compile(r"{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE"
+    re.compile(r"{{lang.*?translit=.*?}}|{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE"
                # 7seg uses superscript = as a parameter value
                r"|7seg"
 
