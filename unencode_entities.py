@@ -1121,9 +1121,7 @@ transform_unsafe = {
     "％": "%",
     "＆": "&",
     "＇": "'",
-    "＊": "*",
     "＋": "+",
-    "－": "-",
     "／": "/",
     "＠": "@",
     "＼": "\\",
@@ -1133,12 +1131,18 @@ transform_unsafe = {
     "￠": "¢",
     "￥": "¥",
     "￦": "₩",
-    "＜": "<",
     "＝": "=",
-    "＞": ">",
     "｜": "{{pipe}}",
     "￤": "¦",
     "　": " ",  # U+3000 full-width space
+
+    # Todo: Find these when not in CJK text
+    # Comments from Dekimasu on
+    # https://en.wikipedia.org/w/index.php?title=Wikipedia_talk%3AWikiProject_Japan#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # "＊": "*",  # "often equivalent to a bullet point rather than an asterisk"
+    # "＜": "<",  # "often used to denote parts of titles or quotations and in these cases are not equivalent to < and >"
+    # "＞": ">",  # "(ditto)"
+    # "－": "-",  # "no problem if the characters are really intending minuses rather than dashes"
 
     # Ignoring for now:
     # ￣
