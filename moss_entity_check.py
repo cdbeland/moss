@@ -812,7 +812,7 @@ def extract_articles(dictionary):
 
 def dump_for_jwb(pulldown_name, bad_entities, file=sys.stdout, articles=[]):
     articles_string = r"\n".join(articles)
-    articles_string = articles_string.sub('"', r'\"')
+    articles_string = articles_string.replace('"', r'\"')
     output_string = '{"%s":' % pulldown_name
     output_string += '{"string":{"articleList":"'
     output_string += articles_string
