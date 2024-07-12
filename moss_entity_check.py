@@ -47,9 +47,8 @@ non_entity_transform = [string for string
 # --
 
 article_blocklist = [
+
     # Characters themselves are discussed or listed as part of a mapping
-    "' (disambiguation)",
-    "AA",
     "ANSEL",
     "ARIB STD B24 character set",
     "ALCOR",
@@ -57,7 +56,6 @@ article_blocklist = [
     "ALGOL 68",
     "ASCII",
     "ASMO 449",
-    "AV",
     "AZERTY",
     "Adobe Glyph List",
     "Afrasianist phonetic notation",
@@ -72,13 +70,7 @@ article_blocklist = [
     "Basic Latin (Unicode block)",
     "Big5",
     "Bitstream International Character Set",
-    "Blackboard bold",
     "Bookshelf Symbol 7",
-    "Bracket",
-    ".ca",
-    "C",
-    "(C)",
-    "C (disambiguation)",
     "CEA-708",
     "CER-GS",
     "Casio calculator character sets",
@@ -106,39 +98,28 @@ article_blocklist = [
     "Code page 1169",
     "Code page 1287",
     "Code page 1288",
-    "Colon (punctuation)",
     "Compose key",
     "Computer Braille Code",
     "Cork encoding",
     "CTA-708",
     "Dania transcription",
-    "Dash",
     "Devanagari transliteration",
     "DEC Hebrew",
     "Digital encoding of APL symbols",
     "DKOI",
     "DIN 66303",
     "Duplicate characters in Unicode",
-    "Ellipsis",
     "ELOT 927",
     "Emoji",
-    "En (typography)",
     "Enclosed Alphanumeric Supplement",
     "Extended Latin-8",
     "Extensions to the International Phonetic Alphabet",
-    "Ezh",
-    "FFL",
     "FOCAL character set",
-    "FR",
-    "G",
     "GB 2312",
     "German keyboard layout",
     "GOST 10859",
     "Grave accent",
     "Greek script in Unicode",
-    "H",
-    "Hashtag",
-    "Hook (diacritic)",
     "HP Roman",
     "IBM 2741",
     "IBM 3270",
@@ -167,10 +148,8 @@ article_blocklist = [
     "ISO/IEC 8859-9",
     "ISO basic Latin alphabet",
     "ITU T.61",
-    "Jeremy Burge",
     "JIS X 0201",
     "JIS X 0208",
-    "K",
     "KOI-8",
     "KOI8-B",
     "KOI8-F",
@@ -179,7 +158,6 @@ article_blocklist = [
     "KOI8-U",
     "KPS 9566",
     "KS X 1001",
-    "L",
     "Latin Extended Additional",
     "Latin Extended-B",
     "Latin script in Unicode",
@@ -194,7 +172,6 @@ article_blocklist = [
     "List of Unicode characters",
     "Lotus Multi-Byte Character Set",
     "LY1 encoding",
-    "M",
     "Mac OS Armenian",
     "Mac OS Celtic",
     "Mac OS Central European encoding",
@@ -209,49 +186,34 @@ article_blocklist = [
     "Mathematical Alphanumeric Symbols",
     "Mathematical operators and symbols in Unicode",
     "MIK (character set)",
-    "Mojibake",
     "Multinational Character Set",
     "NEC APC character set",
     "NeXT character set",
     "Number Forms",
     "Numerals in Unicode",
-    "Numero sign",
     "Numismatics",
     "OT1 encoding",
     "Palatal hook",
     "PETSCII",
     "Phags-pa (Unicode block)",
-    "Phi",
     "Phonetic symbols in Unicode",
     "PostScript Standard Encoding",
-    "Prime (symbol)",
-    "Radical symbol",
-    "Regional indicator symbol",
-    "Registered trademark symbol",
     "RISC OS character set",
     "Roman numerals",
     "Romanization of Arabic",
     "Rough breathing",
     "RPL character set",
-    "Quotation mark",
     "S",
     "Schwarzian derivative",
     "Secondary articulation",
-    "Service mark",
     "Sharp pocket computer character sets",
-    "Square sign",
     "SI 960",
     "Sinclair QL character set",
     "Six-bit character code",
     "Spacing Modifier Letters",
     "Specials (Unicode block)",
-    "Slash (punctuation)",
-    "Slashed zero",
     "Stokoe notation",
-    "Summation",
     "Superior letter",
-    "Symbol (typeface)",
-    "T",
     "T.51/ISO/IEC 6937",
     "Tab key",
     "Tab-separated values",
@@ -259,8 +221,6 @@ article_blocklist = [
     "Thai Industrial Standard 620-2533",
     "TI calculator character sets",
     "Tibetan (Unicode block)",
-    "Tilde",
-    "Trademark symbol",
     "TRON (encoding)",
     "Unicode compatibility characters",
     "Unicode equivalence",
@@ -268,16 +228,13 @@ article_blocklist = [
     "Unicode subscripts and superscripts",
     "UTF-8",
     "UTF-EBCDIC",
-    "V",
     "Ventura International",
     "Videotex character set",
     "VISCII",
     "VSCII",
     "VT100 encoding",
     "VT52",
-    "W",
     "Wang International Standard Code for Information Interchange",
-    "Warmian-Masurian Voivodeship",
     "Welsh orthography",
     "Western Latin character sets (computing)",
     "Whitespace (programming language)",
@@ -297,13 +254,9 @@ article_blocklist = [
     "Windows Polytonic Greek",
     "Wingdings",
     "World glyph set",
-    "X",
     "Xerox Character Code Standard",
     "Yakut scripts",
     "YUSCII",
-    "Zero-width space",
-    "Z",
-    "Œ",
 
     # Note: Characters like &Ohm; and &#x2F802; are changed by
     # Normalization Form Canonical Composition and appear as different
@@ -321,39 +274,6 @@ article_blocklist = [
     "Modern Arabic mathematical notation",  # LTR/RTL characters
     "List of jōyō kanji",  # Breaks display of certain characters
 
-    # Ligatures correctly used
-    "Massachusett dialects",
-    "Massachusett language",
-    "Massachusett writing systems",
-    "Wampum",
-    "Alchemical symbol",
-    "Mayan languages",
-    "Tezos",
-    "Hubert Déquier",
-    "Komi Nje",
-    "Flow process chart",
-
-    # &zwj; apparently needed
-    "Rasm",
-    "The Partisan",
-    "44th Kerala State Film Awards",
-    "Sumana Amarasinghe",
-    "Gopi Sundar",
-    "SASM/GNC romanization",
-    "List of Malayalam films of 2021",
-    "Memoirs of the Actor in a Supporting Role",
-    "Muslim Youth League",
-    "N. F. Varghese",
-
-    # Correctly uses U+2011 Non-Breaking Hypens
-    "Börje",
-
-    # Correctly uses center dots
-    "Additive category",
-
-    # Legitimate uses of ©
-    "Bobbsey Twins",
-
     # Variation issues, maybe need a variant selector?
     "Seong",
     "Sung-mi",
@@ -362,19 +282,10 @@ article_blocklist = [
     # African language needs slash in link
     "2011 South African municipal elections",
 
+    # -- Below probably can't be {{not a typo}}'d; TODO: above probably can --
+
     # Blackboard bold characters used as anchors
     "Glossary of mathematical symbols",
-
-    # Capital Alpha not in Greek word, exactly
-    "Kamen Rider Agito",
-
-    # &lowbar; needed to retain underscore in proper name
-    "Double Fine",
-
-    # Matching the actual unpronouncable album and song titles
-    "Four Tet discography",
-
-    # -- Below probably can't be {{not a typo}}'d, above probably can --
 
     # Legitimate use of <h2> due to complex layout
     "Main Page",
