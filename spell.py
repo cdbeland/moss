@@ -50,7 +50,7 @@ def load_data():
         moss_html = moss_html_file.read()
         queued_matches = re.findall('"https://en.wiktionary.org/wiki/(.*?)"', moss_html)
         if not queued_matches:
-            raise Exception("Empty Wikitionary queue; regex broken?")
+            raise Exception("Empty Wiktionary queue; regex broken?")
         for queued_match in queued_matches:
             add_tokens(queued_match)
 
@@ -611,7 +611,7 @@ def _is_word_spelled_correctly_impl(word_mixedcase):
         return True
 
     # Possessive: NLTK parses e.g. "'s" as a separate word, which
-    # Wikitionary has listed.
+    # Wiktionary has listed.
 
     # https://en.wiktionary.org/wiki/Wiktionary:Criteria_for_inclusion#Inflections
     # says that plural forms SHOULD be in the dictionary, so we do
