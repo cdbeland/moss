@@ -1,7 +1,6 @@
 flake8
 lxml
 lru-dict
-# Requires: sudo dnf install python3-devel
 mysql-connector-python
 nltk
 nose
@@ -11,13 +10,7 @@ unidecode
 wikipedia
 textstat
 
-
-# gcld3
-
-# protobuf
-# protobuf-compiler
-# cpython
-# grpcio
+gcld3
 
 pycountry
 

@@ -127,8 +127,7 @@ echo `date`
 echo "Beginning copyedit collection..."
 echo `date`
 
-# grep -v "TF+" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z][\,\.][A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' | grep -vP '[a-zA-Z][\(\)\[\]][A-Za-z]' > post-copyedit.txt
-grep -v "T+gcld3_broken" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z][\,\.][A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' | grep -vP '[a-zA-Z][\(\)\[\]][A-Za-z]' > post-copyedit-tmp.txt
+grep -v "TF+" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&gt;" | grep -P "[a-z][\,\.][A-z]" | grep -v "* [0123456] -" | perl -pe 's/\[\[wikt:(.*?)\]\]/"\1"/g' | perl -pe 's/.*?\t//' | grep -vP '[a-zA-Z][\(\)\[\]][A-Za-z]' > post-copyedit.txt
 
 # --- PARSE FAILURE FIXES ---
 
@@ -241,8 +240,7 @@ echo "(REPORT DISABLED DUE TO LONG RUN TIME; START MANUALLY)" >> post-chemical-f
 echo "Beginning not-English check"
 echo `date`
 
-# ../run_not_english.sh >& not_english.log
-echo "gcld3 compilation problems" > not_english.log
+../run_not_english.sh >& not_english.log
 
 
 echo "Beginning superscript/subscript check"
