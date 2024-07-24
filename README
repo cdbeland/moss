@@ -21,6 +21,8 @@ sudo chown $USER /var/local/moss/bulk-wikipedia/
 Run "FIRST TIME SETUP" steps in ./update_downloads_parallel.sh
 
 DOWNLOAD DATA:
+# Do not do this if Wikipedia or Wiktionary dumps are in progress at:
+#  https://dumps.wikimedia.org/backup-index-bydb.html
 ./update_downloads_parallel.sh
 
 RUN SPELL CHECK AND FRIENDS:
