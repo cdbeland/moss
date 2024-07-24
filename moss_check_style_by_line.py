@@ -1154,6 +1154,9 @@ def cvt_temperature_check(line, line_flags):
 
 r"""
 
+TODO: Finish rewrite of the below code into Python functions for
+increased performance. The old style was abandoned at commit d0f8fb1
+
 # "internet" -> "Internet" outside of quotations
 
 # TODO: Ignore articles with "unmanned aerial vehicle" to reduce
