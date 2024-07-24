@@ -25,5 +25,8 @@ DOWNLOAD DATA:
 #  https://dumps.wikimedia.org/backup-index-bydb.html
 ./update_downloads_parallel.sh
 
+# Wait for download to complete; you can watch progress with:
+# tail -f /var/local/moss/bulk-wikipedia/*log
+
 RUN SPELL CHECK AND FRIENDS:
 ./run_moss_parallel.sh
