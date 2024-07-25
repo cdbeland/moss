@@ -17,6 +17,13 @@ cd $RUN_NAME
 #  https://askubuntu.com/questions/1400/how-do-i-optimize-the-os-for-ssds
 
 
+# --- PARTIAL SPELL-CHECK BYPASS ---
+
+if [[ $1 == "--spell-check-only" ]]; then
+    ../run_main_spell_check.sh $2
+    exit 0
+fi
+
 # --- HTML ENTITIES ---
 
 # Run time for this segment: ~4 h 10 min (8-core parallel)

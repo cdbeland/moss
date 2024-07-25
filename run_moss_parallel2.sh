@@ -2,34 +2,12 @@
 
 set -e
 
-# --- WIKTIONARY SPELL CHECK ---
-
-echo "Beginning Wiktionary spell check"
-echo `date`
-
 ../run_wiktionary_spell_check.sh >& wiktionary.log
 
-# --- MAIN (WIKIPEDIA) SPELL CHECK ---
+../run_main_spell_check.sh >& main_spell_check.log
 
-# Run time for this segment: ~4 h 10 min (8-core parallel)
-
-echo "Beginning main Wikipedia spell check"
+echo "Failure post-processing"
 echo `date`
-
-../venv/bin/python3 ../moss_spell_check.py > tmp-output.txt
-
-# --- SPELL CHECK WORD CATEGORIZATION AND PARSE FAILURE POST-PROCESSING ---
-
-echo "Beginning word categorization run 1"
-echo `date`
-
-# Run time for this segment: ~25 min (8-core parallel)
-grep ^@ tmp-output.txt | sort -nr -k2 > /tmp/sorted_by_article.txt
-# Sort takes ~37sec
-cat /tmp/sorted_by_article.txt | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
-rm -rf /tmp/sorted_by_article.txt
-# TODO: Can this run as one line, or is that the source of the .py command not found error?
-# grep ^@ tmp-output.txt | sort -nr -k2 | ../venv/bin/python3 ../by_article_processor.py > tmp-articles-linked-words.txt
 
 grep -P '^!\t' tmp-output.txt | perl -pe 's/.*?\t//' | sort > err-parse-failures.txt
 grep -P '^\!Q' tmp-output.txt | perl -pe 's/^\!Q\t\* \[\[(.*?)\]\].*$/$1/' | sort | ../venv/bin/python3 ../sectionalizer.py LARGE > jwb-straight-quotes-unbalanced.txt
@@ -43,12 +21,8 @@ tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tm
 
 # --- BY ARTICLE ---
 
-echo "Beginning by-article post-processing"
+echo "Secondary by-article post-processing"
 echo `date`
-
-# Run time for here to beginning of readability report: ~50 min
-
-cat tmp-articles-linked-words.txt | ../venv/bin/python3 ../make_main_listings.py > post-main-listings.txt
 
 # Dealing with the remaining pile of typos:
 # * Improve transliterate.py

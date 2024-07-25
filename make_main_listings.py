@@ -134,9 +134,11 @@ def extract_linked_articles():
 articles_to_ignore = extract_linked_articles()
 
 for (letter, typos_by_best_type) in typos_by_letter.items():
-    print(f"= {letter} =")
+    letter_output = ""
     for (best_type, tuple_list) in typos_by_best_type.items():
-        print(f"=== {best_type}+ ===")
+        if not tuple_list:
+            continue
+        letter_output += (f"=== {best_type}+ ===\n")
         output_lines = []
         for (article_title, types, typo_links) in sorted(tuple_list):
             if article_title in articles_to_ignore:
@@ -167,4 +169,10 @@ for (letter, typos_by_best_type) in typos_by_letter.items():
             if not_typo_links:
                 output_line += f'  (possibly OK: {", ".join(not_typo_links)})'
             output_lines.append(output_line)
-        print(sectionalize_lines(output_lines))
+        letter_output += sectionalize_lines(output_lines)
+
+    # Avoid printing headers for letters with no output; sometimes a
+    # run is only for a single letter
+    if letter_output:
+        print(f"= {letter} =")
+        print(letter_output)

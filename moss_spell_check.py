@@ -2,6 +2,7 @@
 
 import nltk
 import re
+import sys
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_tags_re
 from spell import is_word_spelled_correctly, bad_words
@@ -432,5 +433,10 @@ def tally_misspelled_words(result):
 
 
 if __name__ == '__main__':
-    read_en_article_text(spellcheck_all_langs, process_result_callback=tally_misspelled_words, parallel=True)
+    # Allow spell-checking only articles starting with a single letter of the alphabet
+    which_articles = "ALL"
+    if len(sys.argv) > 1:
+        which_articles = sys.argv[1]
+    print(f"Spell checking articles: {which_articles}", file=sys.stderr)
+    read_en_article_text(spellcheck_all_langs, process_result_callback=tally_misspelled_words, parallel=True, which_articles=which_articles)
     dump_results()

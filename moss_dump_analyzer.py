@@ -8,7 +8,7 @@ from multiprocessing import Pool
 import re
 import sys
 
-# Runtime: ~1.5 hours (with a simple callback, whata, single-threaded)
+# Runtime: ~1.5 hours (with a simple callback, single-threaded)
 
 DEFAULT_CSV_FILE = "/var/local/moss/bulk-wikipedia/enwiki-articles-no-redir.csv"
 PAGE_RE = re.compile(r"^.*(<page.*?</page>).*$", flags=re.MULTILINE+re.DOTALL)
@@ -20,7 +20,14 @@ def print_result(result):
         print(result)
 
 
-def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=False, process_result_callback=print_result):
+# which_articles selects articles by first character in the title. It
+# can be "ALL", "BEFORE_A", a capital letter A through Z, or "AFTER_Z"
+# (or any leading character you wish to select on)
+def read_en_article_text(callback_function,
+                         filename=DEFAULT_CSV_FILE,
+                         parallel=False,
+                         process_result_callback=print_result,
+                         which_articles="ALL"):
     if not filename:
         # Necessary backstop for dump_grep_regex.py
         filename = DEFAULT_CSV_FILE
@@ -28,6 +35,8 @@ def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=
     if parallel:
         with Pool(8) as pool:
             for (article_title, article_text) in page_generator_fast(filename):
+                if skip_article(article_title, which_articles):
+                    continue
                 result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback)
                 count += 1
                 if count % 100000 == 0:
@@ -43,6 +52,8 @@ def read_en_article_text(callback_function, filename=DEFAULT_CSV_FILE, parallel=
             pool.join()
     else:
         for (article_title, article_text) in page_generator_fast(filename):
+            if skip_article(article_title, which_articles):
+                continue
             """
             # For debugging performance issues
             count += 1
@@ -61,3 +72,19 @@ def page_generator_fast(filename=DEFAULT_CSV_FILE):
         for line in article_xml_file:
             (article_title, article_text) = line.split("\t", 1)
             yield (article_title, article_text)
+
+
+def skip_article(article_title, which_articles):
+    if which_articles == "ALL":
+        return False
+    if which_articles == "BEFORE_A":
+        if article_title[0] < "A":
+            return False
+        return True
+    if which_articles == "AFTER_Z":
+        if article_title[0] > "Z":
+            return False
+        return True
+    if article_title[0] == which_articles:
+        return False
+    return True
