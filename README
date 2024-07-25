@@ -1,5 +1,11 @@
 See https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
 
+HARDWARE REQUIREMENTS
+* It takes at least ~6GB of RAM just for the spell-check dictionary to load
+* Parallelized Python code is expecting 8 available CPU cores for
+  optimal performance (if tweaking, look for "Pool(8)" in Python
+  scripts)
+
 UBUNTU DEPENDENCIES
 sudo apt-get install git pyflakes3 pylint python3-pep8 python3-dev g++ protobuf-c-compiler
 
@@ -30,3 +36,9 @@ DOWNLOAD DATA:
 
 RUN SPELL CHECK AND FRIENDS:
 ./run_moss_parallel.sh
+
+TO SPELL CHECK ONLY ARTICLES WITH TITLES STARTING WITH "X":
+./run_moss_parallel.sh --spell-check-only X
+
+Omit X to run spell check only and skip other reports. You can also
+specify any letter or number, or "BEFORE_A" and "AFTER_Z".
