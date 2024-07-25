@@ -2,6 +2,9 @@
 
 set -e
 
+echo "Thread 2 starting"
+echo `date`
+
 ../run_wiktionary_spell_check.sh >& wiktionary.log
 
 ../run_main_spell_check.sh >& main_spell_check.log
