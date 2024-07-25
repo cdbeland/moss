@@ -1164,6 +1164,12 @@ increased performance. The old style was abandoned at commit d0f8fb1
 # "manned",
 # "unmanned",
 
+# --- ELLIPSES ---
+
+# These are handled by moss_entity_check.py, but this will get a full list:
+../venv/bin/python ../dump_grep_csv.py … | perl -pe 's/^(.*?):.*/$1/' | uniq | sort | uniq > fixme-ellipses.txt
+
+
 # --- FUEL EFFICIENCY CONVERSION ---
 
 echo "Beginning MPG conversion scan"
