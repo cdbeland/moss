@@ -1,5 +1,9 @@
 #!/usr/bin/bash
 
+# RUN TIME
+
+# About 6 hours (as of July 2024)
+
 # FIRST TIME SETUP
 
 # Change "beland" to the Unix user you want to set up for
