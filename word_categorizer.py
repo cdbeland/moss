@@ -442,6 +442,7 @@ def near_common_word(word):
 google_lang_detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0,
                                                     max_num_bytes=1000)
 
+
 def tag_by_lang(word):
     # TODO: Very unreliable for Korean. Try using script detection?
     # -> https://en.wikipedia.org/wiki/Wikipedia:Language_recognition_chart
