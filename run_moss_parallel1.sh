@@ -44,7 +44,7 @@ grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1900s' tmp-infonat.txt | grep -vP 'INFO
 grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_UNK' tmp-infonat.txt | grep -P 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-UNK-big-countries.txt
 grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_UNK' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-UNK-small-countries.txt
 
-grep -P '^INFONAT_REDUNDANT_us_state' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-us-state.txt
+grep -P '^INFONAT_EXPLAIN_us_state' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-us-state.txt
 
 grep -P '^INFONAT_REDUNDANT_(au|be|cn|de|dk|es|fi|fr|gb|hu|ie|in|ir|it|jp|nl|no|ph|pl|se|tr|ug|za)' tmp-infonat.txt | sort > tmp-infonat-large-non-jus-soli.txt
 grep -P '^INFONAT_REDUNDANT_(al|am|ao|at|az|bd|bg|by|ch|cm|co|cz|dz|ee|eg|gh|gr|hr|id|il|in|iq|is|ke|kr|lb|lk|lt|lu|lv|ma|mk|mm|my|np|nz|pk|pr|ps|pt|ru|sa|sg|si|sn|sy|th|tn|tw|ua|vn)' tmp-infonat.txt | sort > tmp-infonat-medium-non-jus-soli.txt
