@@ -35,14 +35,11 @@ cat tmp-infonat.txt | perl -pe 's/^(.*?)\t.*$/$1/'  | sort | perl ../count.pl | 
 # -- Remove citizenship/nationality fields --
 
 # Can be updated from infonat-count-detail.txt
-grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_(1700s|MISC)' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1700s-misc.txt
-grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_2000s' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-2000s.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_(1700s|MISC|2000s)' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-misc.txt
 grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1800s' tmp-infonat.txt | grep -P 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1800s-big-countries.txt
-grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1800s' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1800s-small-countries.txt
+grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1[89]' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1800s-1900s-small-countries.txt
 grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1900s' tmp-infonat.txt | grep -P 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1900s-big-countries.txt
-grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_1900s' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-1900s-small-countries.txt
 grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_UNK' tmp-infonat.txt | grep -P 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-UNK-big-countries.txt
-grep -P '^INFONAT_REDUNDANT_\w+_JUS_SOLI_UNK' tmp-infonat.txt | grep -vP 'INFONAT_REDUNDANT_(ar|br|ca|cl|mx|us)' | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-jus-soli-UNK-small-countries.txt
 
 grep -P '^INFONAT_EXPLAIN_us_state' tmp-infonat.txt | sort | perl -pe 's/^INF\w*\t(.*?)\t.*$/$1/' > infonat-redundant-us-state.txt
 
