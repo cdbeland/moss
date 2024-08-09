@@ -769,6 +769,7 @@ country_map = {
     "Prussia": "pru",
     "Soviet Union": "usr",
     "Soviet": "usr",
+    "USSR": "usr",
     "Ottoman Empire": "oem",
     "Czechoslovakia": "czs",
     "Roman": "rom",
@@ -790,6 +791,13 @@ country_map = {
     "Dominion of Newfoundland": "new",
     "Papal States": "pap",
     "Qing Dynasty": "qin",
+
+    # Domestic nations of the United States
+    "Navajo": "na_nvj",
+    "Osage": "na_osg",
+    "Cherokee": "na_chk",
+    "Choctaw": "na_ctw",
+    "Iñupiaq": "na_ipq",
 
     # Demonyms
     "Falkland Islander": "gb",
