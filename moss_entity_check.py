@@ -49,17 +49,6 @@ non_entity_transform = [string for string
 article_blocklist = [
 
     # Characters themselves are discussed or listed as part of a mapping
-    "ANSEL",
-    "ARIB STD B24 character set",
-    "ALCOR",
-    "ALGOL",
-    "ALGOL 68",
-    "ASCII",
-    "ASMO 449",
-    "AZERTY",
-    "Adobe Glyph List",
-    "AltGr key",
-    "Atari ST character set",
     "Baudot code",
     "Basic Latin (Unicode block)",
     "Big5",
@@ -270,8 +259,6 @@ article_blocklist = [
     "Sung-mi",
     "Yasukuni Shrine",
 
-    # African language needs slash in link
-    "2011 South African municipal elections",
 
     # -- Below probably can't be {{not a typo}}'d; TODO: above probably can --
 
