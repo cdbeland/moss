@@ -20,6 +20,8 @@ remove_image_re = re.compile(r"(\[\[)?(File|Image):.*?[\|\]]")
 remove_image_param_re = re.compile(r"\| *(image[0-9]?|logo|screenshot|sound) *=.*$")
 remove_image_no_end_re = re.compile(r"(File|Image):.*?\.(JPG|jpg|SVG|svg|PNG|png|OGG|ogg|JPEG|jpeg|WEBM|webm|GIF|gif|TIF|tif|TIFF|tiff|WEBP|webp|PDF|pdf|MP3|mp3|ogv)")
 
+remove_lang_re = re.compile(r"\{\{([Vv]erse translation|[Ll]ang|[Tt]ransl|IPA).*?\}\}")
+
 poetry_flags = ["rhym", "poem", "stanza", "verse", "lyric"]
 poetry_flags += [word.title() for word in poetry_flags]
 
@@ -194,7 +196,7 @@ def washington_state_check(line, line_flags):
 rhyme_fast_re = re.compile(r"[Aa][,\-\.]?[AaBb]")
 rhyme_dashed_re = re.compile(r"[^a-z0-9\-A-Z{NON_ASCII_LETTERS}][Aa]-[Bb][^a-zA-Z{NON_ASCII_LETTERS}]")
 rhyme_comma_re = re.compile(r"AA,A?B|AB,[ABC]")
-rhyme_masked_re = re.compile(r"[^A-Za-z0-9\./%#=_\-]a(a|b|aa|ab|ba|bb|bc|aaa|aba|abb|abc|baa|bab|bba|bca|bcb|bcc|bcd)[^a-z0-9/]")
+rhyme_masked_re = re.compile(r"[^A-Za-z0-9\./%#=_\-]a(a|b|aa|ab|ba|bb|bc|aaa|aba|abb|abc|baa|bab|bba|bca|bcb|bcc|bcd)[^a-z0-9{NON_ASCII_LETTERS}/]")
 rhyme_dot_re = re.compile(r"([^a-z\+/]a\.b\.[^d-z]|[^a-z\+/]a\. b\. [^d-z])")
 
 
@@ -227,6 +229,8 @@ def rhyme_scheme_check(line, line_flags):
         return
 
     line_tmp = line_flags["text_no_refs"]
+    line_tmp = remove_lang_re.sub("✂", line_tmp)
+
     if "A-B-C-D-E-F-G" in line_tmp:
         return
     # Re-confirm match after filtering:
