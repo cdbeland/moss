@@ -12,7 +12,7 @@ echo `date`
 
 set +e
 grep ^N tmp-style-by-line.txt | sort > fixme-broken-nbsp.txt
-grep ^R tmp-style-by-line.txt| sort  > fixme-rhyme-scheme.txt
+grep ^R tmp-style-by-line.txt | sort | perl -pe 's/^R\t(.*?)\t(.*)/* [[$1]] - <nowiki>$2<\/nowiki>/' > fixme-rhyme-scheme.txt
 grep ^X tmp-style-by-line.txt | sort > fixme-x-to-times.txt
 grep ^FR tmp-style-by-line.txt | sort > fixme-fraction.txt
 grep ^QL tmp-style-by-line.txt | sort > fixme-logical-quoting.txt
