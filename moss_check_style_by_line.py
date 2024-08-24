@@ -8,6 +8,8 @@ import re
 from moss_dump_analyzer import read_en_article_text
 
 NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ"
+MAJOR_CURRENCY_SYMBOLS = "€$£¥₹₽₩₺"
+
 
 digit_re = re.compile(r"[0-9]")
 remove_math_line_re = re.compile(r"(<math.*?(</math>|$)|\{\{math[^}]+\}?\}?)")
@@ -158,7 +160,8 @@ def check_style_by_line(article_title, article_text):
                                broken_nbsp_check,
                                frac_repair,
                                logical_quoting_check,
-                               liter_lowercase_check]:
+                               liter_lowercase_check,
+                               currency_hyphen_check]:
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -1154,6 +1157,16 @@ def nationality_check(line, line_flags, article_flags):
     if "{{explain citnat" not in line and "{{Explain citnat" not in line:
         return [(f"INFONAT_EXPLAIN_{country_code}",
                  line + " ❦ " + birthplace)]
+
+
+currency_hyphen = re.compile(rf"[{MAJOR_CURRENCY_SYMBOLS}][0-9]+-[mb]illion")
+
+
+def currency_hyphen_check(line, line_flags):
+    if currency_hyphen.search(line):
+        return "$H"
+    else:
+        return
 
 
 def mos_double_check(line, line_flags):

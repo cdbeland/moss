@@ -22,6 +22,7 @@ grep ^SPEED tmp-style-by-line.txt | sort > fixme-speed.txt
 grep ^MAN_MADE tmp-style-by-line.txt | sort > fixme-man-made.txt
 grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
 grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
+grep '^\$H' tmp-style-by-line.txt | sort > fixme-currency-hyphen.txt
 
 grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 
