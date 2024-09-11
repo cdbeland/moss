@@ -13,7 +13,7 @@ echo "Failure post-processing"
 echo `date`
 
 grep -P '^!\t' tmp-output.txt | perl -pe 's/.*?\t//' | sort > err-parse-failures.txt
-grep -P '^\!Q' tmp-output.txt | perl -pe 's/^\!Q\t\* \[\[(.*?)\]\].*$/$1/' | sort | ../venv/bin/python3 ../sectionalizer.py LARGE > jwb-straight-quotes-unbalanced.txt
+grep -P '^\!Q' tmp-output.txt | perl -pe 's/^\!Q\t\* \[\[(.*?)\]\].*$/$1/' | sort > jwb-straight-quotes-unbalanced.txt
 grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2 > debug-spellcheck-ignored.txt
 
 echo "Beginning word categorization run 2"
