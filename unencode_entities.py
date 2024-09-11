@@ -1206,6 +1206,9 @@ transform = {
     "&shortmid;": "{{pipe}}",
     "&hearts;": "♥",
     "&Sqrt;": "√",
+    "&tilde;": "~",
+    "&Rang;": "⟫",
+    "&Lang;": "⟪",
 
     "&#42;": "&ast;",  # * (causes problems with wikitext syntax sometimes)
 
@@ -1726,10 +1729,14 @@ transform = {
     "&nbsh;": "&nbsp;",
     "&nbsdp;": "&nbsp;",
     "&mnbsp;": "&nbsp;",
+    "&nabs;": "&nbsp;",
+    "&mdahs;": "&mdash;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
     # Replace with &sdot; in math expressions
+
+    "&centerdot;": "·",
 }
 
 
