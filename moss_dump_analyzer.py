@@ -68,8 +68,8 @@ def read_en_article_text(callback_function,
 
 def page_generator_fast(filename=DEFAULT_CSV_FILE):
     # Using formfeed as line separator so article text can have newlines.
-    with open(filename, "r", newline="\r") as article_xml_file:
-        for line in article_xml_file:
+    with open(filename, "r", newline="\r") as article_csv_file:
+        for line in article_csv_file:
             (article_title, article_text) = line.split("\t", 1)
             yield (article_title, article_text)
 
