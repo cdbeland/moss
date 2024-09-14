@@ -161,7 +161,8 @@ def check_style_by_line(article_title, article_text):
                                frac_repair,
                                logical_quoting_check,
                                liter_lowercase_check,
-                               currency_hyphen_check]:
+                               currency_hyphen_check,
+                               au_check]:
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -383,6 +384,33 @@ def liter_lowercase_check(line, line_flags):
         # | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]"
         # | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]"
         return [("L7", line)]
+
+
+au_unconverted_abbr_re = re.compile(r"\b[0-9,\.]*[0-9]( |&nbsp;)?(AU|au)\b")
+au_unconverted_full_re = re.compile(r"\b[0-9,\.]*[0-9]( |&nbsp;)?(\[\[)?[Aa]stronomical unit")
+au_converted_re = re.compile(r"r{{ *([Cc]onvert|[Cc]vt)[^}]+(au|AU).*?}}")
+convert_proper_start_re = r"{{[Cc]onvert|[0-9,\.]+\|(±\|[0-9,\.]+\|)?(\|(to|by)\|[0-9,\.]+)?"
+au_converted_from_properly = re.compile(convert_proper_start_re + r"au\|(e6km|e9km|e12km|ly pc)\|abbr=(unit|off)")
+au_converted_to_properly = re.compile(convert_proper_start_re + r"ly|pc au\|")
+
+
+def au_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+    line = remove_lang_re.sub("✂", line)
+
+    if "stronomical" in line:
+        if au_unconverted_full_re.search(line):
+            return [("AU_UNCONVERTED_FULL", line)]
+    if "au" not in line and "AU" not in line:
+        return
+    if au_unconverted_abbr_re.search(line):
+        return [("AU_UNCONVERTED_ABBR", line)]
+    for converted_au_string in au_converted_re.findall(line):
+        if au_converted_from_properly:
+            continue
+        if au_converted_to_properly:
+            continue
+        return [("AU_CONVERTED_WRONG", line)]
 
 
 no_num_kph_re = re.compile(r"\bkph|KPH\b")
