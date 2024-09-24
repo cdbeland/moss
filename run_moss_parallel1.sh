@@ -24,6 +24,9 @@ grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
 grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 grep '^\$H' tmp-style-by-line.txt | sort > fixme-currency-hyphen.txt
 
+grep ^AU tmp-style-by-line.txt | sort > tmp-au.txt
+cat tmp-au.txt | perl -pe 's/^AU_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-au.txt
+
 grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 
 # TODO:
@@ -31,7 +34,7 @@ grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 # * Unpipe country name in birth_place
 
 cat tmp-infonat.txt | perl -pe 's/^(.*?_[A-Z]*?)[_ \t].*$/$1/'  | sort | perl ../count.pl | sort -n > infonat-count-overall.txt
-cat tmp-infonat.txt | perl -pe 's/^(.*?)\t.*$/$1/'  | sort | perl ../count.pl | sort -n > infonat-count-detail.txt
+cat tmp-infonat.txt | perl -pe 's/^(.*?)\t.*$/$1/' | sort | perl ../count.pl | sort -n > infonat-count-detail.txt
 
 # -- Remove citizenship/nationality fields --
 
