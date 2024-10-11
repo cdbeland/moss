@@ -1109,10 +1109,10 @@ transform_unsafe = {
 
     # Asked about these at:
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
-    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Korea-related_articles/Archive_3#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Japan/Archive/July_2024#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/China-_and_Chinese-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
-    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Korea-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea/Archive_24#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
 
     "＂": '"',
