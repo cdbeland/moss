@@ -3,10 +3,12 @@ set -e
 # Downloads of small Wiktionary and Wikipedia pages, and fast processing
 
 echo `date`
-echo "Starting..."
+echo "Downloading all wiktionaries..."
 
 mkdir -p /var/local/moss/bulk-wikipedia/all-wiktionaries
 venv/bin/python3 download_all_wiktionaries.py
+
+echo "Downloading moss subpages..."
 
 rm -rf /var/local/moss/bulk-wikipedia/moss-subpages
 mkdir -p /var/local/moss/bulk-wikipedia/moss-subpages
@@ -22,10 +24,9 @@ cd /var/local/moss/bulk-wikipedia/
 gunzip all-wiktionaries/*
 sort --unique all-wiktionaries/* > titles_all_wiktionaries_uniq.txt
 
-cd /var/local/moss/bulk-wikipedia/
-
 echo `date`
 echo "Downloading special pages..."
+cd /var/local/moss/bulk-wikipedia/
 
 # Sync with spell.py, moss_not_english.py
 rm -f Wikispecies:Requested_articles
