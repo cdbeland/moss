@@ -299,6 +299,9 @@ controversial = {
     "&angzarr;": "⍼",
     "&hbar;": "ℏ",
     "ϕ": "Φ",  # From U+03D5
+    "&NestedGreaterGreater;": "≫",
+    "&NestedLessLess;": "≪",
+    "&SubsetEqual;": "⊆",
 }
 
 # keep.extend(controversial.keys())
@@ -422,6 +425,7 @@ transform_unsafe = {
 
     "&thnsp;": "&thinsp;",
     "&thisp;": "&thinsp;",
+    "&thnisp;": "&thinsp;",
 
     "&ThinSpace;": " ",
     "&thinsp;": " ",  # Use "{{thin space}}" if retained
@@ -536,6 +540,7 @@ transform_unsafe = {
     "…": "...",
     "&#8230;": "...",
     "&hellip;": "...",
+    "&mldr;": "...",
 
     # "&#123;": "&lbrace;",  # {
     # "&lcub;": "&lbrace;",  # {
@@ -1102,18 +1107,17 @@ transform_unsafe = {
     "ｙ": "y",
     "ｚ": "z",
 
-    # TODO: If there are no objections, update:
-    #  Wikipedia:Manual of Style/China- and Chinese-related articles
-    #  Wikipedia:Manual of Style/Korea-related articles
-    #  Wikipedia:Manual of Style/Japan-related articles
-
     # Asked about these at:
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Korea-related_articles/Archive_3#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Japan/Archive/July_2024#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/China-_and_Chinese-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea/Archive_24#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
-    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles/Archive_29#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # and updated:
+    #  [[Wikipedia:Manual of Style/China- and Chinese-related articles]]
+    #  [[Wikipedia:Manual of Style/Korea-related articles]]
+    #  [[Wikipedia:Manual of Style/Japan-related articles]]
 
     "＂": '"',
     "＃": "#",
