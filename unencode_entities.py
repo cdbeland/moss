@@ -1190,6 +1190,7 @@ transform_conditional = {
 # manual inspection of the diff
 transform = {
     "&flat;": "♭",
+    "&sharp;": "♯",
     "&rlhar;": "⇌",
     "&ap;": "&approx;",
     "&ell;": "ℓ",
