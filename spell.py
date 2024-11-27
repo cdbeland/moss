@@ -528,6 +528,10 @@ allow_list = {
     "<abbr>",
     "</abbr>",
     "<mapframe/>",
+    "<templatestyles/>",
+    "</templatestyles>",
+    "<caption>",
+    "</caption>",
 
     # Allowed HTML
     "<samp>",  # Replaces <tt>, {{samp}} can't do multi-line
