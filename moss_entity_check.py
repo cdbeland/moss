@@ -635,15 +635,15 @@ def dump_dict(section_title, dictionary):
     elif section_title == "Unknown":
         output += "Not included in JWB scripts; fix manually or update moss code.\n\n"
     elif section_title == "Uncontroversial entities":
-        output += "Fix automatically with jwb-articles.txt\n\n"
+        output += "Fix automatically with jwb-combo.json\n\n"
     elif section_title == "Low priority":
-        output += "Fix automatically with jwb-articles.txt\n\n"
+        output += "Fix automatically with jwb-combo.json\n\n"
     elif section_title == "Greek letters":
-        output += "Fix automatically with jwb-articles.txt (articles with {{tag|math}} markup excluded)\n\n"
+        output += "Fix automatically with jwb-combo.json (articles with {{tag|math}} markup excluded)\n\n"
     elif section_title == "Controversial entities":
-        output += "Fix automatically with jwb-articles.txt (articles with {{tag|math}} markup excluded)\n\n"
+        output += "Fix automatically with jwb-combo.json (articles with {{tag|math}} markup excluded)\n\n"
     elif section_title == "Numeric":
-        output += "Fix automatically with jwb-articles.txt\n\n"
+        output += "Fix automatically with jwb-combo.json\n\n"
 
     sorted_items = sorted(dictionary.items(), key=lambda t: (len(t[1]), t[0]), reverse=True)
 
