@@ -1634,6 +1634,7 @@ transform = {
     "&Amp;": "&amp;",
     "&AMP;": "&amp;",
     "&NBSP;": "&nbsp;",
+    "&nbsP;": "&nbsp;",
     "&6nbsp;": "&nbsp;",
     "&Ndash;": "&ndash;",
     "&nybsp;": "&nbsp;",
