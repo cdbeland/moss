@@ -5,8 +5,10 @@ set -e
 echo "Thread 2 starting"
 echo `date`
 
+# Run time: About 1 hour 10 min (8-core parallel) when nothing else is running
 ../run_wiktionary_spell_check.sh >& wiktionary.log
 
+# Run time: About 25 hours (8-core parallel) while other thread is running
 ../run_main_spell_check.sh >& main_spell_check.log
 
 echo "Failure post-processing"
@@ -24,6 +26,7 @@ tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tm
 
 # --- BY ARTICLE ---
 
+# Fast
 echo "Secondary by-article post-processing"
 echo `date`
 
@@ -52,6 +55,7 @@ grep TF+la,TF+la tmp-articles-linked-words.txt | grep -v species | perl -pe 's/^
 
 # --- BY FREQUENCY ---
 
+# Fast
 echo "Beginning by-frequency post-processing"
 echo `date`
 
@@ -91,6 +95,7 @@ grep ^N tmp-words-with-articles.txt | perl -pe 's/^N\t//'| grep -vP 'wikt:[\w-]+
 
 # --- COLLECTION FOR POSTING ---
 
+# Fast
 echo "Beginning collection"
 echo `date`
 
@@ -101,6 +106,7 @@ echo `date`
 
 # --- ARTICLES THAT NEED {{copyedit}} ---
 
+# Fast
 echo "Beginning copyedit collection..."
 echo `date`
 
@@ -108,6 +114,7 @@ grep -v "TF+" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&g
 
 # --- PARSE FAILURE FIXES ---
 
+# Run time: About 4 hours
 echo "Beginning foot/inch conversion scan"
 echo `date`
 
@@ -141,6 +148,7 @@ cat tmp-arc-units-all.txt | perl -pe 's/^(.*?):.*/$1/' | sort | uniq >> jwb-arc-
 
 # --- BY WORD LENGTH ---
 
+# Fast
 echo "Beginning by-length post-processing"
 echo `date`
 
@@ -164,6 +172,7 @@ echo "" >> collected_by_length.txt
 
 # --- STATS ---
 
+# Fast
 echo "Beginning stats"
 echo `date`
 
@@ -179,6 +188,7 @@ cat tmp-words-with-articles.txt | ../venv/bin/python3 ../count_by_rating.py >> p
 
 # --- DASHES ---
 
+# Fast
 echo "Beginning dash report"
 echo `date`
 
@@ -197,8 +207,7 @@ grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ..
 
 # --- CHEMICAL FORMULAS ---
 
-# Run time: About 3 h 20 min
-
+# Fast
 echo "Starting chemical formulas report"
 echo `date`
 echo "====Possible chemical formulas that don't use subscripts====" > post-chemical-formulas.txt
@@ -209,11 +218,13 @@ echo "" >> post-chemical-formulas.txt
 echo "====Known chemical formulas that don't use subscripts====" >> post-chemical-formulas.txt
 echo "" >> post-chemical-formulas.txt
 
+# Run time: About 3.5 hours
 echo "(REPORT DISABLED DUE TO LONG RUN TIME; START MANUALLY)" >> post-chemical-formulas.txt
 # ../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
 
 # ---
 
+# Run time: About 6.5 hours
 echo "Beginning not-English check"
 echo `date`
 
@@ -226,3 +237,4 @@ echo `date`
 ../superscripts.sh >& superscripts.log
 
 echo "Done."
+echo `date`
