@@ -238,6 +238,7 @@ controversial = {
     "&dtdot;": "⋱",
     "&sum;": "Σ",  # U+03A3 Greek Capital Letter Sigma
     "&rarr;": "→",
+    "&rarrow;": "→",
     "&larr;": "←",
     "&uparrow;": "↑",
     "&swarr;": "↙",
@@ -1704,6 +1705,7 @@ transform = {
     "&nbsps;": "&nbsp;",
     "&nbstp;": "&nbsp;",
     "&mdaash;": "&mdash;",
+    "&mdasha;": "&mdash;",
     "&nsbsp;": "&nbsp;",
     "&msdash;": "&mdash;",
     "&Nbsp;": "&nbsp;",
