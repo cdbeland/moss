@@ -21,6 +21,7 @@ remove_url_re = re.compile(r"https?:[^ \]\|]+")
 remove_image_re = re.compile(r"(\[\[)?(File|Image):.*?[\|\]]")
 remove_image_param_re = re.compile(r"\| *(image[0-9]?|logo|screenshot|sound) *=.*$")
 remove_image_no_end_re = re.compile(r"(File|Image):.*?\.(JPG|jpg|SVG|svg|PNG|png|OGG|ogg|JPEG|jpeg|WEBM|webm|GIF|gif|TIF|tif|TIFF|tiff|WEBP|webp|PDF|pdf|MP3|mp3|ogv)")
+remove_graphchart_re = re.compile(r"{{[Gg]raphChart.*?}}", re.S)
 
 remove_lang_re = re.compile(r"\{\{([Vv]erse translation|[Ll]ang|[Tt]ransl|IPA).*?\}\}")
 
@@ -28,6 +29,7 @@ poetry_flags = ["rhym", "poem", "stanza", "verse", "lyric"]
 poetry_flags += [word.title() for word in poetry_flags]
 
 remove_code_re = re.compile(r"<code.*?</code>", re.S)
+remove_timeline_re = re.compile(r"<timeline.*?</timeline>", re.S)
 remove_syntaxhighlight_re = re.compile(r"<syntaxhighlight.*?</syntaxhighlight>", re.S)
 
 
@@ -124,6 +126,12 @@ def universal_article_text_cleanup(article_text):
     if "code" in article_text:
         article_text = remove_code_re.sub("✂", article_text)
 
+    if "timeline" in article_text:
+        article_text = remove_timeline_re.sub("✂", article_text)
+
+    if "raphChart" in article_text:
+        article_text = remove_graphchart_re.sub("✂", article_text)
+
     return article_text
 
 
@@ -162,7 +170,8 @@ def check_style_by_line(article_title, article_text):
                                logical_quoting_check,
                                liter_lowercase_check,
                                currency_hyphen_check,
-                               au_check]:
+                               au_check,
+                               decimal_point_check]:
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -411,6 +420,34 @@ def au_check(line, line_flags):
         if au_converted_to_properly:
             continue
         return [("AU_CONVERTED_WRONG", line)]
+
+
+decimal_middot_re = re.compile(r"[0-9]·[0-9]")
+decimal_comma_re = re.compile(r"[0-9],[0-9][0-9]?[^0-9,\.]")
+decimal_comma_exclusion_re = re.compile(r"[\[\(\{\-][0-9]+,[0-9]+[\]\)\}\-]"  # math
+                                        r"|[0-9],[0-9]-[A-Za-z]"  # chemistry
+                                        r"|[0-9],[0-9\.]+,[0-9]")  # lists
+
+
+def decimal_point_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+    if not line_flags["has_digit"]:
+        return
+
+    if "·" in line:
+        if decimal_middot_re.search(line):
+            return [("DECIMAL_MIDDOT", line)]
+    if "," in line:
+        if decimal_comma_re.search(line):
+            if "InChI" in line:  # chemistry formula
+                return
+
+            # TODO: Requires further refinement. Comment patterns are
+            # "NN,N%" and "N,N units" and "$N,N fillion". Maybe make
+            # "DECIMAL_COMMA_HIGH" for high certainty, and punt
+            # sorting out the rest for later?
+            if not decimal_comma_exclusion_re.search(line):
+                return [("DECIMAL_COMMA", line)]
 
 
 no_num_kph_re = re.compile(r"\bkph|KPH\b")
