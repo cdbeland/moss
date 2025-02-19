@@ -299,7 +299,7 @@ controversial = {
     "&cfr;": "𝔠",
     "&angzarr;": "⍼",
     "&hbar;": "ℏ",
-    "ϕ": "Φ",  # From U+03D5
+    "ϕ": "φ",  # Phi conversion from U+03D5 phi symbol to lowercase phi U+03C6
     "&NestedGreaterGreater;": "≫",
     "&NestedLessLess;": "≪",
     "&SubsetEqual;": "⊆",
@@ -1108,11 +1108,12 @@ transform_unsafe = {
     "ｙ": "y",
     "ｚ": "z",
 
+
     # Asked about these at:
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Korea-related_articles/Archive_3#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Japan/Archive/July_2024#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
-    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/China-_and_Chinese-related_articles#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/China-_and_Chinese-related_articles/Archive_8#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_Korea/Archive_24#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Japan-related_articles/Archive_29#Converting_full-width_punctuation_and_currency_symbols_in_horizontal_text
     # and updated:
@@ -1767,7 +1768,7 @@ greek_letters = {
     "&sigma;": "σ",
     "&tau;": "τ",
     "&upsilon;": "υ",
-    "&phi;": "φ",
+    "&phi;": "φ",  # lowercase phi U+03C6
     "&chi;": "χ",
     "&psi;": "ψ",
     "&omega;": "ω",
@@ -1778,10 +1779,10 @@ greek_letters = {
     "&Xi;": "Ξ",
     "&Pi;": "Π",
     "&Sigma;": "Σ",
-    "&Phi;": "Φ",
+    "&Phi;": "Φ",  # capital phi U+03A6
     "&Psi;": "Ψ",
     "&Omega;": "Ω",
-    "&varphi;": "ϕ",
+    "&varphi;": "ϕ",  # U+03D5 phi symbol
 
     # There are strong objections to changing these outside of
     # Greek words, because they look too much like Latin letters.
