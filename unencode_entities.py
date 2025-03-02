@@ -568,6 +568,7 @@ transform_unsafe = {
     # These are usually spurious, per [[MOS:TMRULES]]
     "&trade;": "",  # ™
     "&reg;": "",  # ®
+    "&circledR;": "",  # ®
     "&COPY;": "&copy;",  # ©
     "&copy;": "",  # ©
     "™": "",
