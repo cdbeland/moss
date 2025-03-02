@@ -169,6 +169,7 @@ def check_style_by_line(article_title, article_text):
                                frac_repair,
                                logical_quoting_check,
                                liter_lowercase_check,
+                               cup_tbsp_tsp_check,
                                currency_hyphen_check,
                                au_check,
                                decimal_point_check]:
@@ -393,6 +394,32 @@ def liter_lowercase_check(line, line_flags):
         # | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]"
         # | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]"
         return [("L7", line)]
+
+
+# [[MOS:UNITS]]; not compatible with Template:Convert
+unicode_fractions = "¼½¾⅓⅔⅐⅑⅒⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞"
+unifrac_re = re.compile("[" + unicode_fractions + "]")
+ctt_digit_re = re.compile(r"[0-9]( |&nbsp;)(cup|teaspoon|tablespoon|tsp|tbsp)")
+ctt_unifrac_re = re.compile("[" + unicode_fractions + r"]( |&nbsp;)(cup|tablespoon|teaspoon|tbsp|tsp)")
+ctt_frac_re = re.compile(r"\{\{[F|f]rac[^\}]+\}\}( |&nbsp;)(cup|tablespoon|teaspoon|tbsp|tsp)")
+
+
+def cup_tbsp_tsp_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+
+    if line_flags["has_digit"]:
+        if ctt_digit_re.search(line):
+            return [("CTT1", line)]
+
+    if unifrac_re.search(line):
+        result = ctt_unifrac_re.search(line)
+        if result:
+            return [("CTT2", line)]
+
+    if "rac" in line:
+        result = ctt_frac_re.search(line)
+        if result:
+            return [("CTT3", line)]
 
 
 au_unconverted_abbr_re = re.compile(r"\b[0-9,\.]*[0-9]( |&nbsp;)?(AU|au)\b")
