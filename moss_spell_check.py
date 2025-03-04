@@ -392,7 +392,15 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
 
         # Deal with asymmetrical wiki markup
         word_mixedcase = word_mixedcase.lstrip(":")
-        word_mixedcase = word_mixedcase.lstrip("*")
+
+        if word_mixedcase.startswith("*"):
+            word_mixedcase = word_mixedcase.lstrip("*")
+            if re.search(r"''\*" + word_mixedcase + r"''", article_text):
+                # Unattested forms like "''*tuqlid''" which are not
+                # eligible for dictionary entries. The meaning of
+                # these strings should be clear in context, so no need
+                # to report them.
+                continue
 
         if not word_mixedcase.startswith("&"):
             # Let &xxx; pass through un-stripped so it's easy to identify later
