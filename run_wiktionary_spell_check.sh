@@ -1,5 +1,9 @@
 set -e
 
+# TODO
+# * Sort by language (suggested by Wiktionary User:Jberkel)
+#   -> Look for most recent language-specific header?
+
 echo "Running Wiktionary spell check"
 echo `date`
 
@@ -23,31 +27,31 @@ echo "==Possible typos from (DUMP NAME) ==" > post-wikt-typos.txt
 echo "===T1+ASCII===" > post-wikt-typos.txt
 echo "Possible English-language typos." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
-grep ^T1 tmp-words-with-articles-wikt.txt | grep -P '\[\[wikt:[a-z]+\]\]' | perl -pe "s/^T1\t//" >> post-wikt-typos.txt
+grep ^T1 tmp-words-with-articles-wikt.txt | grep -P '\[\[wikt:[a-z]+\]\]' | perl -pe "s/^T1\t//" | sort -t"[" -k5 >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 
 echo "===ME===" >> post-wikt-typos.txt
 echo "Probable English-language compounds (with and without hyphen)." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
-grep ^ME tmp-words-with-articles-wikt.txt | perl -pe "s/^ME\t//" >> post-wikt-typos.txt
+grep ^ME tmp-words-with-articles-wikt.txt | perl -pe "s/^ME\t//" | sort -t"[" -k5 >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 
 echo "===TE===" >> post-wikt-typos.txt
 echo "Possible English-language typos." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
-grep ^TE tmp-words-with-articles-wikt.txt | perl -pe "s/^TE\t//" >> post-wikt-typos.txt
+grep ^TE tmp-words-with-articles-wikt.txt | perl -pe "s/^TE\t//" | sort -t"[" -k5 >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 
 echo "===C===" >> post-wikt-typos.txt
 echo "Chemistry-related words." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
-grep ^C tmp-words-with-articles-wikt.txt | perl -pe "s/^C\t//" >> post-wikt-typos.txt
+grep ^C tmp-words-with-articles-wikt.txt | perl -pe "s/^C\t//" | sort -t"[" -k5 >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 
 echo "===TS===" >> post-wikt-typos.txt
 echo "These are suspected whitespace errors." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
-grep ^TS tmp-words-with-articles-wikt.txt | perl -pe "s/^TS\t//" >> post-wikt-typos.txt
+grep ^TS tmp-words-with-articles-wikt.txt | perl -pe "s/^TS\t//" | sort -t"[" -k5 >> post-wikt-typos.txt
 
 # --- WITH QUOTATIONS ---
 
