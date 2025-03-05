@@ -27,6 +27,8 @@ grep '^\$H' tmp-style-by-line.txt | sort > fixme-currency-hyphen.txt
 grep ^AU tmp-style-by-line.txt | sort > tmp-au.txt
 cat tmp-au.txt | perl -pe 's/^AU_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-au.txt
 
+grep ^CTT tmp-style-by-line.txt | perl -pe 's/.*?\t(.*)\t(.*)$/$1/' | uniq > beland-ctt.txt
+
 grep ^DECIMAL_MIDDOT tmp-style-by-line.txt | sort | perl -pe 's/^DECIMAL_MIDDOT\t(.*?)\t.*$/$1/' | uniq > fixme-decimal-middot.txt
 grep ^DECIMAL_COMMA tmp-style-by-line.txt | sort | perl -pe 's/^DECIMAL_COMMA\t(.*?)\t.*$/$1/' | uniq > fixme-decimal-comma.txt
 
