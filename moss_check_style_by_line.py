@@ -398,28 +398,47 @@ def liter_lowercase_check(line, line_flags):
 
 # [[MOS:UNITS]]; not compatible with Template:Convert
 unicode_fractions = "¼½¾⅓⅔⅐⅑⅒⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞"
-unifrac_re = re.compile("[" + unicode_fractions + "]")
-ctt_digit_re = re.compile(r"[0-9]( |&nbsp;)(cup|teaspoon|tablespoon|tsp|tbsp)")
-ctt_unifrac_re = re.compile("[" + unicode_fractions + r"]( |&nbsp;)(cup|tablespoon|teaspoon|tbsp|tsp)")
-ctt_frac_re = re.compile(r"\{\{[F|f]rac[^\}]+\}\}( |&nbsp;)(cup|tablespoon|teaspoon|tbsp|tsp)")
+ctt_alternation = "(cup|tablespoon|teaspoon|tbsp|tsp)"
+unifrac_re = re.compile(rf"[{unicode_fractions}]")
+ctt_digit_re = re.compile(rf"([0-9\-/]+( |&nbsp;){ctt_alternation}s?[^A-Za-z])")
+ctt_unifrac_re = re.compile(rf"[{unicode_fractions}]( |&nbsp;){ctt_alternation}")
+ctt_frac_re = re.compile(r"\{\{[F|f]rac[^\}]+\}\}( |&nbsp;)" + ctt_alternation)
+ctt_ignore_num_re = re.compile(r"[0-9][0-9][0-9][0-9] cup|[0-9][0-9]?(-/-)[0-9]?[0-9] cup")
+ctt_ignore_sport_re = re.compile(r"cup[0-9] result|defeat| goals?[^A-Za-z]| games|competition"
+                                 r"| won[,; ]|[Ss]occer|football|[Ww]inner|cup matches|[Rr]egional[0-9] cup"
+                                 r"|play-?off| league |[Mm]otorsports|tournament|championship|cricket"
+                                 r"| win(ning)? |cup final|cup ties| competed | Cup[^A-Za-z]"
+                                 r"|player|[Ss]upercup|greyhound")
+ctt_ignore_converted_re = re.compile(rf"{ctt_alternation}s? \([0-9]+( |&nbsp;)(g|grams|mL)\)")
+# ctt_ignore_cups_of_re = re.compile(r"[0-9] cups of [A-Za-z]")
 
 
 def cup_tbsp_tsp_check(line, line_flags):
     line = line_flags["text_no_refs_images_urls"]
+    line_tmp = None
 
     if line_flags["has_digit"]:
-        if ctt_digit_re.search(line):
-            return [("CTT1", line)]
+        matches = ctt_digit_re.findall(line)
+        if matches:
+            line_tmp = ctt_ignore_converted_re.sub("✂", line)
+            matches = ctt_digit_re.findall(line_tmp)
+
+        for m in matches:
+            if not (ctt_ignore_num_re.match(m[0])
+                    or ctt_ignore_sport_re.search(line)):
+                return [("CTT1", line)]
+
+        if "rac" in line:
+            if not line_tmp:
+                line_tmp = ctt_ignore_converted_re.sub("✂", line)
+            result = ctt_frac_re.search(line_tmp)
+            if result:
+                return [("CTT3", line)]
 
     if unifrac_re.search(line):
         result = ctt_unifrac_re.search(line)
         if result:
             return [("CTT2", line)]
-
-    if "rac" in line:
-        result = ctt_frac_re.search(line)
-        if result:
-            return [("CTT3", line)]
 
 
 au_unconverted_abbr_re = re.compile(r"\b[0-9,\.]*[0-9]( |&nbsp;)?(AU|au)\b")
