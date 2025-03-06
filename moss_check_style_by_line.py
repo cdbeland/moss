@@ -401,7 +401,7 @@ unicode_fractions = "¼½¾⅓⅔⅐⅑⅒⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞"
 ctt_alternation = "(cup|tablespoon|teaspoon|tbsp|tsp)"
 ctt_alternation_re = re.compile("(cup|tablespoon|teaspoon|tbsp|tsp)")
 unifrac_re = re.compile(rf"[{unicode_fractions}]")
-ctt_digit_re = re.compile(rf"([0-9\-/]+( |&nbsp;){ctt_alternation}s?[^A-Za-z])")
+ctt_digit_re = re.compile(rf"([0-9\-/]+( |&nbsp;)(\[\[)?{ctt_alternation}s?[^A-Za-z])")
 ctt_unifrac_re = re.compile(rf"[{unicode_fractions}]( |&nbsp;){ctt_alternation}")
 ctt_frac_re = re.compile(r"\{\{[F|f]ract?[^\}]+\}\}( |&nbsp;)" + ctt_alternation)
 ctt_ignore_num_re = re.compile(r"[0-9][0-9][0-9][0-9] cup|[0-9][0-9]?(-/-)[0-9]?[0-9] cup")
@@ -410,8 +410,8 @@ ctt_ignore_sport_re = re.compile(r"cup[0-9] result|defeat| goals?[^A-Za-z]| game
                                  r"|play-?off| league |[Mm]otorsports|tournament|championship|[Cc]ricket"
                                  r"| win(ning)? |cup final|cup ties| competed | Cup[^A-Za-z]"
                                  r"|player|[Ss]upercup|greyhound")
-ctt_ignore_converted_re = re.compile(rf"{ctt_alternation}s? (\([0-9]+( |&nbsp;)(g|grams|mL)\)| / [0-9]+( |&nbsp;)(g|grams|mL))")
-ctt_ignore_converted_reverse_re = re.compile(rf"[0-9]+( |&nbsp;)(g|grams|mL) \(~?[0-9/]+( |&nbsp;){ctt_alternation}s?\)")
+ctt_ignore_converted_re = re.compile(rf"{ctt_alternation}s? (\([0-9]+( |&nbsp;)(g|grams|mL|L)\)| / [0-9]+( |&nbsp;)(g|grams|mL|L))")
+ctt_ignore_converted_reverse_re = re.compile(rf"[0-9]+( |&nbsp;)(g|grams|mL|L) \(~?[0-9/]+( |&nbsp;){ctt_alternation}s?\)")
 
 
 def cup_tbsp_tsp_check(line, line_flags):
