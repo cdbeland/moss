@@ -410,7 +410,7 @@ ctt_ignore_sport_re = re.compile(r"cup[0-9] result|defeat| goals?[^A-Za-z]| game
                                  r"|play-?off| league |[Mm]otorsports|tournament|championship|[Cc]ricket"
                                  r"| win(ning)? |cup final|cup ties| competed | Cup[^A-Za-z]"
                                  r"|player|[Ss]upercup|greyhound")
-ctt_ignore_converted_re = re.compile(rf"{ctt_alternation}s? \([0-9]+( |&nbsp;)(g|grams|mL)\)")
+ctt_ignore_converted_re = re.compile(rf"{ctt_alternation}s? (\([0-9]+( |&nbsp;)(g|grams|mL)\)| / [0-9]+( |&nbsp;)(g|grams|mL))")
 ctt_ignore_converted_reverse_re = re.compile(rf"[0-9]+( |&nbsp;)(g|grams|mL) \(~?[0-9/]+( |&nbsp;){ctt_alternation}s?\)")
 
 
