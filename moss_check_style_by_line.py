@@ -398,18 +398,23 @@ def liter_lowercase_check(line, line_flags):
 
 # [[MOS:UNITS]]; not compatible with Template:Convert
 unicode_fractions = "¼½¾⅓⅔⅐⅑⅒⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞"
-ctt_alternation = "(cup|tablespoon|teaspoon|tbsp|tsp)"
-ctt_alternation_re = re.compile("(cup|tablespoon|teaspoon|tbsp|tsp)")
+ctt_alternation = "(cup|tablespoon|teaspoon|[Tt]bsp|tsp)"
+ctt_alternation_re = re.compile(ctt_alternation)
 unifrac_re = re.compile(rf"[{unicode_fractions}]")
 ctt_digit_re = re.compile(rf"([0-9\-/]+( |&nbsp;)(\[\[)?{ctt_alternation}s?[^A-Za-z])")
 ctt_unifrac_re = re.compile(rf"[{unicode_fractions}]( |&nbsp;){ctt_alternation}")
 ctt_frac_re = re.compile(r"\{\{[F|f]ract?[^\}]+\}\}( |&nbsp;)" + ctt_alternation)
-ctt_ignore_num_re = re.compile(r"[0-9][0-9][0-9][0-9] cup|[0-9][0-9]?(-/-)[0-9]?[0-9] cup")
+ctt_ignore_num_re = re.compile(r"[0-9][0-9][0-9][0-9] cup|[0-9][0-9]?[-/-–][0-9]?[0-9] cup")
 ctt_ignore_sport_re = re.compile(r"cup[0-9] result|defeat| goals?[^A-Za-z]| games|competition"
                                  r"| won[,; ]|[Ss]occer|football|[Ww]inner|cup matches|[Rr]egional[0-9] cup"
-                                 r"|play-?off| league |[Mm]otorsports|tournament|championship|[Cc]ricket"
-                                 r"| win(ning)? |cup final|cup ties| competed | Cup[^A-Za-z]"
-                                 r"|player|[Ss]upercup|greyhound")
+                                 r"|play-?off| league |[Mm]otorsports|tournament|[Cc]hampionship|[Cc]ricket"
+                                 r"| win(ning)? |cup final|cup ties| competed | Cup[^A-Za-z]|semi-?final"
+                                 r"|player|[Ss]upercup|greyhound|[Rr]ugby| [Ww]ins |scorer"
+                                 r"|cups of coffee|cups of( green| black)? tea|cups/day|cups (per|a) day"
+                                 r"|cups playing card|,000 cups|cup-mark|cup mark|cup-like|cup-shaped"
+                                 r"|cups per shift"
+                                 r"| finals | prize |basketball| victory"
+                                 r"|cup-final| game | played | loss |free kick|Division [0-9] [Cc]up")
 ctt_ignore_converted_re = re.compile(rf"{ctt_alternation}s? (\([0-9]+( |&nbsp;)(g|grams|mL|L)\)| / [0-9]+( |&nbsp;)(g|grams|mL|L))")
 ctt_ignore_converted_reverse_re = re.compile(rf"[0-9]+( |&nbsp;)(g|grams|mL|L) \(~?[0-9/]+( |&nbsp;){ctt_alternation}s?\)")
 
