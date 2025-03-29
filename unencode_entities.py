@@ -1741,6 +1741,7 @@ transform = {
     "&mnbsp;": "&nbsp;",
     "&nabs;": "&nbsp;",
     "&mdahs;": "&mdash;",
+    "&nmsp;": "&nbsp;",
 
     # Used in tables, horizontal list formatting
     "&middot;": "·",
