@@ -141,6 +141,9 @@ def universal_line_cleanup(line):
     return line
 
 
+sports_category_re = re.compile("Category:[^]]+sport")
+
+
 def check_style_by_line(article_title, article_text):
     article_flags = set_article_flags(article_text)
     problem_line_tuples = []
@@ -159,6 +162,11 @@ def check_style_by_line(article_title, article_text):
             result = rhyme_scheme_check(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
+        if not ("Liga " in article_title or "football" in article_title or "F.C." in article_title):
+            result = cup_tbsp_tsp_check(line, line_flags)
+            if result and not sports_category_re.search(article_text):
+                problem_line_tuples.extend(result)
+
         for check_function in [washington_state_check,
                                cvt_speed_check,
                                man_made_check,
@@ -169,7 +177,6 @@ def check_style_by_line(article_title, article_text):
                                frac_repair,
                                logical_quoting_check,
                                liter_lowercase_check,
-                               cup_tbsp_tsp_check,
                                currency_hyphen_check,
                                au_check,
                                decimal_point_check]:
@@ -412,11 +419,12 @@ ctt_ignore_sport_re = re.compile(r"cup[0-9] result|defeat| goals?[^A-Za-z]| game
                                  r"|player|[Ss]upercup|greyhound|[Rr]ugby| [Ww]ins |scorer"
                                  r"|cups of coffee|cups of( green| black)? tea|cups/day|cups (per|a) day"
                                  r"|cups playing card|,000 cups|cup-mark|cup mark|cup-like|cup-shaped"
-                                 r"|cups per shift"
+                                 r"|cups per shift|cups sold"
                                  r"| finals | prize |basketball| victory"
                                  r"|cup-final| game | played | loss |free kick|Division [0-9] [Cc]up")
 ctt_ignore_converted_re = re.compile(rf"{ctt_alternation}s? (\([0-9]+( |&nbsp;)(g|grams|mL|L)\)| / [0-9]+( |&nbsp;)(g|grams|mL|L))")
 ctt_ignore_converted_reverse_re = re.compile(rf"[0-9]+( |&nbsp;)(g|grams|mL|L) \(~?[0-9/]+( |&nbsp;){ctt_alternation}s?\)")
+# TODO: "half teaspoon, quarter cup, one-eighth cup"
 
 
 def cup_tbsp_tsp_check(line, line_flags):
