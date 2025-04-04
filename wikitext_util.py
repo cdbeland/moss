@@ -494,7 +494,7 @@ def wikitext_to_plaintext(string, flatten_sup_sub=True):
 
 contractions_alternation = "|".join(contractions)
 bold_italics_re = re.compile(r"([^']|^)('''''[A-Za-z][^']{0,500}(" + contractions_alternation + ")?[^']{0,500}''''')([^']|$)")
-italics_re = re.compile(r"([^']|^)(''[A-Za-z][^']{0,500}(" + contractions_alternation + ")?[^']{0,500}'')([^']|$)")
+italics_re = re.compile(r"([^']|^)(''[A-Za-z].{0,500}?'')([^']|$)")
 prose_quote_re = re.compile(r'"\S[^"]{0,1000}?\S"|"\S"|""')
 # "" because the contents may have been removed by a previous replacement
 prose_quote_curly_re = re.compile(r'“\S[^”]{0,1000}?\S”|“\S”|“”')
