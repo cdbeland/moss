@@ -350,7 +350,7 @@ suppression_patterns = [
                r"|{{[Cc]ite[^}]+lang(uage)?="
                r").*?}}", flags=re.S),
 
-    re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable)".*?\|}', flags=re.S),
+    re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable|wikitable notatypo)".*?\|}', flags=re.S),
     re.compile(r"(ipa symbol\d?|poj) *= *[^\n]+"),
 
     # Allow these characters:
