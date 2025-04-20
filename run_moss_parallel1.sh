@@ -23,6 +23,7 @@ grep ^MAN_MADE tmp-style-by-line.txt | sort > fixme-man-made.txt
 grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
 grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 grep '^\$H' tmp-style-by-line.txt | sort > fixme-currency-hyphen.txt
+grep ^PAREN_REF tmp-style-by-line.txt | sort > fixme-paren-ref.txt
 
 grep ^AU tmp-style-by-line.txt | sort > tmp-au.txt
 cat tmp-au.txt | perl -pe 's/^AU_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-au.txt

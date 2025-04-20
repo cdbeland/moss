@@ -167,19 +167,22 @@ def check_style_by_line(article_title, article_text):
             if result and not sports_category_re.search(article_text):
                 problem_line_tuples.extend(result)
 
-        for check_function in [washington_state_check,
-                               cvt_speed_check,
-                               man_made_check,
-                               cvt_fuel_efficiency_check,
-                               mos_double_check,
-                               x_to_times_check,
-                               broken_nbsp_check,
-                               frac_repair,
-                               logical_quoting_check,
-                               liter_lowercase_check,
-                               currency_hyphen_check,
-                               au_check,
-                               decimal_point_check]:
+        for check_function in [
+                washington_state_check,
+                cvt_speed_check,
+                man_made_check,
+                cvt_fuel_efficiency_check,
+                mos_double_check,
+                x_to_times_check,
+                broken_nbsp_check,
+                frac_repair,
+                logical_quoting_check,
+                liter_lowercase_check,
+                currency_hyphen_check,
+                au_check,
+                decimal_point_check,
+                paren_ref_check
+        ]:
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
@@ -486,6 +489,36 @@ def au_check(line, line_flags):
         if au_converted_to_properly:
             continue
         return [("AU_CONVERTED_WRONG", line)]
+
+
+# Inline parenthetical references were banned in 2020 per [[WP:PAREN]]
+paren_ref_filter_re = re.compile(r"\([A-Z][^\)]{0,100}[0-9][0-9][0-9][0-9][^\)]{0,100}\)")
+
+
+def paren_ref_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+    if "(" not in line or ")" not in line:
+        return
+    results = paren_ref_filter_re.findall(line)
+    for result in results:
+        if (
+                result.startswith("(January")
+                or result.startswith("(February")
+                or result.startswith("(March")
+                or result.startswith("(April")
+                or result.startswith("(May ")
+                or result.startswith("(May,")
+                or result.startswith("(June ")
+                or result.startswith("(June,")
+                or result.startswith("(July")
+                or result.startswith("(August")
+                or result.startswith("(September")
+                or result.startswith("(October")
+                or result.startswith("(November")
+                or result.startswith("(December")
+        ):
+            continue
+        return [("PAREN_REF", line)]
 
 
 decimal_middot_re = re.compile(r"[0-9]·[0-9]")
