@@ -42,14 +42,6 @@ alert = [
     # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
     # -> Or maybe make separate templates for these
 
-    "ʾ",       #: "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
-    # ASCII apostrophe is used in transliterations by default, per
-    # [[Wikipedia:Naming conventions (Hebrew)]] which uses the Hebrew Academy scheme at
-    # [[Romanization_of_Hebrew#Table]]
-    # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
-    # be clear from context it's not an apostrophe
-    # For Arabic, this is should be changed to {{hamza}}
-
     # For native [[Greek numerals]]
     "&#x0374;",  # : "{{keraia}}",
 
@@ -308,10 +300,22 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
+    # "ʾ",       #: "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
+    # ASCII apostrophe is used in Hebrew transliterations by default, per
+    # [[Wikipedia:Naming conventions (Hebrew)]] which uses the Hebrew Academy scheme at
+    # [[Romanization_of_Hebrew#Table]]
+    # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
+    # be clear from context it's not an apostrophe
+    # For Arabic, this is should be changed to {{hamza}}
+    "ʾ": "{{hamza}}",  # U+02BE Modifier Letter Right Half Ring to ASCII
+    # See [[MOS:APOSTROPHE]] (Unicode character is allowed, but there
+    # have been complaints about lookalike characters and sometimes
+    # the wrong one is used)
+
     # Per [[MOS:MATHSPECIAL]]; may need to convert the remainder of
     # the expression
-    "∘": "<math>\circ</math>",
-    "○": "<math>\circ</math>",
+    "∘": r"<math>\circ</math>",
+    "○": r"<math>\circ</math>",
 
     # Per [[MOS:CURRENCY]] should be £ for pound currencies (GBP, AUP,
     # NZP, etc.)  CAUTION: Keep ₤ or lira and link, e.g.: [[Italian lira|₤]]
@@ -473,7 +477,7 @@ transform_unsafe = {
     # "&dash;": "-",  # ASCII hyphen
     "&dash;": "&ndash;",  # ASCII hyphen
 
-    "&dashv;": "⊣";
+    "&dashv;": "⊣",
 
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
     "&#x2116;": "No.",
