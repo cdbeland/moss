@@ -22,10 +22,6 @@ variant_selectors_re = re.compile(r"^&#x(FE0.|E01..|180B|180C|180D|1F3F[B-F]);",
 alert = [
     "&frasl;",
 
-    # Use \circ in <math>...</math> instead, per [[MOS:MATHSPECIAL]]
-    "∘",
-    "○",
-
     # Convert to straight quotes per [[MOS:CONFORM]]
     # but LEAVE when internal to non-English text per [[MOS:STRAIGHT]]
     # Also seen in URL titles (used as stylized field separators)
@@ -312,6 +308,11 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
+    # Per [[MOS:MATHSPECIAL]]; may need to convert the remainder of
+    # the expression
+    "∘": "<math>\circ</math>",
+    "○": "<math>\circ</math>",
+
     # Per [[MOS:CURRENCY]] should be £ for pound currencies (GBP, AUP,
     # NZP, etc.)  CAUTION: Keep ₤ or lira and link, e.g.: [[Italian lira|₤]]
     "₤": "£",
@@ -427,6 +428,7 @@ transform_unsafe = {
     "&thnsp;": "&thinsp;",
     "&thisp;": "&thinsp;",
     "&thnisp;": "&thinsp;",
+    "&thisnp;": "&thinsp;",
 
     "&ThinSpace;": " ",
     "&thinsp;": " ",  # Use "{{thin space}}" if retained
@@ -470,6 +472,8 @@ transform_unsafe = {
     # Usually a typo for &ndash;
     # "&dash;": "-",  # ASCII hyphen
     "&dash;": "&ndash;",  # ASCII hyphen
+
+    "&dashv;": "⊣";
 
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
     "&#x2116;": "No.",
