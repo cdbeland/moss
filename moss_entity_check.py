@@ -337,7 +337,7 @@ suppression_patterns = [
                # <sup>H</sup> in IPA templates); ignoring for now.
                r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA"
                r"|[Ll]ang(-\w\w+)?\|"
-               r"|[Tt]ransl(iteration)?\|"
+               r"|[Tt]ransliteration\|"
                r"|[Zz]h\|"
                r"|[Ss]cript/|"
                r"|[Nn]astaliq"
@@ -361,7 +361,7 @@ suppression_patterns = [
     # to be used in various non-English orthographies and transliterations,
     # if tagged with the language.
     #
-    # re.compile(r"{{(lang|Lang|transl|Transl)[^}]+[ʿʾʻʼ][^}]+}}", flags=re.S),
+    # re.compile(r"{{(lang|Lang|transliteration|Transliteration)[^}]+[ʿʾʻʼ][^}]+}}", flags=re.S),
     # Disabled for performance - redundant to above
 ]
 

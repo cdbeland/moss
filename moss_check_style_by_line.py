@@ -23,7 +23,7 @@ remove_image_param_re = re.compile(r"\| *(image[0-9]?|logo|screenshot|sound) *=.
 remove_image_no_end_re = re.compile(r"(File|Image):.*?\.(JPG|jpg|SVG|svg|PNG|png|OGG|ogg|JPEG|jpeg|WEBM|webm|GIF|gif|TIF|tif|TIFF|tiff|WEBP|webp|PDF|pdf|MP3|mp3|ogv)")
 remove_graphchart_re = re.compile(r"{{[Gg]raphChart.*?}}", re.S)
 
-remove_lang_re = re.compile(r"\{\{([Vv]erse translation|[Ll]ang|[Tt]ransl|IPA).*?\}\}")
+remove_lang_re = re.compile(r"\{\{([Vv]erse translation|[Ll]ang|[Tt]ransliteration|IPA).*?\}\}")
 
 poetry_flags = ["rhym", "poem", "stanza", "verse", "lyric"]
 poetry_flags += [word.title() for word in poetry_flags]
@@ -1389,7 +1389,7 @@ cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.tx
 
 echo "Beginning MOS:DOUBLE scan"
 echo `date`
-../venv/bin/python3 ../dump_grep_csv.py " '[A-Za-z ,:\-;]+'[,\. \}\)]" | grep -v '"' | grep -vP "{{([Ll]ang|[Tt]ransl|IPA)" | perl -pe 's/^(.*?):.*/$1/' > tmp-MOS-double.txt
+../venv/bin/python3 ../dump_grep_csv.py " '[A-Za-z ,:\-;]+'[,\. \}\)]" | grep -v '"' | grep -vP "{{([Ll]ang|[Tt]ransliteration|IPA)" | perl -pe 's/^(.*?):.*/$1/' > tmp-MOS-double.txt
 cat tmp-MOS-double.txt | perl ../count.pl | sort -rn > tmp-double-most.txt
 grep -vP "(grammar|languag|species| words)" tmp-double-most.txt | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt
 
