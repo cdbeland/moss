@@ -9,7 +9,7 @@ from moss_dump_analyzer import read_en_article_text
 
 
 # For example:
-# venv/bin/python3 dump_grep_csv.py ₤ > /tmp/pound-grep.txt | grep -v lira | perl -pe "s/:.*//" | sort | uniq
+# venv/bin/python3 dump_grep_csv.py ₤ | grep -v lira | perl -pe "s/:.*//" | sort | uniq
 
 FIND_RE = re.compile(sys.argv[1])
 
