@@ -173,6 +173,8 @@ keep = [
 ]
 
 controversial = {
+    "&dashv;": "⊣",
+
     # Objections from User:Jacobolus due to what they think is
     # excessive whitespace added by the template, though Beland thinks
     # it's actually necessary whitespace.
@@ -477,8 +479,6 @@ transform_unsafe = {
     # "&dash;": "-",  # ASCII hyphen
     "&dash;": "&ndash;",  # ASCII hyphen
 
-    "&dashv;": "⊣",
-
     "&#2027;": "&middot;",  # Changing from hyphenation point to middot
     "&#x2116;": "No.",
     "&#8470;": "No.",
@@ -534,6 +534,7 @@ transform_unsafe = {
     "&frac18;": "{{frac|1|8}}",
     "&frac23;": "{{frac|2|3}}",
     "&frac34;": "{{frac|3|4}}",
+    "&frac56;": "{{frac|5|6}}",
     "&frac58;": "{{frac|5|8}}",
     "&frac78;": "{{frac|7|8}}",
     "&#8531;": "{{frac|1|3}}",
