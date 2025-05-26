@@ -148,7 +148,6 @@ article_blocklist = [
     "Latin Extended-B",
     "Latin script in Unicode",
     "Letterlike Symbols",
-    "Ligature (writing)",
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
     "List of Latin-script letters",
@@ -189,7 +188,6 @@ article_blocklist = [
     "Romanization of Arabic",
     "Rough breathing",
     "RPL character set",
-    "S",
     "Schwarzian derivative",
     "Secondary articulation",
     "Sharp pocket computer character sets",
@@ -201,8 +199,6 @@ article_blocklist = [
     "Stokoe notation",
     "Superior letter",
     "T.51/ISO/IEC 6937",
-    "Tab key",
-    "Tab-separated values",
     "Teletext character set",
     "Thai Industrial Standard 620-2533",
     "TI calculator character sets",
@@ -247,7 +243,9 @@ article_blocklist = [
     "Yasukuni Shrine",
 
 
-    # -- Below probably can't be {{not a typo}}'d; TODO: above probably can --
+    # -- Below probably can't be {{not a typo}}'d without better
+    #    parsing.
+    #    TODO: above probably can --
 
     # Blackboard bold characters used as anchors
     "Glossary of mathematical symbols",
@@ -307,6 +305,8 @@ suppression_patterns = [
     # TODO: Some substitutions should be made anyway in certain
     # contexts. For example, "&#39;" -> "'" is safe inside filenames.
 
+    re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable|wikitable notatypo)".*?\|}', flags=re.S),
+
     re.compile(r"<(syntaxhighlight.*?</syntaxhighlight"
                r"|blockquote lang=.*?</blockquote"
                r"|<source.*?</source"
@@ -350,7 +350,6 @@ suppression_patterns = [
                r"|{{[Cc]ite[^}]+lang(uage)?="
                r").*?}}", flags=re.S),
 
-    re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable|wikitable notatypo)".*?\|}', flags=re.S),
     re.compile(r"(ipa symbol\d?|poj) *= *[^\n]+"),
 
     # Allow these characters:
