@@ -8,8 +8,6 @@ from unencode_entities import (
 # Characters with over 100,000 MOS:STRAIGHT violations deprioritized
 # in favor of jwb-straight-quotes-unbalanced.txt
 low_priority = """‘’“”"""
-# Superscripts and subscripts may require more thinking about acceptable contexts and coding
-low_priority += "¹²³⁴⁵⁶⁷⁸⁹⁰ⁱ⁺⁻⁼⁽⁾ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓꟹᵝᵞᵟᵋᶿᶥᶹᵠᵡᵦᵧᵨᵩᵪᵅᶜ̧ᶞᵊᶪᶴᶵꭩˀₔᵑ"
 
 strings_found_by_type = {}
 non_entity_transform = [string for string
@@ -53,7 +51,6 @@ non_entity_transform = [string for string
 article_blocklist = [
 
     # Characters themselves are discussed or listed as part of a mapping
-    "Baudot code",
     "Basic Latin (Unicode block)",
     "Big5",
     "Bitstream International Character Set",
@@ -84,8 +81,6 @@ article_blocklist = [
     "Code page 1169",
     "Code page 1287",
     "Code page 1288",
-    "Compose key",
-    "Computer Braille Code",
     "Cork encoding",
     "CTA-708",
     "Dania transcription",
@@ -102,11 +97,8 @@ article_blocklist = [
     "Extensions to the International Phonetic Alphabet",
     "FOCAL character set",
     "GB 2312",
-    "German keyboard layout",
     "GOST 10859",
     "Grave accent",
-    "Greek script in Unicode",
-    "HP Roman",
     "IBM 2741",
     "IBM 3270",
     "INIS-8",
@@ -168,8 +160,6 @@ article_blocklist = [
     "Mac OS Roman",
     "Mac OS Romanian encoding",
     "Mac OS Turkish encoding",
-    "Mathematical Alphanumeric Symbols",
-    "Mathematical operators and symbols in Unicode",
     "MIK (character set)",
     "Multinational Character Set",
     "NEC APC character set",
@@ -179,12 +169,10 @@ article_blocklist = [
     "Numismatics",
     "OT1 encoding",
     "Palatal hook",
-    "PETSCII",
     "Phags-pa (Unicode block)",
     "Phonetic symbols in Unicode",
     "PostScript Standard Encoding",
     "RISC OS character set",
-    "Roman numerals",
     "Romanization of Arabic",
     "Rough breathing",
     "RPL character set",
@@ -619,7 +607,7 @@ def dump_dict(section_title, dictionary):
     elif section_title == "Uncontroversial entities":
         output += "Fix automatically with jwb-combo.json\n\n"
     elif section_title == "Low priority":
-        output += "Fix automatically with jwb-combo.json\n\n"
+        output += "Consider using jwb-straight-quotes-unbalanced.txt instead.\n\n"
     elif section_title == "Greek letters":
         output += "Fix automatically with jwb-combo.json (articles with {{tag|math}} markup excluded)\n\n"
     elif section_title == "Controversial entities":
