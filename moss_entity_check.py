@@ -301,8 +301,9 @@ suppression_patterns = [
                r"|code.*?</code"
                r"|timeline.*?</timeline"
                ")>", flags=re.I+re.S),
-    re.compile(r"\[\[(File|Image):.*?(\||\])", flags=re.S),
-    re.compile(r"(File:|Image:|link=):[^ ]\.(jpg|JPG|gif|png)", flags=re.S),
+    re.compile(r"\[\[(File|Image):.*?(\||\])"),
+    re.compile(r"(File:|Image:|link=):[^ ]\.(jpg|JPG|gif|png)"),
+    re.compile(r"[^ ]+\.(jpg|JPG|gif|png)\|"),
 
     # For <gallery> blocks. Must use non-matching lookahead to avoid
     # consuming the beginning of the next line, which is needed to
