@@ -293,7 +293,7 @@ suppression_patterns = [
     # TODO: Some substitutions should be made anyway in certain
     # contexts. For example, "&#39;" -> "'" is safe inside filenames.
 
-    re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable|wikitable notatypo)".*?\|}', flags=re.S),
+    re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable|wikitable notatypo|notatypo)".*?\|}', flags=re.S),
 
     re.compile(r"<(syntaxhighlight.*?</syntaxhighlight"
                r"|blockquote lang=.*?</blockquote"
