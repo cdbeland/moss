@@ -179,9 +179,10 @@ def check_style_by_line(article_title, article_text):
                 logical_quoting_check,
                 liter_lowercase_check,
                 currency_hyphen_check,
-                au_check,
                 decimal_point_check,
-                paren_ref_check
+                paren_ref_check,
+                au_check,
+                km_check
         ]:
             result = check_function(line, line_flags)
             if result:
@@ -472,9 +473,12 @@ au_converted_from_properly = re.compile(convert_proper_start_re + r"au\|(e6km|e9
 au_converted_to_properly = re.compile(convert_proper_start_re + r"ly|pc au\|")
 
 
+# [[MOS:CONVERSIONS]]
 def au_check(line, line_flags):
     line = line_flags["text_no_refs_images_urls"]
     line = remove_lang_re.sub("✂", line)
+    if not line_flags["has_digit"]:
+        return
 
     if "stronomical" in line:
         if au_unconverted_full_re.search(line):
@@ -489,6 +493,20 @@ def au_check(line, line_flags):
         if au_converted_to_properly:
             continue
         return [("AU_CONVERTED_WRONG", line)]
+
+
+wrong_meters_prefix_re = re.compile(r"\b[0-9,\.]*[0-9]( |&nbsp;)[GTPEZYRQ]m\b")
+
+
+# [[MOS:CONVERSIONS]] for astronomical distances
+def km_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+    line = remove_lang_re.sub("✂", line)
+    if not line_flags["has_digit"]:
+        return
+
+    if wrong_meters_prefix_re.search(line):
+        return [("KM_WRONG_PREFIX", line)]
 
 
 # Inline parenthetical references were banned in 2020 per [[WP:PAREN]]

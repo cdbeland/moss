@@ -28,6 +28,9 @@ grep ^PAREN_REF tmp-style-by-line.txt | sort > fixme-paren-ref.txt
 grep ^AU tmp-style-by-line.txt | sort > tmp-au.txt
 cat tmp-au.txt | perl -pe 's/^AU_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-au.txt
 
+grep ^KM tmp-style-by-line.txt | sort > tmp-km.txt
+cat tmp-km.txt | perl -pe 's/^KM_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-km.txt
+
 grep ^CTT tmp-style-by-line.txt | perl -pe 's/.*?\t(.*)\t(.*)$/$1/' | uniq > beland-ctt.txt
 
 grep ^DECIMAL_MIDDOT tmp-style-by-line.txt | sort | perl -pe 's/^DECIMAL_MIDDOT\t(.*?)\t.*$/$1/' | uniq > fixme-decimal-middot.txt
