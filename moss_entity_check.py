@@ -51,7 +51,6 @@ non_entity_transform = [string for string
 article_blocklist = [
 
     # Characters themselves are discussed or listed as part of a mapping
-    "Basic Latin (Unicode block)",
     "Big5",
     "Bitstream International Character Set",
     "CEA-708",
@@ -83,8 +82,6 @@ article_blocklist = [
     "Code page 1288",
     "Cork encoding",
     "CTA-708",
-    "Dania transcription",
-    "Devanagari transliteration",
     "DEC Hebrew",
     "Digital encoding of APL symbols",
     "DKOI",
@@ -164,11 +161,7 @@ article_blocklist = [
     "Multinational Character Set",
     "NEC APC character set",
     "NeXT character set",
-    "Number Forms",
-    "Numerals in Unicode",
-    "Numismatics",
     "OT1 encoding",
-    "Palatal hook",
     "Phags-pa (Unicode block)",
     "Phonetic symbols in Unicode",
     "PostScript Standard Encoding",
@@ -204,11 +197,6 @@ article_blocklist = [
     "VSCII",
     "VT100 encoding",
     "VT52",
-    "Wang International Standard Code for Information Interchange",
-    "Western Latin character sets (computing)",
-    "Whitespace (programming language)",
-    "Xerox Character Code Standard",
-    "YUSCII",
 
     # Note: Characters like &Ohm; and &#x2F802; are changed by
     # Normalization Form Canonical Composition and appear as different
@@ -311,6 +299,7 @@ suppression_patterns = [
     re.compile(r"(^|\n)\|? *(File|Image):.*?(?=\||\n)"),
 
     re.compile(r"\| *image[0-9]? *=.*"),
+    re.compile(r"\| *img_?[0-9]? *=.*"),
     re.compile(r"\| *ImageFile *=.*"),
     re.compile(r"\| *image_skyline *=.*"),
     re.compile(r"\| *cover *=.*jpg"),
