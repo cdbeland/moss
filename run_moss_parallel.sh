@@ -49,3 +49,9 @@ cat tmp-entities | ../venv/bin/python3 ../summarizer.py --find-all > post-entiti
 
 echo "Parallel threads started."
 echo `date`
+
+export LC_ALL=C
+grep '*' tmp-entities | perl -pe 's/\]\], \[\[/\n/g' | perl -pe 's/.*\[\[//' | perl -pe 's/\]\]//'  | sort | uniq > jwb-entities-alpha.txt
+
+echo "Main thread done."
+echo `date`
