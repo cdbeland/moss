@@ -182,7 +182,8 @@ def check_style_by_line(article_title, article_text):
                 decimal_point_check,
                 paren_ref_check,
                 au_check,
-                km_check
+                km_check,
+                number_notation_check
         ]:
             result = check_function(line, line_flags)
             if result:
@@ -334,14 +335,30 @@ def logical_quoting_check(line, line_flags):
 
 # Per April 2021 RFC that updated [[MOS:UNITSYMBOLS]]
 
+liter_with_prefix_alt = r"ql|rl|yl|zl|al|fl|pl|µL|μl|ml|cl|dl|dal|hl|kl|Ml|Gl|Tl|Pl|El|Zl|Yl|Rl|Ql"
+
 liter_link_re = re.compile(r"([Ll]iter|[Ll]itre)s?\|l]]")
 liter_convert_re = re.compile(r"{{(convert|cvt)\|[^\}]+\|l(\||}|/)")
 liter_parens_re = re.compile(rf"[^a-zA-Z{NON_ASCII_LETTERS}]\(l(/[a-zA-Z/]+)?\)[^a-zA-Z{NON_ASCII_LETTERS}]")
-liter_prefix_re = re.compile(rf"[^a-zA-Z0-9{NON_ASCII_LETTERS}][0-9]+( |&nbsp;)?(ql|rl|yl|zl|al|fl|pl|µL|μl|ml|cl|dl|dal|hl|kl|Ml|Gl|Tl|Pl|El|Zl|Yl|Rl|Ql)[^a-zA-Z0-9{NON_ASCII_LETTERS}]")
+liter_prefix_re = re.compile(rf"[^a-zA-Z0-9{NON_ASCII_LETTERS}][0-9]+( |&nbsp;)?({liter_with_prefix_alt})[^a-zA-Z0-9{NON_ASCII_LETTERS}]")
 liter_prefix_exclusion_re = re.compile(r"(El [A-Z]|al-[A-Z]|align|fl\.?( |&nbsp;)?oz)")
 liter_illion_re = re.compile(r"[rBbMm]illion( |&nbsp;)l[^a-zA-Z0-9]")
-liter_qty_re = re.compile(r"[0-9]( |&nbsp;)?l[^A-Za-z'0-9]")
-liter_numerator_re = re.compile(r" [0-9,\.]+( |&nbsp;)?l/[a-zA-Z0-9]")
+liter_qty_re = re.compile(rf"[0-9]( |&nbsp;)?l[^a-zA-Z0-9'’{NON_ASCII_LETTERS}]")
+liter_prefix_qty_re = re.compile(rf"[0-9]( |&nbsp;)?({liter_with_prefix_alt})[^a-zA-Z0-9'’{NON_ASCII_LETTERS}]")
+liter_numerator_re = re.compile(rf"(^|[^A-Za-z])[0-9,\.]+( |&nbsp;)?(l|{liter_with_prefix_alt})/[a-zA-Z0-9]")
+liter_denominator_re = re.compile(r"[^A-Za-z\./][A-Za-z]{1,4}/(l|" + liter_with_prefix_alt
+                                  + rf")[^a-zA-Z{NON_ASCII_LETTERS}'0-9/\-_]")
+l7_exclusion_re = re.compile(r"("
+                             + r"w/l(-[0-9])? *="
+                             + r"|"
+                             + r"data:[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]"
+                             + r"|"
+                             + r"[^a-zA-Z0-9]r/l"
+                             + r"|"
+                             + r"[^a-zA-Z0-9]d/l[^a-zA-Z0-9]"
+                             + r"|"
+                             + r"\[\[(\w+ )+a/l [\w ]+\]\]"
+                             + r")")
 
 
 def liter_lowercase_check(line, line_flags):
@@ -370,41 +387,50 @@ def liter_lowercase_check(line, line_flags):
         if liter_prefix_re.search(line_tmp):
             return [("L4", line)]
     if liter_qty_re.search(line):
-        # Might need:
-        # | grep -P "[^p][^.]\s?[0-9]+ l[^a-zA-Z0-9'’{NON_ASCII_LETTERS}]"
-        # | grep -vi " l.jpg"
-        # | grep -v "AD-1 l"
-        # | grep -v "\[\[Pound sterling|l"
-        # | grep -v "{{not English inline}}"
+        if r"[[Pound sterling|l" in line:
+            return
+        if "l.jpg" in line:
+            return
+        if "l.JPG" in line:
+            return
+
         if "l=" not in line and "uSTR" not in line and "l\\" not in line:
             return [("L5", line)]
+    if liter_prefix_qty_re.search(line):
+        # Some may be technically allowed unless the page mixes e.g. "L" with "ml"
+        return [("L9", line)]
+
     if liter_numerator_re.search(line):
         return [("L6", line)]
 
     # Denominator checks
-    if "/l" in line:
-        # May need to manually fix some instances:
-        # expand "m/l" to "music and lyrics" or drop
-        # expand "w/l" to "win/loss"
-        # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
-        # and these:
-        if "Malaysian names#Indian names|a/l" in line:
-            return
-        if "Length at the waterline|w/l" in line:
-            return
-        if "Length at the waterline|Length w/l" in line:
-            return
-        if "Waterline length|w/l" in line:
+    if "/" in line:
+
+        if not liter_denominator_re.search(line):
             return
 
-        # May need to:
-        # | grep -P "[^A-Za-z\./][A-Za-z]{1,4}/l[^a-zA-Z{NON_ASCII_LETTERS}'0-9/\-_]"
-        # | grep -vP "w/l(-[0-9])? *="
-        # | grep -vP "data:[A-Za-z0-9_\-\./,\+%~;]+/l[^a-zA-Z'’]"
-        # | grep -vP "[^a-zA-Z0-9]r/l"
-        # | grep -vP "[^a-zA-Z0-9]d/l[^a-zA-Z0-9]"
-        # | grep -vP "\[\[(\w+ )+a/l [\w ]+\]\]"
-        return [("L7", line)]
+        if "/l" in line:
+            # May need to manually fix some instances:
+            # expand "m/l" to "music and lyrics" or drop
+            # expand "w/l" to "win/loss"
+            # expand "s/l" to "sideline" "l/b" to "sideline" (line ball)
+            # and these:
+            if "Malaysian names#Indian names|a/l" in line:
+                return
+            if "Length at the waterline|w/l" in line:
+                return
+            if "Length at the waterline|Length w/l" in line:
+                return
+            if "Waterline length|w/l" in line:
+                return
+
+            if l7_exclusion_re.search(line):
+                return
+
+            return [("L7", line)]
+        else:
+            # Some may be technically allowed unless the page mixes e.g. "L" with "ml"
+            return [("L8", line)]
 
 
 # [[MOS:UNITS]]; not compatible with Template:Convert
@@ -546,6 +572,7 @@ decimal_comma_exclusion_re = re.compile(r"[\[\(\{\-][0-9]+,[0-9]+[\]\)\}\-]"  # 
                                         r"|[0-9],[0-9\.]+,[0-9]")  # lists
 
 
+# [[MOS:DECIMAL]]
 def decimal_point_check(line, line_flags):
     line = line_flags["text_no_refs_images_urls"]
     if not line_flags["has_digit"]:
@@ -565,6 +592,87 @@ def decimal_point_check(line, line_flags):
             # sorting out the rest for later?
             if not decimal_comma_exclusion_re.search(line):
                 return [("DECIMAL_COMMA", line)]
+
+
+# ---
+
+# [[MOS:DIGITS]]
+spaces_re = r"( |&nbsp;|&thinsp;|\{\{thinsp\}\}|&hairsp;|\{\{hairsp\}\}|&nbsp;|\{\{nbsp\}\})"
+digits_with_spaces_re = re.compile(rf"(^|[^A-Za-z0-9])([0-9]\.[0-9][0-9][0-9]{spaces_re}[0-9]|[0-9]{spaces_re}[0-9][0-9][0-9][^0-9A-Za-z])")
+# Captures e.g. "5 123", "# 5.123 4"
+
+# Broad filter
+scientific_notation_re = re.compile(rf"[0-9]{spaces_re}?[×xX]{spaces_re}?10\<sup")
+
+# Incorrect scientific notation (or engineering notation if exponent is a multiple of 3)
+wrong_sci_notation_re = re.compile(r" [0-9][0-9][0-9]?(\.[0-9]+)? ?[×xX] ?10\<sup")
+
+wrong_million_abbr_re = re.compile(r"[0-9] [Mm]io\.? ")
+exp_re = re.compile(r"10<sup>((-|−|&minus;)?[0-9]+)</sup>")
+
+bad_per_re = re.compile(r"[0-9 /][a-zA-Z]<sup>[-−][123]</sup>")
+
+# TODO: r"\{\{[Vv]al[^\}]+(e=|[0-9]e[0-9])"
+# ESPECIALLY _ILLIONS: r"\{\{[Vv]al[^\}]+(e=(6|9|12)|[0-9]e(6|9|12))"
+
+# Not worth automating - almost all false positives
+# rf" [0-9](\.[0-9]+)?E[0-9][0-9]?( |\.|,)"
+# Filter "Class #E#"
+# ---
+
+
+def number_notation_check(line, line_flags):
+    line = line_flags["text_no_refs_images_urls"]
+    if not line_flags["has_digit"]:
+        return
+
+    if digits_with_spaces_re.search(line):
+        return [("DIGITS_SPACES", line)]
+
+    if wrong_million_abbr_re.search(line):
+        return [("DIGITS_MIO", line)]
+
+    # -- Scientific notation validation
+
+    if "<sup>" in line:
+        if bad_per_re.search(line):
+            # Say e.g. "7 km/s" instead of "7 km s<sup>-1</sup>"
+            return [("SCI_NOTATION_PER", line)]
+    else:
+        return
+
+    if not scientific_notation_re.search(line):
+        return
+
+    if wrong_sci_notation_re.search(line):
+        # Too many digits before the decimal point
+        return [("SCI_NOTATION_WRONG", line)]
+
+    result = exp_re.search(line)
+    if not result:
+        return [("SCI_NOTATION_MALFORMED", line)]
+
+    exp = result.group(1)
+    exp = exp.replace("−", "-")  # U+2212 to U+002D
+    exp = int(exp)
+    if exp == 6:
+        return [("SCI_NOTATION_XILLION", line)]
+
+    if exp == 9:
+        return [("SCI_NOTATION_XILLION", line)]
+
+    if exp == 12:
+        return [("SCI_NOTATION_XILLION", line)]
+
+    if exp >= 15:
+        # So large that writing this way is fine
+        return
+
+    if exp <= -5:
+        # So small that writing this way is fine
+        return
+
+    return [("SCI_NOTATION_CATCHALL", line)]
 
 
 no_num_kph_re = re.compile(r"\bkph|KPH\b")

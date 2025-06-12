@@ -25,6 +25,15 @@ grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 grep '^\$H' tmp-style-by-line.txt | sort > fixme-currency-hyphen.txt
 grep ^PAREN_REF tmp-style-by-line.txt | sort > fixme-paren-ref.txt
 
+grep ^DIGITS_MIO tmp-style-by-line.txt | sort > fixme-digits-mio.txt
+grep ^DIGITS_SPACES tmp-style-by-line.txt | sort > fixme-digits-spaces.txt
+
+grep ^SCI_NOTATION_XILLION tmp-style-by-line.txt | sort > fixme-scinot-xillion.txt
+grep ^SCI_NOTATION_WRONG tmp-style-by-line.txt | sort > fixme-scinot-wrong.txt
+grep ^SCI_NOTATION_MALFORMED tmp-style-by-line.txt | sort > fixme-scinot-malformed.txt
+grep ^SCI_NOTATION_PER tmp-style-by-line.txt | sort > fixme-scinot-per.txt
+grep ^SCI_NOTATION_CATCHALL tmp-style-by-line.txt | sort > fixme-scinot-cachall.txt
+
 grep ^AU tmp-style-by-line.txt | sort > tmp-au.txt
 cat tmp-au.txt | perl -pe 's/^AU_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-au.txt
 
@@ -35,6 +44,8 @@ grep ^CTT tmp-style-by-line.txt | perl -pe 's/.*?\t(.*)\t(.*)$/$1/' | uniq > bel
 
 grep ^DECIMAL_MIDDOT tmp-style-by-line.txt | sort | perl -pe 's/^DECIMAL_MIDDOT\t(.*?)\t.*$/$1/' | uniq > fixme-decimal-middot.txt
 grep ^DECIMAL_COMMA tmp-style-by-line.txt | sort | perl -pe 's/^DECIMAL_COMMA\t(.*?)\t.*$/$1/' | uniq > fixme-decimal-comma.txt
+
+grep ^L tmp-style-by-line.txt | sort > fixme-liters.txt
 
 grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 
