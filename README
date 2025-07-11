@@ -7,7 +7,7 @@ HARDWARE REQUIREMENTS
   scripts)
 
 UBUNTU DEPENDENCIES
-sudo apt-get install git pyflakes3 pylint python3-pep8 python3-dev g++ protobuf-c-compiler
+sudo apt-get install git pyflakes3 pylint python3-pep8 python3-dev g++ protobuf-c-compiler protobuf-compiler
 
 FEDORA DEPENDENCIES
 sudo dnf install git python3-flake8 protobuf-c-compiler pylint python3-devel protobuf-devel
