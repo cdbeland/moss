@@ -149,6 +149,11 @@ def check_style_by_line(article_title, article_text):
     problem_line_tuples = []
     article_text = universal_article_text_cleanup(article_text)
 
+    # Check article title
+    if "…" in article_title:
+        # [[MOS:ELLIPSES]]
+        problem_line_tuples.extend([("ET", article_title + " [title]")])
+
     for line in article_text.splitlines():
         line = universal_line_cleanup(line)
         line_flags = set_line_flags(line)

@@ -47,6 +47,8 @@ grep ^DECIMAL_COMMA tmp-style-by-line.txt | sort | perl -pe 's/^DECIMAL_COMMA\t(
 
 grep ^L tmp-style-by-line.txt | sort > fixme-liters.txt
 
+grep ^ET tmp-style-by-line.txt | sort | perl -pe 's/^ET\t(.*?)\t.*$/$1/' | uniq > fixme-ellipsis-in-title.txt
+
 grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 
 # TODO:
