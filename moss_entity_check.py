@@ -51,8 +51,6 @@ non_entity_transform = [string for string
 article_blocklist = [
 
     # Characters themselves are discussed or listed as part of a mapping
-    "Big5",
-    "Bitstream International Character Set",
     "CEA-708",
     "CER-GS",
     "Casio calculator character sets",
@@ -136,7 +134,6 @@ article_blocklist = [
     "Latin Extended Additional",
     "Latin Extended-B",
     "Latin script in Unicode",
-    "Letterlike Symbols",
     "List of Japanese typographic symbols",
     "List of Latin letters by shape",
     "List of Latin-script letters",
@@ -218,27 +215,8 @@ article_blocklist = [
     "Sung-mi",
     "Yasukuni Shrine",
 
-
-    # -- Below probably can't be {{not a typo}}'d without better
-    #    parsing.
-    #    TODO: above probably can --
-
-    # Blackboard bold characters used as anchors
-    "Glossary of mathematical symbols",
-
     # Legitimate use of <h2> due to complex layout
     "Main Page",
-
-    # {{lang}} can't be used in {{cite}}
-    "Everett, Washington",
-
-    # {{lang}} and {{IPA}} interwoven with other templates
-    "State Anthem of the Soviet Union",
-    "National anthem of Bolivia",
-
-    # {{not a typo}} not working well due to intersecting/nested templates
-    "Beta",
-    "Kappa",
 ]
 
 
@@ -306,6 +284,8 @@ suppression_patterns = [
 
     # TODO: These can be URL-escaped
     re.compile(r"https?://[^ \n\|&]+"),
+
+    re.compile(r"{{[Nn]ot a typo start}}.*?{{[Nn]ot a typo end}}"),
 
     re.compile(r"{{lang.*?translit=.*?}}|{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE"
                # 7seg uses superscript = as a parameter value
