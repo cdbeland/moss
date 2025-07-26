@@ -617,6 +617,9 @@ exp_re = re.compile(r"10<sup>((-|−|&minus;)?[0-9]+)</sup>")
 
 bad_per_re = re.compile(r"[0-9 /][a-zA-Z]<sup>[-−][123]</sup>")
 
+# TODO: "10<sup>[69]</sup>" can probably be changed to "million" and
+# "billion" in a lot of contexts.
+
 # TODO: r"\{\{[Vv]al[^\}]+(e=|[0-9]e[0-9])"
 # ESPECIALLY _ILLIONS: r"\{\{[Vv]al[^\}]+(e=(6|9|12)|[0-9]e(6|9|12))"
 
@@ -1606,6 +1609,9 @@ cat tmp-temp-convert1.txt tmp-temp-convert2.txt tmp-temp-convert3.txt tmp-temp-c
 # rm -f tmp-temp-F.txt
 
 # --- MORE METRIC CONVERSIONS ---
+
+# TODO:
+# insource:/[¼¾½]( |&nbsp;)(cm|mm|mL|L)/
 
 # TODO:
 # * miles, including {{frac|...}} miles and e.g. "1 1/2 miles"
