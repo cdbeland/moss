@@ -1516,6 +1516,8 @@ cat tmp-mpg-convert.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-mpg-convert.tx
 # {{convert|$1|mpgUS}}
 # {{convert|$1|mpgimp}}
 
+# Add to run_moss_parallel1.sh:
+grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
 
 # --- MOS:DOUBLE ---
 
@@ -1607,6 +1609,9 @@ cat tmp-temp-convert1.txt tmp-temp-convert2.txt tmp-temp-convert3.txt tmp-temp-c
 
 # rm -f tmp-temp-weather.txt
 # rm -f tmp-temp-F.txt
+
+# Add to run_moss_parallel1.sh:
+grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 
 # --- MORE METRIC CONVERSIONS ---
 

@@ -20,8 +20,6 @@ grep ^L tmp-style-by-line.txt | sort > fixme-liters.txt
 grep ^W tmp-style-by-line.txt | sort > fixme-washington-state.txt
 grep ^SPEED tmp-style-by-line.txt | sort > fixme-speed.txt
 grep ^MAN_MADE tmp-style-by-line.txt | sort > fixme-man-made.txt
-grep ^FE tmp-style-by-line.txt | sort > fixme-fuel-efficiency.txt
-grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 grep '^\$H' tmp-style-by-line.txt | sort > fixme-currency-hyphen.txt
 grep ^PAREN_REF tmp-style-by-line.txt | sort > fixme-paren-ref.txt
 
