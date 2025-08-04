@@ -1,25 +1,54 @@
 from collections import defaultdict
-import mysql.connector
 import re
+import requests
+import sys
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
 
-mysql_connection = mysql.connector.connect(user='beland',
-                                           host='127.0.0.1',
-                                           database='enwiki')
+# This script finds all instances of known chemical formulas which are
+# outside templates. They should be enclosed in {{chem}} or {{chem2}}
+# for spell-checking purposes.
 
-cursor = mysql_connection.cursor()
+
+# Always returns a list, even if there are no articles in the category
+def get_articles_in_category(category_name, continue_params=None):
+    article_list = []
+    api_params = {
+        "action": "query",
+        "cmtitle": "Category:" + category_name,
+        "cmlimit": 500,
+        "list": "categorymembers",
+        "format": "json"
+    }
+    if continue_params:
+        api_params.update(continue_params)
+    result = session.get(url=api_url, params=api_params)
+    data = result.json()
+    pages = data.get('query', {}).get('categorymembers', [])
+
+    for page in pages:
+        article_list.extend([page['title']])
+
+    if "continue" in data:
+        return article_list + get_articles_in_category(category_name, continue_params=data["continue"])
+    return article_list
+
+
+# --- Live interrogation of Wikipedia categories ---
+
 formulas = []
-for category in [
-        "Redirects_from_chemical_formulas",
-        "Inorganic_molecular_formula_set_index_pages",
+session = requests.Session()
+api_url = "https://en.wikipedia.org/w/api.php"
+print("Getting live category member lists...", file=sys.stderr)
+for category_name in [
+        "Redirects_from_chemical_formulas",  # About 8763 pages
         "Inorganic_molecular_formulas",
         "Molecular_formulas",
-        "Molecular_formula_set_index_pages",
+        "Set index articles on molecular formulas",
 ]:
-    cursor.execute("SELECT title FROM page_categories WHERE category_name=%s", [category])
-    formulas.extend([title.decode('utf8') for (title,) in cursor])
-cursor.close()
+    article_list = get_articles_in_category(category_name)
+    print(f"{category_name} - {len(article_list)}", file=sys.stderr)
+    formulas.extend(article_list)
 
 formulas = [f for f in formulas if any(char for char in list(f) if char.isdigit())]
 formulas = [f for f in formulas if "," not in f]
@@ -74,6 +103,8 @@ def dump_results():
 
 
 if __name__ == '__main__':
+    print("Running chem_formula_check...", file=sys.stderr)
     # Run time: ~2h40m (8-core parallel)
     read_en_article_text(chem_formula_check, process_result_callback=add_tuples_to_results, parallel=True)
     dump_results()
+    print("Done", file=sys.stderr)
