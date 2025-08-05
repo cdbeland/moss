@@ -211,7 +211,7 @@ grep ^D tmp-output.txt | perl -pe 's/^D\t'// | sort -k3 | ../venv/bin/python3 ..
 echo "Starting chemical formulas report"
 echo `date`
 echo "====Possible chemical formulas that don't use subscripts====" > post-chemical-formulas.txt
-grep -P ' ((H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|I|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|R)([2-9]|[1-9][0-9]))+$' debug-spellcheck-ignored.txt | grep -vP ' [KQRBNP][a-h][1-8]$' | grep -vP ' [A-Z]\d\d$' | head -100 >> post-chemical-formulas.txt
+grep -P ' ((H|He|Li|Be|B|C|N|O|F|Ne|Na|Mg|Al|Si|P|S|Cl|Ar|K|Ca|Sc|Ti|V|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Y|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|I|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|W|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|U|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|R)([2-9]|[1-9][0-9]))+$' debug-spellcheck-ignored.txt | grep -vP ' [KQRBNP][a-h][1-8]$' | grep -vP ' [A-Z]\d\d$' | perl -pe 's^(\w+)$^$1 ([https://en.wikipedia.org/w/index.php?search=insource%3A%2F$1%2F&ns0=1 find all])^' | head -100 >> post-chemical-formulas.txt
 # [KQRBNP][a-h][1-8] is to exclude [[Algebraic notation (chess)]]
 
 echo "" >> post-chemical-formulas.txt
