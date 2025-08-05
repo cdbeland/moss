@@ -96,7 +96,7 @@ article_skip_list = [
 bad_words_apos = sorted([w for w in bad_words if "'" in w], key=lambda w: 100 - len(w))
 bad_words_apos_re = re.compile(r"[^a-z](" + "|".join(bad_words_apos) + r")[^a-z]", re.I)
 
-wikt_trans_re = re.compile(r"\{\{trans-see *\|.*?\}\}")
+wikt_trans_re = re.compile(r"\{\{trans-see *\|(.*?)\}\}")
 
 
 def ignore_typo_in_context(word_mixedcase, article_text_orig):
@@ -292,9 +292,9 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
     if wiktionary:
         trans_xrefs = wikt_trans_re.findall(article_text_orig)
         for trans_xref in trans_xrefs:
-            more_words = [word.strip() for word in str(trans_xref).split("|")]
-            more_words = [word for word in more_words if word]
-            word_list.extend(more_words)
+            more_words_tmp = [param.strip() for param in str(trans_xref).split("|")]
+            for param in more_words_tmp:
+                word_list.extend(nltk.word_tokenize(param))
 
     # Old-fashioned loop to allow lookahead and cope with the fact
     # that the length of word_list may change as it is edited in
