@@ -159,7 +159,7 @@ echo "Longest or shortest in certain categories are shown, sometimes just for fu
 echo "" >> collected_by_length.txt
 
 echo "==== Likely chemistry words ====" >> collected_by_length.txt
-echo "These need to be checked by a chemist and marked as {{tl|not a typo}}." >> collected_by_length.txt
+echo "These need to be checked by a chemist and redirect created (if article exists) or marked as {{tl|chem name}} (if no article exists)." >> collected_by_length.txt
 grep ^C tmp-misspelled-words-charlen-cat.txt | perl -pe 's/^C\t//' | head -20 >> collected_by_length.txt
 echo "" >> collected_by_length.txt
 
@@ -218,11 +218,13 @@ echo "" >> post-chemical-formulas.txt
 echo "====Known chemical formulas that don't use subscripts====" >> post-chemical-formulas.txt
 echo "" >> post-chemical-formulas.txt
 
+echo "Starting slow chemical formulas report"
+echo `date`
 # Run time: About 3.5 hours
-echo "(REPORT DISABLED DUE TO LONG RUN TIME; START MANUALLY)" >> post-chemical-formulas.txt
-# ../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
+../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
+echo "Done slow chemical formulas report"
+echo `date`
 
-# ---
 
 # Run time: About 6.5 hours
 echo "Beginning not-English check"
