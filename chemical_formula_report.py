@@ -5,9 +5,9 @@ import sys
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
 
-# This script finds all instances of known chemical formulas which are
-# outside templates. They should be enclosed in {{chem}} or {{chem2}}
-# for spell-checking purposes.
+# This script finds all instances of known chemical formulas which do
+# not use subscripts as required by [[MOS:SUPERSCRIPT]]. These should
+# be enclosed in {{chem}} or {{chem2}} for spell-checking purposes.
 
 
 # Always returns a list, even if there are no articles in the category
@@ -52,7 +52,15 @@ for category_name in [
 
 formulas = [f for f in formulas if any(char for char in list(f) if char.isdigit())]
 formulas = [f for f in formulas if "," not in f]
+formulas = [f for f in formulas if not f[0].isdigit()]
 formulas = sorted(set(formulas), key=lambda f: len(f) * -1)
+
+formulas_by_first_letter = defaultdict(list)
+for formula in formulas:
+    first_letter = formula.strip("()")[0]
+    formulas_by_first_letter[first_letter].append(formula)
+first_letters = list(formulas_by_first_letter.keys())
+
 formulas_pattern = "|".join([rf"\b{formula}\b" for formula in formulas])
 formulas_pattern = formulas_pattern.replace("(", r"\(")
 formulas_pattern = formulas_pattern.replace(")", r"\)")
@@ -72,12 +80,33 @@ def chem_formula_check(article_title, article_text):
     # parameter_exclude_re = re.compile(r"\| c?o2 *=")
     # article_text = parameter_exclude_re.sub("", article_text)
 
+    # Quickly ignore any words without digits
+    article_words = article_text.split(" ")
+    article_words = [word for word in article_words if any(char.isdigit() for char in word)]
+    article_words = [word for word in article_words if not word[0].isdigit()]
+
+    # Quickly ignore any words that won't match any formula
+    article_words = [word for word in article_words
+                     if any(letter for letter in first_letters if letter in word)]
+
     # Fast but over-matches
-    matches = [f for f in formulas if f in article_text]
-    if matches:
+    matching_formulas = []
+    for word in article_words:
+        for letter in first_letter:
+            if letter not in word:
+                continue
+            for formula in formulas_by_first_letter:
+                if formula in word:
+                    matching_formulas.append(formula)
+                    break
+        if matching_formulas:
+            break
+
+    if matching_formulas:
+        article_text_short = " ".join(article_words)
         # Slow but fewer false matches
-        matches = formulas_re.findall(article_text)
-    return (article_title, matches)
+        matches = formulas_re.findall(article_text_short)
+        return (article_title, matches)
 
 
 def add_tuples_to_results(tuple_list):
@@ -104,7 +133,7 @@ def dump_results():
 
 if __name__ == '__main__':
     print("Running chem_formula_check...", file=sys.stderr)
-    # Run time: ~2h40m (8-core parallel)
+    # Run time: ~1h 15 m (8-core parallel)
     read_en_article_text(chem_formula_check, process_result_callback=add_tuples_to_results, parallel=True)
     dump_results()
     print("Done", file=sys.stderr)
