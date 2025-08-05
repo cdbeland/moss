@@ -6,7 +6,7 @@ import sys
 from moss_dump_analyzer import read_en_article_text
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_tags_re
 from spell import is_word_spelled_correctly, bad_words
-from word_categorizer import is_chemistry_word
+from word_categorizer import is_chemical_name, is_chemical_formula, is_chess_notation
 
 
 # TODO:
@@ -129,6 +129,9 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
     if caliber_re.search(word_mixedcase) and ("caliber" in article_text_orig or "calibre" in article_text_orig):
         return True
     if batting_average_re.search(word_mixedcase):
+        # Report as a Z error unless one of these articles is linked
+        # in the text (otherwise many readers will not know what
+        # e.g. "batting .123" means).
         if "batting average" in article_text_orig:
             return True
         if "fielding percentage" in article_text_orig:
@@ -140,6 +143,16 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
     if " " in word_mixedcase:
         words = word_mixedcase.split()
         if all(is_word_spelled_correctly(word) is True for word in words):
+            return True
+
+    if is_chess_notation(word_mixedcase):
+        return True
+    # Must be after is_chess_notation(); they overlap
+    if is_chemical_formula(word_mixedcase):
+        # Subscripts are stripped out in the main spell check, but the
+        # formula only violates [[MOS:SUB]] if it does *not* use
+        # subscripts or a chem template.
+        if word_mixedcase in article_text_orig:
             return True
 
     return False
@@ -235,8 +248,8 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
     # "xxx,yyy" -> ['xxx', ',', 'yyy']
     missing_comma_typos = comma_missing_whitespace_re.findall(article_text)
     for typo in missing_comma_typos:
-        # Ignore chemistry notation
-        if is_chemistry_word(typo):
+        # Ignore chemical names
+        if is_chemical_name(typo):
             continue
 
         # Ignore genetics notation
@@ -253,7 +266,7 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
 
     for typo in bracket_missing_whitespace_re.findall(article_text):
         if is_word_spelled_correctly(typo) in [False, "uncertain"]:
-            if not is_chemistry_word(typo):
+            if not is_chemical_name(typo):
                 article_oops_list.append(typo)
 
     for typo in punct_extra_whitespace_re.findall(article_text):
@@ -410,9 +423,10 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
         if is_spelling_correct is True:
             continue
         if is_spelling_correct == "uncertain":
-            print("G\t%s\t%s" % (word_mixedcase, article_title), flush=True)
-            # "G" for "iGnored but maybe shouldn't be"
-            continue
+            if not batting_average_re.search(word_mixedcase):
+                print("G\t%s\t%s" % (word_mixedcase, article_title), flush=True)
+                # "G" for "iGnored but maybe shouldn't be"
+                continue
         if ignore_typo_in_context(word_mixedcase, article_text_orig):
             continue
 

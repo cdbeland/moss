@@ -33,7 +33,7 @@ probably_wrong = ["T1", "TS+DOT", "TS+COMMA", "TS+EXTRA", "HB", "HL", "T/", "TE"
                   # These need {{lang}} and also to be added to the
                   # English Wiktionary; might be misspelled.
                   "TF+el", "TF+de"]
-probably_right = ["L", "C", "D"]
+probably_right = ["L", "CN", "CF", "D"]
 
 
 line_parser_re = re.compile(r"^(.*?)\t\* \d+ - \[\[(.*?)\]\] - (.*$)")

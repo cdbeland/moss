@@ -16,10 +16,12 @@
 # BC = Bad character
 # Z = Decimal fraction missing leading zero (includes calibers and
 #     batting averages that need a link in the article)
+# CF = Chemical formula (if not using subscripts)
 #
 # Probably OK:
 #
-# C = Chemistry
+# CN = Chemical name
+# CH = Chess notation
 # D = DNA sequence
 # P = Pattern of some kind (rhyme scheme, reduplication)
 # L = Probable Romanization (transLiteration)
@@ -56,16 +58,6 @@ ag_re = re.compile(r"^[a-g]+$")
 mz_re = re.compile(r"[m-z]")
 dna_re = re.compile(r"^[acgt]+$")
 missing_leading_zero_re = re.compile(r"[ ^]\.\d")
-chem_re = re.compile(
-    r"(\d+\-|(D\-|\-)?\d+,\d\-?|N\d+,N\d+\-?|,\d+|"
-    r"mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
-    r"hydrogen|hydroxy|"
-    r"methyl|phenyl|acetate|ene|ine|ane|ide|hydro|nyl|ate$|ium$|acetyl|"
-    r"gluco|aminyl|galacto|pyro|benz|brom|amino|fluor|glyc|cholester|ase$|"
-    r"chlor|oxy|nitr|silic|phosph|nickel|copper|iron|carb|sulf|alumin|arsen|magnesium|mercury|lead|calcium|"
-    r"propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
-    r"cyclo|poly|iso|^Bis|methan|ase|delta\d+|late$|meth|ate$|dione|butan)+",
-    flags=re.I)
 
 known_html_bad = {"<tt>", "<li>", "<ol>", "<ul>", "<table>", "<th>",
                   "<tr>", "<td>", "<i>", "<em>", "<dd>", "<dt>",
@@ -200,8 +192,18 @@ def make_suggestion_dict(input_list):
     return suggestion_dict
 
 
-# -- Chemistry ---
+# -- Chemistry and math and chess ---
 
+chem_re = re.compile(
+    r"(\d+\-|(D\-|\-)?\d+,\d\-?|N\d+,N\d+\-?|,\d+|"
+    r"mono|di|bi|tri|tetr|pent|hex|hept|oct|nona|deca|"
+    r"hydrogen|hydroxy|"
+    r"methyl|phenyl|acetate|ene|ine|ane|ide|hydro|nyl|ate$|ium$|acetyl|"
+    r"gluco|aminyl|galacto|pyro|benz|brom|amino|fluor|glyc|cholester|ase$|"
+    r"chlor|oxy|nitr|silic|phosph|nickel|copper|iron|carb|sulf|alumin|arsen|magnesium|mercury|lead|calcium|"
+    r"propyl|itol|ethyl|oglio|stearyl|alkyl|ethan|amine|ether|keton|oxo|pyri|ine$|"
+    r"cyclo|poly|iso|^Bis|methan|ase|delta\d+|late$|meth|ate$|dione|butan)+",
+    flags=re.I)
 
 element_symbols = [
     "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S",
@@ -219,16 +221,22 @@ chem_roman_numerals = ["II", "III", "IV", "VI", "VII", "VIII", "IX"]
 
 element_alternation = "(" + "|".join(element_symbols) + ")"
 roman_alternation = "(" + "|".join(chem_roman_numerals) + ")"
+num_pat = "([2-9]|[1-9][0-9])?"
+elem_plus_num = element_alternation + num_pat
 
 chem_formula_regexes = [
-    rf"^{element_alternation}+$",                            # NaCl
-    rf"^{element_alternation}+\({element_alternation}+\)$",  # Ca(OH)
+    rf"^({elem_plus_num})+$",                 # NaCl, H2O (violates [[MOS:SUB]])
+    rf"^{elem_plus_num}+\({elem_plus_num}+\)$",  # Ca(OH)
+    rf"^{elem_plus_num}([·∙][0-9]*{elem_plus_num})+$",  # MgCl2·6H2O
     rf"^{element_alternation}+\({roman_alternation}\)$",     # Mn(II)
 ]
 chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
+chem_exclude_re = re.compile(r"^[HBNOFPSKVUR][1-9][0-9]$")  # Implausible chemical, probable model number
 
 math_re = re.compile(r"^([A-Za-z]{1,2}\([A-Za-z]{1,2}\)|log\([a-z0-9]\)|[A-Za-zΑ-Ωα-ω0-9]{2,3})$")
 greek_letter_present_re = re.compile(r"[Α-Ωα-ω]")
+
+chess_re = re.compile(r"^[KQRBNP][a-h][1-8]$")
 
 
 def is_math(word):
@@ -242,12 +250,19 @@ def is_math(word):
     return False
 
 
+# [[Algebraic notation (chess)]]
+def is_chess_notation(word):
+    if chess_re(word):
+        return True
+    return False
+
+
 # Note: This may malfunction slightly if there are commas inside the
 # chemical name.
 # https://en.wikipedia.org/wiki/IUPAC_nomenclature_of_inorganic_chemistry
 # https://en.wikipedia.org/wiki/IUPAC_nomenclature_of_organic_chemistry
 # https://en.wikipedia.org/wiki/Chemical_nomenclature
-def is_chemistry_word(word):
+def is_chemical_name(word):
     small_word = None
     small_word_last = word
     while True:
@@ -270,7 +285,13 @@ def is_chemistry_word(word):
         return True
     if "dinyl)" in word or "(propylene" in word or "bis(" in word:
         return True
+
+
+# Overlaps with is_chess_notation()
+def is_chemical_formula(word):
     if chem_formula_re.match(word):
+        if chem_exclude_re.match(word):
+            return False
         return True
     return False
 
@@ -476,8 +497,12 @@ def get_word_category(word):
 
     if missing_leading_zero_re.search(word):
         return "Z"
-    elif is_chemistry_word(word):
-        return "C"  # Should be before "ME"
+    elif is_chess_notation(word):
+        return "CH"  # Should be before "CF"
+    elif is_chemical_name(word):
+        return "CN"  # Should be before "ME"
+    elif is_chemical_formula(word):
+        return "CF"
     elif is_english_compound(word):
         return "ME"
 
