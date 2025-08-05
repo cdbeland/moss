@@ -222,15 +222,17 @@ chem_roman_numerals = ["II", "III", "IV", "VI", "VII", "VIII", "IX"]
 element_alternation = "(" + "|".join(element_symbols) + ")"
 roman_alternation = "(" + "|".join(chem_roman_numerals) + ")"
 num_pat = "([2-9]|[1-9][0-9])?"
-elem_plus_num = element_alternation + num_pat
+elem_plus_num = f"({element_alternation}{num_pat})"
 
-chem_formula_regexes = [
-    rf"^({elem_plus_num})+$",                 # NaCl, H2O (violates [[MOS:SUB]])
-    rf"^{elem_plus_num}+\({elem_plus_num}+\)$",  # Ca(OH)
-    rf"^{elem_plus_num}([·∙][0-9]*{elem_plus_num})+$",  # MgCl2·6H2O
-    rf"^{element_alternation}+\({roman_alternation}\)$",     # Mn(II)
-]
-chem_formula_re = re.compile("(" + "|".join(chem_formula_regexes) + ")")
+
+chem_formula_re = re.compile(
+    rf"^{elem_plus_num}+" + "(" +
+    r"$|" +                                # NaCl, O2, H2O (numbers violate [[MOS:SUB]])
+    rf"\({elem_plus_num}+\)$|" +           # Ca(OH)
+    rf"([·∙][0-9]*{elem_plus_num}+)+$|" +  # MgCl2·6H2O
+    rf"\({roman_alternation}\)$" +         # Mn(II)
+    ")")
+
 chem_exclude_re = re.compile(r"^[HBNOFPSKVUR][1-9][0-9]$")  # Implausible chemical, probable model number
 
 math_re = re.compile(r"^([A-Za-z]{1,2}\([A-Za-z]{1,2}\)|log\([a-z0-9]\)|[A-Za-zΑ-Ωα-ω0-9]{2,3})$")
