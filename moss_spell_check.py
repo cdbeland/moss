@@ -445,8 +445,9 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
         # Index typo by article
         article_oops_list.append(word_mixedcase)
 
-    article_oops_string = u"𝆃".join(article_oops_list)
-    print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string), flush=True)
+    if article_oops_list:
+        article_oops_string = u"𝆃".join(article_oops_list)
+        print("@\t%s\t%s\t%s" % (len(article_oops_list), article_title, article_oops_string), flush=True)
     return (article_title, article_oops_list)
 
 
