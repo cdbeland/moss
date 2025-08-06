@@ -254,7 +254,7 @@ def is_math(word):
 
 # [[Algebraic notation (chess)]]
 def is_chess_notation(word):
-    if chess_re(word):
+    if chess_re.match(word):
         return True
     return False
 
