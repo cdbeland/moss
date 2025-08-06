@@ -166,6 +166,10 @@ language_divider_re = re.compile(r"^== *([^=]+) *==$")
 
 
 def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=False):
+    return spellcheck_all_langs_wikt(article_title, article_text, include_quotations=True)
+
+
+def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=False):
     language_this_part = ""
     text_this_part = ""
     article_parts = defaultdict(list)
