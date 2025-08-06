@@ -9,7 +9,6 @@ from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, ignore_
 from spell import is_word_spelled_correctly, bad_words
 from word_categorizer import is_chemical_name, is_chemical_formula, is_chess_notation
 
-
 # TODO:
 # * Flag articles for topic (e.g. species, genus) and language hints
 #   (country name, language name, {{lang}} and {{transl}})
@@ -163,7 +162,7 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
     return False
 
 
-language_divider_re = re.compile(r"^== *(.*?) *==$")
+language_divider_re = re.compile(r"^== *([^=]+) *==$")
 
 
 def spellcheck_all_langs_wikt(article_title, article_text):
@@ -176,6 +175,8 @@ def spellcheck_all_langs_wikt(article_title, article_text):
             if text_this_part:
                 article_parts[language_this_part] = text_this_part
             language_this_part = result.group(1)
+            text_this_part = ""
+        text_this_part += line + "\n"
     # Last part won't have a section header to trigger it
     if text_this_part:
         article_parts[language_this_part] = text_this_part
@@ -487,7 +488,9 @@ def tally_misspelled_words(result):
     # separately, and tracks the language name for sorting purposes
     if type(result) is list:
         for result_part in result:
+            # Only useful for its side effects
             tally_misspelled_words(result_part)
+            return
 
     (article_title, article_oops_list) = result
     global misspelled_words
@@ -499,7 +502,7 @@ def tally_misspelled_words(result):
 
 
 if __name__ == '__main__':
-    # Allow spell-checking only articles starting with a single letter of the alphabet
+    # Allow spell-checking a subset of articles based on the first letter of their titles, or all
     which_articles = "ALL"
     if len(sys.argv) > 1:
         which_articles = sys.argv[1]
