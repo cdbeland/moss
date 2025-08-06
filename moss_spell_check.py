@@ -153,8 +153,10 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
     if is_chemical_formula(word_mixedcase):
         # Subscripts are stripped out in the main spell check, but the
         # formula only violates [[MOS:SUB]] if it does *not* use
-        # subscripts or a chem template.
-        if word_mixedcase in article_text_orig:
+        # subscripts or a chem template. (Thus if the formula has
+        # changed due to stripping of <sub>, it can safely be ignored
+        # in context.)
+        if word_mixedcase not in article_text_orig:
             return True
 
     return False
@@ -279,9 +281,6 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
     found_bad_words = bad_words_apos_re.findall(article_text)
     for bad_word in found_bad_words:
         article_oops_list.append(bad_word)
-
-    article_oops_list = [oops for oops in article_oops_list
-                         if not ignore_typo_in_context(oops, article_text_orig)]
 
     # -- Generate and fix tokenization of word_list --
 
@@ -433,17 +432,19 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
         if is_spelling_correct is True:
             continue
         if is_spelling_correct == "uncertain":
-            if not batting_average_re.search(word_mixedcase):
+            if not ignore_typo_in_context(word_mixedcase, article_text_orig):
                 print("G\t%s\t%s" % (word_mixedcase, article_title), flush=True)
                 # "G" for "iGnored but maybe shouldn't be"
                 continue
-        if ignore_typo_in_context(word_mixedcase, article_text_orig):
-            continue
 
         # - Word is misspelled -
 
         # Index typo by article
         article_oops_list.append(word_mixedcase)
+
+    # Exceptions - words and written forms not in the dictionary
+    article_oops_list = [oops for oops in article_oops_list
+                         if not ignore_typo_in_context(oops, article_text_orig)]
 
     if article_oops_list:
         article_oops_string = u"𝆃".join(article_oops_list)
