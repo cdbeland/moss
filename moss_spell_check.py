@@ -186,7 +186,7 @@ def spellcheck_all_langs_wikt(article_title, article_text):
         spell_check_result = spellcheck_all_langs(f"{article_title}#{article_part}",
                                                   part_text,
                                                   wiktionary=True)
-        if spell_check_result:
+        if spell_check_result and spell_check_result[1]:
             result_list.append(spell_check_result)
 
     return result_list
@@ -490,7 +490,7 @@ def tally_misspelled_words(result):
         for result_part in result:
             # Only useful for its side effects
             tally_misspelled_words(result_part)
-            return
+        return
 
     (article_title, article_oops_list) = result
     global misspelled_words
