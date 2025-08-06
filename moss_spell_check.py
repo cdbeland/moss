@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collections import defaultdict
 import nltk
 import re
 import sys
@@ -162,8 +163,32 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
     return False
 
 
+language_divider_re = re.compile(r"^== *(.*?) *==$")
+
+
 def spellcheck_all_langs_wikt(article_title, article_text):
-    return spellcheck_all_langs(article_title, article_text, wiktionary=True)
+    language_this_part = ""
+    text_this_part = ""
+    article_parts = defaultdict(list)
+    for line in article_text.split("\n"):
+        result = language_divider_re.match(line)
+        if result:
+            if text_this_part:
+                article_parts[language_this_part] = text_this_part
+            language_this_part = result.group(1)
+    # Last part won't have a section header to trigger it
+    if text_this_part:
+        article_parts[language_this_part] = text_this_part
+
+    result_list = []
+    for (article_part, part_text) in article_parts.items():
+        spell_check_result = spellcheck_all_langs(f"{article_title}#{article_part}",
+                                                  part_text,
+                                                  wiktionary=True)
+        if spell_check_result:
+            result_list.append(spell_check_result)
+
+    return result_list
 
 
 def spellcheck_all_langs(article_title, article_text, wiktionary=False):
@@ -457,6 +482,13 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
 def tally_misspelled_words(result):
     if not result:
         return
+
+    # For Wiktionary, which spell-checks each language for an entry
+    # separately, and tracks the language name for sorting purposes
+    if type(result) is list:
+        for result_part in result:
+            tally_misspelled_words(result_part)
+
     (article_title, article_oops_list) = result
     global misspelled_words
     for word_mixedcase in article_oops_list:
