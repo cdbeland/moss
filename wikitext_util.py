@@ -264,7 +264,6 @@ early_substitutions = [
     (re.compile(r"{{dirprod}}", flags=re.I), "⊗"),
     (re.compile(r"{{DELTA}}"), "Δ"),
     (re.compile(r"{{circle}}", flags=re.I), "￼"),
-    (re.compile(r"{{angle bracket\|(.*?)}}", flags=re.I), "⟨$1⟩"),
     (re.compile(r"{{beta letter}}", flags=re.I), "β"),
 
     (re.compile(r"{{em\|(.*?)}}", flags=re.I), "$1"),
