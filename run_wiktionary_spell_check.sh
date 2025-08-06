@@ -87,6 +87,18 @@ echo >> tmp-wikt-typos.txt
 # Add language column data requested by User:Jberkel
 cat tmp-wikt-typos.txt | perl -pe 's/#([^\[]+)\]\]$/#$1]] || $1/' > post-wikt-typos.txt
 
+# --- MOST WANTED NO QUOTATIONS ---
+
+echo '{| class="wikitable sortable"' > post-wikt-most-wanted-no-quotations.txt
+echo "|-" >> post-wikt-most-wanted-no-quotations.txt
+echo "! Typo class" >> post-wikt-most-wanted-no-quotations.txt
+echo "! Typo freq" >> post-wikt-most-wanted-no-quotations.txt
+echo "! Possible typo" >> post-wikt-most-wanted-no-quotations.txt
+echo "! Pages" >> post-wikt-most-wanted-no-quotations.txt
+echo "! Language" >> post-wikt-most-wanted-no-quotations.txt
+grep -vP "^(H|HB|HL|BC|BW)" tmp-words-with-articles-wikt.txt | perl -pe 's/^(.*?)\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3 || $4/' | perl -pe 's/#([^\[]+)\]\]$/#$1]] || $1/' >> post-wikt-most-wanted-no-quotations.txt
+echo "|}" >> post-wikt-most-wanted-no-quotations.txt
+
 # --- WITH QUOTATIONS ---
 
 # Run time: About 10 min
