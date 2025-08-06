@@ -165,7 +165,7 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
 language_divider_re = re.compile(r"^== *([^=]+) *==$")
 
 
-def spellcheck_all_langs_wikt(article_title, article_text):
+def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=False):
     language_this_part = ""
     text_this_part = ""
     article_parts = defaultdict(list)
@@ -185,14 +185,15 @@ def spellcheck_all_langs_wikt(article_title, article_text):
     for (article_part, part_text) in article_parts.items():
         spell_check_result = spellcheck_all_langs(f"{article_title}#{article_part}",
                                                   part_text,
-                                                  wiktionary=True)
+                                                  wiktionary=True,
+                                                  include_quotations=include_quotations)
         if spell_check_result and spell_check_result[1]:
             result_list.append(spell_check_result)
 
     return result_list
 
 
-def spellcheck_all_langs(article_title, article_text, wiktionary=False):
+def spellcheck_all_langs(article_title, article_text, wiktionary=False, include_quotations=False):
     # WARNING: This function runs in subprocesses, and cannot
     # change global context variables. (It CAN print.)
 
@@ -227,7 +228,7 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
 
     article_text_orig = article_text
     article_text = wikitext_to_plaintext(article_text)
-    article_text = get_main_body_wikitext(article_text, wiktionary)
+    article_text = get_main_body_wikitext(article_text, include_quotations=include_quotations)
 
     # This can break wikitext_to_plaintext() in ways that cause wiki
     # syntax to be mistaken for prose.

@@ -16,7 +16,7 @@ echo `date`
 
 # Few if any English misspellings: H, BW, TF, T/, A, BC, P, L
 
-tac tmp-wiktionary-spell.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles-wikt.txt
+tac tmp-wiktionary-spell.txt | grep '^*' | ../venv/bin/python3 ../wbord_categorizer.py > tmp-words-with-articles-wikt.txt
 
 echo "==Possible typos from (DUMP NAME) ==" > tmp-wikt-typos.txt
 
@@ -104,9 +104,22 @@ echo "|}" >> post-wikt-most-wanted-no-quotations.txt
 # Run time: About 10 min
 tac tmp-wiktionary-spell-with-quotations.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles-wikt-with-quotations.txt
 
+
+# Most common HTML typos
 grep -P "^(HB|HL)" tmp-words-with-articles-wikt-with-quotations.txt | perl -pe "s/^HB\t//" | perl -pe 's/</&lt;/g' | perl -pe 's/>/&gt;/g' | grep -v "Unsupported titles/HTML" > post-wikt-html-with-quotations.txt
 
-grep -vP "^(HB|HL|BW|BC|H|TS)" tmp-words-with-articles-wikt-with-quotations.txt | perl -pe "s/^.*?\t//" | grep -v "(" | grep -v ")" | sort -rn -k2 | head -50 > post-wikt-most-wanted-with-quotations.txt
+# Most common typos / wanted entries with quotations
+echo '{| class="wikitable sortable"' > post-wikt-most-wanted-with-quotations.txt
+echo "|-" >> post-wikt-most-wanted-with-quotations.txt
+echo "! Typo class" >> post-wikt-most-wanted-with-quotations.txt
+echo "! Typo freq" >> post-wikt-most-wanted-with-quotations.txt
+echo "! Possible typo" >> post-wikt-most-wanted-with-quotations.txt
+echo "! Pages" >> post-wikt-most-wanted-with-quotations.txt
+echo "! Language" >> post-wikt-most-wanted-with-quotations.txt
+grep -vP "^(H|HB|HL|BC|BW|TS)" tmp-words-with-articles-wikt-with-quotations.txt | perl -pe "s/^.*?\t//" | grep -v "(" | grep -v ")" | sort -rn -k2 | head -50 | perl -pe 's/^(.*?)\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3 || $4/' | perl -pe 's/#([^\[]+)\]\]$/#$1]] || $1/' >> post-wikt-most-wanted-with-quotations.txt
+echo "|}" >> post-wikt-most-wanted-with-quotations.txt
+
+# ---
 
 echo "Done post-processing"
 echo `date`

@@ -534,7 +534,7 @@ wikt_line_starts_with_re = re.compile(r"\n#\*[^\n]*")
 # Quotations, often with archaic spelling
 
 
-def get_main_body_wikitext(wikitext_input, strong=False, wiktionary=False):
+def get_main_body_wikitext(wikitext_input, strong=False, include_quotations=False):
     # Ignore non-prose and segments not parsed for grammar, spelling, etc.
 
     # TODO: Get smarter about these sections.  But for now, ignore
@@ -558,7 +558,7 @@ def get_main_body_wikitext(wikitext_input, strong=False, wiktionary=False):
         wikitext_working = parenthetical_re.sub("", wikitext_working)
         wikitext_working = ignore_lists_re.sub("", wikitext_working)
 
-    if wiktionary:
+    if not include_quotations:
         wikitext_working = wikt_line_starts_with_re.sub("", wikitext_working)
 
     """
