@@ -212,7 +212,7 @@ echo "Starting chemical formulas report"
 echo `date`
 echo "====Possible chemical formulas that don't use subscripts====" > post-chemical-formulas.txt
 
-grep -P '^(?!CF/)' tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-chemical-formulas.txt
+grep ^CF tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-chemical-formulas.txt
 
 echo "" >> post-chemical-formulas.txt
 echo "====Known chemical formulas that don't use subscripts====" >> post-chemical-formulas.txt

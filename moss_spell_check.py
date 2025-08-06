@@ -459,9 +459,10 @@ def spellcheck_all_langs(article_title, article_text, wiktionary=False):
             continue
         if is_spelling_correct == "uncertain":
             if not ignore_typo_in_context(word_mixedcase, article_text_orig):
-                print("G\t%s\t%s" % (word_mixedcase, article_title), flush=True)
-                # "G" for "iGnored but maybe shouldn't be"
-                continue
+                if not is_chemical_formula(word_mixedcase):
+                    print("G\t%s\t%s" % (word_mixedcase, article_title), flush=True)
+                    # "G" for "iGnored but maybe shouldn't be"
+                    continue
 
         # - Word is misspelled -
 
