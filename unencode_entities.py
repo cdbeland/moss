@@ -1308,9 +1308,6 @@ transform = {
     "&bullet;": "•",
     "&hyphen;": "-",
 
-    # Random control character
-    "\x01": "",
-
     # Raw non-breaking space
     "\xA0": "&nbsp;",
 
