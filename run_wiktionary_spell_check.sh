@@ -58,7 +58,7 @@ grep ^TE tmp-words-with-articles-wikt.txt | perl -pe 's/^TE\t\* ([0-9]+) - (\[\[
 echo "|}" >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 
-echo "===C===" >> post-wikt-typos.txt
+echo "===CN===" >> post-wikt-typos.txt
 echo "Chemistry-related words." >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 echo '{| class="wikitable sortable"' >> post-wikt-typos.txt
@@ -66,7 +66,7 @@ echo "|-" >> post-wikt-typos.txt
 echo "! Typo freq" >> post-wikt-typos.txt
 echo "! Possible typo" >> post-wikt-typos.txt
 echo "! Pages" >> post-wikt-typos.txt
-grep ^C tmp-words-with-articles-wikt.txt | perl -pe 's/^C\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> post-wikt-typos.txt
+grep ^CN tmp-words-with-articles-wikt.txt | perl -pe 's/^CN\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> post-wikt-typos.txt
 echo "|}" >> post-wikt-typos.txt
 echo >> post-wikt-typos.txt
 
