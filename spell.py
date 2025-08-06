@@ -692,7 +692,7 @@ numerator_words = {
     "µg",
     "g",
     "mg",
-    "l",
+    "L",
     "µmol",
     "people",  # Not persons
     "inhabitants",  # Not inhab, hab
@@ -702,16 +702,16 @@ numerator_words = {
 
 demoninator_words = {
     "m",
-    "m²",
-    "m³",
-    "km²",
+    "m2",
+    "m3",
+    "km2",
     "cm",
-    "cm³",
-    "mi²",
-    "ft²",
-    "µl",
-    "ml",  # or mL?
-    "dl",  # or dL?
+    "cm3",
+    "mi2",
+    "ft2",
+    "µL",
+    "mL",
+    "dL",
     "g",
     "kg",
     "s",
