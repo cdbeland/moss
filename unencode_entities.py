@@ -1309,7 +1309,7 @@ transform = {
     "&hyphen;": "-",
 
     # Random control character
-    "\x0A": "",
+    "\x01": "",
 
     # Raw non-breaking space
     "\xA0": "&nbsp;",
