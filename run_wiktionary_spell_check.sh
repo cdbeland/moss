@@ -16,7 +16,7 @@ echo `date`
 
 # Few if any English misspellings: H, BW, TF, T/, A, BC, P, L
 
-tac tmp-wiktionary-spell.txt | grep '^*' | ../venv/bin/python3 ../wbord_categorizer.py > tmp-words-with-articles-wikt.txt
+tac tmp-wiktionary-spell.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles-wikt.txt
 
 echo "==Possible typos from (DUMP NAME) ==" > tmp-wikt-typos.txt
 

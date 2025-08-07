@@ -165,7 +165,7 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
 language_divider_re = re.compile(r"^== *([^=]+) *==$")
 
 
-def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=False):
+def spellcheck_all_langs_wikt_with_quotations(article_title, article_text):
     return spellcheck_all_langs_wikt(article_title, article_text, include_quotations=True)
 
 
