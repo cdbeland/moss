@@ -96,7 +96,11 @@ echo "! Typo freq" >> post-wikt-most-wanted-no-quotations.txt
 echo "! Possible typo" >> post-wikt-most-wanted-no-quotations.txt
 echo "! Pages" >> post-wikt-most-wanted-no-quotations.txt
 echo "! Language" >> post-wikt-most-wanted-no-quotations.txt
-grep -vP "^(H|HB|HL|BC|BW)" tmp-words-with-articles-wikt.txt | perl -pe 's/^(.*?)\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3 || $4/' | perl -pe 's/#([^\[]+)\]\]$/#$1]] || $1/' >> post-wikt-most-wanted-no-quotations.txt
+
+# TODO: Permute "box(es)" and "box[es]" into "box" and "boxes", so
+# removal of unmatched ()[] are not necessary here and blow for
+# with-quotations.
+grep -vP "^(H|HB|HL|BC|BW)" tmp-words-with-articles-wikt.txt | grep -v "(" | grep -v ")" | grep -viP '[a-z: ][\]\[][a-z ]' | perl -pe 's/^(.*?)\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3 || $4/' | perl -pe 's/#([^\[]+)\]\]$/#$1]] || $1/' >> post-wikt-most-wanted-no-quotations.txt
 echo "|}" >> post-wikt-most-wanted-no-quotations.txt
 
 # --- WITH QUOTATIONS ---
