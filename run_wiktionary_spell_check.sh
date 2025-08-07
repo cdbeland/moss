@@ -66,7 +66,7 @@ echo "! Typo freq" >> tmp-wikt-typos.txt
 echo "! Possible typo" >> tmp-wikt-typos.txt
 echo "! Pages" >> tmp-wikt-typos.txt
 echo "! Language" >> tmp-wikt-typos.txt
-grep ^CN tmp-words-with-articles-wikt.txt | perl -pe 's/^CN\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
+grep ^CN tmp-words-with-articles-wikt.txt | perl -pe 's/^CN\t\* ([0-9]+) - (\[\[.+?\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
 echo "|}" >> tmp-wikt-typos.txt
 echo >> tmp-wikt-typos.txt
 
@@ -80,7 +80,7 @@ echo "! Typo freq" >> tmp-wikt-typos.txt
 echo "! Possible typo" >> tmp-wikt-typos.txt
 echo "! Pages" >> tmp-wikt-typos.txt
 echo "! Language" >> tmp-wikt-typos.txt
-grep ^TS tmp-words-with-articles-wikt.txt | perl -pe 's/^TS\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
+grep ^TS tmp-words-with-articles-wikt.txt | perl -pe 's/^TS\t\* ([0-9]+) - (\[\[.+?\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
 echo "|}" >> tmp-wikt-typos.txt
 echo >> tmp-wikt-typos.txt
 
