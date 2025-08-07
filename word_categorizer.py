@@ -216,6 +216,7 @@ element_symbols = [
     "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og",
     "R"  # Not an element; for [[substiuent]]s ("R groups")
 ]
+upper_only_symbols = "".join([e for e in element_symbols if len(e) == 1])
 
 chem_roman_numerals = ["II", "III", "IV", "VI", "VII", "VIII", "IX"]
 
@@ -233,7 +234,22 @@ chem_formula_re = re.compile(
     rf"\({roman_alternation}\)$" +         # Mn(II)
     ")")
 
-chem_exclude_re = re.compile(r"^[HBNOFPSKVUR][1-9][0-9]$")  # Implausible chemical, probable model number
+chem_exclude_re = re.compile(r"^("
+
+                             # Implausible chemical, probable model number
+                             + rf"[{upper_only_symbols}]+[1-9][0-9]|"
+
+                             # Probably an acronym, possibly pluralized
+                             + r"[" + upper_only_symbols + r"]{3,}s?|"
+
+                             # Catalog numbers, acryonyms, proteins, DNA markers, etc.
+                             + r"[" + upper_only_symbols + r"]{3,}[0-9]+|"
+
+                             + r")$|"
+
+                             # Unusually large numbers
+                             + r"[^CHNO][4-9][0-9]"
+                             )
 
 math_re = re.compile(r"^([A-Za-z]{1,2}\([A-Za-z]{1,2}\)|log\([a-z0-9]\)|[A-Za-zΑ-Ωα-ω0-9]{2,3})$")
 greek_letter_present_re = re.compile(r"[Α-Ωα-ω]")
