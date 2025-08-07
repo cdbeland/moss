@@ -472,7 +472,12 @@ def tag_by_lang(word):
 
     lang_code = google_lang_detector.FindLanguage(word).language
     if lang_code == "en":
-        return "TE"
+        if az_plus_re.match(word):
+            return "TE"
+        else:
+            # English does not have diacritics, MIT Technology Review
+            # and The New Yorker notwithstanding.
+            return "TF+?"
     else:
         if lang_code == "iw":
             lang_code = "he"
