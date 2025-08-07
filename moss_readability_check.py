@@ -77,7 +77,7 @@ def check_reading_level(article_title, article_text):
         return
 
     article_text = wikitext_to_plaintext(article_text)
-    article_text = get_main_body_wikitext(article_text, strong=True)
+    article_text = get_main_body_wikitext(article_text, ignore_nonprose=True)
     article_text = article_text.replace("✂", "")
 
     # Non-prose is out of scope for readability metrics

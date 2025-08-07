@@ -534,19 +534,20 @@ wikt_line_starts_with_re = re.compile(r"\n#\*[^\n]*")
 # Quotations, often with archaic spelling
 
 
-def get_main_body_wikitext(wikitext_input, strong=False, include_quotations=False):
+def get_main_body_wikitext(wikitext_input, ignore_nonprose=False, include_quotations=False):
     # Ignore non-prose and segments not parsed for grammar, spelling, etc.
 
     # TODO: Get smarter about these sections.  But for now, ignore
     # them, since they are full of proper nouns and URL words.
     wikitext_working = ignore_sections_re.sub("", wikitext_input)
 
-    wikitext_working = prose_quote_re.sub("✂", wikitext_working)
-    wikitext_working = prose_quote_curly_re.sub("✂", wikitext_working)
-    wikitext_working = bold_italics_re.sub(r"\1✂\3", wikitext_working)
-    wikitext_working = italics_re.sub(r"\1✂\3", wikitext_working)
-    wikitext_working = single_quote_re.sub(r"\1✂\3", wikitext_working)
-    wikitext_working = blockquote_re.sub("✂", wikitext_working)
+    if not include_quotations:
+        wikitext_working = prose_quote_re.sub("✂", wikitext_working)
+        wikitext_working = prose_quote_curly_re.sub("✂", wikitext_working)
+        wikitext_working = bold_italics_re.sub(r"\1✂\3", wikitext_working)
+        wikitext_working = italics_re.sub(r"\1✂\3", wikitext_working)
+        wikitext_working = single_quote_re.sub(r"\1✂\3", wikitext_working)
+        wikitext_working = blockquote_re.sub("✂", wikitext_working)
     wikitext_working = ignore_headers_re.sub("", wikitext_working)
     wikitext_working = line_starts_with_re.sub("", wikitext_working)
 
@@ -554,7 +555,7 @@ def get_main_body_wikitext(wikitext_input, strong=False, include_quotations=Fals
     for (regex, replacement) in substitutions_bold_italics:
         wikitext_working = regex.sub(replacement, wikitext_working)
 
-    if strong:
+    if ignore_nonprose:
         wikitext_working = parenthetical_re.sub("", wikitext_working)
         wikitext_working = ignore_lists_re.sub("", wikitext_working)
 
@@ -562,7 +563,9 @@ def get_main_body_wikitext(wikitext_input, strong=False, include_quotations=Fals
         wikitext_working = wikt_line_starts_with_re.sub("", wikitext_working)
 
     """
-    # TODO: Do the same thing for italics and single quote passages
+    # TODO: Do the same thing for italics and single quote
+    # passages. Better yet, find these in this function and return
+    # them separately, for efficiency.
 
     quotation_list = blockquote_re.findall(article_text)
     quotation_list.extend(prose_quote_re.findall(article_text))

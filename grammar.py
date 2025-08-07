@@ -121,7 +121,7 @@ def check_english(wikitext, title):
     # Ignore bad grammar in quotations and poems
     wikitext = blockquote_re.sub("✂", wikitext)
 
-    plaintext = get_main_body_wikitext(wikitext_to_plaintext(wikitext), strong=True)
+    plaintext = get_main_body_wikitext(wikitext_to_plaintext(wikitext), ignore_nonprose=True)
     sentences = []
 
     # Tokenizing paragraphs individually helps prevent NLTK from
@@ -342,7 +342,7 @@ def fetch_article_plaintext(title):
     site = Site()
     page = Page(site, title=title)
     plaintext = wikitext_to_plaintext(page.text)
-    return get_main_body_wikitext(plaintext, strong=True)
+    return get_main_body_wikitext(plaintext, ignore_nonprose=True)
 
 
 # TODO: For later command-line use
