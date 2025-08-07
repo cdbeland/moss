@@ -501,7 +501,11 @@ def tally_misspelled_words(result):
     (article_title, article_oops_list) = result
     global misspelled_words
     for word_mixedcase in article_oops_list:
-        word_lower = word_mixedcase.lower()
+        if is_chemical_formula(word_mixedcase):
+            # Retain capitalization for correct word categorization later
+            word_lower = word_mixedcase
+        else:
+            word_lower = word_mixedcase.lower()
         (freq, existing_list) = misspelled_words.get(word_lower, (0, []))
         existing_list.append(article_title)
         misspelled_words[word_lower] = (len(existing_list), existing_list)
