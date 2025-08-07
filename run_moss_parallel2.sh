@@ -212,7 +212,10 @@ echo "Starting chemical formulas report"
 echo `date`
 echo "====Possible chemical formulas that don't use subscripts====" > post-chemical-formulas.txt
 
-grep ^CF tmp-words-with-articles.txt | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all >> post-chemical-formulas.txt
+grep ^CF tmp-words-with-articles.txt | grep -P "wikt:[^\]]*[0-9]" | perl -pe 's/.*?\t//' | ../venv/bin/python3 ../summarizer.py --find-all > tmp-all-cf-num.txt
+
+# TODO: Use word_categorizer.chem_re here in a Python filtering script
+grep -P "chem|compounds|acid|ferr|oxy|ide\]\]|ate\]\]|materials|alloy|mono|hydro|pent|hex|hept|nona|deca|ium\]\]|[hntkp]yl|fluor|chlor|cyclo|poly|iso" tmp-all-cf-num.txt >> post-chemical-formulas.txt
 
 echo "" >> post-chemical-formulas.txt
 echo "====Known chemical formulas that don't use subscripts====" >> post-chemical-formulas.txt
