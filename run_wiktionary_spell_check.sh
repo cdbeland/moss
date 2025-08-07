@@ -18,6 +18,10 @@ echo `date`
 
 tac tmp-wiktionary-spell.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles-wikt.txt
 
+# TODO: Permute "box(es)" and "box[es]" into "box" and "boxes", so
+# removal of unmatched ()[] are not necessary here and elsewhere.
+cat tmp-words-with-articles-wikt.txt | grep -vP "wikt:[^\]]*[\(\)]" | grep -viP '[a-z: ][\]\[][a-z ]' > tmp-words-with-articles-wikt-filtered.txt
+
 echo "==Possible typos from (DUMP NAME) ==" > tmp-wikt-typos.txt
 
 echo "===T1+ASCII===" > tmp-wikt-typos.txt
@@ -28,7 +32,7 @@ echo "! Typo freq" >> tmp-wikt-typos.txt
 echo "! Possible typo" >> tmp-wikt-typos.txt
 echo "! Pages" >> tmp-wikt-typos.txt
 echo "! Language" >> tmp-wikt-typos.txt
-grep ^T1 tmp-words-with-articles-wikt.txt | grep -P '\[\[wikt:[a-z]+\]\]' | perl -pe 's/^T1\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
+grep ^T1 tmp-words-with-articles-wikt-filtered.txt | grep -P '\[\[wikt:[a-z]+\]\]' | perl -pe 's/^T1\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
 echo "|}" >> tmp-wikt-typos.txt
 echo >> tmp-wikt-typos.txt
 
@@ -40,7 +44,7 @@ echo "! Typo freq" >> tmp-wikt-typos.txt
 echo "! Possible typo" >> tmp-wikt-typos.txt
 echo "! Pages" >> tmp-wikt-typos.txt
 echo "! Language" >> tmp-wikt-typos.txt
-grep ^ME tmp-words-with-articles-wikt.txt | perl -pe 's/^ME\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
+grep ^ME tmp-words-with-articles-wikt-filtered.txt | perl -pe 's/^ME\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
 echo "|}" >> tmp-wikt-typos.txt
 echo >> tmp-wikt-typos.txt
 
@@ -53,7 +57,7 @@ echo "! Typo freq" >> tmp-wikt-typos.txt
 echo "! Possible typo" >> tmp-wikt-typos.txt
 echo "! Pages" >> tmp-wikt-typos.txt
 echo "! Language" >> tmp-wikt-typos.txt
-grep ^TE tmp-words-with-articles-wikt.txt | perl -pe 's/^TE\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
+grep ^TE tmp-words-with-articles-wikt-filtered.txt | perl -pe 's/^TE\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
 echo "|}" >> tmp-wikt-typos.txt
 echo >> tmp-wikt-typos.txt
 
@@ -66,7 +70,7 @@ echo "! Typo freq" >> tmp-wikt-typos.txt
 echo "! Possible typo" >> tmp-wikt-typos.txt
 echo "! Pages" >> tmp-wikt-typos.txt
 echo "! Language" >> tmp-wikt-typos.txt
-grep ^CN tmp-words-with-articles-wikt.txt | perl -pe 's/^CN\t\* ([0-9]+) - (\[\[.+?\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
+grep ^CN tmp-words-with-articles-wikt-filtered.txt | perl -pe 's/^CN\t\* ([0-9]+) - (\[\[.+?\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
 echo "|}" >> tmp-wikt-typos.txt
 echo >> tmp-wikt-typos.txt
 
@@ -80,7 +84,7 @@ echo "! Typo freq" >> tmp-wikt-typos.txt
 echo "! Possible typo" >> tmp-wikt-typos.txt
 echo "! Pages" >> tmp-wikt-typos.txt
 echo "! Language" >> tmp-wikt-typos.txt
-grep ^TS tmp-words-with-articles-wikt.txt | perl -pe 's/^TS\t\* ([0-9]+) - (\[\[.+?\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
+grep ^TS tmp-words-with-articles-wikt-filtered.txt | perl -pe 's/^TS\t\* ([0-9]+) - (\[\[.+?\]\]) - (.*$)/|-\n| $1 || $2 || $3/'  >> tmp-wikt-typos.txt
 echo "|}" >> tmp-wikt-typos.txt
 echo >> tmp-wikt-typos.txt
 
@@ -97,10 +101,7 @@ echo "! Possible typo" >> post-wikt-most-wanted-no-quotations.txt
 echo "! Pages" >> post-wikt-most-wanted-no-quotations.txt
 echo "! Language" >> post-wikt-most-wanted-no-quotations.txt
 
-# TODO: Permute "box(es)" and "box[es]" into "box" and "boxes", so
-# removal of unmatched ()[] are not necessary here and blow for
-# with-quotations.
-grep -vP "^(H|HB|HL|BC|BW)" tmp-words-with-articles-wikt.txt | grep -v "(" | grep -v ")" | grep -viP '[a-z: ][\]\[][a-z ]' | perl -pe 's/^(.*?)\t\* ([0-9]+) - (\[\[[^\]]+\]\]) - (.*$)/|-\n| $1 || $2 || $3 || $4/' | perl -pe 's/#([^\[]+)\]\]$/#$1]] || $1/' >> post-wikt-most-wanted-no-quotations.txt
+
 echo "|}" >> post-wikt-most-wanted-no-quotations.txt
 
 # --- WITH QUOTATIONS ---
