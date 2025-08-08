@@ -285,7 +285,7 @@ suppression_patterns = [
     # TODO: These can be URL-escaped
     re.compile(r"https?://[^ \n\|&]+"),
 
-    re.compile(r"{{[Nn]ot a typo start}}.*?{{[Nn]ot a typo end}}"),
+    re.compile(r"{{[Nn]ot a typo start}}.*?{{[Nn]ot a typo end}}", flags=re.S),
 
     re.compile(r"{{lang.*?translit=.*?}}|{{([Nn]ot a typo|[Ss]hort description|proper name|DISPLAYTITLE"
                # 7seg uses superscript = as a parameter value
