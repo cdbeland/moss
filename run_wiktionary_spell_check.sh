@@ -124,7 +124,7 @@ echo "|}" >> post-wikt-most-wanted-with-quotations.txt
 
 # ---
 
-cat tmp-words-with-articles.txt-wikt | ../venv/bin/python3 ../count_by_rating.py >> post-stats-wikt.txt
+cat tmp-words-with-articles-wikt.txt | ../venv/bin/python3 ../count_by_rating.py --wiktionary > post-stats-wikt.txt
 
 
 echo "Done post-processing"

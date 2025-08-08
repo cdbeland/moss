@@ -2,6 +2,11 @@ from collections import defaultdict
 import fileinput
 import re
 import subprocess
+import sys
+
+wiktionary = False
+if len(sys.argv) > 1 and sys.argv[1] == "--wiktionary":
+    wiktionary = True
 
 instance_re = re.compile(r"\* (\d+)")
 ratings_uniques = defaultdict(int)
@@ -35,13 +40,25 @@ print("|-")
 print("INSTANCES ALL IN ONE LINE:")
 
 ratings_sorted = [rating for (rating, uniques) in sorted_tuples]
-print("! Dump (moss version) || Parse failures (articles + articles with [[MOS:STRAIGHT]] violations) || TOTAL (instances) || " + " || ".join(ratings_sorted))
 
+header_line = "! Dump (moss version) "
+if not wiktionary:
+    header_line += "|| Parse failures (articles + articles with [[MOS:STRAIGHT]] violations) "
+header_line += "|| TOTAL (instances) || " + " || ".join(ratings_sorted)
+
+print(header_line)
 print("|-")
 
 instances_sorted = [str(ratings_instances[rating]) for (rating, uniques) in sorted_tuples]
-fails_output = subprocess.run(["wc", "-l", "err-parse-failures.txt"], capture_output=True)
-(num_failed_articles, _filename) = fails_output.stdout.decode("utf-8").split(" ")
-mos_straight_fails_output = subprocess.run(["wc", "-l", "jwb-straight-quotes-unbalanced.txt"], capture_output=True)
-(num_mos_straight_failed, _filename) = mos_straight_fails_output.stdout.decode("utf-8").split(" ")
-print(f"| DUMP# || {num_failed_articles} + {num_mos_straight_failed} || {total_instances} || " + " || ".join(instances_sorted))
+
+if not wiktionary:
+    fails_output = subprocess.run(["wc", "-l", "err-parse-failures.txt"], capture_output=True)
+    (num_failed_articles, _filename) = fails_output.stdout.decode("utf-8").split(" ")
+    mos_straight_fails_output = subprocess.run(["wc", "-l", "jwb-straight-quotes-unbalanced.txt"], capture_output=True)
+    (num_mos_straight_failed, _filename) = mos_straight_fails_output.stdout.decode("utf-8").split(" ")
+
+count_line = "| DUMP# "
+if not wiktionary:
+    count_line += "|| {num_failed_articles} + {num_mos_straight_failed} "
+count_line += f"|| {total_instances} || " + " || ".join(instances_sorted)
+print(count_line)
