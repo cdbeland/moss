@@ -10,6 +10,9 @@ from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
 # be enclosed in {{chem}} or {{chem2}} for spell-checking purposes.
 
 
+MANUAL_FORMULAS = ["MtCO2", "MtCO2e", "MtCO2eq", "GtCO2"]
+
+
 # Always returns a list, even if there are no articles in the category
 def get_articles_in_category(category_name, continue_params=None):
     article_list = []
@@ -50,6 +53,7 @@ for category_name in [
     print(f"{category_name} - {len(article_list)}", file=sys.stderr)
     formulas.extend(article_list)
 
+formulas.extend(MANUAL_FORMULAS)
 formulas = [f for f in formulas if any(char for char in list(f) if char.isdigit())]
 formulas = [f for f in formulas if "," not in f]
 formulas = [f for f in formulas if not f[0].isdigit()]
