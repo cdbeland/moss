@@ -112,11 +112,14 @@ number_formats_allowed_re = re.compile(
                        base_number_format,
                        "|".join(prefixed_number_formats)))
 
-# Word blocklist
 bad_words = {
     # Per [[MOS:YOU]]
     "you",
     "your",
+
+    # Per [[MOS:COMMONALITY]], [[wikt:gaol]],
+    # https://www.abc.net.au/listen/radionational/archived/booksandarts/jail-or-gaol-how-should-australia-spell-it/7532694
+    "gaol",
 
     "and/or",  # [[MOS:AND/OR]]
 
