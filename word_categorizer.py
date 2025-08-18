@@ -509,7 +509,7 @@ def get_word_category(word):
     suggestion = None
 
     if word.lower() in bad_words or word in bad_words:
-        # "you"
+        # "you", etc.
         return "BW"
     if word in bad_words:
         # "I'm"
