@@ -80,7 +80,7 @@ you can either add an entry to the English Wiktionary (which provides
 English definitions for words in all languages) or tag all instances
 of the word on the English Wikipedia with {{tl|lang}}.  Wiktionary
 does not accept Romanizations for some languages, so those cases must
-be tagged as {{tl|transl}} or {{tl|lang}}.
+be tagged as {{tl|transliteration}} or {{tl|lang}}.
 
 Legitimate misspellings are candidates for [[Wikipedia:Lists of common misspellings]].
 If there is an obvious correction, adding that to

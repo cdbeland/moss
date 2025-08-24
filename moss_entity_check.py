@@ -296,7 +296,7 @@ suppression_patterns = [
                # <sup>H</sup> in IPA templates); ignoring for now.
                r"|IPA|UPA|PIE|[Aa]ngle|[Aa]ngbr|[Aa]ngbr IPA|[Aa]udio-IPA"
                r"|[Ll]ang(-\w\w+)?\|"
-               r"|[Tt]ransliteration\|"
+               r"|[Tt]ransl(iteration)?\|"
                r"|[Zz]h\|"
                r"|[Ss]cript/|"
                r"|[Nn]astaliq"
