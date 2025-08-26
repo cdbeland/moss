@@ -117,8 +117,8 @@ bad_words = {
     "you",
     "your",
 
-    # Per [[MOS:COMMONALITY]], [[wikt:gaol]],
-    # https://www.abc.net.au/listen/radionational/archived/booksandarts/jail-or-gaol-how-should-australia-spell-it/7532694
+    # Per [[MOS:COMMONALITY]], and
+    # [[Wikipedia:Manual of Style/Spelling#English spelling comparison chart]]
     "gaol",
 
     "and/or",  # [[MOS:AND/OR]]

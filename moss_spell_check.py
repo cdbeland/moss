@@ -97,8 +97,10 @@ bad_words_apos = sorted([w for w in bad_words if "'" in w], key=lambda w: 100 - 
 bad_words_apos_re = re.compile(r"[^a-z](" + "|".join(bad_words_apos) + r")[^a-z]", re.I)
 
 wikt_trans_re = re.compile(r"\{\{trans-see *\|(.*?)\}\}")
+gaol_fever_re = re.compile(r"gaol fever")
 
 
+# Returning True means "yes, ignore"
 def ignore_typo_in_context(word_mixedcase, article_text_orig):
 
     # Hack to avoid having to do even more complicated token
@@ -125,6 +127,15 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
         return True
     if word_mixedcase == "<li>" and "<ol type=" in article_text_orig:
         return True
+
+    # Keep "gaol fever" as long as "jail fever" is glossed; per Google
+    # Ngrams, "gaol fever" is still more common than "jail fever", but
+    # "gaol" is not more common than "jail fever".
+    if word_mixedcase == "gaol":
+        if "jail fever" in article_text_orig:
+            article_text_copy = gaol_fever_re.sub("", article_text_orig)
+            if "gaol" not in article_text_copy:
+                return True
 
     # Exceptions made by
     # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Decimals
