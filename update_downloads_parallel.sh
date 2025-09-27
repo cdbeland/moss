@@ -51,6 +51,9 @@
 
 set -e
 
+export commit_id=`git log | head -c 14 | perl -pe "s/commit //"`
+export MOSS_USER_AGENT="mossbot/${commit_id} https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss"
+
 echo `date`
 echo "Dropping walled garden data..."
 # Both can't fit in storage at the same time

@@ -28,27 +28,28 @@ echo `date`
 echo "Downloading special pages..."
 cd /var/local/moss/bulk-wikipedia/
 
+export WGET_COMMAND='wget -o - --no-verbose --user-agent="$MOSS_USER_AGENT"'
+
 # Sync with spell.py, moss_not_english.py
 rm -f Wikispecies:Requested_articles
-wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
+$WGET_COMMAND https://species.wikimedia.org/wiki/Wikispecies:Requested_articles
 rm -f Before_2019
-wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/Before_2019
+$WGET_COMMAND https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/Before_2019
 rm -f 2020
-wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2020
+$WGET_COMMAND https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2020
 rm -f 2021
-wget -o - --no-verbose https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2021
+$WGET_COMMAND https://species.wikimedia.org/wiki/Wikispecies:Requested_articles/2021
 
 rm -f moss
-wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
+$WGET_COMMAND https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
 
 rm -f For_Wiktionary
-wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/For_Wiktionary
+$WGET_COMMAND https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/For_Wiktionary
 
 rm -f Old_case_notes
-wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/Old_case_notes
+$WGET_COMMAND https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss/Old_case_notes
 
 # For retf_offline_scan.py
-wget -o - --no-verbose https://en.wikipedia.org/wiki/Wikipedia:AutoWikiBrowser/Typos
+$WGET_COMMAND https://en.wikipedia.org/wiki/Wikipedia:AutoWikiBrowser/Typos
 
-echo `date`
 echo "Done."
