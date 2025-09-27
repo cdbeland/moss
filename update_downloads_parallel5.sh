@@ -5,7 +5,7 @@ cd /var/local/moss/bulk-wikipedia/
 
 echo `date`
 echo "Building page_categories table..."
-# Run time: About 40 minutes
+# Run time: A minute or two
 
 echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiktionary
 echo "CREATE TABLE page_categories (
@@ -17,9 +17,10 @@ echo "CREATE TABLE page_categories (
 echo "DELETE FROM page WHERE page_namespace != 0;" | mysql -D enwiktionary
 
 echo "INSERT INTO page_categories (title, category_name)
- SELECT page_title, cl_to
- FROM page, categorylinks
- WHERE page.page_id = categorylinks.cl_from;" | mysql -D enwiktionary
+ SELECT page_title, cat_title
+ FROM page, categorylinks, category
+ WHERE page.page_id = categorylinks.cl_from
+ AND category.cat_id = categorylinks.cl_target_id;" | mysql -D enwiktionary
 
 echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mysql -D enwiktionary
 echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D enwiktionary
@@ -27,7 +28,7 @@ echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D e
 echo `date`
 cd $ORIG_DIR
 venv/bin/python3 extract_english.py > /var/local/moss/bulk-wikipedia/english_words_only.txt
-# extract_english.py takes about 2.5 hours
+# Run time: 20-30 minutes?
 
 echo `date`
 echo "Done."

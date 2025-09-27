@@ -22,6 +22,10 @@ echo `date`
 rm -f enwiktionary-latest-categorylinks.sql
 wget -o - --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-categorylinks.sql.gz
 echo `date`
+rm -f enwiktionary-latest-category.sql
+wget -o - --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-category.sql.gz
+
+echo `date`
 rm -f enwiktionary-latest-all-titles-in-ns0
 wget -o - --no-verbose https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-all-titles-in-ns0.gz
 echo `date`
@@ -51,6 +55,10 @@ echo `date`
 echo "Loading enwiktionary-latest-categorylinks.sql..."
 gunzip enwiktionary-latest-categorylinks.sql
 cat enwiktionary-latest-categorylinks.sql | mysql -D enwiktionary
+echo `date`
+echo "Loading enwiktionary-latest-category.sql..."
+gunzip enwiktionary-latest-category.sql
+cat enwiktionary-latest-category.sql | mysql -D enwiktionary
 
 # Prereqs for this very long page_categories table rebuild are now
 # done; parallelize this because it only uses 1 CPU (for mysqld)
