@@ -31,7 +31,7 @@ echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D e
 echo `date`
 cd $ORIG_DIR
 venv/bin/python3 extract_english.py > /var/local/moss/bulk-wikipedia/english_words_only.txt
-# Run time: 20-30 minutes?
+# Run time: ~1 h 10 min
 
 echo `date`
 echo "Done."
