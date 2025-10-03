@@ -50,6 +50,7 @@ grep ^ET tmp-style-by-line.txt | sort | perl -pe 's/^ET\t(.*?)\t.*$/$1/' | uniq 
 grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 
 # TODO:
+# * [[USA]] -> [[US]] anywhere
 # * USA -> US, U.S.A. -> U.S. in infoboxes, prose
 # * Unpipe country name in birth_place
 
