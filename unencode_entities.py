@@ -580,6 +580,7 @@ transform_unsafe = {
     "&circledR;": "",  # ®
     "&COPY;": "&copy;",  # ©
     "&copy;": "",  # ©
+    "&copysr;": "℗",
     "™": "",
     "℠": "",
     "®": "",
