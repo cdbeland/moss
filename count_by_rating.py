@@ -59,6 +59,6 @@ if not wiktionary:
 
 count_line = "| DUMP# "
 if not wiktionary:
-    count_line += "|| {num_failed_articles} + {num_mos_straight_failed} "
+    count_line += f"|| {num_failed_articles} + {num_mos_straight_failed} "
 count_line += f"|| {total_instances} || " + " || ".join(instances_sorted)
 print(count_line)
