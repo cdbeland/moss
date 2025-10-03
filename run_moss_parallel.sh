@@ -2,7 +2,10 @@
 
 set -e
 
-export RUN_NAME=run-`git log | head -c 14 | perl -pe "s/commit //"`+`date "+%Y-%m-%dT%T"`
+# Keep in sync with update_downloads_parallel.sh.
+export commit_id=`git log | head -c 14 | perl -pe "s/commit //"`
+export RUN_NAME=run-${commit_id}+`date "+%Y-%m-%dT%T"`
+export MOSS_USER_AGENT="mossbot/${commit_id} https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss"
 mkdir $RUN_NAME
 cd $RUN_NAME
 

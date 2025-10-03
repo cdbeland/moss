@@ -1,4 +1,5 @@
 from collections import defaultdict
+import os
 import re
 import requests
 import sys
@@ -11,6 +12,7 @@ from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext
 
 
 MANUAL_FORMULAS = ["MtCO2", "MtCO2e", "MtCO2eq", "GtCO2"]
+MOSS_USER_AGENT = os.environ["MOSS_USER_AGENT"]
 
 
 # Always returns a list, even if there are no articles in the category
@@ -26,7 +28,14 @@ def get_articles_in_category(category_name, continue_params=None):
     if continue_params:
         api_params.update(continue_params)
     result = session.get(url=api_url, params=api_params)
-    data = result.json()
+
+    try:
+        data = result.json()
+    except Exception as e:
+        print("Bad response to category membership fetch!")
+        print(result)
+        print(e)
+        exit(1)
     pages = data.get('query', {}).get('categorymembers', [])
 
     for page in pages:
@@ -41,6 +50,7 @@ def get_articles_in_category(category_name, continue_params=None):
 
 formulas = []
 session = requests.Session()
+session.headers.update({"User-Agent": MOSS_USER_AGENT})
 api_url = "https://en.wikipedia.org/w/api.php"
 print("Getting live category member lists...", file=sys.stderr)
 for category_name in [
