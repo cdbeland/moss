@@ -8,11 +8,10 @@
 
 # Change "beland" to the Unix user you want to set up for
 
-# sudo su
-# apt-get install mariadb-server
+# sudo apt-get install mariadb-server
 #  (Fedora: dnf install mariadb-server)
-# service mariadb restart
-# mysql
+# sudo service mariadb restart
+# sudo mysql
 #  CREATE DATABASE enwiktionary;
 #  USE enwiktionary;
 #  CREATE USER 'beland'@'localhost';
@@ -78,7 +77,7 @@ echo `date`
 ./update_downloads_parallel2.sh >& /var/local/moss/bulk-wikipedia/download-parallel2.log &
 # 4 and 5 are kicked off from 2
 
-# ./update_downloads_parallel3.sh >& /bulk-wikipedia/download-parallel3.log &
+# ./update_downloads_parallel3.sh >& /var/local/moss/bulk-wikipedia/download-parallel3.log &
 # Only used by chemical formula report, takes more than 24 hours,
 # disabled until performance can be improved or the report is manually
 # run.
