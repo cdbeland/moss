@@ -588,6 +588,8 @@ transform_unsafe = {
     "&8482;": "",   # ™
 
     # Normalizing quote marks
+    '‘’': '"',
+    "``": '"',
     "‘": "'",
     "&lsquo;": "'",
     "’": "'",
