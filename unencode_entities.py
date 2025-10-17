@@ -232,6 +232,8 @@ controversial = {
     "&larr;": "←",
     "&uparrow;": "↑",
     "&swarr;": "↙",
+    "&varr;": "↕",
+    "&map;": "↦",
     "&le;": "≤",  # available at the bottom of the wikitext edit window
     "&ge;": "≥",  # available at the bottom of the wikitext edit window
     "&GreaterEqual;": "≥",  # available at the bottom of the wikitext edit window
@@ -826,6 +828,7 @@ transform_unsafe = {
     "&integers;": r"<math>\mathbb{Z}</math>",
     "&reals;": r"<math>\mathbb{R}</math>",
     "&Ropf;": r"<math>\mathbb{R}</math>",
+    "&Popf;": r"<math>\mathbb{P}</math>",
     "&Kopf;": r"<math>\mathbb{K}</math>",
     "&Copf;": r"<math>\mathbb{C}</math>",
     "&complexes;": r"<math>\mathbb{C}</math>",
