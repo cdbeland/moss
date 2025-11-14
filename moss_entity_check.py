@@ -345,6 +345,8 @@ skip_article_strings = [
     "{{which lang",
     "{{move to Wiki",
     "{{Move to Wiki",
+    "{{copy to wiki",
+    "{{Copy to wiki",
     "{{MOS",
 ]
 
