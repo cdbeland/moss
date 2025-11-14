@@ -39,15 +39,16 @@ def read_en_article_text(callback_function,
                     continue
                 result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback)
                 count += 1
-                if count % 100000 == 0:
+                if count % 25000 == 0:
                     # Prevent results from child processes from piling up
                     # waiting for the parent process to deal with
                     # callbacks.  (This can consume all available memory
                     # because article text isn't garbage collected until
                     # the callback is complete.)
                     result.wait()
-                    print(f"Processed {count} articles - " + str(datetime.datetime.now().isoformat()),
-                          file=sys.stderr)
+                    if count % 100000 == 0:
+                        print(f"Processed {count} articles - " + str(datetime.datetime.now().isoformat()),
+                              file=sys.stderr)
             pool.close()
             pool.join()
     else:
