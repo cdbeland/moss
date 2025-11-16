@@ -36,9 +36,12 @@ import fileinput
 import gcld3
 from multiprocessing import Pool
 from nltk.metrics import distance
+import os
 import re
 import sys
 import unicodedata
+
+os.environ["NO_LOAD"] = "1"
 
 try:
     from sectionalizer import get_word
@@ -72,13 +75,6 @@ not_html = {"<a>", "<name>", "<r>", "<h>"}
 
 # -- INITIALIZATION HELPERS AND GLOBAL VARIABLES --
 
-
-titles_all_wiktionaries = None
-transliterations = None
-english_wiktionary = None
-english_words = None
-suggestion_dict = None  # Keys are length, then low-fi match sets
-
 # Edit distance 4 and greater gives a negligible true positive rate
 # Though even 2 and 3 are more non-typos than typos, especially if
 # using a full dictionary.  Need to use other methods to classify
@@ -98,7 +94,12 @@ def edits1(word):
     return set(deletes + transposes + replaces + inserts)
 
 
-def check_dictionary(word_list, edit_distance_target, this_edit_distance=1):
+"""
+def check_dictionary(word_list, edit_distance_target, this_edit_distance=1, english_words):
+    if not english_words:
+        print("MISSING english_words in check_dictionary()", file=sys.stderr)
+        exit(1)
+
     edited_string_sets = [edits1(word) for word in word_list]
     edited_strings = set()
     edited_strings.update(*edited_string_sets)
@@ -107,7 +108,8 @@ def check_dictionary(word_list, edit_distance_target, this_edit_distance=1):
         return (this_edit_distance, found_strings)
     if this_edit_distance == edit_distance_target:
         return None
-    return check_dictionary(edited_strings, edit_distance_target, this_edit_distance + 1)
+    return check_dictionary(edited_strings, edit_distance_target, this_edit_distance + 1, english_words)
+"""
 
 
 # Based on code from http://norvig.com/spell-correct.html
@@ -176,19 +178,21 @@ def make_suggestion_helper(word):
 
 
 def make_suggestion_dict(input_list):
+
     # Takes about 4.5 min in parallel, 10 min serial at MAX_EDIT_DISTANCE 3
     suggestion_dict = dict()
     for d in range(1, MAX_EDIT_DISTANCE + 1):
         suggestion_dict[d] = defaultdict(set)
 
     with Pool(8) as pool:
-        for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list):
+        for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, 1000):
             for (ed, sets_for_word_this_ed) in sets_for_word.items():
                 for set_for_word_this_ed in sets_for_word_this_ed:
                     suggestion_dict[ed][set_for_word_this_ed].add(word)
         pool.close()
         pool.join()
 
+    # Keys are length, values are low-fi match sets
     return suggestion_dict
 
 
@@ -411,7 +415,12 @@ def is_rhyme_scheme(word):
     return False
 
 
-def is_english_compound(word):
+def is_english_compound(word, english_words):
+    if not english_words:
+        print("PARALLEL GARBAGE COLLECT RECOVERY - english_words in is_english_compound()", file=sys.stderr)
+        exit(1)
+        # load_data()
+
     if "." in word:
         return False
 
@@ -447,7 +456,12 @@ def get_anychar_permutations(word):
 # Returns (False) if not near a known English word, or (integer edit
 # distance, spelling suggestion) to closest word up to
 # MAX_EDIT_DISTANCE
-def near_common_word(word):
+def near_common_word(word, english_words, suggestion_dict):
+    if not english_words or not suggestion_dict:
+        print("PARALLEL GARBAGE COLLECT RECOVERY - near_common_words()", file=sys.stderr)
+        exit(1)
+        # load_data()
+
     word = word.lower()
     if word in english_words:
         return 0
@@ -504,7 +518,7 @@ def tag_by_lang(word):
 # -- Main loop functions --
 
 
-def get_word_category(word):
+def get_word_category(word, english_words, titles_all_wiktionaries, transliterations, suggestion_dict):
     category = None
     suggestion = None
 
@@ -526,11 +540,17 @@ def get_word_category(word):
         return "CN"  # Should be before "ME"
     elif is_chemical_formula(word):
         return "CF"
-    elif is_english_compound(word):
+    elif is_english_compound(word, english_words):
         return "ME"
 
     if is_math(word):
         return "A"
+
+    # Parallel garbage collection problems?
+    if not titles_all_wiktionaries or not transliterations:
+        print("PARALLEL GARBAGE COLLECT RECOVERY - get_word_catgegory", file=sys.stderr)
+        exit(1)
+        # load_data()
 
     # Words in English Wiktionary (presumably including all known
     # English words) are ignored by the spell checker, so no need to
@@ -549,7 +569,7 @@ def get_word_category(word):
         category = "TS"
     elif az_plus_re.match(word):
         if az_re.match(word):
-            (edit_distance, suggestion) = near_common_word(word)
+            (edit_distance, suggestion) = near_common_word(word, english_words, suggestion_dict)
             if word in transliterations:
                 category = "L"
             elif is_rhyme_scheme(word):
@@ -597,7 +617,14 @@ def get_word_category(word):
     return category
 
 
-def process_line(line):
+def process_line(param_list):
+    # Share data made by parent
+    english_words = param_list[0]
+    titles_all_wiktionaries = param_list[1]
+    transliterations = param_list[2]
+    suggestion_dict = param_list[3]
+    line = param_list[4]
+
     length = None
     word = None
 
@@ -606,7 +633,7 @@ def process_line(line):
     else:
         word = get_word(line)
 
-    category = get_word_category(word)
+    category = get_word_category(word, english_words, titles_all_wiktionaries, transliterations, suggestion_dict)
 
     if length:
         return f"{category}\t* {length} [https://en.wikipedia.org/w/index.php?search={word} {word}]"
@@ -614,13 +641,11 @@ def process_line(line):
         return f"{category}\t{line}"
 
 
-def process_input_parallel():
-    if not titles_all_wiktionaries:
-        load_data()
-
+def process_input_parallel(english_words, titles_all_wiktionaries, transliterations, suggestion_dict):
     lines = [line.strip() for line in fileinput.input("-")]
     with Pool(8) as pool:
-        for result in pool.imap(process_line, lines):
+        param_list = [(english_words, titles_all_wiktionaries, transliterations, suggestion_dict, line) for line in lines]
+        for result in pool.imap(process_line, param_list, 1000):
             print(result)
         pool.close()
         pool.join()
@@ -629,12 +654,6 @@ def process_input_parallel():
 # Separate function so these don't have to be loaded for unit tests,
 # but can be loaded when importing functions that need all the data.
 def load_data():
-    global titles_all_wiktionaries
-    global transliterations
-    global english_words
-    global suggestion_dict
-    global english_words_by_length_and_letter
-
     # Any words in multi-word phrases should also be listed as individual
     # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
     # (at list creation time?) since these won't be matched anyway.
@@ -652,6 +671,8 @@ def load_data():
     with open("/var/local/moss/bulk-wikipedia/english_words_only.txt", "r") as title_list:
         english_words = set([line.strip() for line in title_list])
 
+    """
+    global english_words_by_length_and_letter
     print("Indexing English words by length...", file=sys.stderr)
     english_words_by_length_and_letter = defaultdict(dict)
     for word in [w.lower() for w in english_words if az_re.match(w)]:
@@ -661,6 +682,7 @@ def load_data():
             existing_dict[first_letter] = {word}
         else:
             existing_dict[first_letter].add(word)
+    """
 
     print(datetime.datetime.now(), file=sys.stderr)
     print("Indexing English spelling suggestions...", file=sys.stderr)
@@ -668,11 +690,13 @@ def load_data():
 
     print("Done loading.", file=sys.stderr)
     print(datetime.datetime.now(), file=sys.stderr)
+    return (english_words, titles_all_wiktionaries, transliterations, suggestion_dict)
 
 
 if __name__ == '__main__':
-    load_data()
+    print("NORMAL load_data", file=sys.stderr)
+    (english_words, titles_all_wiktionaries, transliterations, suggestion_dict) = load_data()
 
-    process_input_parallel()
+    process_input_parallel(english_words, titles_all_wiktionaries, transliterations, suggestion_dict)
     print("Done categorizing.", file=sys.stderr)
     print(datetime.datetime.now(), file=sys.stderr)
