@@ -185,7 +185,7 @@ def make_suggestion_dict(input_list):
         suggestion_dict[d] = defaultdict(set)
 
     with Pool(8) as pool:
-        for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, 1000):
+        for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, 100000):
             for (ed, sets_for_word_this_ed) in sets_for_word.items():
                 for set_for_word_this_ed in sets_for_word_this_ed:
                     suggestion_dict[ed][set_for_word_this_ed].add(word)
@@ -645,7 +645,7 @@ def process_input_parallel(english_words, titles_all_wiktionaries, transliterati
     lines = [line.strip() for line in fileinput.input("-")]
     with Pool(8) as pool:
         param_list = [(english_words, titles_all_wiktionaries, transliterations, suggestion_dict, line) for line in lines]
-        for result in pool.imap(process_line, param_list, 1000):
+        for result in pool.imap(process_line, param_list, 100000):
             print(result)
         pool.close()
         pool.join()
