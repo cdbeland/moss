@@ -642,9 +642,15 @@ def process_line(param_list):
 
 
 def process_input_parallel(english_words, titles_all_wiktionaries, transliterations, suggestion_dict):
+
+    # TODO: Would probably be more efficient if this used shared
+    # memory; right now, data is copied.
+    # https://docs.python.org/3/library/multiprocessing.shared_memory.html
+
     lines = [line.strip() for line in fileinput.input("-")]
     with Pool(8) as pool:
         param_list = [(english_words, titles_all_wiktionaries, transliterations, suggestion_dict, line) for line in lines]
+        # Chunk size 100000 is a LOT faster than the default of 1
         for result in pool.imap(process_line, param_list, 100000):
             print(result)
         pool.close()
