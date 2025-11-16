@@ -559,7 +559,7 @@ allow_list = {
 }
 
 
-print("Done.", file=sys.stderr)
+print("Done loading spell data.", file=sys.stderr)
 
 
 cached_answers = LRU(10000)
