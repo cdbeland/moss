@@ -34,7 +34,7 @@ from collections import defaultdict
 import datetime
 import fileinput
 import gcld3
-from multiprocessing import Pool
+import multiprocessing
 from nltk.metrics import distance
 import os
 import re
@@ -184,8 +184,8 @@ def make_suggestion_dict(input_list):
     for d in range(1, MAX_EDIT_DISTANCE + 1):
         suggestion_dict[d] = defaultdict(set)
 
-    with Pool(8) as pool:
-        for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, 100000):
+    with multiprocessing.Pool(8) as pool:
+        for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, chunksize=1000):
             for (ed, sets_for_word_this_ed) in sets_for_word.items():
                 for set_for_word_this_ed in sets_for_word_this_ed:
                     suggestion_dict[ed][set_for_word_this_ed].add(word)
@@ -416,11 +416,6 @@ def is_rhyme_scheme(word):
 
 
 def is_english_compound(word, english_words):
-    if not english_words:
-        print("PARALLEL GARBAGE COLLECT RECOVERY - english_words in is_english_compound()", file=sys.stderr)
-        exit(1)
-        # load_data()
-
     if "." in word:
         return False
 
@@ -457,11 +452,6 @@ def get_anychar_permutations(word):
 # distance, spelling suggestion) to closest word up to
 # MAX_EDIT_DISTANCE
 def near_common_word(word, english_words, suggestion_dict):
-    if not english_words or not suggestion_dict:
-        print("PARALLEL GARBAGE COLLECT RECOVERY - near_common_words()", file=sys.stderr)
-        exit(1)
-        # load_data()
-
     word = word.lower()
     if word in english_words:
         return 0
@@ -546,12 +536,6 @@ def get_word_category(word, english_words, titles_all_wiktionaries, transliterat
     if is_math(word):
         return "A"
 
-    # Parallel garbage collection problems?
-    if not titles_all_wiktionaries or not transliterations:
-        print("PARALLEL GARBAGE COLLECT RECOVERY - get_word_catgegory", file=sys.stderr)
-        exit(1)
-        # load_data()
-
     # Words in English Wiktionary (presumably including all known
     # English words) are ignored by the spell checker, so no need to
     # categorize words in english_words and english_wiktionary.
@@ -617,14 +601,7 @@ def get_word_category(word, english_words, titles_all_wiktionaries, transliterat
     return category
 
 
-def process_line(param_list):
-    # Share data made by parent
-    english_words = param_list[0]
-    titles_all_wiktionaries = param_list[1]
-    transliterations = param_list[2]
-    suggestion_dict = param_list[3]
-    line = param_list[4]
-
+def process_line(line):
     length = None
     word = None
 
@@ -641,17 +618,17 @@ def process_line(param_list):
         return f"{category}\t{line}"
 
 
-def process_input_parallel(english_words, titles_all_wiktionaries, transliterations, suggestion_dict):
+# Generator so the parent doesn't have to keep all the input lines in memory at the same time
+def param_generator():
+    for line in fileinput.input("-"):
+        yield (line.strip())
 
-    # TODO: Would probably be more efficient if this used shared
-    # memory; right now, data is copied.
-    # https://docs.python.org/3/library/multiprocessing.shared_memory.html
 
-    lines = [line.strip() for line in fileinput.input("-")]
-    with Pool(8) as pool:
-        param_list = [(english_words, titles_all_wiktionaries, transliterations, suggestion_dict, line) for line in lines]
-        # Chunk size 100000 is a LOT faster than the default of 1
-        for result in pool.imap(process_line, param_list, 100000):
+# def process_input_parallel(english_words, titles_all_wiktionaries, transliterations, suggestion_dict):
+def process_input_parallel():
+    # If this needs more aggressive garbage collection, add maxtasksperchild=10000 or something
+    with multiprocessing.Pool(8) as pool:
+        for result in pool.imap(process_line, param_generator(), chunksize=1000):
             print(result)
         pool.close()
         pool.join()
@@ -660,6 +637,11 @@ def process_input_parallel(english_words, titles_all_wiktionaries, transliterati
 # Separate function so these don't have to be loaded for unit tests,
 # but can be loaded when importing functions that need all the data.
 def load_data():
+    global titles_all_wiktionaries
+    global transliterations
+    global english_words
+    global suggestion_dict
+
     # Any words in multi-word phrases should also be listed as individual
     # words, so don't bother tokenizing.  TODO: Drop multi-word phrases
     # (at list creation time?) since these won't be matched anyway.
@@ -696,13 +678,16 @@ def load_data():
 
     print("Done loading.", file=sys.stderr)
     print(datetime.datetime.now(), file=sys.stderr)
-    return (english_words, titles_all_wiktionaries, transliterations, suggestion_dict)
 
 
 if __name__ == '__main__':
-    print("NORMAL load_data", file=sys.stderr)
-    (english_words, titles_all_wiktionaries, transliterations, suggestion_dict) = load_data()
 
-    process_input_parallel(english_words, titles_all_wiktionaries, transliterations, suggestion_dict)
+    # Share static language data with child processes without copying
+    multiprocessing.set_start_method("fork")
+
+    # Generate static language data, shared as global variables
+    load_data()
+
+    process_input_parallel()
     print("Done categorizing.", file=sys.stderr)
     print(datetime.datetime.now(), file=sys.stderr)
