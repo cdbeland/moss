@@ -508,7 +508,12 @@ def tag_by_lang(word):
 # -- Main loop functions --
 
 
-def get_word_category(word, english_words, titles_all_wiktionaries, transliterations, suggestion_dict):
+def get_word_category(word):
+    global english_words
+    global titles_all_wiktionaries
+    global transliterations
+    global suggestion_dict
+
     category = None
     suggestion = None
 
@@ -610,7 +615,7 @@ def process_line(line):
     else:
         word = get_word(line)
 
-    category = get_word_category(word, english_words, titles_all_wiktionaries, transliterations, suggestion_dict)
+    category = get_word_category(word)
 
     if length:
         return f"{category}\t* {length} [https://en.wikipedia.org/w/index.php?search={word} {word}]"
