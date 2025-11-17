@@ -39,7 +39,7 @@ def add_tokens(line):
 
 
 def load_data():
-    print("Loading spellcheck dictionary...", file=sys.stderr)
+    print("Loading spell.py dictionary...", file=sys.stderr)
 
     # TODO: Possibly move this to postgres or MySQL.  Load DB as part
     # of update_downloads.sh; startup time is very slow due to loading
@@ -559,7 +559,7 @@ allow_list = {
 }
 
 
-print("Done loading spell data.", file=sys.stderr)
+print("Done loading spell.py data.", file=sys.stderr)
 
 
 cached_answers = LRU(10000)
