@@ -4,7 +4,7 @@
 # http://meta.wikimedia.org/wiki/Data_dumps
 
 import datetime
-from multiprocessing import Pool
+import multiprocessing
 import re
 import sys
 
@@ -33,10 +33,13 @@ def read_en_article_text(callback_function,
         filename = DEFAULT_CSV_FILE
     count = 0
     if parallel:
-        with Pool(8) as pool:
-            for (article_title, article_text) in page_generator_fast(filename):
-                if skip_article(article_title, which_articles):
-                    continue
+        # Shares parent data with children without copying
+        multiprocessing.set_start_method("fork")
+
+        # If this needs more aggressive garbage collection, add
+        # maxtasksperchild=10000 or something
+        with multiprocessing.Pool(16) as pool:
+            for (article_title, article_text) in page_generator_fast(filename, which_articles):
                 result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback)
                 count += 1
                 if count % 25000 == 0:
@@ -46,15 +49,10 @@ def read_en_article_text(callback_function,
                     # because article text isn't garbage collected until
                     # the callback is complete.)
                     result.wait()
-                    if count % 100000 == 0:
-                        print(f"Processed {count} articles - " + str(datetime.datetime.now().isoformat()),
-                              file=sys.stderr)
             pool.close()
             pool.join()
     else:
         for (article_title, article_text) in page_generator_fast(filename):
-            if skip_article(article_title, which_articles):
-                continue
             """
             # For debugging performance issues
             count += 1
@@ -67,11 +65,19 @@ def read_en_article_text(callback_function,
             callback_function(article_title, article_text)
 
 
-def page_generator_fast(filename=DEFAULT_CSV_FILE):
+def page_generator_fast(filename=DEFAULT_CSV_FILE, which_articles="ALL"):
+    count = 0
     # Using formfeed as line separator so article text can have newlines.
     with open(filename, "r", newline="\r") as article_csv_file:
         for line in article_csv_file:
+            count += 1
+            if count % 100000 == 0:
+                print(f"Queued {count} articles - " + str(datetime.datetime.now().isoformat()),
+                      file=sys.stderr)
             (article_title, article_text) = line.split("\t", 1)
+            if skip_article(article_title, which_articles):
+                print ("Skipped {article_title}", file=sys.stderr)
+                continue
             yield (article_title, article_text)
 
 
