@@ -43,11 +43,12 @@ def read_en_article_text(callback_function,
                 result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback)
                 count += 1
                 if count % 25000 == 0:
-                    # Prevent results from child processes from piling up
-                    # waiting for the parent process to deal with
-                    # callbacks.  (This can consume all available memory
-                    # because article text isn't garbage collected until
-                    # the callback is complete.)
+                    # Avoid using all available memory; article text
+                    # isn't garbage collected until the callback is
+                    # complete. (Not sure if it's queued requests
+                    # waiting for child processes to start them, or
+                    # results from child processes waiting for the
+                    # parent to service them.)
                     result.wait()
             pool.close()
             pool.join()
