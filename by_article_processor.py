@@ -1,5 +1,5 @@
 import fileinput
-from multiprocessing import Pool
+import multiprocessing
 import sys
 from word_categorizer import get_word_category, load_data
 
@@ -39,12 +39,17 @@ def process_line(line):
 
 
 if __name__ == '__main__':
+    # Share static language data with child processes without copying
+    multiprocessing.set_start_method("fork")
+
+    # Generate static language data, shared as global variables
     load_data()
+
     print("Loading input...", file=sys.stderr)
     lines = [line.strip() for line in fileinput.input("-")]
     print("Processing...", file=sys.stderr)
-    with Pool(8) as pool:
-        for result in pool.imap(process_line, lines, chunksize=100):
+    with multiprocessing.Pool(8) as pool:
+        for result in pool.imap(process_line, lines, chunksize=1000):
             print(result)
         pool.close()
         pool.join()
