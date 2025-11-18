@@ -3298,7 +3298,7 @@ else:
 print(f"Loaded {len(regex_tuples)} regular expressions", file=sys.stderr)
 
 
-def skip_article(article_text):
+def skip_article_retf(article_text):
     """
     # Weeded out upstream by xml_to_csv.py
     if article_text.startswith("#REDIRECT") or article_text.startswith("#redirect"):
@@ -3355,19 +3355,6 @@ def clean_article(article_text, aggressive=False):
     return article_text
 
 
-def fast_regex_callback(article_title, article_text):
-    if skip_article(article_text):
-        return
-    article_text = clean_article(article_text, aggressive=True)
-
-    for regex_tuple in regex_tuples:
-        result = regex_tuple[2].search(article_text)
-        if result:
-            print(article_title)
-            # For performance reasons, stop after the first detected problem
-            return
-
-
 checked = 0
 skipped = 0
 regex_runtimes = defaultdict(int)
@@ -3388,11 +3375,14 @@ def show_replacement(result, regex_tuple, article_text):
         return (f'{pformat(snippet)} -> {pformat(changed_to)}')
 
 
-def full_regex_callback(article_title, article_text):
+def full_regex_callback(params):
+    article_title = params[0]
+    article_text = params[1]
+
     global checked
     global skipped
 
-    if skip_article(article_text):
+    if skip_article_retf(article_text):
         skipped += 1
         return
     article_text = clean_article(article_text, aggressive=True)
@@ -3443,7 +3433,6 @@ def full_regex_callback(article_title, article_text):
             # pprint(hits_sorted)
 
 
-print(f"{datetime.datetime.now().isoformat()}", file=sys.stderr)
-# read_en_article_text(fast_regex_callback, parallel=True)
+print(f"Starting RETF scan {datetime.datetime.now().isoformat()}", file=sys.stderr)
 read_en_article_text(full_regex_callback, parallel=True)
-print(f"{datetime.datetime.now().isoformat()} ", file=sys.stderr)
+print(f"Finished RETF scan {datetime.datetime.now().isoformat()} ", file=sys.stderr)
