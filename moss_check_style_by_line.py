@@ -1480,6 +1480,35 @@ r"""
 TODO: Finish rewrite of the below code into Python functions for
 increased performance. The old style was abandoned at commit d0f8fb1
 
+# ---
+# Feet and inches - [[MOS:UNITNAMES]]
+
+$ wc -l *feet*
+   36663 jwb-feet-inches-all.txt
+   62922 jwb-feet-inches-err.txt
+       8 tmp-feet-inches1.txt
+     951 tmp-feet-inches2.txt
+   61963 tmp-feet-inches3.txt
+     271 tmp-feet-inches-all1.txt
+    4302 tmp-feet-inches-all2.txt
+  259654 tmp-feet-inches-all3.txt
+  426734 total
+
+### TODO: This also needs to handle {{frac}} in place of pure digits
+# {{s?frac|[0-9]+|[0-9]+(|[0-9]+)?}}
+../venv/bin/python3 ../dump_grep_csv.py "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" > tmp-feet-inches-all1.txt
+../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' > tmp-feet-inches-all2.txt
+../venv/bin/python3 ../dump_grep_csv.py ' [^"][0-9]"' tmp-feet-inches-all3.txt
+ | perl -pe 's/<.*?>//g'
+ | perl -pe 's/[\( \|]"[a-zA-Z][^"]*[0-9]"//g'
+ | perl -pe 's/"[0-9\.]+"//g'
+ | grep -P '[0-9]"'
+ > tmp-feet-inches-all3.txt
+cat tmp-feet-inches-all2.txt tmp-feet-inches-all1.txt tmp-feet-inches-all3.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-feet-inches-all.txt
+
+
+# ---
+
 # "internet" -> "Internet" outside of quotations
 
 # TODO: Ignore articles with "unmanned aerial vehicle" to reduce
