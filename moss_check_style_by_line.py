@@ -1683,4 +1683,4 @@ TO:"$1 $2"
 
 
 if __name__ == "__main__":
-    read_en_article_text(check_style_by_line, parallel=True)
+    read_en_article_text(check_style_by_line, parallel="incremental")

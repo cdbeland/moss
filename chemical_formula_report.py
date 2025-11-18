@@ -84,7 +84,10 @@ formulas_re = re.compile(formulas_pattern)
 articles_by_formula = defaultdict(list)
 
 
-def chem_formula_check(article_title, article_text):
+def chem_formula_check(params):
+    article_title = params[0]
+    article_text = params[1]
+
     article_text = wikitext_to_plaintext(article_text, flatten_sup_sub=False)
     article_text = get_main_body_wikitext(article_text)
 

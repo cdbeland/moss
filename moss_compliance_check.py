@@ -112,7 +112,10 @@ accumulated_changes = []
 loop_number = 1
 
 
-def process_article(article_title, article_text):
+def process_article(params):
+    article_title = params[0]
+    article_text = params[1]
+
     global accumulated_changes, loop_number
     accumulated_changes.append((article_title,
                                 make_change_map_for_article(article_title, article_text)))

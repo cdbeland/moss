@@ -31,16 +31,35 @@ def read_en_article_text(callback_function,
     if not filename:
         # Necessary backstop for dump_grep_regex.py
         filename = DEFAULT_CSV_FILE
-    count = 0
     if parallel:
         # Shares parent data with children without copying
         multiprocessing.set_start_method("fork")
+        if parallel is True:
+            # Processes results all at once. May use a lot of memory
+            # if there are a lot of results, and will NOT output
+            # incrementally. Faster than parallel="incremental".
+            #
+            # callback_function will get only one argument: (article_title, article_text)
 
-        # If this needs more aggressive garbage collection, add
-        # maxtasksperchild=10000 or something
-        with multiprocessing.Pool(16) as pool:
+            # If more aggressive garbage collection is needed for
+            # children, try e.g. maxtasksperchild=50000 for Pool()
+            with multiprocessing.Pool(16) as pool:
+                results = pool.imap(callback_function,
+                                    page_generator_fast(filename, which_articles),
+                                    chunksize=10000)
+                pool.close()
+                pool.join()
+                [process_result_callback(result) for result in results]
+        elif parallel == "incremental":
+            # Processes results incrementally, before processing too
+            # many. Slower but uses less memory than parallel=True if
+            # results are large.
+            #
+            # callback_function will get two arguments: article_title, article_text
+
+            count = 0
             for (article_title, article_text) in page_generator_fast(filename, which_articles):
-                result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback)
+                result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback, error_callback=parallel_error)
                 count += 1
                 if count % 25000 == 0:
                     # Avoid using all available memory; article text
@@ -50,20 +69,16 @@ def read_en_article_text(callback_function,
                     # results from child processes waiting for the
                     # parent to service them.)
                     result.wait()
-            pool.close()
-            pool.join()
     else:
-        for (article_title, article_text) in page_generator_fast(filename):
-            """
-            # For debugging performance issues
-            count += 1
-            if count % 100 == 0:
-                print(f"Processed {count} articles - " + str(datetime.datetime.now().isoformat()),
-                      file=sys.stderr)
-            if count % 1001 == 0:
-                exit(0)
-            """
-            callback_function(article_title, article_text)
+        result = [callback_function(article_title, article_text)
+                  for (article_title, article_text)
+                  in page_generator_fast(filename)]
+        process_result_callback(result)
+
+
+def parallel_error(error):
+    print(error)
+    raise ("ERROR IN CHILD PROCESS")
 
 
 def page_generator_fast(filename=DEFAULT_CSV_FILE, which_articles="ALL"):
@@ -75,9 +90,10 @@ def page_generator_fast(filename=DEFAULT_CSV_FILE, which_articles="ALL"):
             if count % 100000 == 0:
                 print(f"Queued {count} articles - " + str(datetime.datetime.now().isoformat()),
                       file=sys.stderr)
+                break
             (article_title, article_text) = line.split("\t", 1)
             if skip_article(article_title, which_articles):
-                print ("Skipped {article_title}", file=sys.stderr)
+                print("Skipped {article_title}", file=sys.stderr)
                 continue
             yield (article_title, article_text)
 

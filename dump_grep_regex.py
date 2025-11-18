@@ -34,4 +34,4 @@ def grep_callback(article_title, article_text):
         return output
 
 
-read_en_article_text(grep_callback, filename=filename, parallel=True)
+read_en_article_text(grep_callback, filename=filename, parallel="incremental")

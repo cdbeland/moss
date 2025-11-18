@@ -351,7 +351,10 @@ skip_article_strings = [
 ]
 
 
-def entity_check(article_title, article_text):
+def entity_check(params):
+    article_title = params[0]
+    article_text = params[1]
+
     if article_title in article_blocklist:
         return
 

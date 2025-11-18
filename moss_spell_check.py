@@ -176,11 +176,14 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
 language_divider_re = re.compile(r"^== *([^=]+) *==$")
 
 
-def spellcheck_all_langs_wikt_with_quotations(article_title, article_text):
-    return spellcheck_all_langs_wikt(article_title, article_text, include_quotations=True)
+def spellcheck_all_langs_wikt_with_quotations(params):
+    return spellcheck_all_langs_wikt(params, include_quotations=True)
 
 
-def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=False):
+def spellcheck_all_langs_wikt(params, include_quotations=False):
+    article_title = params[0]
+    article_text = params[1]
+
     language_this_part = ""
     text_this_part = ""
     article_parts = defaultdict(list)
@@ -198,8 +201,7 @@ def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=Fa
 
     result_list = []
     for (article_part, part_text) in article_parts.items():
-        spell_check_result = spellcheck_all_langs(f"{article_title}#{article_part}",
-                                                  part_text,
+        spell_check_result = spellcheck_all_langs((f"{article_title}#{article_part}", part_text),
                                                   wiktionary=True,
                                                   include_quotations=include_quotations)
         if spell_check_result and spell_check_result[1]:
@@ -208,9 +210,12 @@ def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=Fa
     return result_list
 
 
-def spellcheck_all_langs(article_title, article_text, wiktionary=False, include_quotations=False):
+def spellcheck_all_langs(params, wiktionary=False, include_quotations=False):
     # WARNING: This function runs in subprocesses, and cannot
     # change global context variables. (It CAN print.)
+
+    article_title = params[0]
+    article_text = params[1]
 
     # -- Skip article entirely if appropriate --
 

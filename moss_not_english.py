@@ -79,7 +79,10 @@ def is_english_word(word):
     return False
 
 
-def find_non_english(article_title, article_text):
+def find_non_english(params):
+    article_title = params[0]
+    article_text = params[1]
+
     if ignore_tags_re.search(article_text):
         return
 

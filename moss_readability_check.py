@@ -32,7 +32,10 @@ def is_prose_paragraph(paragraph_text):
     return False
 
 
-def check_reading_level(article_title, article_text):
+def check_reading_level(params):
+    article_title = params[0]
+    article_text = params[1]
+
     if "disambiguation)" in article_title:
         return
     if article_title.startswith("Index of"):
