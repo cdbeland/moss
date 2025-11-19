@@ -4,7 +4,10 @@
 
 # Run time (commit af4ead3, 4 types of complaint): ~2 hours, 8-core parallel
 
+from pprint import pformat
 import re
+import sys
+import traceback
 from moss_dump_analyzer import read_en_article_text
 
 NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ"
@@ -145,6 +148,15 @@ sports_category_re = re.compile("Category:[^]]+sport")
 
 
 def check_style_by_line(article_title, article_text):
+    try:
+        check_style_by_line_impl(article_title, article_text)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+        raise Exception("FATAL ERROR IN check_style_by_line")
+
+
+def check_style_by_line_impl(article_title, article_text):
     article_flags = set_article_flags(article_text)
     problem_line_tuples = []
     article_text = universal_article_text_cleanup(article_text)
@@ -195,9 +207,16 @@ def check_style_by_line(article_title, article_text):
                 problem_line_tuples.extend(result)
     if not problem_line_tuples:
         return None
-    line_string = "\n".join([f"{code}\t{article_title}\t{line_text}"
-                             for (code, line_text) in problem_line_tuples])
-    return line_string
+    try:
+        line_string = "\n".join([f"{code}\t{article_title}\t{line_text}"
+                                 for (code, line_text) in problem_line_tuples])
+        return line_string
+    except Exception as e:
+        print("problem_line_tuples:", file=sys.stderr)
+        print(pformat(problem_line_tuples), file=sys.stderr)
+        print(e, file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+        raise e
 
 
 washington_state_foo_re = re.compile(r"Washington State [A-Z]")
@@ -662,6 +681,7 @@ def number_notation_check(line, line_flags):
 
     exp = result.group(1)
     exp = exp.replace("−", "-")  # U+2212 to U+002D
+    exp = exp.replace("&minus;", "-")  # HTML entity to U+002D
     exp = int(exp)
     if exp == 6:
         return [("SCI_NOTATION_XILLION", line)]
@@ -1462,7 +1482,7 @@ currency_hyphen = re.compile(rf"[{MAJOR_CURRENCY_SYMBOLS}][0-9]+-[mb]illion")
 
 def currency_hyphen_check(line, line_flags):
     if currency_hyphen.search(line):
-        return "$H"
+        return [("$H", line)]
     else:
         return
 
