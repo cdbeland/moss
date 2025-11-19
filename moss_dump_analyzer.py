@@ -56,19 +56,22 @@ def read_en_article_text(callback_function,
             # results are large.
             #
             # callback_function will get two arguments: article_title, article_text
-
-            count = 0
-            for (article_title, article_text) in page_generator_fast(filename, which_articles):
-                result = pool.apply_async(callback_function, args=[article_title, article_text], callback=process_result_callback, error_callback=parallel_error)
-                count += 1
-                if count % 25000 == 0:
-                    # Avoid using all available memory; article text
-                    # isn't garbage collected until the callback is
-                    # complete. (Not sure if it's queued requests
-                    # waiting for child processes to start them, or
-                    # results from child processes waiting for the
-                    # parent to service them.)
-                    result.wait()
+            with multiprocessing.Pool(16) as pool:
+                count = 0
+                for (article_title, article_text) in page_generator_fast(filename, which_articles):
+                    result = pool.apply_async(callback_function,
+                                              args=[article_title, article_text],
+                                              callback=process_result_callback,
+                                              error_callback=parallel_error)
+                    count += 1
+                    if count % 25000 == 0:
+                        # Avoid using all available memory; article text
+                        # isn't garbage collected until the callback is
+                        # complete. (Not sure if it's queued requests
+                        # waiting for child processes to start them, or
+                        # results from child processes waiting for the
+                        # parent to service them.)
+                        result.wait()
     else:
         result = [callback_function(article_title, article_text)
                   for (article_title, article_text)
@@ -77,8 +80,8 @@ def read_en_article_text(callback_function,
 
 
 def parallel_error(error):
-    print(error)
-    raise ("ERROR IN CHILD PROCESS")
+    print(error, file=sys.stderr)
+    raise Exception("ERROR IN CHILD PROCESS")
 
 
 def page_generator_fast(filename=DEFAULT_CSV_FILE, which_articles="ALL"):
@@ -90,7 +93,6 @@ def page_generator_fast(filename=DEFAULT_CSV_FILE, which_articles="ALL"):
             if count % 100000 == 0:
                 print(f"Queued {count} articles - " + str(datetime.datetime.now().isoformat()),
                       file=sys.stderr)
-                break
             (article_title, article_text) = line.split("\t", 1)
             if skip_article(article_title, which_articles):
                 print("Skipped {article_title}", file=sys.stderr)
