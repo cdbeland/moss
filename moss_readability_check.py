@@ -32,9 +32,7 @@ def is_prose_paragraph(paragraph_text):
     return False
 
 
-def check_reading_level(params):
-    article_title = params[0]
-    article_text = params[1]
+def check_reading_level(article_title, article_text):
 
     if "disambiguation)" in article_title:
         return
@@ -54,24 +52,6 @@ def check_reading_level(params):
         return
     if article_text.startswith("#REDIRECT") or article_text.startswith("#redirect"):
         return
-    """
-    if (article_title.endswith("season")
-            or article_title.endswith("roster")
-            or article_title.endswith("rosters")
-            or article_title.endswith("League")
-            or article_title.endswith("Games")
-            or article_title.endswith("Cup")
-            or article_title.endswith("football")
-            or article_title.endswith("squads")):
-        if article_title[0:4].isnumeric():
-            return
-        if article_title[0:3] == "FC ":
-            return
-        if "at the" in article_title:
-            return
-    if article_title.endswith("Championships"):
-        return
-    """
     if ignore_tags_re.search(article_text):
         return
     if ignore_tags_more_re.search(article_text):
@@ -128,5 +108,5 @@ def check_reading_level(params):
 
 if __name__ == '__main__':
     print(f"Started at {datetime.datetime.now().isoformat()}", file=sys.stderr)
-    read_en_article_text(check_reading_level, parallel=True)
+    read_en_article_text(check_reading_level, parallel="incremental")
     print(f"Finished at {datetime.datetime.now().isoformat()}", file=sys.stderr)
