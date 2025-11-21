@@ -43,7 +43,7 @@ def read_en_article_text(callback_function,
 
             # If more aggressive garbage collection is needed for
             # children, try e.g. maxtasksperchild=50000 for Pool()
-            with multiprocessing.Pool(16) as pool:
+            with multiprocessing.Pool(8) as pool:
                 results = pool.imap(callback_function,
                                     page_generator_fast(filename, which_articles),
                                     chunksize=10000)
@@ -56,7 +56,7 @@ def read_en_article_text(callback_function,
             # results are large.
             #
             # callback_function will get two arguments: article_title, article_text
-            with multiprocessing.Pool(16) as pool:
+            with multiprocessing.Pool(8) as pool:
                 count = 0
                 for (article_title, article_text) in page_generator_fast(filename, which_articles):
                     result = pool.apply_async(callback_function,
