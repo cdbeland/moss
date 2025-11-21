@@ -161,10 +161,9 @@ def check_style_by_line_impl(article_title, article_text):
     problem_line_tuples = []
     article_text = universal_article_text_cleanup(article_text)
 
-    # Check article title
-    if "…" in article_title:
-        # [[MOS:ELLIPSES]]
-        problem_line_tuples.extend([("ET", article_title + " [title]")])
+    result = check_article_title(article_title, article_text)
+    if result:
+        problem_line_tuples.extend(result)
 
     for line in article_text.splitlines():
         line = universal_line_cleanup(line)
@@ -217,6 +216,44 @@ def check_style_by_line_impl(article_title, article_text):
         print(e, file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
         raise e
+
+
+english_letters = "a-zA-Z"
+latin_diacritics = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽž"
+more_ld = r"ṢṭțşăłŞıÅŁźİĀĀćčđĐḍĕĚǴǵĥħḥḤĪɪḳḷṅŌŚṣßţṬūŪżẓ"
+punct = r"\!\-_\(\)\.–,\":='’\?&%\*\+;@~"
+other_ok = r"əþɛ×/"
+english_chars_re = re.compile(rf"[{english_letters}0-9{latin_diacritics}"
+                              + rf"{more_ld}{punct}{other_ok}]+")
+english_letters_re = re.compile(rf"[{english_letters}]+")
+
+
+def check_article_title(article_title, article_text):
+    if article_text.startswith("#REDIRECT") or article_text.startswith("#redirect"):
+        return
+
+    title_tmp = english_chars_re.sub("", article_title)
+    if not title_tmp:
+        return
+
+    """
+    # This isolates disallowed characters that appear in titles mixed
+    # with English letters.
+
+    for char in title_tmp:
+        category = unicodedata.category(char)
+        # Category codes and meanings:
+        # https://www.unicode.org/reports/tr44/#General_Category_Values
+        # if category in ["Ll", "Lu", "Po", "Sm", "Sk", "So", "Lm",
+        #                 "Sc", "Pd", "No", "Pi"]:
+        #    continue
+        # print(f"{char} category: " + category)
+        if category == "Lo":
+            if english_letters_re.search(article_title):
+                return [("TC", article_title + " [title]")]
+    """
+
+    return [("TC", article_title + " [title]")]
 
 
 washington_state_foo_re = re.compile(r"Washington State [A-Z]")
