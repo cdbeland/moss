@@ -10,7 +10,8 @@ from moss_dump_analyzer import read_en_article_text
 from moss_entity_check import skip_article_strings
 from wikitext_util import get_main_body_wikitext
 
-# Run time: About 21 hours for 4138 regexes on 6.77 million articles
+# Run time: About 8 hours for 4000+ regexes on 7 million+ articles
+# (big-board, 8-core parallel with SSD)x
 
 regex_tuples = []
 with open("/var/local/moss/bulk-wikipedia/Typos", "r") as regex_file:

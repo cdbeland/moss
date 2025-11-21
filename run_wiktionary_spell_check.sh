@@ -4,10 +4,10 @@ echo "Running Wiktionary spell check"
 echo `date`
 
 ../venv/bin/python3 ../moss_spell_check_wiktionary.py > tmp-wiktionary-spell.txt
-# Run time: About 30 min
+# Run time: About 8 min (big-board SSD)
 
 ../venv/bin/python3 ../moss_spell_check_wiktionary_with_quotations.py > tmp-wiktionary-spell-with-quotations.txt
-# Run time: About 30 min
+# Run time: About 8 min (big-board SSD)
 
 # --- WITHOUT QUOTATIONS ---
 
@@ -106,7 +106,7 @@ echo "|}" >> post-wikt-most-wanted-no-quotations.txt
 
 # --- WITH QUOTATIONS ---
 
-# Run time: About 10 min
+# Run time: About 1 min (big-board SSD)
 tac tmp-wiktionary-spell-with-quotations.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles-wikt-with-quotations.txt
 
 # Most common HTML typos

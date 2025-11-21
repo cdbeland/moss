@@ -126,7 +126,7 @@ set -e
 echo "Beginning readability check..."
 echo `date`
 
-# Run time for this segment: ~1h (8-core parallel)
+# Run time for this segment: ~36 min (8-core parallel, big-board)
 
 ../venv/bin/python3 ../moss_readability_check.py > tmp-readability.txt
 sort -k2 -n tmp-readability.txt > post-readability.txt

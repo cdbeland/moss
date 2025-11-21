@@ -2,13 +2,16 @@
 
 set -e
 
+# big-board has an Intel i5-1240P with 8 cores (16 if you count
+# hyperthreading) and SSD drive
+
 echo "Thread 2 starting"
 echo `date`
 
-# Run time: About 1 hour 10 min (8-core parallel) when nothing else is running
+# Run time: About 20 min (8-core parallel, big-board) when nothing else is running
 ../run_wiktionary_spell_check.sh >& wiktionary.log
 
-# Run time: About 25 hours (8-core parallel) while other thread is running
+# Run time: About 2 h 15 min (8-core parallel, big-board)
 ../run_main_spell_check.sh >& main_spell_check.log
 
 echo "Failure post-processing"
@@ -21,7 +24,7 @@ grep ^G tmp-output.txt | ../venv/bin/python3 ../rollup_ignored.py | sort -nr -k2
 echo "Beginning word categorization run 2"
 echo `date`
 
-# Run time for this line: ~20 min (8-core parallel)
+# Run time for this line: ~5 min (8-core parallel, big-board)
 tac tmp-output.txt | grep '^*' | ../venv/bin/python3 ../word_categorizer.py > tmp-words-with-articles.txt
 
 # --- BY ARTICLE ---
@@ -114,7 +117,7 @@ grep -v "TF+" tmp-articles-linked-words.txt | grep -vP "(U|BC|Z)," | grep -v "&g
 
 # --- PARSE FAILURE FIXES ---
 
-# Run time: About 4 hours
+# Run time: About 10 min (8-core parallel, big-board)
 echo "Beginning foot/inch conversion scan"
 echo `date`
 
@@ -219,13 +222,15 @@ echo "" >> post-chemical-formulas.txt
 
 echo "Starting slow chemical formulas report"
 echo `date`
-# Run time: About 1.2 h
+# Run time: About 30 min (big-board)
 ../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
 echo "Done slow chemical formulas report"
 echo `date`
+Mon Nov 17 12:51:44 PM EST 2025
+Mon Nov 17 01:18:43 PM EST 2025
 
 
-# Run time: About 6.5 hours
+# Run time: About 1 hour (big-board)
 echo "Beginning not-English check"
 echo `date`
 
