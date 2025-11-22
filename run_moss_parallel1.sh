@@ -47,12 +47,16 @@ grep ^L tmp-style-by-line.txt | sort > fixme-liters.txt
 
 grep ^ET tmp-style-by-line.txt | sort | perl -pe 's/^ET\t(.*?)\t.*$/$1/' | uniq > fixme-ellipsis-in-title.txt
 
-grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
+grep ^TC tmp-style-by-line.txt | sort | perl -pe 's/^TC\t(.*?)\t.*$/$1/' | uniq > fixme-title-character.txt
 
 # TODO:
 # * [[USA]] -> [[US]] anywhere
 # * USA -> US, U.S.A. -> U.S. in infoboxes, prose
 # * Unpipe country name in birth_place
+
+# --- INFONAT---
+
+grep ^INFONAT tmp-style-by-line.txt | sort > tmp-infonat.txt
 
 cat tmp-infonat.txt | perl -pe 's/^(.*?_[A-Z]*?)[_ \t].*$/$1/'  | sort | perl ../count.pl | sort -n > infonat-count-overall.txt
 cat tmp-infonat.txt | perl -pe 's/^(.*?)\t.*$/$1/' | sort | perl ../count.pl | sort -n > infonat-count-detail.txt
@@ -96,8 +100,6 @@ grep -P '_2000s' tmp-infonat-large-non-jus-soli.txt > infonat-redundant-large-no
 # grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-jus-soli.txt
 # grep ^INFONAT_REDUNDANT tmp-infonat.txt | grep -v JUS_SOLI | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | uniq > fixme-infonat-redundant-not-jus-soli.txt
 
-# --
-
 # Remove flag per [[MOS:FLAGBIO]]
 grep ^INFONAT_FLAG tmp-infonat.txt | perl -pe 's/INFONAT.*?\t(.*?)\t.*/$1/' | sort | uniq > fixme-infonat-mos-flagbio.txt
 
@@ -115,11 +117,14 @@ grep ^INFONAT_EXPLAIN_us tmp-infonat.txt | grep -v ^INFONAT_us_state | grep "nat
 
 grep ^INFONAT_ERR tmp-infonat.txt | sort > fixme-infonat-err.txt
 
+# ---
+
 echo "moss_check-style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
 # grep ^P tmp-style-by-line.txt > fixme-prime.txt
 # grep ^QB tmp-style-by-line.txt > fixme-bad-quoting.txt
 # grep ^QD tmp-style-by-line.txt | perl ../count.pl | sort -rn | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt
 set -e
+
 
 # --- READABILITY ---
 
