@@ -85,7 +85,7 @@ venv/bin/python3 transliterate.py > /var/local/moss/bulk-wikipedia/transliterati
 echo `date`
 echo "Decompressing enwiktionary multistream and converting XML to CSV..."
 # Run time: About 2 hours
-bunzip2 -c /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml.bz2 | venv/bin/python3 xml_to_csv.py > /var/local/moss/bulk-wikipedia/enwiktionary-articles-no-redir.csv
+bunzip2 -c /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml.bz2 | venv/bin/python3 xml_to_csv.py enwiktionary
 rm -f /var/local/moss/bulk-wikipedia/enwiktionary-latest-pages-articles-multistream.xml.bz2
 
 echo `date`
