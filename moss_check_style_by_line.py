@@ -2,6 +2,8 @@
 # venv/bin/pip install mtprof
 # venv/bin/python3 -m mtprof moss_check_style_by_line.py
 
+# Usage: venv/bin/python3 moss_check_style_by_line.py REDIRECTS_FILE.CSV
+
 # Run time (commit af4ead3, 4 types of complaint): ~2 hours, 8-core parallel
 
 from pprint import pformat
@@ -10,9 +12,530 @@ import sys
 import traceback
 from moss_dump_analyzer import read_en_article_text
 
-NON_ASCII_LETTERS = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽžəþɛ"
-MAJOR_CURRENCY_SYMBOLS = "€$£¥₹₽₩₺"
+print("Loading redirects...", file=sys.stderr)
+redirect_filename = sys.argv[1]
+redirect_dict = {}
+for redirect_pair in open(redirect_filename, "r"):
+    (redirect_from, redirect_to) = redirect_pair.split("\t")
+    redirect_dict[redirect_from] = redirect_to
+print("Finished loading redirects.", file=sys.stderr)
 
+ascii_equiv_letters = {
+    "á": "a",
+    "Á": "A",
+    "à": "a",
+    "ă": "a",
+    "â": "a",
+    "Â": "A",
+    "ấ": "a",
+    "ầ": "a",
+    "å": "a",
+    "Å": "A",
+    "ä": "a",
+    "Ä": "A",
+    "ã": "a",
+    "Ã": "A",
+    "ā": "a",
+    "Ā": "A",
+    "ạ": "a",
+    "ậ": "a",
+    "æ": "ae",
+    "ɑ̠": "a",
+    "ć": "c",
+    "č": "c",
+    "ç": "c",
+    "Ç": "C",
+    "đ": "d",
+    "Đ": "D",
+    "ḍ": "d",
+    "é": "e",
+    "É": "E",
+    "è": "e",
+    "È": "E",
+    "ĕ": "e",
+    "ê": "e",
+    "Ê": "E",
+    "Ě": "E",
+    "ë": "e",
+    "Ë": "E",
+    "ē": "e",
+    "ǵ": "g",
+    "Ǵ": "G",
+    "ĥ": "h",
+    "ħ": "h",
+    "ḥ": "h",
+    "Ḥ": "H",
+    "í": "i",
+    "Í": "I",
+    "ì": "i",
+    "Ì": "I",
+    "ĭ": "i",
+    "î": "i",
+    "Î": "I",
+    "ǐ": "i",
+    "ï": "i",
+    "Ï": "I",
+    "İ": "I",
+    "ī": "i",
+    "Ī": "I",
+    "ı": "i",
+    "ɪ": "i",
+    "ʝ": "j",
+    "ḳ": "k",
+    "ł": "l",
+    "Ł": "L",
+    "ḷ": "l",
+    "ń": "n",
+    "ñ": "n",
+    "Ñ": "N",
+    "ṅ": "n",
+    "ó": "o",
+    "Ó": "O",
+    "ò": "o",
+    "Ò": "O",
+    "ô": "o",
+    "Ô": "O",
+    "ö": "o",
+    "Ö": "O",
+    "õ": "o",
+    "Õ": "O",
+    "ø": "o",
+    "ō": "o",
+    "Ō": "O",
+    "ớ": "o",
+    "ộ": "o",
+    "Ś": "S",
+    "š": "s",
+    "Š": "S",
+    "ş": "s",
+    "Ş": "S",
+    "ṣ": "s",
+    "Ṣ": "S",
+    "ţ": "t",
+    "ṭ": "t",
+    "Ṭ": "T",
+    "ț": "t",
+    "ú": "u",
+    "Ú": "U",
+    "ù": "u",
+    "Ù": "U",
+    "û": "u",
+    "Û": "U",
+    "ü": "u",
+    "Ü": "U",
+    "ǚ": "u",
+    "ũ": "u",
+    "ū": "u",
+    "Ū": "U",
+    "ư": "u",
+    "ụ": "u",
+    "ý": "y",
+    "Ý": "Y",
+    "ÿ": "y",
+    "Ÿ": "Y",
+    "ź": "z",
+    "ž": "z",
+    "Ž": "Z",
+    "ż": "z",
+    "ẓ": "z",
+
+    "À": "A",
+    "Ă": "A",
+    "ắ": "a",
+    "ằ": "a",
+    "ẵ": "a",
+    "Ấ": "A",
+    "ẫ": "a",
+    "ẩ": "a",
+    "Ẩ": "A",
+    "ǎ": "a",
+    "ȧ": "a",
+    "Ȧ": "A",
+    "ą": "a",
+    "Ą": "A",
+    "ả": "a",
+    "Ả": "A",
+    "ặ": "a",
+    "Æ": "AE",
+    "ǽ": "ae",
+    "Ǣ": "AE",
+    "ḃ": "b",
+    "Ƀ": "B",
+    "Ɓ": "B",
+    "Ć": "C",
+    "ĉ": "c",
+    "Ĉ": "C",
+    "Č": "C",
+    "ċ": "c",
+    "Ċ": "C",
+    "Ḉ": "C",
+    "Ȼ": "C",
+    "Ƈ": "C",
+    "ď": "d",
+    "Ď": "D",
+    "ḑ": "d",
+    "Ḑ": "D",
+    "Ḍ": "D",
+    "ḏ": "d",
+    "Ḏ": "D",
+    "ð": "d",
+    "Ð": "D",
+    "ɗ": "d",
+    "Ɗ": "D",
+    "ế": "e",
+    "ề": "e",
+    "ễ": "e",
+    "ể": "e",
+    "ě": "e",
+    "ẽ": "e",
+    "Ẽ": "E",
+    "ė": "e",
+    "Ė": "E",
+    "ę": "e",
+    "Ę": "E",
+    "Ē": "E",
+    "ẻ": "e",
+    "ẹ": "e",
+    "Ẹ": "E",
+    "ệ": "e",
+    "Ƒ": "F",
+    "ğ": "g",
+    "Ğ": "G",
+    "ĝ": "g",
+    "Ĝ": "G",
+    "ǧ": "g",
+    "Ǧ": "G",
+    "ġ": "g",
+    "Ġ": "G",
+    "ģ": "g",
+    "Ģ": "G",
+    "Ꞡ": "G",
+    "ɡ": "g",
+    "ǥ": "g",
+    "Ĥ": "H",
+    "ȟ": "h",
+    "Ȟ": "H",
+    "ḩ": "h",
+    "Ḩ": "H",
+    "Ħ": "H",
+    "ḫ": "h",
+    "Ḫ": "H",
+    "ẖ": "h",
+    "ⱨ": "h",
+    "Ⱨ": "H",
+    "Ĭ": "I",
+    "ĩ": "i",
+    "į": "i",
+    "Į": "I",
+    "ỉ": "i",
+    "Ȋ": "I",
+    "ị": "i",
+    "Ɪ": "I",
+    "ɨ": "i",
+    "Ĵ": "j",
+    "ḱ": "k",
+    "Ḱ": "K",
+    "Ǩ": "K",
+    "ķ": "k",
+    "Ķ": "K",
+    "Ꞣ": "K",
+    "ḵ": "k",
+    "Ḵ": "K",
+    "Ƙ": "K",
+    "ⱪ": "k",
+    "ĺ": "l",
+    "ľ": "l",
+    "Ľ": "L",
+    "ļ": "l",
+    "Ļ": "L",
+    "Ḷ": "L",
+    "Ḹ": "L",
+    "ḻ": "l",
+    "Ḿ": "M",
+    "ṁ": "m",
+    "ṃ": "m",
+    "Ɱ": "M",
+    "Ń": "N",
+    "Ǹ": "N",
+    "ň": "n",
+    "Ň": "N",
+    "Ṅ": "N",
+    "ņ": "n",
+    "Ņ": "N",
+    "Ꞥ": "N",
+    "ṇ": "n",
+    "Ṇ": "N",
+    "ṉ": "n",
+    "Ɲ": "N",
+    "ꞑ": "n",
+    "ŋ": "n",
+    "ŏ": "o",
+    "Ŏ": "O",
+    "ố": "o",
+    "Ố": "O",
+    "ồ": "o",
+    "ỗ": "o",
+    "ổ": "o",
+    "ǒ": "o",
+    "ő": "o",
+    "Ő": "O",
+    "Ø": "O",
+    "ǫ": "o",
+    "Ǫ": "O",
+    "ỏ": "o",
+    "ơ": "o",
+    "Ơ": "O",
+    "ờ": "o",
+    "ỡ": "o",
+    "ở": "o",
+    "ợ": "o",
+    "ọ": "o",
+    "Ọ": "O",
+    "œ": "oe",
+    "Œ": "OE",
+    "Ꝍ": "O",
+    "ⱺ": "o",
+    "Ṕ": "P",
+    "Ƥ": "P",
+    "ŕ": "r",
+    "Ŕ": "R",
+    "ř": "r",
+    "Ř": "R",
+    "Ꞧ": "R",
+    "Ȓ": "R",
+    "ṛ": "r",
+    "Ṛ": "R",
+    "Ṝ": "R",
+    "ṟ": "r",
+    "𝕊": "S",
+    "ś": "s",
+    "ŝ": "s",
+    "Ŝ": "S",
+    "ṡ": "s",
+    "Ṡ": "S",
+    "Ꞩ": "S",
+    "ș": "s",
+    "Ș": "S",
+    "ť": "t",
+    "Ť": "T",
+    "Ţ": "T",
+    "Ț": "T",
+    "ṯ": "t",
+    "Ṯ": "T",
+    "ᵵ": "t",
+    "Ƭ": "T",
+    "Ʈ": "T",
+    "ŭ": "u",
+    "Ŭ": "U",
+    "ǔ": "u",
+    "ů": "u",
+    "ű": "u",
+    "Ű": "U",
+    "Ũ": "U",
+    "ų": "u",
+    "Ų": "U",
+    "ṻ": "u",
+    "ủ": "u",
+    "Ư": "U",
+    "ứ": "u",
+    "Ứ": "U",
+    "ừ": "u",
+    "ữ": "u",
+    "ử": "u",
+    "ự": "u",
+    "ṳ": "u",
+    "ʉ": "u",
+    "Ẃ": "W",
+    "ẁ": "w",
+    "Ẁ": "W",
+    "ŵ": "w",
+    "Ŵ": "W",
+    "Ẋ": "X",
+    "ỳ": "y",
+    "ŷ": "y",
+    "ỹ": "y",
+    "Ỹ": "Y",
+    "Ȳ": "Y",
+    "ỷ": "y",
+    "Ỷ": "Y",
+    "ỵ": "y",
+    "Ƴ": "Y",
+    "Ź": "Z",
+    "ẑ": "z",
+    "Ẑ": "Z",
+    "Ż": "Z",
+    "Ẓ": "Z",
+    "ẕ": "z",
+    "Ẕ": "Z",
+    "ƶ": "z",
+    "Ȥ": "Z",
+
+    # "ǝ": "",
+    # "Ǝ": "",
+    # "ə": "",
+    # "Ə": "",
+    # "ɛ": "",
+    # "Ɛ": "",
+    # "ﬁ": "",
+    # "ꜰ": "",
+    # "ɣ": "",
+    # "ʰ": "",
+    # "ᴋ": "",
+    # "ℓ": "",
+    # "ƛ": "",
+    # "ⁿ": "",
+    # "ɔ": "",
+    # "Ɵ": "",
+    # "™": "",
+    # "ᵘ": "u",
+    # "Ꞟ": "",
+    # "Ɯ": "",
+    # "Ʊ": "",
+    # "Ʋ": "",
+    # "Ỽ": "",
+    # "ʷ": "",
+    # "ℨ": "",
+    # "ʒ": "",
+    # "Ʒ": "",
+    # "Ǯ": "",
+    # "Ƹ": "",
+    # "Ƨ": "",
+
+    # Greek
+    "α": "alpha",
+    "Α": "Alpha",
+    # "ά": "",
+    "β": "beta",
+    "Β": "Beta",
+    "γ": "gamma",
+    "Γ": "Gamma",
+    "δ": "delta",
+    "Δ": "Delta",
+    "ε": "epsilon",
+    "Ε": "Epsilon",
+    "μ": "u"
+    # "Ͷ": "",
+    # "Ζ": "",
+    # "η": "",
+    # "Η": "",
+    # "Θ": "",
+    # "ι": "",
+    # "Ι": "",
+    # "κ": "",
+    # "Κ": "",
+    # "Λ": "",
+    # "Μ": "",
+    # "ν": "",
+    # "Ν": "",
+    # "Ξ": "",
+    # "ο": "",
+    # "Ο": "",
+    # "ό": "",
+    # "π": "pi", # RENAME INSTEAD
+    # "Π": "",
+    # "ρ": "",
+    # "σ": "",
+    # "Σ": "",
+    # "τ": "",
+    # "Τ": "",
+    # "υ": "",
+    # "φ": "",
+    # "Φ": "",
+    # "χ": "",
+    # "Χ": "",
+    # "Ψ": "",
+    # "ω": "",
+    # "Ω": "",
+
+    # Cyrllic
+    # "а": "",
+    # "А": "",
+    # "Ӕ": "",
+    # "б": "",
+    # "в": "",
+    # "В": "",
+    # "г": "",
+    # "Г": "",
+    # "д": "",
+    # "Д": "",
+    # "е": "",
+    # "з": "",
+    # "Ѕ": "",
+    # "и": "",
+    # "і": "",
+    # "ї": "",
+    # "ј": "",
+    # "к": "",
+    # "қ": "",
+    # "л": "",
+    # "Л": "",
+    # "м": "",
+    # "н": "",
+    # "Н": "",
+    # "о": "",
+    # "п": "",
+    # "р": "",
+    # "с": "",
+    # "С": "",
+    # "Т": "",
+    # "у": "",
+    # "Ў": "",
+    # "ф": "",
+    # "Ф": "",
+    # "х": "",
+    # "Ш": "",
+    # "ь": "",
+    # "я": "",
+    # "ա": "",
+    # "հ": "",
+    # "յ": "",
+}
+
+ascii_equiv_other = {
+    "ʻ": "'",  # U+02BB Modifier letter turned comma ('okina)
+    "ʾ": "'",  # U+02BE Modifier letter right half ring (hamza)
+    "ʿ": "'",  # U+02BF Modier letter left half ring (ayin)
+    # "ʽ": "'",  # U+02BD Modier letter reversed comma (ayin) - change to U+02BF?
+    "¹": "1",
+    "₁": "1",
+    "²": "2",
+    "₂": "2",
+    "³": "3",
+    "⁵": "5",
+    "½": " 1/2",
+    "¼": " 1/4",
+    "¾": " 3/4",
+    "×": "x",  # Times symbol
+    "±": " Plus/Minus "
+    "ʼ": "'",  # U+02BC Modifier letter apostrophe ([[Baháʼí orthography]], First Nation languages)
+    "—": "-",  # U+2014
+    # "Ƽ": "",  # U+01BC Latin capital letter tone five
+    # "Ꞌ": "",  # U+A78B Latin capital letter saltillo (Mexican glottal stop)
+    # "ꞌ": "",  # U+A78C Latin small letter saltillo (Mexican glottal stop)
+
+    "ǃ": "!",  # U+01C3 Latin letter retroflex click
+    "þ": "Th",
+    "Þ": "th",
+    "ß": "ss",
+    # Asked about these and others at
+    # https://en.wikipedia.org/wiki/Wikipedia_talk:Article_titles#Unusual_characters_in_proper_names
+}
+
+special_titles_ok = [
+    "₰",
+    "𝔹",
+    "𓈖",
+    "B₀",
+]
+
+english_ok_chars = r"a-zA-Z0-9/\!\-_\(\)\.–,\":='\?&%\*\+;@~\$"
+english_ok_re = re.compile(rf"[{english_ok_chars}]+")
+ok_with_redirect_chars = "".join(ascii_equiv_letters.keys()) + "".join(ascii_equiv_other.keys())
+ok_with_redirect_re = re.compile(rf"[{ok_with_redirect_chars}]+")
+### other_ok = r"əþɛ/"
+
+NON_ASCII_LETTERS = "".join(ascii_equiv_letters.keys())+"əþɛ"
+MAJOR_CURRENCY_SYMBOLS = "€$£¥₹₽₩₺"
 
 digit_re = re.compile(r"[0-9]")
 remove_math_line_re = re.compile(r"(<math.*?(</math>|$)|\{\{math[^}]+\}?\}?)")
@@ -149,7 +672,7 @@ sports_category_re = re.compile("Category:[^]]+sport")
 
 def check_style_by_line(article_title, article_text):
     try:
-        check_style_by_line_impl(article_title, article_text)
+        return check_style_by_line_impl(article_title, article_text)
     except Exception as e:
         print(e, file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
@@ -204,6 +727,7 @@ def check_style_by_line_impl(article_title, article_text):
             result = check_function(line, line_flags)
             if result:
                 problem_line_tuples.extend(result)
+
     if not problem_line_tuples:
         return None
     try:
@@ -218,42 +742,80 @@ def check_style_by_line_impl(article_title, article_text):
         raise e
 
 
-english_letters = "a-zA-Z"
-latin_diacritics = "ậạàÁáÂâÃãÄäầåấæɑ̠āÇçÈèÉéÊêËëēÌìÍíÎîÏïĭǐīʝÑñÒòÓóÔôÕõÖöớộøōŠšÚúùÙÛûǚÜüũưụÝýŸÿŽž"
-more_ld = r"ṢṭțşăłŞıÅŁźİĀĀćčđĐḍĕĚǴǵĥħḥḤĪɪḳḷṅŌŚṣßţṬūŪżẓ"
-punct = r"\!\-_\(\)\.–,\":='’\?&%\*\+;@~"
-other_ok = r"əþɛ×/"
-english_chars_re = re.compile(rf"[{english_letters}0-9{latin_diacritics}"
-                              + rf"{more_ld}{punct}{other_ok}]+")
-english_letters_re = re.compile(rf"[{english_letters}]+")
+def asciify(input_string):
+    tmp_string = input_string
+    for (from_char, to_char) in ascii_equiv_letters.items():
+        tmp_string = tmp_string.replace(from_char, to_char)
+    for (from_char, to_char) in ascii_equiv_other.items():
+        tmp_string = tmp_string.replace(from_char, to_char)
+    tmp_string = tmp_string.replace("  ", " ")
+    return tmp_string
 
 
+"""
+# unreliable:
+import unicodedata
+title_asciified = unicodedata.normalize("NFKD", article_title).encode('ascii', 'ignore')
+if len(article_title) != len(title_asciified):
+print(f"{article_title} asciified to {title_asciified}", file=sys.stderr)
+chars = title_no_ascii.replace(" ", "")
+for char in chars:
+    print(char)
+    return
+"""
+
+
+# [[WP:TITLESPECIALCHARACTERS]] and [[WP:ENGLISHTITLE]]
 def check_article_title(article_title, article_text):
     if article_text.startswith("#REDIRECT") or article_text.startswith("#redirect"):
         return
 
-    title_tmp = english_chars_re.sub("", article_title)
-    if not title_tmp:
+    title_no_ascii = english_ok_re.sub("", article_title)
+    title_no_ascii = title_no_ascii.strip()
+    if not title_no_ascii:
         return
 
-    """
-    # This isolates disallowed characters that appear in titles mixed
-    # with English letters.
+    if article_title in single_char_titles_ok:
+        return
 
-    for char in title_tmp:
-        category = unicodedata.category(char)
-        # Category codes and meanings:
-        # https://www.unicode.org/reports/tr44/#General_Category_Values
-        # if category in ["Ll", "Lu", "Po", "Sm", "Sk", "So", "Lm",
-        #                 "Sc", "Pd", "No", "Pi"]:
-        #    continue
-        # print(f"{char} category: " + category)
-        if category == "Lo":
-            if english_letters_re.search(article_title):
-                return [("TC", article_title + " [title]")]
-    """
+    if "{{Wiktionary redirect}}" in article_text:
+        return
 
-    return [("TC", article_title + " [title]")]
+    title_tmp = ok_with_redirect_re.sub("", title_no_ascii)
+    title_tmp = title_tmp.strip()
+    if title_tmp:
+        # Found disallowed characters
+        return [("TC", f'"{title_tmp}" in article title')]
+    else:
+        # Found Non-ASCII characters allowed with redirect
+        title_asciified = asciify(article_title)
+        redirect_target = redirect_dict.get(title_asciified)
+        if redirect_target != article_title:
+            # Missing redirect
+            return [("MR", f"{title_asciified} -> {article_title}")]
+        else:
+            print(f"OK with redirect from {title_asciified}", file=sys.stderr)
+            # Otherwise, title is OK
+
+
+"""
+# This isolates disallowed characters that appear in titles mixed
+# with English letters.
+
+import unicodedata
+english_letters_re = re.compile(rf"[a-zA-Z]+")
+for char in title_no_ascii:
+    category = unicodedata.category(char)
+    # Category codes and meanings:
+    # https://www.unicode.org/reports/tr44/#General_Category_Values
+    # if category in ["Ll", "Lu", "Po", "Sm", "Sk", "So", "Lm",
+    #                 "Sc", "Pd", "No", "Pi"]:
+    #    continue
+    # print(f"{char} category: " + category)
+    if category == "Lo":
+        if english_letters_re.search(article_title):
+            return [("CHAR_MIXED", article_title + " [title]")]
+"""
 
 
 washington_state_foo_re = re.compile(r"Washington State [A-Z]")
