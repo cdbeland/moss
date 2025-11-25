@@ -20,6 +20,7 @@ for redirect_pair in open(redirect_filename, "r"):
     redirect_dict[redirect_from] = redirect_to
 print("Finished loading redirects.", file=sys.stderr)
 
+# VALUE CAN BE A STRING OR A LIST OF STRINGS
 ascii_equiv_letters = {
     "á": "a",
     "Á": "A",
@@ -370,41 +371,18 @@ ascii_equiv_letters = {
     "ƶ": "z",
     "Ȥ": "Z",
 
-    # "ǝ": "",
-    # "Ǝ": "",
-    # "ə": "",
-    # "Ə": "",
-    # "ɛ": "",
-    # "Ɛ": "",
-    # "ﬁ": "",
-    # "ꜰ": "",
-    # "ɣ": "",
-    # "ʰ": "",
-    # "ᴋ": "",
-    # "ℓ": "",
-    # "ƛ": "",
-    # "ⁿ": "",
-    # "ɔ": "",
-    # "Ɵ": "",
-    # "™": "",
-    # "ᵘ": "u",
-    # "Ꞟ": "",
-    # "Ɯ": "",
-    # "Ʊ": "",
-    # "Ʋ": "",
-    # "Ỽ": "",
-    # "ʷ": "",
-    # "ℨ": "",
-    # "ʒ": "",
-    # "Ʒ": "",
-    # "Ǯ": "",
-    # "Ƹ": "",
-    # "Ƨ": "",
+    # Latin epsilon, used in various languages
+    "Ɛ": "E",
+    "ɛ": "e",
+    "Ɛ̃": "E",
+
+    # Cyrillic but close enough
+    "ї": "i",
+    "Ӕ": "AE",
 
     # Greek
     "α": "alpha",
     "Α": "Alpha",
-    # "ά": "",
     "β": "beta",
     "Β": "Beta",
     "γ": "gamma",
@@ -413,17 +391,15 @@ ascii_equiv_letters = {
     "Δ": "Delta",
     "ε": "epsilon",
     "Ε": "Epsilon",
-    "μ": "u"
-    # "Ͷ": "",
-    # "Ζ": "",
-    # "η": "",
-    # "Η": "",
+    "μ": "u",
+    "Ζ": "Zeta",
+    "η": "eta",
+    "Η": "Eta",
     # "Θ": "",
     # "ι": "",
     # "Ι": "",
     # "κ": "",
-    # "Κ": "",
-    # "Λ": "",
+    "Λ": "lambda",
     # "Μ": "",
     # "ν": "",
     # "Ν": "",
@@ -431,8 +407,8 @@ ascii_equiv_letters = {
     # "ο": "",
     # "Ο": "",
     # "ό": "",
-    # "π": "pi", # RENAME INSTEAD
-    # "Π": "",
+    "π": "pi",  # Wave of discussions in 2010s supported keeping with redirect
+    "Π": "Pi",
     # "ρ": "",
     # "σ": "",
     # "Σ": "",
@@ -446,49 +422,6 @@ ascii_equiv_letters = {
     # "Ψ": "",
     # "ω": "",
     # "Ω": "",
-
-    # Cyrllic
-    # "а": "",
-    # "А": "",
-    # "Ӕ": "",
-    # "б": "",
-    # "в": "",
-    # "В": "",
-    # "г": "",
-    # "Г": "",
-    # "д": "",
-    # "Д": "",
-    # "е": "",
-    # "з": "",
-    # "Ѕ": "",
-    # "и": "",
-    # "і": "",
-    # "ї": "",
-    # "ј": "",
-    # "к": "",
-    # "қ": "",
-    # "л": "",
-    # "Л": "",
-    # "м": "",
-    # "н": "",
-    # "Н": "",
-    # "о": "",
-    # "п": "",
-    # "р": "",
-    # "с": "",
-    # "С": "",
-    # "Т": "",
-    # "у": "",
-    # "Ў": "",
-    # "ф": "",
-    # "Ф": "",
-    # "х": "",
-    # "Ш": "",
-    # "ь": "",
-    # "я": "",
-    # "ա": "",
-    # "հ": "",
-    # "յ": "",
 }
 
 ascii_equiv_other = {
@@ -505,10 +438,39 @@ ascii_equiv_other = {
     "½": " 1/2",
     "¼": " 1/4",
     "¾": " 3/4",
+    "¢": " cents ",
     "×": "x",  # Times symbol
-    "±": " Plus/Minus "
+    "±": " Plus/Minus ",
     "ʼ": "'",  # U+02BC Modifier letter apostrophe ([[Baháʼí orthography]], First Nation languages)
     "—": "-",  # U+2014
+    "₀": " subscript zero",
+
+    # In some weird proper nouns, titles of works
+    "«": '"',  # Musical work
+    "»": '"',  # Musical work
+    "™": "TM",
+
+    # Imported from Cyrillic as a Latin letter in [[Yañalif]]
+    "ь": ["b", "i"],
+
+    # First Nation languages and PIE
+    "ʰ": "h",
+    "ʷ": "w",
+    "ᵘ": "u",
+
+    # In some African languages
+    "ɣ": ["g'", "y"],
+    "ʔ": ["?", "'"],  # Glottal stop
+    "ɂ": ["?", "'"],  # Glottal stop
+
+    # Azerbaijani
+    "ə": ["a", "e"],
+    "Ə": ["A", "E"],
+
+    # Spanish
+    "¿": ["", "?"],
+    "¡": ["", "!"],
+
     # "Ƽ": "",  # U+01BC Latin capital letter tone five
     # "Ꞌ": "",  # U+A78B Latin capital letter saltillo (Mexican glottal stop)
     # "ꞌ": "",  # U+A78C Latin small letter saltillo (Mexican glottal stop)
@@ -521,14 +483,14 @@ ascii_equiv_other = {
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Article_titles#Unusual_characters_in_proper_names
 }
 
-special_titles_ok = [
-    "₰",
-    "𝔹",
-    "𓈖",
-    "B₀",
+disambig_templates = [
+    "{{disamb}}",
+    "{{mathdab}}",
+    "{{dab}}"
+    "{{disambiguation}}",
 ]
 
-english_ok_chars = r"a-zA-Z0-9/\!\-_\(\)\.–,\":='\?&%\*\+;@~\$"
+english_ok_chars = r"a-zA-Z0-9/\!\-_\(\)\.–,\":='\?&%\*\+;@~\$\^"
 english_ok_re = re.compile(rf"[{english_ok_chars}]+")
 ok_with_redirect_chars = "".join(ascii_equiv_letters.keys()) + "".join(ascii_equiv_other.keys())
 ok_with_redirect_re = re.compile(rf"[{ok_with_redirect_chars}]+")
@@ -705,7 +667,6 @@ def check_style_by_line_impl(article_title, article_text):
             result = cup_tbsp_tsp_check(line, line_flags)
             if result and not sports_category_re.search(article_text):
                 problem_line_tuples.extend(result)
-
         for check_function in [
                 washington_state_check,
                 cvt_speed_check,
@@ -742,14 +703,24 @@ def check_style_by_line_impl(article_title, article_text):
         raise e
 
 
+# Can return multiple strings due to ambiguity
 def asciify(input_string):
-    tmp_string = input_string
-    for (from_char, to_char) in ascii_equiv_letters.items():
-        tmp_string = tmp_string.replace(from_char, to_char)
-    for (from_char, to_char) in ascii_equiv_other.items():
-        tmp_string = tmp_string.replace(from_char, to_char)
-    tmp_string = tmp_string.replace("  ", " ")
-    return tmp_string
+    output_strings = [input_string]
+
+    for (from_char, to_charx) in list(ascii_equiv_letters.items()) + list(ascii_equiv_other.items()) + [("  ", " ")]:
+        if type(to_charx) is str:
+            output_strings = [s.replace(from_char, to_charx).strip() for s in output_strings]
+        elif type(to_charx) is list:
+            tmp_strings = []
+            for to_char in to_charx:
+                if to_char in output_strings[0]:
+                    tmp_strings += [s.replace(from_char, to_char).strip() for s in output_strings]
+                else:
+                    tmp_strings = output_strings
+            output_strings = tmp_strings
+        else:
+            raise ("Bad type in value")
+    return output_strings
 
 
 """
@@ -775,7 +746,11 @@ def check_article_title(article_title, article_text):
     if not title_no_ascii:
         return
 
-    if article_title in single_char_titles_ok:
+    if len(article_title) == 1 and any([dt for dt in disambig_templates if dt in article_text]):
+        return
+
+    if article_title[0] == ".":
+        # Skip internationalized top-level domains in DNS
         return
 
     if "{{Wiktionary redirect}}" in article_text:
@@ -788,14 +763,14 @@ def check_article_title(article_title, article_text):
         return [("TC", f'"{title_tmp}" in article title')]
     else:
         # Found Non-ASCII characters allowed with redirect
-        title_asciified = asciify(article_title)
-        redirect_target = redirect_dict.get(title_asciified)
-        if redirect_target != article_title:
-            # Missing redirect
-            return [("MR", f"{title_asciified} -> {article_title}")]
-        else:
-            print(f"OK with redirect from {title_asciified}", file=sys.stderr)
-            # Otherwise, title is OK
+        titles_asciified = asciify(article_title)
+        result = []
+        for title_asciified in titles_asciified:
+            redirect_target = redirect_dict.get(title_asciified)
+            if redirect_target != article_title:
+                # Missing redirect
+                result += [("MR", f"{title_asciified} -> {article_title}")]
+        return result
 
 
 """
