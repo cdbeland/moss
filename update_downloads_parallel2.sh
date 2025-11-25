@@ -22,7 +22,7 @@ echo `date`
 echo "Decompressing enwiki multistream and converting XML to CSV..."
 cd $ORIG_DIR
 # Run time: About 4 hours (on big-bucks)
-bunzip2 -c /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml.bz2 | venv/bin/python3 xml_to_csv.py enwiki
+bunzip2 -c /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml.bz2 | venv/bin/python3 xml_to_csv.py /var/local/moss/bulk-wikipedia/enwiki
 rm -f /var/local/moss/bulk-wikipedia/enwiki-latest-pages-articles-multistream.xml.bz2
 # 1 Aug 2023: .xml.bz2 20GB, .xml 90GB, .csv 54GB
 
