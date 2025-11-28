@@ -445,6 +445,8 @@ ascii_equiv_other = {
     "—": "-",  # U+2014
     "₀": " subscript zero",
 
+    "¥": "Y",
+
     # In some weird proper nouns, titles of works
     "«": '"',  # Musical work
     "»": '"',  # Musical work
@@ -475,11 +477,14 @@ ascii_equiv_other = {
     # "Ꞌ": "",  # U+A78B Latin capital letter saltillo (Mexican glottal stop)
     # "ꞌ": "",  # U+A78C Latin small letter saltillo (Mexican glottal stop)
 
-    "ǃ": "!",  # U+01C3 Latin letter retroflex click
+    "ǃ": "!",   # U+01C3 Latin letter retroflex click
+    "ǀ": ["I", ""],   # Dental click
+    "ǁ": ["II", ""],  # Lateral click
+    "ǂ": "",          # Palatal click
     "þ": "Th",
     "Þ": "th",
     "ß": "ss",
-    # Asked about these and others at
+    ### Asked about these and others at
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Article_titles#Unusual_characters_in_proper_names
 }
 
@@ -736,10 +741,38 @@ for char in chars:
 """
 
 
+special_titles = [
+    "YS",
+    "Yes",
+    "¥$",
+    "¥€$",
+]
+
+
 # [[WP:TITLESPECIALCHARACTERS]] and [[WP:ENGLISHTITLE]]
 def check_article_title(article_title, article_text):
     if article_text.startswith("#REDIRECT") or article_text.startswith("#redirect"):
         return
+
+    if article_title in special_titles:
+        # Cases where disambiguation pages (instead of redirects) link
+        # to untypeable titles.
+        #
+        # TODO: generate a list of links to non-ASCII titles from all
+        # disambiguation pages so these don't have to be
+        # special-cased.
+        if article_title in ["¥$", "¥€$"]:
+            return
+        if article_title == "YS":
+            if "[[¥$]]" in article_text:
+                return
+            else:
+                return [("MR", "YS -> ¥$")]
+        if article_title == "Yes":
+            if "[[¥€$]]" in article_text:
+                return
+            else:
+                return [("MR", "Yes -> ¥€$")]
 
     title_no_ascii = english_ok_re.sub("", article_title)
     title_no_ascii = title_no_ascii.strip()
