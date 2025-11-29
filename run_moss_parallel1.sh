@@ -119,7 +119,7 @@ grep ^INFONAT_ERR tmp-infonat.txt | sort > fixme-infonat-err.txt
 
 # ---
 
-echo "moss_check-style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
+echo "moss_check_style_by_line.py needs rewrite for performance" > INCOMPLETE.txt
 # grep ^P tmp-style-by-line.txt > fixme-prime.txt
 # grep ^QB tmp-style-by-line.txt > fixme-bad-quoting.txt
 # grep ^QD tmp-style-by-line.txt | perl ../count.pl | sort -rn | perl -pe "s/^\d+\t//" | head -1000 > jwb-double-most.txt
