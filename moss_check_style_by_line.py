@@ -451,6 +451,7 @@ ascii_equiv_other = {
     "«": '"',  # Musical work
     "»": '"',  # Musical work
     "™": "TM",
+    "§": "S",  # Weird poetry; should normally be moved to "Section"
 
     # Imported from Cyrillic as a Latin letter in [[Yañalif]]
     "ь": ["b", "i"],
@@ -746,12 +747,18 @@ for char in chars:
 """
 
 
-special_titles = [
-    "YS",
-    "Yes",
-    "¥$",
-    "¥€$",
-]
+# Cases where disambiguation pages (instead of redirects) link to
+# untypeable titles.
+#
+# TODO: generate a list of links to non-ASCII titles from all
+# disambiguation pages so these don't have to be special-cased.
+
+disambig_to_article = {
+    "YS": "¥$",
+    "Yes": "¥€$",
+    "UF": "μF",
+    "Theta (disambiguation)": "Θ (set theory)",
+}
 
 
 # [[WP:TITLESPECIALCHARACTERS]] and [[WP:ENGLISHTITLE]]
@@ -759,25 +766,12 @@ def check_article_title(article_title, article_text):
     if article_text.startswith("#REDIRECT") or article_text.startswith("#redirect"):
         return
 
-    if article_title in special_titles:
-        # Cases where disambiguation pages (instead of redirects) link
-        # to untypeable titles.
-        #
-        # TODO: generate a list of links to non-ASCII titles from all
-        # disambiguation pages so these don't have to be
-        # special-cased.
-        if article_title in ["¥$", "¥€$"]:
+    disambig_target = disambig_to_article.get(article_title)
+    if disambig_target:
+        if f"[[{disambig_target}]]" in article_text or f"[[{disambig_target} (disambiguation)]]" in article_text:
             return
-        if article_title == "YS":
-            if "[[¥$]]" in article_text:
-                return
-            else:
-                return [("MR", "YS -> ¥$")]
-        if article_title == "Yes":
-            if "[[¥€$]]" in article_text:
-                return
-            else:
-                return [("MR", "Yes -> ¥€$")]
+        else:
+            return [("MD", f"{article_title} -> {disambig_target}")]
 
     title_no_ascii = english_ok_re.sub("", article_title)
     title_no_ascii = title_no_ascii.strip()
@@ -818,6 +812,10 @@ def check_article_title(article_title, article_text):
                 return
 
         return [("MR", f"{article_title} -> {alt_plural}")]
+
+    # U+2212 Minus Sign is the correct character in chemical names
+    if "(−)" in article_title:
+        return
 
     title_tmp = ok_with_redirect_re.sub("", title_no_ascii)
     title_tmp = title_tmp.strip()
