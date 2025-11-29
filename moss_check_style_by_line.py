@@ -495,11 +495,16 @@ disambig_templates = [
     "{{disambiguation}}",
 ]
 
+disambig_templates_chinese = [
+    "{{disambig|chinese",
+    "{{disambiguation|chinese",
+    "{{dab|chinese",
+]
+
 english_ok_chars = r"a-zA-Z0-9/\!\-_\(\)\.–,\":='\?&%\*\+;@~\$\^"
 english_ok_re = re.compile(rf"[{english_ok_chars}]+")
 ok_with_redirect_chars = "".join(ascii_equiv_letters.keys()) + "".join(ascii_equiv_other.keys())
 ok_with_redirect_re = re.compile(rf"[{ok_with_redirect_chars}]+")
-### other_ok = r"əþɛ/"
 
 NON_ASCII_LETTERS = "".join(ascii_equiv_letters.keys())+"əþɛ"
 MAJOR_CURRENCY_SYMBOLS = "€$£¥₹₽₩₺"
@@ -779,7 +784,14 @@ def check_article_title(article_title, article_text):
     if not title_no_ascii:
         return
 
-    if len(article_title) == 1 and any([dt for dt in disambig_templates if dt in article_text]):
+    article_text_lower = article_text.lower()
+
+    if len(article_title) == 1 and any([dt for dt in disambig_templates if dt in article_text_lower]):
+        return
+
+    # Special exception for Chinese characters, where different
+    # readings produce incoherent romanizations
+    if any([dt for dt in disambig_templates_chinese if dt in article_text_lower]):
         return
 
     if article_title[0] == ".":
@@ -788,6 +800,24 @@ def check_article_title(article_title, article_text):
 
     if "{{Wiktionary redirect}}" in article_text:
         return
+
+    if "°" in title_no_ascii:
+        # Special cases for degree sign
+        if re.search(r"\([0-9][0-9]°[0-9][0-9]′", article_title):
+            # Readers are unlikely to input geographic coordinates
+            # used as a disambiguator
+            return
+
+        alt_plural = article_title.replace("°", " degrees ").replace("  ", " ").strip()
+        if redirect_dict.get(alt_plural) == article_title:
+            return
+
+        for replacement in [" degree ", " Degrees ", " Degree "]:
+            alt_title = article_title.replace("°", replacement).replace("  ", " ").strip()
+            if redirect_dict.get(alt_title) == article_title:
+                return
+
+        return [("MR", f"{article_title} -> {alt_plural}")]
 
     title_tmp = ok_with_redirect_re.sub("", title_no_ascii)
     title_tmp = title_tmp.strip()
