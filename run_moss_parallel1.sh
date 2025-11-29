@@ -5,7 +5,7 @@
 set -e
 echo "Starting style check by line..."
 echo `date`
-../venv/bin/python3 ../moss_check_style_by_line.py > tmp-style-by-line.txt
+../venv/bin/python3 ../moss_check_style_by_line.py /var/local/moss/bulk-wikipedia/enwiki-redirects.csv > tmp-style-by-line.txt
 # "grep" returns non-zero exit status if there are no matches
 echo "Finished style check by line; processing..."
 echo `date`

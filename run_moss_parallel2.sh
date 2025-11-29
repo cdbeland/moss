@@ -123,6 +123,10 @@ echo `date`
 
 # Feet and inches - [[MOS:UNITNAMES]]
 
+# grep returns non-zero if no matches are found, but this is normal
+# sometimes.
+set +e
+
 # A comprehensive scan for foot-inch conversions is also done in
 # moss_check_style_by_line.py. The below is for high-priority
 # instances that are causing parse errors and could use conversion
@@ -136,6 +140,8 @@ cat tmp-feet-inches2.txt tmp-feet-inches1.txt tmp-feet-inches3.txt | perl -pe 's
 grep -P "[0-9]+° ?[0-9]+' ?[0-9]+\"" err-parse-failures.txt | perl -pe 's/^\* \[\[(.*?)\]\] - .*$/$1/' | sort | uniq > jwb-arc-units.txt
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9]+° ?[0-9]+' ?[0-9]+\"" > tmp-arc-units-all.txt
 cat tmp-arc-units-all.txt | perl -pe 's/^(.*?):.*/$1/' | sort | uniq >> jwb-arc-units.txt
+
+set -e
 
 # See also: jwb-straight-quotes-unbalanced.txt
 
@@ -226,8 +232,6 @@ echo `date`
 ../venv/bin/python3 ../chemical_formula_report.py >> post-chemical-formulas.txt
 echo "Done slow chemical formulas report"
 echo `date`
-Mon Nov 17 12:51:44 PM EST 2025
-Mon Nov 17 01:18:43 PM EST 2025
 
 
 # Run time: About 1 hour (big-board)
