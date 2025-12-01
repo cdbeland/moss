@@ -21,6 +21,7 @@ for redirect_pair in open(redirect_filename, "r"):
 print("Finished loading redirects.", file=sys.stderr)
 
 # VALUE CAN BE A STRING OR A LIST OF STRINGS
+### TODO: Support both "and" and "or" logic in lists
 ascii_equiv_letters = {
     "á": "a",
     "Á": "A",
@@ -386,7 +387,7 @@ ascii_equiv_letters = {
     "β": "beta",
     "Β": "Beta",
     "γ": "gamma",
-    "Γ": "Gamma",
+    "Γ": "Gamma ",
     "δ": "delta",
     "Δ": "Delta",
     "ε": "epsilon",
@@ -396,32 +397,19 @@ ascii_equiv_letters = {
     "η": "eta",
     "Η": "Eta",
     # "Θ": "",
-    # "ι": "",
-    # "Ι": "",
-    # "κ": "",
-    "Λ": "lambda",
-    # "Μ": "",
-    # "ν": "",
-    # "Ν": "",
-    # "Ξ": "",
-    # "ο": "",
-    # "Ο": "",
-    # "ό": "",
+    "Λ": "Lambda",
+    "Ξ": " Xi ",
     "π": "pi",  # Wave of discussions in 2010s supported keeping with redirect
     "Π": "Pi",
     # "ρ": "",
-    # "σ": "",
-    # "Σ": "",
+    "σ": "sigma",
+    "Σ": "Sigma",
     # "τ": "",
-    # "Τ": "",
-    # "υ": "",
     # "φ": "",
     # "Φ": "",
-    # "χ": "",
-    # "Χ": "",
-    # "Ψ": "",
-    # "ω": "",
-    # "Ω": "",
+    "Ψ": "Psi",
+    "ω": " omega ",
+    "Ω": "Omega",
 }
 
 ascii_equiv_other = {
@@ -439,19 +427,21 @@ ascii_equiv_other = {
     "¼": " 1/4",
     "¾": " 3/4",
     "¢": " cents ",
-    "×": "x",  # Times symbol
+    "×": "x",    # Times symbol
     "±": " Plus/Minus ",
-    "ʼ": "'",  # U+02BC Modifier letter apostrophe ([[Baháʼí orthography]], First Nation languages)
-    "—": "-",  # U+2014
+    "ʼ": "'",    # U+02BC Modifier letter apostrophe ([[Baháʼí orthography]], First Nation languages)
+    "—": "-",    # U+2014
     "₀": " subscript zero",
-
+    "ℓ": "l",    # Math
+    "⋯": "...",  # Math
     "¥": "Y",
 
     # In some weird proper nouns, titles of works
-    "«": '"',  # Musical work
-    "»": '"',  # Musical work
+    "«": '"',   # Musical work
+    "»": '"',   # Musical work
     "™": "TM",
-    "§": "S",  # Weird poetry; should normally be moved to "Section"
+    "§": "S",   # Weird poetry; should normally be moved to "Section"
+    "®": "^R",  # Musical works
 
     # Imported from Cyrillic as a Latin letter in [[Yañalif]]
     "ь": ["b", "i"],
@@ -485,7 +475,7 @@ ascii_equiv_other = {
     "þ": "Th",
     "Þ": "th",
     "ß": "ss",
-    ### Asked about these and others at
+    # Asked about these and others at
     # https://en.wikipedia.org/wiki/Wikipedia_talk:Article_titles#Unusual_characters_in_proper_names
 }
 
@@ -496,13 +486,16 @@ disambig_templates = [
     "{{disambiguation}}",
 ]
 
+# Must be lowercase
 disambig_templates_chinese = [
     "{{disambig|chinese",
     "{{disambiguation|chinese",
     "{{dab|chinese",
+    "{{chinese title disambiguation}}",
+    "{{disambig-chinese-char-title}}",
 ]
 
-english_ok_chars = r"a-zA-Z0-9/\!\-_\(\)\.–,\":='\?&%\*\+;@~\$\^"
+english_ok_chars = r"a-zA-Z0-9/\!\-_\(\)\.–,\":='\?&%\*\+;@~\$\^\\"
 english_ok_re = re.compile(rf"[{english_ok_chars}]+")
 ok_with_redirect_chars = "".join(ascii_equiv_letters.keys()) + "".join(ascii_equiv_other.keys())
 ok_with_redirect_re = re.compile(rf"[{ok_with_redirect_chars}]+")
@@ -758,7 +751,15 @@ disambig_to_article = {
     "Yes": "¥€$",
     "UF": "μF",
     "Theta (disambiguation)": "Θ (set theory)",
+    "ST": "ΣΤ",  # Sigma tau
 }
+
+# Must be lowercase
+wiktionary_redirect = [
+    "{{wiktionary redirect}}",
+    "{{wtsr}}",
+    "{{wikt red",
+]
 
 
 # [[WP:TITLESPECIALCHARACTERS]] and [[WP:ENGLISHTITLE]]
@@ -792,7 +793,7 @@ def check_article_title(article_title, article_text):
         # Skip internationalized top-level domains in DNS
         return
 
-    if "{{Wiktionary redirect}}" in article_text:
+    if any([tag for tag in wiktionary_redirect if tag in article_text_lower]):
         return
 
     if "°" in title_no_ascii:
