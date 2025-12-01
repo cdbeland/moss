@@ -2162,6 +2162,13 @@ $ wc -l *feet*
  > tmp-feet-inches-all3.txt
 cat tmp-feet-inches-all2.txt tmp-feet-inches-all1.txt tmp-feet-inches-all3.txt | perl -pe 's/^(.*?):.*/$1/' | uniq > jwb-feet-inches-all.txt
 
+# TODO:
+https://en.wikipedia.org/wiki/Template_talk:Convert#Inches_to_cm_vs._mm
+
+Add "|cm" to {{convert}} and {{cvt}} instances where a distance is
+expressed in whole inches, from 1 to 39 inches (1-100 cm).
+ -> One-time run, doesn't need to be done in all instances, depending
+    on the application, and 100+ cm might be OK sometimes, too.
 
 # ---
 
