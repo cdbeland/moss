@@ -4,8 +4,8 @@ lru-dict
 mysql-connector-python
 nltk
 nose
+overdue
 pyenchant
-stopit
 unidecode
 wikipedia
 textstat

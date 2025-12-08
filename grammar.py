@@ -17,15 +17,15 @@
 
 import mysql.connector
 import nltk
+from overdue import timeout_set_to, TaskAbortedError
+from pywikibot import Page, Site
 import re
-import stopit
 import sys
 import time
 from english_grammar import (enwiktionary_cat_to_pos,
                              phrase_structures,
                              closed_lexicon,
                              vocab_overrides)
-from pywikibot import Page, Site
 from wikitext_util import wikitext_to_plaintext, get_main_body_wikitext, blockquote_re
 
 
@@ -67,7 +67,6 @@ conforming_currency_re = re.compile("^(%s)%s(M|bn)?$" % (currency_pattern, numbe
 # M for million, bn for billion per
 # https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Currencies_and_monetary_values
 
-# Must be an integer
 SENTENCE_TIMEOUT_SEC = 1
 
 
@@ -170,12 +169,11 @@ def check_english(wikitext, title):
 
         (grammar_string, word_to_pos) = load_grammar_for_word_list(words)
         is_grammatical = None
-        with stopit.SignalTimeout(SENTENCE_TIMEOUT_SEC, swallow_exc=True) as timeout_result:
-            is_grammatical = is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string)
-
-        elapsed = time.time() - start_time
-
-        if timeout_result.state == timeout_result.TIMED_OUT:
+        try:
+            with timeout_set_to(SENTENCE_TIMEOUT_SEC, raise_exception=True):
+                is_grammatical = is_sentence_grammatical_beland(words, word_to_pos, title, sentence, grammar_string)
+        except TaskAbortedError:
+            elapsed = time.time() - start_time
             print("T\t%s\t%s\tTIMEOUT\t%s" % (elapsed, title, sentence))
             continue
 
