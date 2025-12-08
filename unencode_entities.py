@@ -32,16 +32,6 @@ alert = [
     # "»",  # rsaquo
     # "„",  # bdquo
 
-    # Disabled - these are probably fine as-is. TODO: Should use ʿ
-    # vs. ' more consistently, and in some cases {{transl}} tags are
-    # missing.
-    # # For transliterated Arabic ayin
-    # "ʿ",  # : "{{ayin}}",
-
-    # CONFLICTING SUBSTITUTIONS FOR ARABIC VS. HEBREW:
-    # "ʾ": "{{lenis}}",  # For transliterated Arabic alpeh and hamza
-    # -> Or maybe make separate templates for these
-
     # For native [[Greek numerals]]
     "&#x0374;",  # : "{{keraia}}",
 
@@ -305,17 +295,29 @@ transform_unsafe = {
     # character itself is being discussed, or are just rules of thumb
     # based on observed misuse.
 
-    # "ʾ",       #: "'",  # U+02BE Modifier Letter Right Half Ring to ASCII
+    # "ʾ": "{{hamza}}",
+    "ʾ": "'",
+    # U+02BE Modifier Letter Right Half Ring to ASCII
+    #
     # ASCII apostrophe is used in Hebrew transliterations by default, per
     # [[Wikipedia:Naming conventions (Hebrew)]] which uses the Hebrew Academy scheme at
     # [[Romanization_of_Hebrew#Table]]
     # Hebrew letter [[yodh]] can be left as raw U+05D9 since it should
     # be clear from context it's not an apostrophe
-    # For Arabic, this is should be changed to {{hamza}}
-    "ʾ": "{{hamza}}",  # U+02BE Modifier Letter Right Half Ring to ASCII
-    # See [[MOS:APOSTROPHE]] (Unicode character is allowed, but there
-    # have been complaints about lookalike characters and sometimes
-    # the wrong one is used)
+    #
+    # For Arabic, basic transliteration with apostrophe is used in
+    # most cases per [[Wikipedia:Manual of Style/Arabic]], {{hamza}}
+    # is used in strict transliteration for linguistics (should be
+    # inside {{transliteration}}) unless there is a common
+    # transliteration.  See also [[MOS:APOSTROPHE]].
+
+    # "ʿ": "{{ayin}}",
+    "ʿ": "'",
+    # U+02BF Modifier letter left half ring to ASCII
+    # Use apostrophe for basic transliteration (most cases) per
+    # [[Wikipedia:Manual of Style/Arabic]], and {{ayin}} in strict
+    # transliteration, inside {{transliteration}} unless there is a
+    # common transliteration. See also [[MOS:APOSTROPHE]].
 
     # Per [[MOS:MATHSPECIAL]]; may need to convert the remainder of
     # the expression
