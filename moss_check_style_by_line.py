@@ -392,19 +392,20 @@ ascii_equiv_letters = {
     "Δ": "Delta",
     "ε": "epsilon",
     "Ε": "Epsilon",
+    "κ": "kappa",
     "μ": "u",
     "Ζ": "Zeta",
     "η": "eta",
     "Η": "Eta",
     # "Θ": "",
     "Λ": "Lambda",
+    "ν": "v",  # nu
     "Ξ": " Xi ",
     "π": "pi",  # Wave of discussions in 2010s supported keeping with redirect
     "Π": "Pi",
     # "ρ": "",
     "σ": "sigma",
     "Σ": "Sigma",
-    # "τ": "",
     # "φ": "",
     # "Φ": "",
     "Ψ": "Psi",
@@ -428,6 +429,7 @@ ascii_equiv_other = {
     "¾": " 3/4",
     "¢": " cents ",
     "×": "x",    # Times symbol
+    "÷": "/",
     "±": " Plus/Minus ",
     "ʼ": "'",    # U+02BC Modifier letter apostrophe ([[Baháʼí orthography]], First Nation languages)
     "—": "-",    # U+2014
@@ -436,12 +438,26 @@ ascii_equiv_other = {
     "⋯": "...",  # Math
     "¥": "Y",
 
+    # Ordinal indicators for some non-English works (restricted by regex later)
+    "ª": "a",
+    "º": "o",
+
+    "−": "-",  # U+2212 Minus Sign from ASCII dash (needed in some
+               # math-related titles, some astronomical objects, and
+               # some time zones, but wrong for titles with year
+               # ranges and hyphenated words)
+
     # In some weird proper nouns, titles of works
     "«": '"',   # Musical work
     "»": '"',   # Musical work
     "™": "TM",
     "§": "S",   # Weird poetry; should normally be moved to "Section"
     "®": "^R",  # Musical works
+    "·": "-",   # Also STEM, some Spanish places
+    "•••–": "dot dot dot dash",
+
+    "♭": " flat ",
+    "♯": " sharp ",
 
     # Imported from Cyrillic as a Latin letter in [[Yañalif]]
     "ь": ["b", "i"],
@@ -450,6 +466,7 @@ ascii_equiv_other = {
     "ʰ": "h",
     "ʷ": "w",
     "ᵘ": "u",
+    "ⁿ": "n",
 
     # In some African languages
     "ɣ": ["g'", "y"],
@@ -752,13 +769,15 @@ disambig_to_article = {
     "UF": "μF",
     "Theta (disambiguation)": "Θ (set theory)",
     "ST": "ΣΤ",  # Sigma tau
+    "AA": "A∴A∴",
 }
 
-# Must be lowercase
+# Must be lowercase, literal string (not regex)
 wiktionary_redirect = [
     "{{wiktionary redirect}}",
     "{{wtsr}}",
     "{{wikt red",
+    "{{wi|"
 ]
 
 
@@ -813,6 +832,15 @@ def check_article_title(article_title, article_text):
                 return
 
         return [("MR", f"{article_title} -> {alt_plural}")]
+
+    # Special restriction for ordinal indicators (to catch incorrect
+    # uses like "Nº")
+    if "ª" in title_no_ascii:
+        if not re.search(r"[0-9]ª", article_title):
+            return [("TC", 'Incorrect use of ordinal indicator "ª" in article title')]
+    if "º" in title_no_ascii:
+        if not re.search(r"[0-9]ª", article_title):
+            return [("TC", 'Incorrect use of ordinal indicator "º" in article title')]
 
     # U+2212 Minus Sign is the correct character in chemical names
     if "(−)" in article_title:
@@ -2135,6 +2163,8 @@ r"""
 
 TODO: Finish rewrite of the below code into Python functions for
 increased performance. The old style was abandoned at commit d0f8fb1
+
+# "N°" or any "[^0-9]° should probably not have degree symbol
 
 # ---
 # Feet and inches - [[MOS:UNITNAMES]]
