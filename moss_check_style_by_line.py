@@ -724,7 +724,7 @@ def check_style_by_line_impl(article_title, article_text):
         raise e
 
 
-# Can return multiple strings due to ambiguity
+# Can return multiple strings due to ambiguity of what the ASCII version should be
 def asciify(input_string):
     output_strings = [input_string]
 
@@ -734,7 +734,7 @@ def asciify(input_string):
         elif type(to_charx) is list:
             tmp_strings = []
             for to_char in to_charx:
-                if to_char in output_strings[0]:
+                if from_char in output_strings[0]:
                     tmp_strings += [s.replace(from_char, to_char).strip() for s in output_strings]
                 else:
                     tmp_strings = output_strings
