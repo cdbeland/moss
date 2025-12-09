@@ -38,8 +38,14 @@ with open("/var/local/moss/bulk-wikipedia/Typos", "r") as regex_file:
             regex_compiled = re.compile(regex_string)
             regex_tuples.append((regex_name, regex_string, regex_compiled, replacement))
 
-# Captured from 2024-03-20 database dump
+#  Refresh from retf-stat-array.py
 regex_frequencies = {
+    # 2025-12-01 dump patches
+    "French": 917,
+    "Currency symbol before number#2": 836,
+    "Currency symbol before number": 915,
+
+    # Captured from 2024-03-20 database dump
     "Abandon": 1,
     "Abkhazia": 1,
     "Absorb": 1,
@@ -3379,7 +3385,7 @@ def show_replacement(result, regex_tuple, article_text):
     if snippet == changed_to:
         return None
     else:
-        return (single_line_format(changed_to))
+        return (f"{single_line_format(snippet)}\t{single_line_format(changed_to)}")
 
 
 def full_regex_callback(params):
@@ -3413,7 +3419,9 @@ def full_regex_callback(params):
                 if print_stats:
                     regex_hits[regex_tuple[0]] += 1
                 regex_historical_frequency = regex_frequencies.get(regex_tuple[0], 0)
-                print(f'{article_title}\t{single_line_format(result[0])}\t{replacement_str}\t"{regex_tuple[0]}"\t{regex_historical_frequency}')
+                # This version adds the trigger string without context in a separate column
+                # print(f'{article_title}\t{single_line_format(result[0])}\t{replacement_str}\t"{regex_tuple[0]}"\t{regex_historical_frequency}')
+                print(f'{article_title}\t{regex_historical_frequency}\t"{regex_tuple[0]}"\t{replacement_str}')
             else:
                 # print(f"{article_title}\tNO CHANGES MADE")
                 pass

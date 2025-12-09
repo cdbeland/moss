@@ -141,13 +141,16 @@ rm tmp-readability.txt
 
 echo "Beginning RETF scan..."
 echo `date`
-../venv/bin/python ../retf_offline_scan.py | sort > tmp-retf.csv
-cat tmp-retf.csv | perl -pe 's/^.*\t(.*?)\t.*?$/$1/' | sort | perl ../count.pl | sort -n > retf-counts.txt
-sort tmp-retf.csv --stable -n -k5 -t "	" > retf-by-regex.csv
+# Takes many hours
+../venv/bin/python ../retf_offline_scan.py > tmp-retf.csv
+
+# The rest takes a few seconds
+sort -k2n -k3,3 -k1  -t"	" tmp-retf.csv > retf-by-regex.csv
+# rm -f tmp-retf.csv
 # Above, -t "(tab character)"
-rm -f tmp-retf.csv
+cat retf-by-regex.csv | perl -pe 's/^.*?\t.*?\t(.*?)\t.*?$/$1/' | sort | perl ../count.pl | sort -n > retf-counts.txt
 cat retf-counts.txt | perl -pe 's/^(.*?)\t"(.*?)"$/    "$2": $1,/' > retf-stat-array.py
-cat retf-by-regex.csv | grep -vP "(0–0–0|0–0|2–1–1|2–1|ELLIPSIS|'s)" | perl -pe 's/^(.*?)\t.*$/$1/' | uniq | head -5000 > retf-high-priority-articles.txt
+cat retf-by-regex.csv | perl -pe 's/^(.*?)\t.*$/$1/' | uniq | head -5000 > retf-high-priority-articles.txt
 
 # ---
 
