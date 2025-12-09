@@ -1,6 +1,6 @@
 from collections import defaultdict
 import datetime
-from pprint import pformat, pprint
+from pprint import pprint
 import regex as re
 import sys
 import time
@@ -11,7 +11,7 @@ from moss_entity_check import skip_article_strings
 from wikitext_util import get_main_body_wikitext
 
 # Run time: About 8 hours for 4000+ regexes on 7 million+ articles
-# (big-board, 8-core parallel with SSD)x
+# (big-board, 8-core parallel with SSD)
 
 regex_tuples = []
 with open("/var/local/moss/bulk-wikipedia/Typos", "r") as regex_file:
@@ -3364,6 +3364,12 @@ debug_contents = False
 print_stats = False  # Probably need to set parallel=False
 
 
+def single_line_format(text):
+    text = text.replace("\n", r"\n")
+    text = text.replace("\t", r"\t")
+    return text
+
+
 def show_replacement(result, regex_tuple, article_text):
     replacement = regex_tuple[3]
     snippet_start = max(result.start() - 10, 0)
@@ -3373,7 +3379,7 @@ def show_replacement(result, regex_tuple, article_text):
     if snippet == changed_to:
         return None
     else:
-        return (f'{pformat(snippet)} -> {pformat(changed_to)}')
+        return (single_line_format(changed_to))
 
 
 def full_regex_callback(params):
@@ -3407,7 +3413,7 @@ def full_regex_callback(params):
                 if print_stats:
                     regex_hits[regex_tuple[0]] += 1
                 regex_historical_frequency = regex_frequencies.get(regex_tuple[0], 0)
-                print(f'{article_title}\t{pformat(result[0])}\t{replacement_str}\t"{regex_tuple[0]}"\t{regex_historical_frequency}')
+                print(f'{article_title}\t{single_line_format(result[0])}\t{replacement_str}\t"{regex_tuple[0]}"\t{regex_historical_frequency}')
             else:
                 # print(f"{article_title}\tNO CHANGES MADE")
                 pass
