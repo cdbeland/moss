@@ -48,6 +48,7 @@ grep ^L tmp-style-by-line.txt | sort > fixme-liters.txt
 grep ^ET tmp-style-by-line.txt | sort | perl -pe 's/^ET\t(.*?)\t.*$/$1/' | uniq > fixme-ellipsis-in-title.txt
 
 grep ^TC tmp-style-by-line.txt | sort | perl -pe 's/^TC\t(.*?)\t.*$/$1/' | uniq > fixme-title-character.txt
+grep ^MR tmp-style-by-line.txt | sort > fixme-missing-redirects.txt
 
 # TODO:
 # * [[USA]] -> [[US]] anywhere

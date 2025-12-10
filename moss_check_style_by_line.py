@@ -791,7 +791,7 @@ def check_article_title(article_title, article_text):
         if f"[[{disambig_target}]]" in article_text or f"[[{disambig_target} (disambiguation)]]" in article_text:
             return
         else:
-            return [("MD", f"{article_title} -> {disambig_target}")]
+            return [("MD", disambig_target)]
 
     title_no_ascii = english_ok_re.sub("", article_title)
     title_no_ascii = title_no_ascii.strip()
@@ -831,7 +831,7 @@ def check_article_title(article_title, article_text):
             if redirect_dict.get(alt_title) == article_title:
                 return
 
-        return [("MR", f"{article_title} -> {alt_plural}")]
+        return [("MR", alt_plural)]
 
     # Special restriction for ordinal indicators (to catch incorrect
     # uses like "Nº")
@@ -859,7 +859,7 @@ def check_article_title(article_title, article_text):
             redirect_target = redirect_dict.get(title_asciified)
             if redirect_target != article_title:
                 # Missing redirect
-                result += [("MR", f"{title_asciified} -> {article_title}")]
+                result += [("MR", title_asciified)]
         return result
 
 
