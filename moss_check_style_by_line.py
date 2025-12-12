@@ -497,19 +497,10 @@ ascii_equiv_other = {
 }
 
 disambig_templates = [
-    "{{disamb}}",
+    "{{disamb",
     "{{mathdab}}",
-    "{{dab}}"
-    "{{disambiguation}}",
-]
-
-# Must be lowercase
-disambig_templates_chinese = [
-    "{{disambig|chinese",
-    "{{disambiguation|chinese",
-    "{{dab|chinese",
+    "{{dab",
     "{{chinese title disambiguation}}",
-    "{{disambig-chinese-char-title}}",
 ]
 
 english_ok_chars = r"a-zA-Z0-9/\!\-_\(\)\.–,\":='\?&%\*\+;@~\$\^\\"
@@ -800,12 +791,10 @@ def check_article_title(article_title, article_text):
 
     article_text_lower = article_text.lower()
 
-    if len(article_title) == 1 and any([dt for dt in disambig_templates if dt in article_text_lower]):
-        return
-
-    # Special exception for Chinese characters, where different
-    # readings produce incoherent romanizations
-    if any([dt for dt in disambig_templates_chinese if dt in article_text_lower]):
+    # [[WP:TRANSLITERATE]] exception for disambiguation pages due to
+    # AFDs closing as "keep" for lots of Chinese and some Arabic
+    # strings
+    if any([dt for dt in disambig_templates if dt in article_text_lower]):
         return
 
     if article_title[0] == ".":
