@@ -1184,6 +1184,9 @@ transform_unsafe = {
     # ﾀ ﾁ ﾂ ﾃ ﾄ ﾅ ﾆ ﾇ ﾈ ﾉ ﾊ ﾋ ﾌ ﾍ ﾎ ﾏ
     # ﾐ ﾑ ﾒ ﾓ ﾔ ﾕ ﾖ ﾗ ﾘ ﾙ ﾚ ﾛ ﾜ ﾝ ﾞ ﾟ
     # https://en.wikipedia.org/wiki/Half-width_kana
+
+    "{{reflist|2}}": "<references />",
+    "{{reflist|3}}": "<references />",
 }
 
 transform_conditional = {
