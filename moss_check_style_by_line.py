@@ -1281,8 +1281,10 @@ digits_with_spaces_re = re.compile(rf"(^|[^A-Za-z0-9])([0-9]\.[0-9][0-9][0-9]{sp
 # Broad filter
 scientific_notation_re = re.compile(rf"[0-9]{spaces_re}?[×xX]{spaces_re}?10\<sup")
 
-# Incorrect scientific notation (or engineering notation if exponent is a multiple of 3)
-wrong_sci_notation_re = re.compile(r" [0-9][0-9][0-9]?(\.[0-9]+)? ?[×xX] ?10\<sup")
+# Must have one digit before the decimal point for normal scientific
+# notation, but engineering notation allows 1, 2, or 3 if the exponent
+# is a multiple of 3.
+wrong_sci_notation_re = re.compile(r"[^0-9][0-9][0-9][0-9]?(\.[0-9]+)? ?[×xX] ?10\<sup>-?(0|1|2|4|5|7|8|10|11|13|14|16|17|19|[23456789][0-9]+)</sup>")
 
 wrong_million_abbr_re = re.compile(r"[0-9] [Mm]io\.? ")
 exp_re = re.compile(r"10<sup>((-|−|&minus;)?[0-9]+)</sup>")
