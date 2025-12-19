@@ -2171,6 +2171,10 @@ $ wc -l *feet*
 
 ### TODO: This also needs to handle {{frac}} in place of pure digits
 # {{s?frac|[0-9]+|[0-9]+(|[0-9]+)?}}
+# Must also handle {{val|10000|u=ft}} etc.
+# Must also handle sqin, sqft, sqyd, sqmi, cuin, cuft, cuyd, cumi
+# Must remove cukm, cu m, cucm
+
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" > tmp-feet-inches-all1.txt
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' > tmp-feet-inches-all2.txt
 ../venv/bin/python3 ../dump_grep_csv.py ' [^"][0-9]"' tmp-feet-inches-all3.txt
