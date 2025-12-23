@@ -463,6 +463,7 @@ transform_unsafe = {
 
     "ϑ": "θ",  # U+03D1 Greek Theta Symbol to U+03B8 Green Small Letter Theta
     "∼": "~",  # U+223C Tilde Operator to ASCII U+007E Tilde
+               # Should be ≈ for approximation per [[MOS:MATHSPECIAL]]
     "∕": "/",  # U+2215 Division Slash to ASCII U+002F Solidus
     "∖": "\\",  # U+2216 Set Minus
     "∶": ":",   # U+2236 Ratio to ASCII U+003A Colon
@@ -1202,7 +1203,11 @@ transform_conditional = {
     "？": "?",
     "［ ": "[",
     "］": "]",
-    "～": "~",  # ASCII preferred in Korean per https://en.wikipedia.org/wiki/Korean_punctuation
+
+    "～": "~",
+    # ASCII preferred in Korean per
+    # https://en.wikipedia.org/wiki/Korean_punctuation
+    # Should be ≈ for # approximation per [[MOS:MATHSPECIAL]]
 
     # Per https://en.wikipedia.org/wiki/Wikipedia_talk:WikiProject_China/Archive_31#Conversion_of_full-width_Latin_letters_and_Arabic_numbers
     "｛": "{",
