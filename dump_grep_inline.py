@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import lxml.etree
-from multiprocessing import Pool
+import multiprocessing
 import re
 import sys
 
@@ -13,6 +13,7 @@ import sys
 # venv/bin/python3 dump_grep.py ₤ > /tmp/pound-grep.xml
 # cat /tmp/pound-grep.xml | venv/bin/python3 dump_grep_inline.py ₤ | grep -v lira | perl -pe "s/:.*//" | sort | uniq
 
+multiprocessing.set_start_method("fork")
 FIND_RE = re.compile(sys.argv[1])
 
 
@@ -26,7 +27,7 @@ def process_article(article_title, article_text):
 def grep_dump_inline():
     working_string = ""
 
-    with Pool(8) as pool:
+    with multiprocessing.Pool(8) as pool:
         for line in sys.stdin:
             working_string += line
             if line == "  </page>\n":
