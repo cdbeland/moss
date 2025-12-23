@@ -36,8 +36,9 @@ grep ^SCI_NOTATION_CATCHALL tmp-style-by-line.txt | sort > fixme-scinot-cachall.
 grep ^AU tmp-style-by-line.txt | sort > tmp-au.txt
 cat tmp-au.txt | perl -pe 's/^AU_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-au.txt
 
-grep ^KM tmp-style-by-line.txt | sort > tmp-km.txt
-cat tmp-km.txt | perl -pe 's/^KM_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-km.txt
+# Permanently disabled due to false positives
+# grep ^KM tmp-style-by-line.txt | sort > tmp-km.txt
+# cat tmp-km.txt | perl -pe 's/^KM_\w+\t(.*?)\t.*$/$1/' | uniq > fixme-km.txt
 
 grep ^CTT tmp-style-by-line.txt | perl -pe 's/.*?\t(.*)\t(.*)$/$1/' | uniq > beland-ctt.txt
 

@@ -694,7 +694,7 @@ def check_style_by_line_impl(article_title, article_text):
                 decimal_point_check,
                 paren_ref_check,
                 au_check,
-                km_check,
+                # km_check,
                 number_notation_check
         ]:
             result = check_function(line, line_flags)
@@ -1198,8 +1198,19 @@ def au_check(line, line_flags):
         return [("AU_CONVERTED_WRONG", line)]
 
 
-wrong_meters_prefix_re = re.compile(r"\b[0-9,\.]*[0-9]( |&nbsp;)[GTPEZYRQ]m\b")
+r"""
+Disabled - all initial instances (presumably from before
+[[MOS:CONVERSIONS]] banned astronomical distance metric prefixes
+other than km) fixed, and too many false positives to repeat
 
+# Pm gives false positives for typos of p.m. and promethium
+#    but is also sometimes used inappropriately to convert light-years
+# Tm gives false positives for thulium and Timothy (bible book)
+#    but is also sometimes used inappropriately for interplanetary distances
+# Em gives false positives in random ways
+# Gm is commonly used and converts directly to "million km"
+# Gm gives false positives for G minor and random math
+wrong_meters_prefix_re = re.compile(r"\b[0-9,\.]*[0-9]( |&nbsp;)[GZYRQ]m\b")
 
 # [[MOS:CONVERSIONS]] for astronomical distances
 def km_check(line, line_flags):
@@ -1210,7 +1221,7 @@ def km_check(line, line_flags):
 
     if wrong_meters_prefix_re.search(line):
         return [("KM_WRONG_PREFIX", line)]
-
+"""
 
 # Inline parenthetical references were banned in 2020 per [[WP:PAREN]]
 paren_ref_filter_re = re.compile(r"\([A-Z][^\)]{0,100}[0-9][0-9][0-9][0-9][^\)]{0,100}\)")
