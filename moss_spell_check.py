@@ -96,7 +96,9 @@ article_skip_list = [
 bad_words_apos = sorted([w for w in bad_words if "'" in w], key=lambda w: 100 - len(w))
 bad_words_apos_re = re.compile(r"[^a-z](" + "|".join(bad_words_apos) + r")[^a-z]", re.I)
 
+# This is for adding words to the grist
 wikt_trans_re = re.compile(r"\{\{trans-see *\|(.*?)\}\}")
+
 gaol_fever_re = re.compile(r"gaol fever")
 
 
