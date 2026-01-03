@@ -173,11 +173,12 @@ controversial = {
     "″": "{{pprime}}",
     "&Prime;": "{{pprime}}",
 
-    # Following objections from User:Headbomb and User:Deacon Vorbis
-    # (retired), keep these in articles with <math> markup. In these
-    # articles, some editors prefer to be able to search by the TeX
-    # name (usually the same as the HTML entity) rather than by the
-    # Unicode character.
+    # Following objections from User:Headbomb (though they later said
+    # substituting for ± was OK) and User:Deacon Vorbis (retired), and
+    # User:jacobolus, keep these in articles with <math> markup. In
+    # these articles, some editors prefer to be able to search by the
+    # TeX name (usually the same as the HTML entity) rather than by
+    # the Unicode character.
     "&bigcap;": "⋂",
     "&asymp;": "≈",
     "&empty;": "∅",
