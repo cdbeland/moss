@@ -2048,6 +2048,8 @@ def country_match(input_str):
     return []
 
 
+# Per [[MOS:INFONAT]]
+# UPDATE: See [[MOS:GEOLINK]] and https://en.wikipedia.org/wiki/Wikipedia_talk:Manual_of_Style/Infoboxes#Baltic_birth_places_and_linking
 def nationality_check(line, line_flags, article_flags):
     if "nationality2" in line:
         return [("INFONAT_REDUNDANT", line)]
