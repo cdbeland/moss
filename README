@@ -7,10 +7,10 @@ HARDWARE REQUIREMENTS
   scripts)
 
 UBUNTU DEPENDENCIES
-sudo apt-get install git pyflakes3 pylint python3-pep8 python3-dev g++ protobuf-c-compiler protobuf-compiler
+sudo apt-get install git pyflakes3 pylint python3-pep8 python3-dev g++ protobuf-c-compiler protobuf-compiler mariadb-server
 
 FEDORA DEPENDENCIES
-sudo dnf install git python3-flake8 protobuf-c-compiler pylint python3-devel protobuf-devel g++
+sudo dnf install git python3-flake8 protobuf-c-compiler pylint python3-devel protobuf-devel g++ mariadb-server
 
 GIT SETUP (optional)
 git config --global color.ui true
@@ -22,9 +22,12 @@ cd ~
 git clone https://github.com/cdbeland/moss.git
 cd moss/
 ./reset_environment.sh
-sudo mkdir /var/local/moss/bulk-wikipedia/
-sudo chown $USER /var/local/moss/bulk-wikipedia/
-Run "FIRST TIME SETUP" steps in ./update_downloads_parallel.sh
+sudo mkdir -p /var/local/moss/bulk-wikipedia/
+sudo chown -R $USER /var/local/moss
+sudo service mariadb restart
+cat first-time.sql | perl -pe "s/beland/$USER/g" | sudo mysql
+sudo cp moss-mysqld.cnf /etc/my.cnf.d/
+sudo service mariadb restart
 
 DOWNLOAD DATA:
 # Do not do this if Wikipedia or Wiktionary dumps are in progress at:
