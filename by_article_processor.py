@@ -3,6 +3,8 @@ import multiprocessing
 import sys
 from word_categorizer import get_word_category, load_data
 
+CPU_COUNT = multiprocessing.cpu_count()
+
 
 def get_word_categories_uniq(word_list):
     # This is to speed up categorization for articles with multiple
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     print("Loading input...", file=sys.stderr)
     lines = [line.strip() for line in fileinput.input("-")]
     print("Processing...", file=sys.stderr)
-    with multiprocessing.Pool(8) as pool:
+    with multiprocessing.Pool(CPU_COUNT) as pool:
         for result in pool.imap(process_line, lines, chunksize=1000):
             print(result)
         pool.close()

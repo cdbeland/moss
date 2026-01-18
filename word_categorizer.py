@@ -54,6 +54,8 @@ except ImportError:
     from .spell import bad_words
     from .wikitext_util import html_tag_re
 
+CPU_COUNT = multiprocessing.cpu_count()
+
 az_re = re.compile(r"^[a-z']+$", flags=re.I)
 az_plus_re = re.compile(r"^[a-z|\d|\-|\.']+$", flags=re.I)
 az_dot_re = re.compile(r"^[a-z]+(\-[a-z]+)?\.[a-z]+(\-[a-z]+)?$", flags=re.I)
@@ -184,7 +186,7 @@ def make_suggestion_dict(input_list):
     for d in range(1, MAX_EDIT_DISTANCE + 1):
         suggestion_dict[d] = defaultdict(set)
 
-    with multiprocessing.Pool(8) as pool:
+    with multiprocessing.Pool(CPU_COUNT) as pool:
         for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, chunksize=1000):
             for (ed, sets_for_word_this_ed) in sets_for_word.items():
                 for set_for_word_this_ed in sets_for_word_this_ed:
@@ -632,7 +634,7 @@ def param_generator():
 # def process_input_parallel(english_words, titles_all_wiktionaries, transliterations, suggestion_dict):
 def process_input_parallel():
     # If this needs more aggressive garbage collection, add maxtasksperchild=10000 or something
-    with multiprocessing.Pool(8) as pool:
+    with multiprocessing.Pool(CPU_COUNT) as pool:
         for result in pool.imap(process_line, param_generator(), chunksize=1000):
             print(result)
         pool.close()

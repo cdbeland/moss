@@ -14,6 +14,7 @@ import sys
 # cat /tmp/pound-grep.xml | venv/bin/python3 dump_grep_inline.py ₤ | grep -v lira | perl -pe "s/:.*//" | sort | uniq
 
 multiprocessing.set_start_method("fork")
+CPU_COUNT = multiprocessing.cpu_count()
 FIND_RE = re.compile(sys.argv[1])
 
 
@@ -27,7 +28,7 @@ def process_article(article_title, article_text):
 def grep_dump_inline():
     working_string = ""
 
-    with multiprocessing.Pool(8) as pool:
+    with multiprocessing.Pool(CPU_COUNT) as pool:
         for line in sys.stdin:
             working_string += line
             if line == "  </page>\n":

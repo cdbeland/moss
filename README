@@ -2,9 +2,8 @@ See https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss
 
 HARDWARE REQUIREMENTS
 * It takes at least ~6GB of RAM just for the spell-check dictionary to load
-* Parallelized Python code is expecting 8 available CPU cores for
-  optimal performance (if tweaking, look for "Pool(8)" in Python
-  scripts)
+* Parallelized Python code will automatically spawn one child process
+  per CPU core (including hyperthreaded "cores")
 
 UBUNTU DEPENDENCIES
 sudo apt-get install git pyflakes3 pylint python3-pep8 python3-dev g++ protobuf-c-compiler protobuf-compiler mariadb-server
