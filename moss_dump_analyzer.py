@@ -42,9 +42,11 @@ def read_en_article_text(callback_function,
             #
             # callback_function will get only one argument: (article_title, article_text)
 
-            # If more aggressive garbage collection is needed for
-            # children, try e.g. maxtasksperchild=50000 for Pool()
-            with multiprocessing.Pool(CPU_COUNT) as pool:
+            # maxtasksperchild is here for aggressive garbage
+            # collection of child processes; needed to prevent
+            # moss_readability_check children from growing without
+            # bound (matters when running with 8GB RAM on 8 cores).
+            with multiprocessing.Pool(CPU_COUNT, maxtasksperchild=50000) as pool:
                 results = pool.imap(callback_function,
                                     page_generator_fast(filename, which_articles),
                                     chunksize=10000)
