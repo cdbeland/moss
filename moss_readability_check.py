@@ -17,6 +17,7 @@ ignore_tags_more_re = re.compile("|".join([
     r"{{[Ll]ike resume",
     r"{{[Aa]dvert",
     r"{{[Ll]ong plot",
+    r"{{[Cc]reate list",
     ]))
 
 
