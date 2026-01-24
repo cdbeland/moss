@@ -144,7 +144,7 @@ rm tmp-readability.txt
 
 echo "Beginning RETF scan..."
 echo `date`
-# Takes many hours
+# Takes ~28 hours on 8 cores (airstream)
 ../venv/bin/python ../retf_offline_scan.py > tmp-retf.csv
 
 # The rest takes a few seconds
