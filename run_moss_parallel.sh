@@ -44,8 +44,8 @@ grep '*' tmp-entities | perl -pe 's/\]\], \[\[/\n/g' | perl -pe 's/.*\[\[//' | p
 # --- PARALLELIZED REPORTS ---
 
 # Run serially to avoid exceeding 8 MB RAM
-../run_moss_parallel1.sh >& thread2.log
-../run_moss_parallel2.sh >& thread1.log
+../run_moss_parallel2.sh >& thread2.log
+../run_moss_parallel1.sh >& thread1.log
 
 # Sometimes there can be a CPU bottleneck for parent threads, leaving
 # child threads underused, so starting two scripts at the same time
