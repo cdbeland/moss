@@ -7,6 +7,7 @@ import datetime
 import multiprocessing
 import re
 import sys
+import traceback
 
 # Runtime: ~1.5 hours (with a simple callback, single-threaded)
 
@@ -85,6 +86,7 @@ def read_en_article_text(callback_function,
 
 def parallel_error(error):
     print(error, file=sys.stderr)
+    traceback.print_exception(error, file=sys.stderr)
     raise Exception("ERROR IN CHILD PROCESS")
 
 
