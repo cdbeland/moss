@@ -178,14 +178,11 @@ def ignore_typo_in_context(word_mixedcase, article_text_orig):
 language_divider_re = re.compile(r"^== *([^=]+) *==$")
 
 
-def spellcheck_all_langs_wikt_with_quotations(params):
-    return spellcheck_all_langs_wikt(params, include_quotations=True)
+def spellcheck_all_langs_wikt_with_quotations(article_title, article_text):
+    return spellcheck_all_langs_wikt(article_title, article_text, include_quotations=True)
 
 
-def spellcheck_all_langs_wikt(params, include_quotations=False):
-    article_title = params[0]
-    article_text = params[1]
-
+def spellcheck_all_langs_wikt(article_title, article_text, include_quotations=False):
     language_this_part = ""
     text_this_part = ""
     article_parts = defaultdict(list)
@@ -212,12 +209,9 @@ def spellcheck_all_langs_wikt(params, include_quotations=False):
     return result_list
 
 
-def spellcheck_all_langs(params, wiktionary=False, include_quotations=False):
+def spellcheck_all_langs(article_title, article_text, wiktionary=False, include_quotations=False):
     # WARNING: This function runs in subprocesses, and cannot
     # change global context variables. (It CAN print.)
-
-    article_title = params[0]
-    article_text = params[1]
 
     # -- Skip article entirely if appropriate --
 
@@ -535,5 +529,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         which_articles = sys.argv[1]
     print(f"Spell checking articles: {which_articles}", file=sys.stderr)
-    read_en_article_text(spellcheck_all_langs, process_result_callback=tally_misspelled_words, parallel=True, which_articles=which_articles)
+    read_en_article_text(spellcheck_all_langs, process_result_callback=tally_misspelled_words, parallel="incremental", which_articles=which_articles)
     dump_results()
