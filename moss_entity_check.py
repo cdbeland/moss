@@ -132,6 +132,8 @@ suppression_patterns = [
 
     re.compile(r'{\|\s*class="(wikitable IPA|IPA wikitable|wikitable notatypo|notatypo).*?\|}', flags=re.S),
 
+    re.compile(r'{\|\s*{{chset-table-header1', flags=re.S),
+
     re.compile(r"<(syntaxhighlight.*?</syntaxhighlight"
                r"|blockquote lang=.*?</blockquote"
                r"|<source.*?</source"
