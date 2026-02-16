@@ -50,6 +50,7 @@ non_entity_transform = [string for string
 
 article_blocklist = [
 
+    # TODO: Drop these and use in-wiki templates instead
     # Characters themselves are discussed or listed as part of a mapping
     "Duplicate characters in Unicode",
     "Latin script in Unicode",
@@ -64,7 +65,6 @@ article_blocklist = [
     "Romanization of Arabic",
     "Unicode compatibility characters",
     "Unicode equivalence",
-    "Unicode input",
 
     # Note: Characters like &Ohm; and &#x2F802; are changed by
     # Normalization Form Canonical Composition and appear as different
