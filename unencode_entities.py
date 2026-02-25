@@ -161,9 +161,9 @@ keep = [
     "&c.",  # Archaic "etc."
     "&c;",  # Archaic "etc."
 
-   # Replacment character. [[User:Spitzak]] thinks editors may be
-   # confused and think that some other character has been replaced.
-   "&#xFFFD;",
+    # Replacment character. [[User:Spitzak]] thinks editors may be
+    # confused and think that some other character has been replaced.
+    "&#xFFFD;",
 ]
 
 controversial = {
