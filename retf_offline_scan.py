@@ -3441,9 +3441,7 @@ def show_replacement(result, regex_tuple, article_text):
         return (f"{single_line_format(snippet)}\t{single_line_format(changed_to)}")
 
 
-def full_regex_callback(params):
-    article_title = params[0]
-    article_text = params[1]
+def full_regex_callback(article_title, article_text):
 
     global checked
     global skipped
@@ -3502,5 +3500,5 @@ def full_regex_callback(params):
 
 
 print(f"Starting RETF scan {datetime.datetime.now().isoformat()}", file=sys.stderr)
-read_en_article_text(full_regex_callback, parallel=True)
+read_en_article_text(full_regex_callback, parallel="incremental")
 print(f"Finished RETF scan {datetime.datetime.now().isoformat()} ", file=sys.stderr)
