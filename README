@@ -37,10 +37,10 @@ DOWNLOAD DATA:
 # tail -f /var/local/moss/bulk-wikipedia/*log
 
 RUN SPELL CHECK AND FRIENDS:
-./run_moss_parallel.sh
+./run_moss.sh
 
 TO SPELL CHECK ONLY ARTICLES WITH TITLES STARTING WITH "X":
-./run_moss_parallel.sh --spell-check-only X
+./run_moss.sh --spell-check-only X
 
 Omit X to run spell check only and skip other reports. You can also
 specify any letter or number, or "BEFORE_A" and "AFTER_Z".
