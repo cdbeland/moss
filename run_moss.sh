@@ -28,3 +28,5 @@ if [[ $1 == "--spell-check-only" ]]; then
 fi
 
 ../run_moss_background.sh >& thread_main.log&
+
+echo "moss started; logging to ${RUN_NAME}/thread_main.log"
