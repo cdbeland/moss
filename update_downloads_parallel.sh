@@ -6,7 +6,7 @@
 
 set -e
 
-# Keep in sync with run_moss_parallel.sh.
+# Keep in sync with run_moss.sh.
 export commit_id=`git log | head -c 14 | perl -pe "s/commit //"`
 export MOSS_USER_AGENT="mossbot/${commit_id} https://en.wikipedia.org/wiki/Wikipedia:Typo_Team/moss"
 
