@@ -84,9 +84,7 @@ formulas_re = re.compile(formulas_pattern)
 articles_by_formula = defaultdict(list)
 
 
-def chem_formula_check(params):
-    article_title = params[0]
-    article_text = params[1]
+def chem_formula_check(article_title, article_text):
 
     article_text = wikitext_to_plaintext(article_text, flatten_sup_sub=False)
     article_text = get_main_body_wikitext(article_text)
@@ -151,6 +149,6 @@ def dump_results():
 if __name__ == '__main__':
     print("Running chem_formula_check...", file=sys.stderr)
     # Run time: ~1h 15 m (8-core parallel)
-    read_en_article_text(chem_formula_check, process_result_callback=add_tuples_to_results, parallel=True)
+    read_en_article_text(chem_formula_check, process_result_callback=add_tuples_to_results, parallel="incremental")
     dump_results()
     print("Done", file=sys.stderr)
