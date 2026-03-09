@@ -5,6 +5,7 @@ mysql-connector-python
 nltk
 nose
 overdue
+psutil
 pyenchant
 unidecode
 wikipedia
