@@ -190,6 +190,7 @@ def make_suggestion_dict(input_list):
 
     # maxtasksperchild=10000 for garbage collection
     # chunksize=1000 for marshalling speed
+    # Process size can be over 3 GB, so divide by 4 GB gives a safety margin
     max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 4))
     with multiprocessing.Pool(max_safe_children, maxtasksperchild=10000) as pool:
         for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, chunksize=1000):
@@ -640,6 +641,7 @@ def param_generator():
 def process_input_parallel():
     # maxtasksperchild=10000 for garbage collection
     # chunksize=1000 for marshalling speed
+    # Process size can be about 1.2 GB, so dividing by 2 GB gives a safety margin
     max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 2))
     with multiprocessing.Pool(max_safe_children, maxtasksperchild=10000) as pool:
         for result in pool.imap(process_line, param_generator(), chunksize=1000):
