@@ -188,10 +188,11 @@ def make_suggestion_dict(input_list):
     for d in range(1, MAX_EDIT_DISTANCE + 1):
         suggestion_dict[d] = defaultdict(set)
 
-    # maxtasksperchild=10000 for garbage collection
-    # chunksize=1000 for marshalling speed
-    # Process size can be over 3 GB, so divide by 4 GB gives a safety margin
-    max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 4))
+    # * maxtasksperchild=10000 for garbage collection
+    # * chunksize=1000 for marshalling speed
+    # * Process size can be over 3 GB (maybe 4 transiently?), so divide
+    #   by 5 GB gives a safety margin
+    max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 5))
     with multiprocessing.Pool(max_safe_children, maxtasksperchild=10000) as pool:
         for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, chunksize=1000):
             for (ed, sets_for_word_this_ed) in sets_for_word.items():

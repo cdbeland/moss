@@ -1,9 +1,11 @@
 import fileinput
 import multiprocessing
+import psutil
 import sys
 from word_categorizer import get_word_category, load_data
 
 CPU_COUNT = multiprocessing.cpu_count()
+MEMORY_GB = psutil.virtual_memory().total / 1000000000
 
 
 def get_word_categories_uniq(word_list):
@@ -50,7 +52,9 @@ if __name__ == '__main__':
     print("Loading input...", file=sys.stderr)
     lines = [line.strip() for line in fileinput.input("-")]
     print("Processing...", file=sys.stderr)
-    with multiprocessing.Pool(CPU_COUNT) as pool:
+
+    max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 2))
+    with multiprocessing.Pool(max_safe_children) as pool:
         for result in pool.imap(process_line, lines, chunksize=1000):
             print(result)
         pool.close()
