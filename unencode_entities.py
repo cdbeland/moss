@@ -475,6 +475,10 @@ transform_unsafe = {
     "∶": ":",   # U+2236 Ratio to ASCII U+003A Colon
     "&ratio;": ":",
 
+    # Ohm to Omega
+    "&ohm;": "Ω",
+    "Ω": "Ω",
+
     # ---
 
     "&#x202F;": "",  # Narrow non-breaking space, usually not needed
@@ -1228,6 +1232,8 @@ transform_conditional = {
 # Automatically change, with the expectation there will be a
 # manual inspection of the diff
 transform = {
+    "&lcub;": "&lbrace;",
+    "&rcub;": "&rbrace;",
     "&flat;": "♭",
     "&sharp;": "♯",
     "&rlhar;": "⇌",
@@ -1613,6 +1619,7 @@ transform = {
     "&Ouml;": "Ö",
     "&ouml;": "ö",
     "&#X14D;": "ō",
+    "&rcaron;": "ř",
     "&Scaron;": "Š",
     "&scaron;": "š",
     "&#X161;": "š",
