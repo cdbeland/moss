@@ -50,22 +50,6 @@ non_entity_transform = [string for string
 
 article_blocklist = [
 
-    # TODO: Drop these and use in-wiki templates instead
-    # Characters themselves are discussed or listed as part of a mapping
-    "Duplicate characters in Unicode",
-    "Latin script in Unicode",
-    "List of Japanese typographic symbols",
-    "List of Latin letters by shape",
-    "List of Latin-script letters",
-    "List of mathematical symbols by subject",
-    "List of precomposed Latin characters in Unicode",
-    "List of typographical symbols and punctuation marks",
-    "List of Unicode characters",
-    "Extensions to the International Phonetic Alphabet",
-    "Romanization of Arabic",
-    "Unicode compatibility characters",
-    "Unicode equivalence",
-
     # Note: Characters like &Ohm; and &#x2F802; are changed by
     # Normalization Form Canonical Composition and appear as different
     # Unicode characters, like &Omega;.  Using the HTML entity instead
