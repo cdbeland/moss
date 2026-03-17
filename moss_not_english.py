@@ -79,9 +79,7 @@ def is_english_word(word):
     return False
 
 
-def find_non_english(params):
-    article_title = params[0]
-    article_text = params[1]
+def find_non_english(article_title, article_text):
 
     if ignore_tags_re.search(article_text):
         return
@@ -176,4 +174,4 @@ def find_non_english(params):
 
 if __name__ == '__main__':
     print("Starting search...", file=sys.stderr)
-    read_en_article_text(find_non_english, parallel=True)
+    read_en_article_text(find_non_english, parallel="incremental")
