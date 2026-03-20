@@ -29,7 +29,8 @@ def read_en_article_text(callback_function,
                          filename=DEFAULT_CSV_FILE,
                          parallel=False,
                          process_result_callback=print_result,
-                         which_articles="ALL"):
+                         which_articles="ALL",
+                         peak_child_mem_gb=1):
     if not filename:
         # Necessary backstop for dump_grep_regex.py
         filename = DEFAULT_CSV_FILE
@@ -61,7 +62,7 @@ def read_en_article_text(callback_function,
             # collection of child processes; needed to prevent
             # moss_readability_check children from growing without
             # bound (matters when running with 8GB RAM on 8 cores).
-            with multiprocessing.Pool(max_children(), maxtasksperchild=50000) as pool:
+            with multiprocessing.Pool(max_children(peak_child_mem_gb=peak_child_mem_gb), maxtasksperchild=50000) as pool:
                 count = 0
                 for (article_title, article_text) in page_generator_fast(filename, which_articles):
                     result = pool.apply_async(callback_function,
