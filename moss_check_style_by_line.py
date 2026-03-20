@@ -1134,6 +1134,7 @@ ctt_ignore_converted_reverse_re = re.compile(rf"[0-9]+( |&nbsp;)(g|grams|mL|L) \
 # TODO: "half teaspoon, quarter cup, one-eighth cup"
 
 
+# To fix in wikitext, use {{cups}}, {{tbspUS}}, and {{tspUS}}.
 def cup_tbsp_tsp_check(line, line_flags):
     line = line_flags["text_no_refs_images_urls"]
 
@@ -2187,8 +2188,17 @@ $ wc -l *feet*
 ### TODO: This also needs to handle {{frac}} in place of pure digits
 # {{s?frac|[0-9]+|[0-9]+(|[0-9]+)?}}
 # Must also handle {{val|10000|u=ft}} etc.
-# Must also handle sqin, sqft, sqyd, sqmi, cuin, cuft, cuyd, cumi
+# Must also handle sqin, sqft, sqyd, sqmi, cuin, cuft, cuyd, cumi,
+# Must handle alternate forms: cu ft, cfs, cu. ft(.), etc.
 # Must remove cukm, cu m, cucm
+# Abolish: [kMGTP](cu|sq)(ft|in|yd|mi) and convert to
+#   e{3,6,9,12,15}{ft,in,yd,mi}{2,3} to avoid mixing exponents and
+#   sq/cu in the same number
+# Abolish: [kMGTP](ft|in|yd|mi)[23] and convert to e$1$2$3 to avoid
+#   mixing exponents and sq/cu in the same number. ft3 gives cu ft
+#   here unlike other units that have been fixed; this will not be
+#   changed per [[Template talk:Convert/Archive 3#Square notations]]
+# In articles that mix ft3 and cuft (etc.) flip to ft3 only
 
 ../venv/bin/python3 ../dump_grep_csv.py "[0-9\.]+(&nbsp;| )?'[0-9\.]+(&nbsp;| ) ?\"[^0-9\.]" > tmp-feet-inches-all1.txt
 ../venv/bin/python3 ../dump_grep_csv.py '[0-9\.]+"(&nbsp;| )?(x|by|×)(&nbsp;| )?[0-9\./]+"' > tmp-feet-inches-all2.txt
@@ -2351,7 +2361,6 @@ grep ^TEMP tmp-style-by-line.txt | sort > fixme-temp.txt
 # TODO:
 # * miles, including {{frac|...}} miles and e.g. "1 1/2 miles"
 #   (and fractions for other US units)
-# * inch and foot, cu ft, cfs - adapt from run_moss_parallel2.sh
 # * pounds (weight vs. money)
 # * oz (troy, avdp, etc.), fl oz, pint (various), quart (various), gallon (various)
 # * psi
