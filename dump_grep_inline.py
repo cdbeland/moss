@@ -4,6 +4,7 @@ import lxml.etree
 import multiprocessing
 import re
 import sys
+from wikitext_util import max_children
 
 # Used to turn the XML output of dump_grep.py (which takes a long time
 # to run) into output more typical of Unix grep (one line per
@@ -14,7 +15,6 @@ import sys
 # cat /tmp/pound-grep.xml | venv/bin/python3 dump_grep_inline.py ₤ | grep -v lira | perl -pe "s/:.*//" | sort | uniq
 
 multiprocessing.set_start_method("fork")
-CPU_COUNT = multiprocessing.cpu_count()
 FIND_RE = re.compile(sys.argv[1])
 
 
@@ -28,7 +28,7 @@ def process_article(article_title, article_text):
 def grep_dump_inline():
     working_string = ""
 
-    with multiprocessing.Pool(CPU_COUNT) as pool:
+    with multiprocessing.Pool(max_children()) as pool:
         for line in sys.stdin:
             working_string += line
             if line == "  </page>\n":

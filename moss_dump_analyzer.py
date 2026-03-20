@@ -8,10 +8,10 @@ import multiprocessing
 import re
 import sys
 import traceback
+from wikitext_util import max_children
 
 # Runtime: ~1.5 hours (with a simple callback, single-threaded)
 
-CPU_COUNT = multiprocessing.cpu_count()
 DEFAULT_CSV_FILE = "/var/local/moss/bulk-wikipedia/enwiki-articles-no-redir.csv"
 PAGE_RE = re.compile(r"^.*(<page.*?</page>).*$", flags=re.MULTILINE+re.DOTALL)
 
@@ -43,7 +43,7 @@ def read_en_article_text(callback_function,
             #
             # callback_function will get only one argument: (article_title, article_text)
 
-            with multiprocessing.Pool(CPU_COUNT) as pool:
+            with multiprocessing.Pool(max_children()) as pool:
                 results = pool.imap(callback_function,
                                     page_generator_fast(filename, which_articles),
                                     chunksize=10000)
@@ -61,7 +61,7 @@ def read_en_article_text(callback_function,
             # collection of child processes; needed to prevent
             # moss_readability_check children from growing without
             # bound (matters when running with 8GB RAM on 8 cores).
-            with multiprocessing.Pool(CPU_COUNT, maxtasksperchild=50000) as pool:
+            with multiprocessing.Pool(max_children(), maxtasksperchild=50000) as pool:
                 count = 0
                 for (article_title, article_text) in page_generator_fast(filename, which_articles):
                     result = pool.apply_async(callback_function,

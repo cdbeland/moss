@@ -1,11 +1,8 @@
 import fileinput
 import multiprocessing
-import psutil
 import sys
+from wikitext_util import max_children
 from word_categorizer import get_word_category, load_data
-
-CPU_COUNT = multiprocessing.cpu_count()
-MEMORY_GB = psutil.virtual_memory().total / 1000000000
 
 
 def get_word_categories_uniq(word_list):
@@ -53,8 +50,7 @@ if __name__ == '__main__':
     lines = [line.strip() for line in fileinput.input("-")]
     print("Processing...", file=sys.stderr)
 
-    max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 2))
-    with multiprocessing.Pool(max_safe_children) as pool:
+    with multiprocessing.Pool(max_children(peak_child_mem_gb=2)) as pool:
         for result in pool.imap(process_line, lines, chunksize=1000):
             print(result)
         pool.close()

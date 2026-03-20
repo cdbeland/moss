@@ -37,7 +37,6 @@ import gcld3
 import multiprocessing
 from nltk.metrics import distance
 import os
-import psutil
 import re
 import sys
 import unicodedata
@@ -48,15 +47,12 @@ try:
     from sectionalizer import get_word
     from spell import bad_characters
     from spell import bad_words
-    from wikitext_util import html_tag_re
+    from wikitext_util import html_tag_re, max_children
 except ImportError:
     from .sectionalizer import get_word
     from .spell import bad_characters
     from .spell import bad_words
-    from .wikitext_util import html_tag_re
-
-CPU_COUNT = multiprocessing.cpu_count()
-MEMORY_GB = psutil.virtual_memory().total / 1000000000
+    from .wikitext_util import html_tag_re, max_children
 
 az_re = re.compile(r"^[a-z']+$", flags=re.I)
 az_plus_re = re.compile(r"^[a-z|\d|\-|\.']+$", flags=re.I)
@@ -192,8 +188,7 @@ def make_suggestion_dict(input_list):
     # * chunksize=1000 for marshalling speed
     # * Process size can be over 3 GB (maybe 4 transiently?), so divide
     #   by 5 GB gives a safety margin
-    max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 5))
-    with multiprocessing.Pool(max_safe_children, maxtasksperchild=10000) as pool:
+    with multiprocessing.Pool(max_children(peak_child_mem_gb=5), maxtasksperchild=10000) as pool:
         for (word, sets_for_word) in pool.imap(make_suggestion_helper, input_list, chunksize=1000):
             for (ed, sets_for_word_this_ed) in sets_for_word.items():
                 for set_for_word_this_ed in sets_for_word_this_ed:
@@ -643,8 +638,7 @@ def process_input_parallel():
     # maxtasksperchild=10000 for garbage collection
     # chunksize=1000 for marshalling speed
     # Process size can be about 1.2 GB, so dividing by 2 GB gives a safety margin
-    max_safe_children = int(min(CPU_COUNT, MEMORY_GB / 2))
-    with multiprocessing.Pool(max_safe_children, maxtasksperchild=10000) as pool:
+    with multiprocessing.Pool(max_children(peak_child_mem_gb=2), maxtasksperchild=10000) as pool:
         for result in pool.imap(process_line, param_generator(), chunksize=1000):
             print(result)
         pool.close()

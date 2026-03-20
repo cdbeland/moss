@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import multiprocessing
+import psutil
 import re
+
+
+# For parallel processing, run at most one process per visible CPU
+# core, and try not to exceed available memory (assumes no other
+# processes are running). Lots of memory can be used even with fork().
+def max_children(peak_child_mem_gb=1):
+    CPU_COUNT = multiprocessing.cpu_count()
+    MEMORY_GB = psutil.virtual_memory().total / 1000000000
+    return int(min(CPU_COUNT, MEMORY_GB / peak_child_mem_gb))
+
 
 contractions = {
     # Sourced from
