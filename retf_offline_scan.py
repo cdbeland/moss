@@ -3500,5 +3500,5 @@ def full_regex_callback(article_title, article_text):
 
 
 print(f"Starting RETF scan {datetime.datetime.now().isoformat()}", file=sys.stderr)
-read_en_article_text(full_regex_callback, parallel="incremental")
+read_en_article_text(full_regex_callback, parallel="incremental", peak_child_mem_gb=2)
 print(f"Finished RETF scan {datetime.datetime.now().isoformat()} ", file=sys.stderr)
