@@ -477,7 +477,7 @@ transform_unsafe = {
 
     # Ohm to Omega
     "&ohm;": "Ω",
-    "Ω": "Ω",
+    "Ω": "Ω",
 
     # ---
 
@@ -1788,11 +1788,24 @@ transform = {
     "&mdahs;": "&mdash;",
     "&nmsp;": "&nbsp;",
 
+    # Found by User:1234qwer1234qwer4 - wrong character
+    "<<ref>": "<ref>",
+    "<ref>>": "<ref>",
+    "</ref>>": "</ref>",
+    "<</ref>": "</ref>",
+
     # Used in tables, horizontal list formatting
     "&middot;": "·",
     # Replace with &sdot; in math expressions
 
     "&centerdot;": "·",
+
+    # Found by User:1234qwer1234qwer4 - wrong character
+    "M<sub>ʘ</sub>": "M<sub>☉</sub>",
+    "M<sub>⊙</sub>": "M<sub>☉</sub>",
+    # De-jargon
+    "M<sub>⊙</sub>": "solar masses",
+    # TODO: {{solar mass}} instances may also need to be converted
 }
 
 

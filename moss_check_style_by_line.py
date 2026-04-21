@@ -2166,6 +2166,22 @@ def cvt_temperature_check(line, line_flags):
 
 r"""
 
+TODO:
+* "([0-9\.])+( |&nbsp;)M<sub>☉</sub>" -> "{{[Ss]olar mass|$1}}"
+* "{{[Ss]olar mass[^\]]+first=yes}}" should appear on the page if "{{[Ss]olar mass" does.
+* And the same for:
+  {{Solar radius}} (etc.)
+  {{Lunar mass}}
+  {{Lunar radius}}
+  {{Earth mass}} M<sub>🜨</sub>
+  {{Earth radius}}
+  {{Earth density}}
+  {{Jupiter mass}} M<sub>J</sub>
+  {{Jupiter radius}}
+  {{Solar density}}
+  {{Solar luminosity}}
+  {{Solar constant}}
+
 TODO: Finish rewrite of the below code into Python functions for
 increased performance. The old style was abandoned at commit d0f8fb1
 
