@@ -23,7 +23,7 @@ echo `date`
 
 # Run time: ~52 hours!!!
 echo "Loading enwiki-latest-categorylinks.sql..."
-cat enwiki-latest-categorylinks.sql | mysql -D enwiki
+cat enwiki-latest-categorylinks.sql | mariadb -D enwiki
 
 # Fast
 rm -f enwiki-latest-page.sql
@@ -33,31 +33,31 @@ gunzip enwiki-latest-page.sql
 echo `date`
 # Run time: ~2 hours
 echo "Loading enwiki-latest-page.sql..."
-cat enwiki-latest-page.sql | mysql -D enwiki
+cat enwiki-latest-page.sql | mariadb -D enwiki
 
 echo `date`
 echo "Building page_categories table..."
 # Run time: About 3 hours
 
-echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiki
+echo "DROP TABLE IF EXISTS page_categories;" | mariadb -D enwiki
 echo "CREATE TABLE page_categories (
   title varbinary(255) NOT NULL DEFAULT '',
   category_name varbinary(255) NOT NULL DEFAULT '',
   PRIMARY KEY (title, category_name)
-);" | mysql -D enwiki
+);" | mariadb -D enwiki
 
-echo "DELETE FROM page WHERE page_namespace != 0;" | mysql -D enwiki
+echo "DELETE FROM page WHERE page_namespace != 0;" | mariadb -D enwiki
 
 echo "INSERT INTO page_categories (title, category_name)
  SELECT page_title, cl_to
  FROM page, categorylinks
- WHERE page.page_id = categorylinks.cl_from;" | mysql -D enwiki
+ WHERE page.page_id = categorylinks.cl_from;" | mariadb -D enwiki
 
-echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mysql -D enwiki
-echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D enwiki
+echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mariadb -D enwiki
+echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mariadb -D enwiki
 
-echo "DROP TABLE categorylinks;" | mysql -D enwiki
-echo "DROP TABLE page;" | mysql -D enwiki
+echo "DROP TABLE categorylinks;" | mariadb -D enwiki
+echo "DROP TABLE page;" | mariadb -D enwiki
 
 echo "All done!"
 echo `date`

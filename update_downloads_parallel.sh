@@ -14,18 +14,18 @@ echo `date`
 echo "Dropping walled garden data..."
 # Both can't fit in storage at the same time
 
-echo "DROP TABLE IF EXISTS page;" | mysql -D enwiki
-echo "DROP TABLE IF EXISTS pagelinks;" | mysql -D enwiki
-echo "DROP TABLE IF EXISTS named_page_links;" | mysql -D enwiki
+echo "DROP TABLE IF EXISTS page;" | mariadb -D enwiki
+echo "DROP TABLE IF EXISTS pagelinks;" | mariadb -D enwiki
+echo "DROP TABLE IF EXISTS named_page_links;" | mariadb -D enwiki
 
 echo `date`
 echo "Dropping tables to be regenerated..."
 # Breathing room while regenerating
 
-echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiktionary
-echo "DROP TABLE IF EXISTS categorylinks;" | mysql -D enwiktionary
-echo "DROP TABLE IF EXISTS page;" | mysql -D enwiktionary
-echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiki
+echo "DROP TABLE IF EXISTS page_categories;" | mariadb -D enwiktionary
+echo "DROP TABLE IF EXISTS categorylinks;" | mariadb -D enwiktionary
+echo "DROP TABLE IF EXISTS page;" | mariadb -D enwiktionary
+echo "DROP TABLE IF EXISTS page_categories;" | mariadb -D enwiki
 
 echo `date`
 

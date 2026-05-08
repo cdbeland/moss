@@ -50,18 +50,18 @@ gunzip enwiktionary-latest-all-titles-in-ns0.gz
 echo `date`
 echo "Loading enwiktionary-latest-page.sql..."
 gunzip enwiktionary-latest-page.sql
-cat enwiktionary-latest-page.sql | mysql -D enwiktionary  # ~45 min
+cat enwiktionary-latest-page.sql | mariadb -D enwiktionary  # ~45 min
 echo `date`
 echo "Loading enwiktionary-latest-categorylinks.sql..."
 gunzip enwiktionary-latest-categorylinks.sql
-cat enwiktionary-latest-categorylinks.sql | mysql -D enwiktionary
+cat enwiktionary-latest-categorylinks.sql | mariadb -D enwiktionary
 echo `date`
 echo "Loading enwiktionary-latest-linktarget.sql..."
 gunzip enwiktionary-latest-linktarget.sql
-cat enwiktionary-latest-linktarget.sql | mysql -D enwiktionary
+cat enwiktionary-latest-linktarget.sql | mariadb -D enwiktionary
 
 # Prereqs for this very long page_categories table rebuild are now
-# done; parallelize this because it only uses 1 CPU (for mysqld)
+# done; parallelize this because it only uses 1 CPU (for mariadbd)
 echo `date`
 cd $ORIG_DIR
 ./update_downloads_parallel5.sh >& /var/local/moss/bulk-wikipedia/download-parallel5.log &

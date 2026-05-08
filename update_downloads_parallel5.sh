@@ -7,25 +7,25 @@ echo `date`
 echo "Building page_categories table..."
 # Run time: A minute or two
 
-echo "DROP TABLE IF EXISTS page_categories;" | mysql -D enwiktionary
+echo "DROP TABLE IF EXISTS page_categories;" | mariadb -D enwiktionary
 echo "CREATE TABLE page_categories (
   title varbinary(255) NOT NULL DEFAULT '',
   category_name varbinary(255) NOT NULL DEFAULT '',
   PRIMARY KEY (title, category_name)
-);" | mysql -D enwiktionary
+);" | mariadb -D enwiktionary
 
-echo "DELETE FROM page WHERE page_namespace != 0;" | mysql -D enwiktionary
+echo "DELETE FROM page WHERE page_namespace != 0;" | mariadb -D enwiktionary
 
 echo "INSERT INTO page_categories (title, category_name)
  SELECT page_title, lt_title
  FROM page, categorylinks, linktarget
  WHERE page.page_id = categorylinks.cl_from
- AND linktarget.lt_id = categorylinks.cl_target_id;" | mysql -D enwiktionary
+ AND linktarget.lt_id = categorylinks.cl_target_id;" | mariadb -D enwiktionary
 # Run time: ~36 min
 
-echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mysql -D enwiktionary
+echo "ALTER TABLE page_categories ADD INDEX i_title (title);" | mariadb -D enwiktionary
 # Run time: ~5 min
-echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mysql -D enwiktionary
+echo "ALTER TABLE page_categories ADD INDEX i_cat (category_name);" | mariadb -D enwiktionary
 # Run time: ~6 min
 
 echo `date`
