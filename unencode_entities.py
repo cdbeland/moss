@@ -1805,7 +1805,6 @@ transform = {
 
     # Found by User:1234qwer1234qwer4 - wrong character
     "M<sub>ʘ</sub>": "M<sub>☉</sub>",
-    "M<sub>⊙</sub>": "M<sub>☉</sub>",
     # De-jargon
     "M<sub>⊙</sub>": "solar masses",
     # TODO: {{solar mass}} instances may also need to be converted
