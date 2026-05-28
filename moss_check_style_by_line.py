@@ -947,7 +947,7 @@ x_no_space_re = re.compile(r"[0-9]x[0-9]")
 x_no_space_exclusions = re.compile(r"([a-zA-Z\-_][0-9]+x"
                                    r"| 4x4 "
                                    r"| 6x6 "
-                                   r"|[0-9]+x[0-9]+px"
+                                   r"|[0-9]+x[0-9]+ ?px"
                                    r"|[^0-9]0x[0-9]+)")
 x_space_exclusions = re.compile(r"("
                                 r"x ="
